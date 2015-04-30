@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name = UNetLab Theme
+Description = Unified Networking Lab Theme
+ModuleName = script
+
+[script]
+ImageDir = /lib/plymouth/themes/unetlab
+ScriptFile = /lib/plymouth/themes/unetlab/unetlab.script

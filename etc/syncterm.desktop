@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Name=SyncTerm
+GenericName=Telnet
+Comment=Telnet Client
+Exec=/usr/bin/putty %U
+TryExec=/usr/bin/putty
+Icon=/usr/bin/putty
+Terminal=false
+Type=Application
+Categories=TerminalEmulator;Network;Telnet;Internet;BBS;
+MimeType=x-scheme/telnet
+X-KDE-Protocols=telnet
+Keywords=Terminal;Emulator;Network;Internet;BBS;Telnet;Client;

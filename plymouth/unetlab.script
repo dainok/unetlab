@@ -1,0 +1,164 @@
+# Setting the backgrounds
+Window.SetBackgroundTopColor(0.24, 0.65, 0.73);
+Window.SetBackgroundBottomColor(0.24, 0.65, 0.73);
+
+# Load the logo
+logo.image = Image("logo_wo_bar.png");
+
+# Start of bar
+bar_y = 885;
+bar_x = 104;
+bar_width = 1684;
+
+# Scaling during boot/shutdown
+boot_scale = 3.84;      # 1 / max_progress
+shutdown_scale = 1.10;   # 1 / min_progress
+
+# Get scale factor
+if (Window.GetWidth() > logo.image.GetWidth() && Window.GetHeight() > logo.image.GetHeight()) {
+    # Screen is larger than logo
+    scale = 1;
+} else {
+    # Screen is smaller than logo
+    scale_x = Window.GetWidth() / logo.image.GetWidth();
+    scale_y = Window.GetHeight() / logo.image.GetHeight();
+    scale = Math.Min(scale_x, scale_y) * 0.95;
+}
+
+# Position the scaled logo in the center of the screen
+logo.width = logo.image.GetWidth() * scale;
+logo.height = logo.image.GetHeight() * scale;
+logo.scaled = logo.image.Scale(logo.width, logo.height);
+logo.x = Window.GetX() + Window.GetWidth() / 2 - logo.width / 2;
+logo.y = Window.GetY() + Window.GetHeight() / 2 - logo.height / 2;
+logo.z = 0;
+
+# Print the logo
+logo.sprite = Sprite();
+logo.sprite.SetImage(logo.scaled);
+logo.sprite.SetX(logo.x);
+logo.sprite.SetY(logo.y);
+logo.sprite.SetZ(logo.z);
+logo.sprite.SetOpacity(1);
+
+fun refresh_callback () {
+    # Currently we do nothing here
+}
+
+Plymouth.SetRefreshFunction (refresh_callback);
+
+#----------------------------------------- Progress Bar --------------------------------
+
+# Load the bar
+bar.image = Image("bar.png");
+bar.height = bar.image.GetHeight() * scale;
+bar.x = logo.x + logo.width * bar_x / logo.image.GetWidth();    # x = bar_x starts the bar (upper/left corner)
+bar.y = logo.y + logo.height * bar_y / logo.image.GetHeight();  # y = bar_y starts the bar (upper/left corner)
+bar.z = 2;
+
+# Load the end of the bar
+end.image = Image("end.png");
+end.height = end.image.GetHeight() * scale;
+end.y = logo.y + logo.height * bar_y / logo.image.GetHeight();
+end.z = 3;
+
+checkpoint = 0;
+fun progress_callback (duration, progress) {
+    # Debug
+    # plymouthd --tty=/dev/tty1; plymouth --show-splash ; for ((I=0;I<10;I++)); do sleep 1 ; plymouth --update=event$I ; done ; plymouth --quit
+    #my_image = Image.Text(progress, 0, 0, 0);
+    #message_sprite.SetImage(my_image);
+
+    if (Plymouth.GetMode() == "boot") {
+        if (progress * boot_scale <= 1) {
+            # Boot scale can lead to large bar
+            bar.width = bar_width * scale * progress * boot_scale;
+        }
+    } else if (Plymouth.GetMode() == "shutdown") {
+        if (1 - progress * shutdown_scale >= 0) {
+            # Shutdown scale can lead to negative bar
+            bar.width = bar_width * scale * (1 - progress * shutdown_scale);
+        }
+    } else {
+        # suspend and resume
+        bar.width = bar_width * scale;
+    }
+
+    if (checkpoint != progress) {
+        # Position the scaled bar
+        bar.scaled = bar.image.Scale(bar.width, bar.height);
+        bar.sprite = Sprite();
+        bar.sprite.SetImage(bar.scaled);
+        bar.sprite.SetX(bar.x);
+        bar.sprite.SetY(bar.y);
+        bar.sprite.SetZ(bar.z);
+        bar.sprite.SetOpacity(1);
+
+        # Position the scaled end bar
+        end.x = logo.x + logo.width * bar_x / logo.image.GetWidth() + bar.width - 1;   # Start at the end of the bar
+        end.width = end.image.GetWidth() * scale;
+        end.scaled = end.image.Scale(end.width, end.height);
+        end.sprite = Sprite();
+        end.sprite.SetImage(end.scaled);
+        end.sprite.SetX(end.x);
+        end.sprite.SetY(end.y);
+        end.sprite.SetZ(end.z);
+        end.sprite.SetOpacity(1);
+
+        checkpoint = progress;
+    }
+}
+
+    # Currently we do nothing here
+Plymouth.SetBootProgressFunction(progress_callback);
+
+#----------------------------------------- Quit --------------------------------
+
+fun quit_callback () {
+    if (Plymouth.GetMode() == "boot") {
+        bar.width = bar_width * scale;
+    } else if (Plymouth.GetMode() == "shutdown") {
+        bar.width = 0;
+    } else {
+        # suspend and resume
+        bar.width = bar_width * scale;
+    }
+
+    if (checkpoint != progress) {
+        # Position the scaled bar
+        bar.scaled = bar.image.Scale(bar.width, bar.height);
+        bar.sprite = Sprite();
+        bar.sprite.SetImage(bar.scaled);
+        bar.sprite.SetX(bar.x);
+        bar.sprite.SetY(bar.y);
+        bar.sprite.SetZ(bar.z);
+        bar.sprite.SetOpacity(1);
+
+        # Position the scaled end bar
+        end.x = logo.x + logo.width * bar_x / logo.image.GetWidth() + bar.width - 1;   # Start at the end of the bar
+        end.width = end.image.GetWidth() * scale;
+        end.scaled = end.image.Scale(end.width, end.height);
+        end.sprite = Sprite();
+        end.sprite.SetImage(end.scaled);
+        end.sprite.SetX(end.x);
+        end.sprite.SetY(end.y);
+        end.sprite.SetZ(end.z);
+        end.sprite.SetOpacity(1);
+
+        checkpoint = progress;
+    }
+}
+
+Plymouth.SetQuitFunction(quit_callback);
+
+#----------------------------------------- Message --------------------------------
+
+message_sprite = Sprite();
+message_sprite.SetPosition(10, 10, 10000);
+
+fun message_callback (text) {
+    my_image = Image.Text(text, 1, 1, 1);
+    message_sprite.SetImage(my_image);
+}
+
+Plymouth.SetMessageFunction(message_callback);

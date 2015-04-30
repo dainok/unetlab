@@ -1,0 +1,10 @@
+Package: unetlab-qemu
+Version: %VERSION%-%RELEASE%
+Name: Unified Networking Lab - QEMU
+Architecture: amd64
+Maintainer: Andrea Dainese <andrea.dainese@gmail.com>
+Homepage: http://www.unetlab.com/
+Installed-Size: 95564
+Section: devel
+Priority: optional
+Description: QEMU files for UNetLab.

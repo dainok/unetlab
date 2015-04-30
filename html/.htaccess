@@ -1,0 +1,37 @@
+# vim: syntax=apache tabstop=4 softtabstop=0 noexpandtab laststatus=1 ruler
+
+# supress php errors
+php_flag display_startup_errors off
+php_flag display_errors off
+php_flag html_errors off
+
+# enable PHP error logging
+php_flag log_errors on
+php_value error_log /opt/unetlab/data/Logs/php_errors.txt
+
+# PHP settings
+php_value session.gc_maxlifetime 86400
+
+# TODO
+# ErrorDocument 403 /error.php
+
+<IfModule mod_rewrite.c>
+	# http://httpd.apache.org/docs/2.4/rewrite/flags.html
+	RewriteEngine On
+	RewriteBase /
+
+	# If not a dir, if not a file and if /api, call API router
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_URI} /api
+	RewriteRule ^(.*)$ /api.php [B,L,QSA]
+
+	# If URL is empty, call the theme
+	RewriteRule ^$ /themes/default/ [B,L,QSA] TODO
+
+	# If not a dir and if not a file, call the theme
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_URI} !/iou-web
+	RewriteRule ^(.*)$ /themes/default/$1 [B,L,QSA]
+</IfModule>

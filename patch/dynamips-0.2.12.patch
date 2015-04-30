@@ -1,0 +1,21 @@
+@@ -196,6 +196,7 @@
+           "  --timer-itv <val>  : Timer IRQ interval check (default: %u)\n"
+           "\n"
+           "  -i <instance>      : Set instance ID\n"
++          "  -N <name>          : Set instance name (and Window title)\n"
+           "  -r <ram_size>      : Set the virtual RAM size (default: %u Mb)\n"
+           "  -o <rom_size>      : Set the virtual ROM size (default: %u Mb)\n"
+           "  -n <nvram_size>    : Set the NVRAM size (default: %d Kb)\n"
+@@ -441,6 +442,12 @@
+          case 'i':
+             break;
+
++         /* Instance name (and Window Title) */
++         case 'N':
++            vm->name = optarg;
++            printf("Window Title set to '%s'.\n",vm->name);
++            break;
++
+          /* Platform (already managed) */
+          case 'P':
+             break;

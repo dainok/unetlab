@@ -1,0 +1,11 @@
+--- hw/i386/pc_piix.orig	2014-09-25 21:54:52.000000000 +0200
++++ hw/i386/pc_piix.c	2015-03-26 14:13:32.688939922 +0100
+@@ -229,7 +229,7 @@
+     pc_vga_init(isa_bus, pci_enabled ? pci_bus : NULL);
+ 
+     /* init basic PC hardware */
+-    pc_basic_device_init(isa_bus, gsi, &rtc_state, &floppy, xen_enabled(),
++    pc_basic_device_init(isa_bus, gsi, &rtc_state, &floppy, TRUE,
+         0x4);
+ 
+     pc_nic_init(isa_bus, pci_bus);

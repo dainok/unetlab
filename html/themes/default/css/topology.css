@@ -1,0 +1,55 @@
+.node_interface {
+    font-family: helvetica;
+    font-size: 0.8em;
+    font-color: #000000;
+    font-weight: bold;
+    background-color: #9fd3db;
+    border: 2px solid #46a6b6;
+    padding: 0px 2px 0px 2px;
+    border-radius: 8px;
+    z-index: 5050;
+}
+.node_frame .node_name {
+    font-family: helvetica;
+    font-size: 1.2em;
+    font-weight: bold;
+    position: relative;
+    top: -2px;
+}
+.node_frame {
+    border: 0px;
+    font-family: helvetica;
+    font-size: 0.8em;
+    z-index: 5000;
+    position: fixed;
+    text-align: center;
+}
+.network_frame {
+    border: 0px;
+    font-family: helvetica;
+    font-size: 0.8em;
+    z-index: 5025;
+    position: fixed;
+    text-align: center;
+}
+#node_menu {
+    display: none;
+    position: absolute;
+    z-index: 5100;
+}
+#network_menu {
+    display: none;
+    position: absolute;
+    z-index: 5100;
+}
+#msg_frame {
+    position: absolute;
+    top: 0;
+    left 0;
+    width: 100%;
+    z-index: 6000;
+}
+.modal {
+    position: absolute;
+    z-index: 8000;
+}

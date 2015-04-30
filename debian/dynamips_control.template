@@ -1,0 +1,12 @@
+Package: unetlab-dynamips
+Version: %VERSION%-%RELEASE%
+Name: Unified Networking Lab - Dynamips
+Architecture: amd64
+Maintainer: Andrea Dainese <andrea.dainese@gmail.com>
+Homepage: http://www.unetlab.com/
+Installed-Size: 1044
+Section: devel
+Priority: optional
+Conflicts: dynamips
+Replaces: dynamips
+Description: Dynamips files for UNetLab.
