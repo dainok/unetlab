@@ -22,11 +22,11 @@
  * You should have received a copy of the GNU General Public License
  * along with UNetLab.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Andrea Dainese <andrea.dainese@gmail.co>
+ * @author Andrea Dainese <andrea.dainese@gmail.com>
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150422
+ * @version 20150504
  */
 
 #include <ctype.h>
@@ -251,7 +251,7 @@ int main (int argc, char *argv[]) {
 
     // Adding device_id as last
     tmp = (char *) malloc(m * sizeof(char));
-    sprintf(tmp, "%i", device_id + 1);
+    sprintf(tmp, "%i", device_id);
     cmd_add(&cmd, " ");
     cmd_add(&cmd, tmp);
     free(tmp);

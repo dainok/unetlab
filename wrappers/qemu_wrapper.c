@@ -22,11 +22,11 @@
  * You should have received a copy of the GNU General Public License
  * along with UNetLab.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Andrea Dainese <andrea.dainese@gmail.co>
+ * @author Andrea Dainese <andrea.dainese@gmail.com>
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150422
+ * @version 20150504
  */
 
 /*
@@ -111,7 +111,7 @@ int main (int argc, char *argv[]) {
             case 'D':
                 // Mandatory: Device ID
                 device_id = atoi(optarg);
-                if (tenant_id < 0) {
+                if (device_id < 0) {
                     printf("ERR: device_id must be integer.\n");
                     exit(1);
                 }

@@ -20,7 +20,7 @@
  * You should have received a copy of the GNU General Public License
  * along with UNetLab.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Andrea Dainese <andrea.dainese@gmail.co>
+ * @author Andrea Dainese <andrea.dainese@gmail.com>
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/

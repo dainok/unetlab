@@ -22,11 +22,11 @@
  * You should have received a copy of the GNU General Public License
  * along with UNetLab.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Andrea Dainese <andrea.dainese@gmail.co>
+ * @author Andrea Dainese <andrea.dainese@gmail.com>
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150422
+ * @version 20150504
  */
 
 #include <arpa/inet.h>
@@ -87,7 +87,7 @@ void usage(const char *bin) {
 int mk_netmap() {
     FILE *f_iol_netmap;
     int d = 0;
-    int iol_id = device_id + 1;
+    int iol_id = device_id;
     int rc = 0;
     int wrapper_id = iol_id + 512;
     if (access("NETMAP", F_OK) != -1 && remove("NETMAP") != 0) {
@@ -121,7 +121,7 @@ int mk_afsocket(int *wrapper_socket, int *iol_socket) {
     memset(&tmp_netio, 0, sizeof(tmp_netio));
     char tmp[100];
     memset(&tmp, 0, sizeof(tmp));
-    int iol_id = device_id + 1;
+    int iol_id = device_id;
     int wrapper_id = iol_id + 512;
     int rc = -1;
 
@@ -263,14 +263,15 @@ int packet_af(int af_socket, int *iol_fd, int *udp_fd, int *remote_id, int *remo
             // TODO: Intra Tenant Link
             int dst_tenant_id = tenant_id;
             memcpy(ser_frame, &tmp_frame, length);      // size(header(IOL)) == size(header(UNETLAB))
-            ser_frame[0] = tenant_id;                   // Destination Tenant ID (TODO Intra Tenant Link)
-            ser_frame[1] = dst_tenant_id;               // Source Tenant ID
+            ser_frame[0] = dst_tenant_id;               // Destination Tenant ID (TODO Intra Tenant Link)
+            ser_frame[1] = tenant_id;                   // Source Tenant ID
             ser_frame[2] = remote_id[iol_ifid] >> 8;    // Destination Device ID (TODO)
             ser_frame[3] = remote_id[iol_ifid] & 255;
             ser_frame[4] = device_id >> 8;              // Source Device ID
             ser_frame[5] = device_id & 255;
-            ser_frame[6] = iol_ifid;                    // Source Interface ID (TODO)
-            ser_frame[7] = remote_if[iol_ifid];         // Destination Interface ID
+            ser_frame[6] = remote_if[iol_ifid];         // Destination Interface ID
+            ser_frame[7] = iol_ifid;                    // Source Interface ID (TODO)
+			if (DEBUG > 2) printf("DEBUG: received IOL packet from device %u:%u:%u to device %u:%u:%u\n", tenant_id, device_id, iol_ifid, dst_tenant_id, remote_id[iol_ifid], remote_if[iol_ifid]);
 
             if (write(udp_fd[iol_ifid], ser_frame, length) < 0) {
                 // Sometimes packets cannot be delivered if end point is not active (Connection refused)
@@ -285,7 +286,7 @@ int packet_af(int af_socket, int *iol_fd, int *udp_fd, int *remote_id, int *remo
 
 // Receiving packet from TAP
 int packet_tap(int tap_socket, int af_socket, int iol_ifid) {
-    int iol_id = device_id + 1;
+    int iol_id = device_id;
     int length = -1;
     int rc = -1;
     int wrapper_id = iol_id + 512;
@@ -346,7 +347,7 @@ int packet_tap(int tap_socket, int af_socket, int iol_ifid) {
 
 // Receiving packet from UDP
 int packet_udp(int udp_socket, int af_socket) {
-    int iol_id = device_id + 1;
+    int iol_id = device_id;
     int length = -1;
     int rc = -1;
     int wrapper_id = iol_id + 512;
@@ -358,6 +359,9 @@ int packet_udp(int udp_socket, int af_socket) {
     int dst_tenant_id = 0;
     int dst_device_id = 0;
     int dst_device_if = 0;
+    int src_tenant_id = 0;
+    int src_device_id = 0;
+    int src_device_if = 0;
 
     /* 
      * IOL 64 bit header:
@@ -369,15 +373,22 @@ int packet_udp(int udp_socket, int af_socket) {
      * Destination TAP interface is: vunlT_U_Z (T = tenant_id, U = device_id, Z = interface_id)
      */
 
-    /* 
-     * UNL 64 bit header:
-     * - 8 bits for the destination Tenant ID
-     * - 8 bits for the source Tenant ID
-     * - 16 bits for the destination Device ID
-     * - 16 bits for the source Device ID
-     * - 8 bits for the destination interface
-     * - 8 bits for the source interface
-     */
+	/*
+	 * UNL 64 bit header:
+	 * - 8 bits for the destination Tenant ID (TT)
+	 * - 8 bits for the source Tenant ID (tt)
+	 * - 16 bits for the destination Device ID (DDDD)
+	 * - 16 bits for the source Device ID (dddd)
+	 * - 8 bits for the destination interface (II)
+	 * - 8 bits for the source interface (ii)
+	 * # tcpdump -i lo -X -nn udp
+	 * 14:20:37.096862 IP6 ::1.37773 > ::1.32770: UDP, length 309
+	 *         0x0000:  6000 0000 013d 1140 0000 0000 0000 0000  `....=.@........
+	 *         0x0010:  0000 0000 0000 0001 0000 0000 0000 0000  ................
+	 *         0x0020:  0000 0000 0000 0001 938d 8002 013d 12e7  .............=..
+	 *         0x0030:  TTtt DDDD dddd IIii 8f00 2000 02b4 151c  ................
+	 * [...]
+	 */
 
     if ((length = serial2udp_receive(&ser_frame, udp_socket)) <= 0) {
         // Read error
@@ -395,8 +406,11 @@ int packet_udp(int udp_socket, int af_socket) {
         memcpy(tmp_frame, &ser_frame, length);
         memcpy(iol_frame, &ser_frame, length);
         dst_tenant_id = tmp_frame[0];
+        src_tenant_id = tmp_frame[1];
         dst_device_id = (tmp_frame[2] << 8) + tmp_frame[3];
+        src_device_id = (tmp_frame[4] << 8) + tmp_frame[5];
         dst_device_if = tmp_frame[6];
+        src_device_if = tmp_frame[7];
         if (dst_tenant_id != tenant_id) {
             printf("%u:%u ERR: ignoring frame from UDP because wrong tenant_id (%i).\n", tenant_id, device_id, dst_tenant_id);
             return 0;
@@ -406,21 +420,22 @@ int packet_udp(int udp_socket, int af_socket) {
             return 0;
         }
         // Now send packet to AF_UNIX
-        iol_frame[0] = iol_id >> 8;         // IOL device ID
-        iol_frame[1] = iol_id & 255;
+        iol_frame[0] = dst_device_id >> 8;  // IOL device ID
+        iol_frame[1] = dst_device_id & 255;
         iol_frame[2] = wrapper_id >> 8;     // WRAPPER device ID
         iol_frame[3] = wrapper_id & 255;
         iol_frame[4] = dst_device_if;       // IOL device ID
         iol_frame[5] = dst_device_if;       // WRAPPER device ID
         iol_frame[6] = 1;
         iol_frame[7] = 0;
+		if (DEBUG > 2) printf("DEBUG: received UDP packet from device %u:%u:%u to device %u:%u:%u\n", src_tenant_id, src_device_id, src_device_if, dst_tenant_id, dst_device_id, dst_device_if);
         if ((write(af_socket, iol_frame, length)) < 0) {
             rc = 3;
             if (DEBUG > 0) printf("DEBUG: failed forwarding data to AF_UNIX (%i) socket.\n", af_socket);
             printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
             return rc;
         } else {
-            if (DEBUG > 2) printf("DEBUG: sent ser frame to AF_UNIX (dst: %u:%u, src: %u:%u\n",
+            if (DEBUG > 2) printf("DEBUG: sent ser frame to AF_UNIX (dst: %u:%u, src: %u:%u)\n",
                     256 * (int) iol_frame[0] + (int) iol_frame[1], (int) iol_frame[4],
                     256 * (int) iol_frame[2] + (int) iol_frame[3], (int) iol_frame[5]);
             return 0;
