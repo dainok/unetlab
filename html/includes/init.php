@@ -38,7 +38,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150428
+ * @version 20150507
  */
 
 // Include custom configuration
@@ -88,7 +88,7 @@ if (!isset($node_templates)) {
 }
 
 // Define parameters
-define('VERSION', '0.9.0-13');
+define('VERSION', 'development');
 define('BASE_DIR', '/opt/unetlab');
 define('BASE_LAB', BASE_DIR.'/labs');
 define('BASE_TMP', BASE_DIR.'/tmp');

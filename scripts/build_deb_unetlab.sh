@@ -17,6 +17,7 @@ mkdir -p ${DATA_DIR}/opt/unetlab ${DATA_DIR}/opt/unetlab/addons ${DATA_DIR}/opt/
 rsync -a --delete html ${DATA_DIR}/opt/unetlab/
 cat html/includes/init.php | sed "s/define('VERSION', .*/define('VERSION', '${VERSION}-${RELEASE}');/g" > ${DATA_DIR}/opt/unetlab/html/includes/init.php
 cp -a scripts/set_uuid.php ${DATA_DIR}/opt/unetlab/scripts/
+cp -a scripts/fix_iol_nvram.sh ${DATA_DIR}/opt/unetlab/scripts/
 chown -R root:root ${DATA_DIR}/opt/unetlab
 chown -R www-data:www-data ${DATA_DIR}/opt/unetlab/data ${DATA_DIR}/opt/unetlab/labs
 chown -R root:unl ${DATA_DIR}/opt/unetlab/tmp
@@ -65,35 +66,36 @@ mv -f ${DATA_DIR}/opt/ovf/ovfconfig.conf ${DATA_DIR}/etc/init/ovfconfig.conf
 # Post Install
 cat > ${CONTROL_DIR}/postinst << EOF
 #!/bin/sh
-groupadd -g 32768 -f unl
-a2enmod rewrite
-a2dissite 000-default
-a2ensite unetlab
-service apache2 restart
+groupadd -g 32768 -f unl > /dev/null 2>&1
+a2enmod rewrite > /dev/null 2>&1
+a2dissite 000-default > /dev/null 2>&1
+a2ensite unetlab > /dev/null 2>&1
+service apache2 restart > /dev/null 2>&1
 sed -i 's/.*GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash vga=788"/g' /etc/default/grub
 sed -i 's/.*GRUB_GFXMODE=.*/GRUB_GFXMODE="800x600"/g' /etc/default/grub
 sed -i 's/.*GRUB_HIDDEN_TIMEOUT=.*/GRUB_HIDDEN_TIMEOUT=2/g' /etc/default/grub
 sed -i 's/.*GRUB_HIDDEN_TIMEOUT_QUIET=.*/GRUB_HIDDEN_TIMEOUT_QUIET=true/g' /etc/default/grub
 sed -i 's/.*GRUB_TIMEOUT=.*/GRUB_TIMEOUT=0/g' /etc/default/grub
 sed -i "s/^ServerName.*$/ServerName \$(hostname -f)/g" /etc/apache2/sites-available/unetlab.conf
-update-alternatives --install /lib/plymouth/themes/default.plymouth default.plymouth /lib/plymouth/themes/unetlab/unetlab.plymouth 100
-update-initramfs -u
-update-grub2
+update-alternatives --install /lib/plymouth/themes/default.plymouth default.plymouth /lib/plymouth/themes/unetlab/unetlab.plymouth 100 > /dev/null 2>&1
+update-initramfs -u > /dev/null 2>&1
+update-grub2 > /dev/null 2>&1
 fgrep "xml.cisco.com" /etc/hosts > /dev/null || echo 127.0.0.127 xml.cisco.com >> /etc/hosts
 # Fix tunctl
-setcap cap_net_admin+ep /usr/sbin/tunctl
-setcap cap_net_admin+ep /bin/ip
-setcap cap_net_admin+ep /sbin/brctl
-setcap cap_net_admin+ep /usr/bin/ovs-vsctl
+setcap cap_net_admin+ep /usr/sbin/tunctl > /dev/null 2>&1
+setcap cap_net_admin+ep /bin/ip > /dev/null 2>&1
+setcap cap_net_admin+ep /sbin/brctl > /dev/null 2>&1
+setcap cap_net_admin+ep /usr/bin/ovs-vsctl > /dev/null 2>&1
 # Check for Intel VT-x/AMD-V
 fgrep -e vmx -e svm /proc/cpuinfo > /dev/null || echo "*** WARNING: neither Intel VT-x or AMD-V found"
 # Cleaning log
 rm -f /opt/unetlab/data/Logs/*
-/usr/sbin/apache2ctl graceful
+/usr/sbin/apache2ctl graceful > /dev/null 2>&1
 # Mark official kernels as hold
-apt-mark hold  \$(dpkg -l | grep -e linux-image -e linux-headers -e linux-generic | grep -v unetlab | awk '{print \$2}')
+apt-mark hold  \$(dpkg -l | grep -e linux-image -e linux-headers -e linux-generic | grep -v unetlab | awk '{print \$2}') > /dev/null 2>&1
 # Setting UUID on labs
 find /opt/unetlab/labs/ -name "*.unl" -exec /opt/unetlab/scripts/set_uuid.php "{}" \;
+find /opt/unetlab/tmp/0/ -name "nvram_*" -exec /opt/unetlab/scripts/fix_iol_nvram.sh "{}" \;
 EOF
 
 # Configuring APT

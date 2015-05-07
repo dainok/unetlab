@@ -27,17 +27,17 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150428
+ * @version 20150507
  */
 
 $p['type'] = 'qemu';          // Must be iol, dynamips or qemu
 $p['name'] = 'ASA';           // Can be empty
 $p['icon'] = 'Firewall.png';  // Can be empty, or a icon inside /opt/unetlab/html/images/icons/
 $p['cpu'] = 1;                // Must be integer
-$p['ram'] = 1024;             // Must be integer
+$p['ram'] = 256;              // Must be integer
 $p['ethernet'] = 4;           // Must be integer
 $p['console'] = 'telnet';     // Must be telnet or vnc
 $p['qemu_arch'] = 'i386';
 $p['qemu_nic'] = 'i82559er';
-$p['qemu_options'] = '-machine type=pc-1.0,accel=tcg -serial mon:stdio -nographic -nodefconfig -nodefaults -rtc base=utc -no-shutdown -boot order=c -hdachs 980,16,32 -smbios type=1,product=asa5520 -icount 1';
+$p['qemu_options'] = '-machine type=pc-1.0,accel=tcg -serial mon:stdio -nographic -nodefconfig -nodefaults -rtc base=utc -no-shutdown -boot order=c -smbios type=1,product=asa5520 -icount 1';
 ?>
