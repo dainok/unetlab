@@ -27,7 +27,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150504
+ * @version 20150507
  * @property type $flags_eth CMD flags related to Ethernet interfaces. It's mandatory and automatically set.
  * @property type $flags_ser CMD flags related to Serial interfaces. It's mandatory and automatically set.
  * @property type $console protocol. It's optional.
@@ -1466,6 +1466,7 @@ class Node {
 							$this -> flags_eth .= ' -device %NICDRIVER%,netdev=net'.$i.',mac=50:'.sprintf('%02x', $this -> tenant).':'.sprintf('%02x', $this -> id / 512).':'.sprintf('%02x', $this -> id % 512).':00:'.sprintf('%02x', $i);
 							$this -> flags_eth .= ' -netdev tap,id=net'.$i.',ifname=vunl'.$this -> tenant.'_'.$this -> id.'_'.$i.',script=no';
 						}
+						break;
 					case 'olive':
 						for ($i = 0; $i < $this -> ethernet; $i++) {
 							if (isset($old_ethernets[$i])) {
