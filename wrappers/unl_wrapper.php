@@ -28,7 +28,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150428
+ * @version 20150508
  */
 
 require_once('/opt/unetlab/html/includes/init.php');
@@ -210,14 +210,31 @@ switch ($action) {
                 }
             }
 
-            // Starting all nodes
+            // Starting all non-IOL nodes
 			foreach ($lab -> getNodes() as $node_id => $node) {
-                $rc = start($node, $node_id, $tenant, $lab -> getNetworks());
-                if ($rc !== 0) {
-                    // Failed to start the node
-                    error_log('ERROR: '.$GLOBALS['messages'][$rc]);
-					error_log('ERROR: '.$GLOBALS['messages'][12]);
-					exit(12);
+				if ($node -> getNType() != 'iol') {
+					// IOL nodes drop privileges, so need to be postponed
+					$rc = start($node, $node_id, $tenant, $lab -> getNetworks());
+					if ($rc !== 0) {
+						// Failed to start the node
+						error_log('ERROR: '.$GLOBALS['messages'][$rc]);
+						error_log('ERROR: '.$GLOBALS['messages'][12]);
+						exit(12);
+					}
+                }
+			}
+
+            // Starting all IOL nodes
+			foreach ($lab -> getNodes() as $node_id => $node) {
+				if ($node -> getNType() == 'iol') {
+					// IOL nodes drop privileges, so need to be postponed
+					$rc = start($node, $node_id, $tenant, $lab -> getNetworks());
+					if ($rc !== 0) {
+						// Failed to start the node
+						error_log('ERROR: '.$GLOBALS['messages'][$rc]);
+						error_log('ERROR: '.$GLOBALS['messages'][12]);
+						exit(12);
+					}
                 }
             }
         }

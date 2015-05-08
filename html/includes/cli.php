@@ -27,7 +27,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150429
+ * @version 20150508
  */
 
 /**
@@ -670,6 +670,7 @@ function start($n, $id, $t, $nets) {
 
 	$cmd .= ' -- '.$flags.' > '.$n -> getRunningPath().'/wrapper.txt 2>&1 &';
 	exec($cmd, $o, $rc);
+	error_log('INFO: CWD is '.getcwd());
 	error_log('INFO: starting '.$cmd);
 
 	return 0;

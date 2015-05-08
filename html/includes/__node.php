@@ -588,7 +588,7 @@ class Node {
 
 		if ($this -> type == 'dynamips') {
 			// Dynamips node
-			require_once(BASE_DIR.'/html/templates/'.$this -> template.'.php');
+			require(BASE_DIR.'/html/templates/'.$this -> template.'.php');
 
 			$bin .= '/usr/bin/dynamips';
 

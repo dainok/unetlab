@@ -95,7 +95,7 @@ rm -f /opt/unetlab/data/Logs/*
 apt-mark hold  \$(dpkg -l | grep -e linux-image -e linux-headers -e linux-generic | grep -v unetlab | awk '{print \$2}') > /dev/null 2>&1
 # Setting UUID on labs
 find /opt/unetlab/labs/ -name "*.unl" -exec /opt/unetlab/scripts/set_uuid.php "{}" \;
-find /opt/unetlab/tmp/0/ -name "nvram_*" -exec /opt/unetlab/scripts/fix_iol_nvram.sh "{}" \;
+find /opt/unetlab/tmp/ -name "nvram_*" -exec /opt/unetlab/scripts/fix_iol_nvram.sh "{}" \;
 EOF
 
 # Configuring APT
