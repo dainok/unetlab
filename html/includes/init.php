@@ -11,11 +11,9 @@
  * named 'config.php' under /opt/unetlab/html/includes and set some of all
  * the following parameters:
  *
- * define('TIMEZONE', 'Europe/Rome');
- * define('BASE_WWW', 'http://192.168.204.129:80');
  * define('THEME', 'default');
- * define('DISABLE_CACHE', False);
- * define('UPDATE_INTERVAL', '2');
+ * define('TIMEZONE', 'Europe/Rome');
+ * define('FORCE_VM', 'auto');
  *
  * LICENSE:
  *
@@ -38,7 +36,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150507
+ * @version 20150511
  */
 
 // Include custom configuration
@@ -48,6 +46,7 @@ if (file_exists('includes/config.php')) {
 
 if (!defined('THEME')) define('THEME', 'default');
 if (!defined('TIMEZONE')) define('TIMEZONE', 'Europe/Rome');
+if (!defined('FORCE_VM')) define('FORCE_VM', 'auto');
 
 if (!isset($node_templates)) {
 	$node_templates = Array(

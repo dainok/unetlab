@@ -27,7 +27,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150428
+ * @version 20150511
  */
 
 /**
@@ -292,6 +292,44 @@ function genUuid() {
 		// 48 bits for "node"
 		mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
 	);
+}
+
+/**
+ * Function to check if UNetLab is running as a VM.
+ *
+ * @return  bool                        True is is a VM
+ */
+function isVirtual() {
+	switch (FORCE_VM) {
+		default:
+			// Auto or non valid setting
+			$cmd = 'sudo /opt/unetlab/wrappers/unl_wrapper -a platform';
+			exec($cmd, $o, $rc);
+			switch (implode('', $o)) {
+				default:
+					return False;
+				case 'VMware Virtual Platform':
+					return True;
+				case 'VirtualBox':
+					return True;
+				case 'KVM':
+					// QEMU (KVM)
+					return True;
+				case 'Bochs':
+					// QEMU (emulated)
+					return True;
+				case 'Virtual Machine':
+					// Microsoft VirtualPC
+					return True;
+				case 'Xen':
+					// HVM domU
+					return True;
+			}
+		case 'on':
+			return True;
+		case 'off':
+			return False;
+	}
 }
 
 /**

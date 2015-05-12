@@ -28,7 +28,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150508
+ * @version 20150511
  */
 
 require_once('/opt/unetlab/html/includes/init.php');
@@ -151,7 +151,12 @@ switch ($action) {
         // Wrappers
         $cmd = '/bin/chmod 755 /opt/unetlab/wrappers/*_wrapper* > /dev/null 2>&1';
         exec($cmd, $o, $rc);
-        break;
+		break;
+	case 'platform':
+		$cmd = '/usr/sbin/dmidecode -s system-product-name';
+		exec($cmd, $o, $rc);
+		print(implode('', $o)."\n");
+		break;
     case 'start':
 		// Starting node(s)
 		if (!checkUsername($lab -> getTenant())) {
