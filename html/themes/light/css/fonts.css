@@ -1,0 +1,76 @@
+/*
+ * vim: syntax=css tabstop=4 softtabstop=0 noexpandtab laststatus=1 ruler
+ */
+
+/**
+ * html/themes/light/css/fonts.css
+ *
+ * CSS fonts for UNetLab.
+ *
+ * LICENSE:
+ *
+ * This file is part of UNetLab (Unified Networking Lab).
+ *
+ * UNetLab is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * UNetLab is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with UNetLab. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Andrea Dainese <andrea.dainese@gmail.com>
+ * @copyright 2014-2015 Andrea Dainese
+ * @license http://www.gnu.org/licenses/gpl.html
+ * @link http://www.unetlab.com/
+ * @version 20150521
+ */
+
+@font-face {
+	font-family: 'DIN Bold';
+	font-style: normal;
+	font-weight: normal;
+	src: url('/themes/light/fonts/din-bold-webfont.eot');
+	src: url('/themes/light/fonts/din-bold-webfont.eot?#iefix') format('embedded-opentype'),
+		url('/themes/light/fonts/din-bold-webfont.woff') format('woff'),
+		url('/themes/light/fonts/din-bold-webfont.ttf') format('truetype'),
+		url('/themes/light/fonts/din-bold-webfont.svg#DINBold') format('svg');
+}
+
+@font-face {
+	font-family: 'DIN Light';
+	font-style: normal;
+	font-weight: normal;
+	src: url('/themes/light/fonts/din-light-webfont.eot');
+	src: url('/themes/light/fonts/din-light-webfont.eot?#iefix') format('embedded-opentype'),
+		url('/themes/light/fonts/din-light-webfont.woff') format('woff'),
+		url('/themes/light/fonts/din-light-webfont.ttf') format('truetype'),
+		url('/themes/light/fonts/din-light-webfont.svg#DINLight') format('svg');
+}
+
+@font-face { 
+	font-family: 'DIN Regular';
+	font-style: normal;
+	font-weight: normal;
+	src: url('/themes/light/fonts/din-regular-webfont.eot');
+	src: url('/themes/light/fonts/din-regular-webfont.eot?#iefix') format('embedded-opentype'),
+		url('/themes/light/fonts/din-regular-webfont.woff') format('woff'),
+		url('/themes/light/fonts/din-regular-webfont.ttf') format('truetype'),
+		url('/themes/light/fonts/din-regular-webfont.svg#DINRegular') format('svg');
+}
+
+@font-face {
+	font-family: 'DIN Black';
+	font-style: normal;
+	font-weight: normal;
+	src: url('/themes/light/fonts/din-black-webfont.eot');
+	src: url('/themes/light/fonts/din-black-webfont.eot?#iefix') format('embedded-opentype'),
+		url('/themes/light/fonts/din-black-webfont.woff') format('woff'),
+		url('/themes/light/fonts/din-black-webfont.ttf') format('truetype'),
+		url('/themes/light/fonts/din-black-webfont.svg#DINBlack') format('svg');
+}

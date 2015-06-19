@@ -27,8 +27,26 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150511
+ * @version 20150526
  */
+
+/**
+ * Function to check if database is availalble.
+ *
+ * @return  PDO                         PDO object if valid, or False if invalid
+ */
+function checkDatabase() {
+	// Database connection
+	try {
+		$db = new PDO('sqlite:'.DATABASE);
+		$db -> setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		return $db;
+	} catch (Exception $e) {
+		error_log('ERROR: '.$GLOBALS['messages'][90003]);
+		error_log((string) $e);
+		return False;
+	}
+}
 
 /**
  * Function to check if a string is valid as folder_path.
@@ -81,7 +99,7 @@ function checkLabFilename($s) {
  * @return  bool                        True if valid
  */
 function checkLabName($s) {
-	if (preg_match('/[A-Za-z0-9_\\s-]+$/', $s)) {
+	if (preg_match('/^[A-Za-z0-9_\\s-]+$/', $s)) {
 		return True;
 	} else {
 		return False;
@@ -123,8 +141,12 @@ function checkNetworkType($s) {
  * @return  bool                        True if valid
  */
 function checkNodeConfig($s) {
-	// TODO
-	return True;
+	if (in_array($s, Array('Saved', 'Unconfigured'))) {
+		// TODO must add templates
+		return True;
+	} else {
+		return False;
+	}
 }
 
 /**
@@ -192,7 +214,7 @@ function checkNodeImage($s, $t, $p) {
  * @return  bool                        True if valid
  */
 function checkNodeName($s) {
-	if (preg_match('/[A-Za-z0-9-]+$/', $s)) {
+	if (preg_match('/^[A-Za-z0-9-_]+$/', $s)) {
 		return True;
 	} else {
 		return False;
@@ -254,6 +276,34 @@ function checkPosition($s) {
 }
 
 /**
+ * Function to check user expiration.
+ *
+ * @param   PDO     $db                 PDO object for database connection
+ * @param   string  $username           Username
+ * @return  bool                        True if valid
+ */
+function checkUserExpiration($db, $username) {
+	$now = time() + SESSION;
+	try {
+		$query = 'SELECT COUNT(*) AS rows FROM users WHERE username = :username AND (expiration < 0 OR expiration >= :expiration);';
+		$statement = $db -> prepare($query);
+		$statement -> bindParam(':expiration', $now, PDO::PARAM_INT);
+		$statement -> bindParam(':username', $username, PDO::PARAM_STR);
+		$statement -> execute();
+		$result = $statement -> fetch();
+		if ($result['rows'] == 1) {
+			return True;
+		} else {
+			return False;
+		}
+	} catch (Exception $e) {
+		error_log('ERROR: '.$GLOBALS['messages'][90024]);
+		error_log((string) $e);
+		return False;
+	}
+}
+
+/**
  * Function to check if a string is valid as UUID.
  *
  * @param   string  $s                  String to check
@@ -264,6 +314,193 @@ function checkUuid($s) {
 		return True;
 	} else {
 		return False;
+	}
+}
+
+/**
+ * Function to configure a POD for a user.
+ *
+ * @param   PDO     $db                 PDO object for database connection
+ * @param   string  $username			Username
+ * @return  int							0 means ok
+ */
+function configureUserPod($db, $username) {
+	// Check if a POD is already been assigned
+	try {
+		$query = 'SELECT COUNT(*) AS rows FROM pods LEFT JOIN users ON pods.user_id = users.id WHERE users.username = :username;';
+		$statement = $db -> prepare($query);
+		$statement -> bindParam(':username', $cookie, PDO::PARAM_STR);
+		$statement -> execute();
+		$result = $statement -> fetch();
+		if ($result['rows'] > 1) {
+			// We expect one or none rows
+			error_log('ERROR: '.$GLOBALS['messages'][90015]);
+			return 90015;
+		} else if ($result['rows'] == 0) {
+			// POD already assigned
+			return 0;
+		}
+	} catch (Exception $e) {
+		error_log('ERROR: '.$GLOBALS['messages'][90027]);
+		error_log((string) $e);
+		return 90027;
+	}
+			
+	try {
+		// List assigned PODS
+		$query = 'SELECT id, user_id FROM pods;';	// List also expired lab, because they are not cleared yet
+		$statement = $db -> prepare($query);
+		$statement -> bindParam(':expiration', $now, PDO::PARAM_INT);
+		$statement -> execute();
+		$result = $statement -> fetchAll(PDO::FETCH_KEY_PAIR|PDO::FETCH_GROUP);
+	} catch (Exception $e) {
+		error_log('ERROR: '.$GLOBALS['messages'][90025]);
+		error_log((string) $e);
+		return 90025;
+	}
+
+	// Find the first available POD
+	$pod = 0;
+	while (True) {
+		if (!isset($result[$pod])) {
+			break;
+		}
+		$pod = $pod + 1;
+	}
+
+	if ($pod >= 256) {
+		// No free POD available
+		error_log('ERROR: '.$GLOBALS['messages'][90022]);
+		return 90022;
+	} else {
+		// Assign the POD
+		try {
+			$query = 'INSERT INTO pods (id, user_id) SELECT :pod_id, id FROM users WHERE username = :username;';
+			$statement = $db -> prepare($query);
+			$statement -> bindParam(':pod_id', $pod, PDO::PARAM_INT);
+			$statement -> bindParam(':username', $username, PDO::PARAM_STR);
+			$statement -> execute();
+		} catch (Exception $e) {
+			error_log('ERROR: '.$GLOBALS['messages'][90023]);
+			error_log((string) $e);
+			return 90023;
+		}
+	}
+	return 0;
+}
+
+/**
+ * Function to delete expired sessions.
+ *
+ * @param   PDO     $db                 PDO object for database connection
+ * @param   string  $username			Username
+ * @return  int							0 means ok
+ */
+function deleteSessions($db) {
+	$now = time();
+	try {
+		// List expired PODS
+		$query = 'SELECT id FROM pods WHERE expiration > -1 AND expiration < :expiration;';
+		$statement = $db -> prepare($query);
+		$statement -> bindParam(':expiration', $now, PDO::PARAM_INT);
+		$statement -> execute();
+		$result = $statement -> fetch();
+		// TODO should delete each POD
+		// foreach $result... delete $result['tenant_id']
+	} catch (Exception $e) {
+		error_log('ERROR: '.$GLOBALS['messages'][90020]);
+		error_log((string) $e);
+		return 90020;
+	}
+
+	try {
+		// Delete expired PODS from database
+		$query = 'DELETE FROM pods WHERE expiration > -1 AND expiration < :expiration;';
+		$statement = $db -> prepare($query);
+		$statement -> bindParam(':expiration', $now, PDO::PARAM_INT);
+		$statement -> execute();
+		$result = $statement -> fetch();
+	} catch (Exception $e) {
+		error_log('ERROR: '.$GLOBALS['messages'][90021]);
+		error_log((string) $e);
+		return 90021;
+	}
+
+	return 0;
+}
+
+/**
+ * Function to get username by cookie
+ *
+ * @param   PDO     $db                 PDO object for database connection
+ * @param   string  $cookie             Session cookie
+ * @return  bool                        True if valid
+ */
+function getUsernameByCookie($db, $cookie) {
+	$now = time();
+	try {
+		$query = 'SELECT users.email AS email, users.name AS name, pods.id AS pod, users.username AS username FROM users LEFT JOIN pods ON users.id = pods.user_id WHERE cookie = :cookie AND users.web_expiration >= :web_expiration AND (users.expiration < 0 OR users.expiration >= :user_expiration) AND (pods.expiration < 0 OR pods.expiration > :pod_expiration);';
+		$statement = $db -> prepare($query);
+		$statement -> bindParam(':cookie', $cookie, PDO::PARAM_STR);
+		$statement -> bindParam(':web_expiration', $now, PDO::PARAM_INT);
+		$statement -> bindParam(':user_expiration', $now, PDO::PARAM_INT);
+		$statement -> bindParam(':pod_expiration', $now, PDO::PARAM_INT);
+		$statement -> execute();
+		$result = $statement -> fetch();
+		// TODO should check number of rows == 1, if not database corrupted
+		if (isset($result['username'])) {
+			return Array(
+				'email' => $result['email'],
+				'name' => $result['name'],
+				'username' => $result['username'],
+				'tenant' => $result['pod']
+			);
+		} else {
+			return Array();
+		}
+	} catch (Exception $e) {
+		error_log('ERROR: '.$GLOBALS['messages'][90026]);
+		error_log((string) $e);
+		return Array();;
+	}
+}
+
+/**
+ * Function to get a POD configured for a user.
+ *
+ * @param   PDO     $db                 PDO object for database connection
+ * @param   string  $cookie				Cookie
+ * @return  int							The assigned POD
+ */
+function getUserPod($db, $cookie) {
+	try {
+		$query = 'SELECT COUNT(*) AS rows FROM pods LEFT JOIN users ON pods.user_id = users.id WHERE users.cookie = :cookie;';
+		$statement = $db -> prepare($query);
+		$statement -> bindParam(':cookie', $cookie, PDO::PARAM_STR);
+		$statement -> execute();
+		$result = $statement -> fetch();
+		if ($result['rows'] > 1) {
+			// We expect one or none row
+			error_log('ERROR: '.$GLOBALS['messages'][90015]);
+			return -1;
+		}
+	} catch (Exception $e) {
+		error_log('ERROR: '.$GLOBALS['messages'][90027]);
+		error_log((string) $e);
+		return False;
+	}
+
+	try {
+		$query = 'SELECT pods.id FROM pods LEFT JOIN users ON pods.user_id = users.id WHERE users.cookie = :cookie;';
+		$statement = $db -> prepare($query);
+		$statement -> bindParam(':cookie', $cookie, PDO::PARAM_STR);
+		$statement -> execute();
+		$result = $statement -> fetch();
+		return 0;
+	} catch (Exception $e) {
+		error_log('ERROR: '.$GLOBALS['messages'][90027]);
+		error_log((string) $e);
+		return -1;
 	}
 }
 
@@ -473,6 +710,143 @@ function resizeImage($image, $width, $height) {
 	} else {
 		// No need to resize, return the original image
 		return $image;
+	}
+}
+
+/**
+ * Function to update database.
+ *
+ * @param   PDO     $db                 PDO object for database connection
+ * @return  bool                        True if updated
+ */
+function updateDatabase($db) {
+	// Users table
+	try {
+		$query = "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'users';";
+		$statement = $db -> prepare($query);
+		$statement -> execute();
+		$result = $statement -> fetch();
+		if ($result['name'] != 'users') {
+			// User table is missing
+			$db -> beginTransaction();
+			$query = 'CREATE TABLE users (username TEXT PRIMARY KEY, cookie TEXT, email TEXT, expiration INTEGER DEFAULT -1, name, TEXT, password TEXT, lab_id TEXT);';
+			$statement = $db -> prepare($query);
+			$statement -> execute();
+
+			// Adding admin user
+			$query = "INSERT INTO users (email, name, username, password) VALUES('root@localhost', 'UNetLab Administrator', 'admin', '".hash('sha256', 'unl')."');";
+			$statement = $db -> prepare($query);
+			$statement -> execute();
+			$db -> commit();
+
+			error_log('ERROR: '.$GLOBALS['messages'][90004]);
+		}
+	} catch (Exception $e) {
+		error_log('ERROR: '.$GLOBALS['messages'][90005]);
+		error_log((string) $e);
+		return False;
+	}
+
+	// Roles table
+	try {
+		$query = "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'permissions';";
+		$statement = $db -> prepare($query);
+		$statement -> execute();
+		$result = $statement -> fetch();
+		if ($result['name'] != 'permissions') {
+			// User table is missing
+			$db -> beginTransaction();
+			$query = 'CREATE TABLE permissions (lab_id TEXT, role TEXT, username TEXT, PRIMARY KEY (lab_id, role, username));';
+			$statement = $db -> prepare($query);
+			$statement -> execute();
+
+			// Adding admin user
+			$query = "INSERT INTO permissions (lab_id, role, username) SELECT '*', 'admin', 'admin';";
+			$statement = $db -> prepare($query);
+			$statement -> execute();
+			$db -> commit();
+
+			error_log('ERROR: '.$GLOBALS['messages'][90007]);
+		}
+	} catch (Exception $e) {
+		error_log('ERROR: '.$GLOBALS['messages'][90008]);
+		error_log((string) $e);
+		return False;
+	}
+
+	// Sessions table
+	try {
+		$query = "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'sessions';";
+		$statement = $db -> prepare($query);
+		$statement -> execute();
+		$result = $statement -> fetch();
+		if ($result['name'] != 'sessions') {
+			// User table is missing
+			$db -> beginTransaction();
+			$query = 'CREATE TABLE sessions (cookie TEXT PRIMARY KEY, expiration INTEGER DEFAULT -1, username TEXT);';
+			$statement = $db -> prepare($query);
+			$statement -> execute();
+			$query = 'CREATE INDEX username_sessions ON sessions (username);';
+			$statement = $db -> prepare($query);
+			$statement -> execute();
+			$db -> commit();
+			error_log('ERROR: '.$GLOBALS['messages'][90028]);
+		}
+	} catch (Exception $e) {
+		error_log('ERROR: '.$GLOBALS['messages'][90029]);
+		error_log((string) $e);
+		return False;
+	}
+
+	// Pods table
+	try {
+		$query = "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'pods';";
+		$statement = $db -> prepare($query);
+		$statement -> execute();
+		$result = $statement -> fetch();
+		if ($result['name'] != 'pods') {
+			// User table is missing
+			$db -> beginTransaction();
+			$query = 'CREATE TABLE pods (id INTEGER PRIMARY KEY, expiration INTEGER DEFAULT -1, username TEXT, lab_id TEXT);';
+			$statement = $db -> prepare($query);
+			$statement -> execute();
+			$query = 'CREATE INDEX username_pods ON pods (username);';
+			$statement = $db -> prepare($query);
+			$statement -> execute();
+			$db -> commit();
+			error_log('ERROR: '.$GLOBALS['messages'][90009]);
+		}
+	} catch (Exception $e) {
+		error_log('ERROR: '.$GLOBALS['messages'][90010]);
+		error_log((string) $e);
+		return False;
+	}
+
+	return $db;
+}
+
+/**
+ * Function to update user session (expiration).
+ *
+ * @param   PDO     $db                 PDO object for database connection
+ * @param   string  $username           Username
+ * @param   string  $cookie             Session cookie
+ * @return  0                           0 means ok
+ */
+function updateUserCookie($db, $username, $cookie) {
+	try {
+		$now = time() + SESSION;
+		$query = 'INSERT OR REPLACE INTO sessions SET cookie = :cookie, expiration = :expiration, username = :username;';
+		$statement = $db -> prepare($query);
+		$statement -> bindParam(':cookie', $cookie, PDO::PARAM_STR);
+		$statement -> bindParam(':session', $now, PDO::PARAM_INT);
+		$statement -> bindParam(':username', $username, PDO::PARAM_STR);
+		$statement -> execute();
+		return 0;
+	} catch (Exception $e) {
+		error_log('ERROR: '.$GLOBALS['messages'][90017]);
+		error_log((string) $e);
+		return 90017;
 	}
 }
 ?>

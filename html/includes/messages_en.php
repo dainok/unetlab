@@ -17,17 +17,17 @@
  *
  * UNetLab is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with UNetLab.  If not, see <http://www.gnu.org/licenses/>.
+ * along with UNetLab. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150428
+ * @version 20150527
  */
 
 /***************************************************************************
@@ -99,6 +99,8 @@ $messages[20032] = 'Cannot link node, invalid node_id (20032).';
 $messages[20033] = 'Cannot link node, invalid network_id (20033).';
 $messages[20034] = 'Cannot link node (20034).';
 $messages[20035] = 'Cannot unlink node (20035).';
+$messages[20036] = 'Cannot save startup-config in the selected lab (20036).';
+$messages[20037] = 'Config ignored, cannot load it (20037).';
 
 // __network.php (30000-39999)
 $messages[30000] = 'Cannot create network, invalid or missing mandatory parameters (30000).';
@@ -258,4 +260,49 @@ $messages[80053] = 'Node cleared (80053).';
 $messages[80054] = 'Dynamips not found (80054).';
 $messages[80055] = 'Failed to set ageing on bridge (80055).';
 $messages[80056] = 'Cloud interface does not exist (80056).';
+$messages[80057] = 'Nodes exported (80057).';
+$messages[80058] = 'Node exported (80058).';
+$messages[80059] = 'Cannot delete tmp file (80059).';
+$messages[80060] = 'Failed to run iou_export (80060).';
+$messages[80061] = 'Node not supported for config export (80061).';
+$messages[80062] = 'Config file not found (80062).';
+$messages[80063] = 'Failed to save startup-config (80063).';
+$messages[80064] = 'Cannot open tmp file (80064).';
+$messages[80065] = 'Cannot read tmp file (80065).';
+$messages[80066] = 'NVRAM file not found (80066).';
+$messages[80067] = 'Failed to dump startup-config (80067).';
+$messages[80068] = 'Cannot open startup-config file (80068).';
+$messages[80069] = 'Cannot write startup-config file (80069).';
+$messages[80070] = 'Failed to remove tmp file (80070).';
+
+// Authentication (90000-99999)
+$messages[90001] = 'User is not authenticated (90001).';
+$messages[90002] = 'User has been loaded (90002).';
+$messages[90003] = 'Database error (90003).';
+$messages[90004] = 'Created "users" table (90004).';
+$messages[90005] = 'Failed to create "users" table (90005).';
+$messages[90006] = 'Failed to update database (90006).';
+$messages[90007] = 'Created "permissions" table (90007).';
+$messages[90008] = 'Failed to create "permissions" table (90008).';
+$messages[90009] = 'Created "pods" table (90009).';
+$messages[90010] = 'Failed to create "pods" table (90010).';
+$messages[90011] = 'Username not set (90011).';
+$messages[90012] = 'Password not set (90012).';
+$messages[90013] = 'User logged in (90013).';
+$messages[90014] = 'Authentication failed: invalid username/password (90014).';
+$messages[90015] = 'Database corrupted (90015).';
+$messages[90016] = 'Cannot set user expiration on database (90016).';
+$messages[90017] = 'Cannot set user cookie on database (90017).';
+$messages[90018] = 'Authentication failed: user has been expired (90018).';
+$messages[90019] = 'User logged out (90019).';
+$messages[90020] = 'Cannot query for expired PODS (90020).';
+$messages[90021] = 'Cannot remove expired PODS from database (90021).';
+$messages[90022] = 'No POD available (90022).';
+$messages[90023] = 'Cannot assign POD to user (90023).';
+$messages[90024] = 'Cannot check expiration on database (90024).';
+$messages[90025] = 'Cannot list expired PODS (90025).';
+$messages[90026] = 'Cannot query for users on (90026).';
+$messages[90027] = 'Cannot query for pods on (90027).';
+$messages[90028] = 'Created "sessions" table (90028).';
+$messages[90029] = 'Failed to create "sessions" table (90029).';
 ?>

@@ -17,24 +17,24 @@
  *
  * UNetLab is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with UNetLab.  If not, see <http://www.gnu.org/licenses/>.
+ * along with UNetLab.If not, see <http:
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150428
+ * @version 20150521
  */
 
-$p['type'] = 'dynamips';    // Must be iol, dynamips or qemu
-$p['name'] = '1710';          // Can be empty
-$p['icon'] = 'Router.png';    // Can be empty, or a icon inside /opt/unetlab/html/images/icons/
-$p['idlepc'] = '0x80369ac4';  // Must be hexadecimal
-$p['nvram'] = 128;            // Must be integer
-$p['ram'] = 96;               // Must be integer
+$p['type'] = 'dynamips';
+$p['name'] = '1710';
+$p['icon'] = 'Router.png';
+$p['idlepc'] = '0x80369ac4';
+$p['nvram'] = 128;
+$p['ram'] = 96; 
 $p['dynamips_options'] = '-P 1700 -t 1710 -o 4 -c 0x2102 -X';
 ?>

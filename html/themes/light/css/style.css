@@ -1,0 +1,433 @@
+/*
+ * vim: syntax=css tabstop=4 softtabstop=0 noexpandtab laststatus=1 ruler
+ */
+
+/**
+ * html/themes/light/css/style.css
+ *
+ * CSS styles for UNetLab.
+ *
+ * LICENSE:
+ *
+ * This file is part of UNetLab (Unified Networking Lab).
+ *
+ * UNetLab is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * UNetLab is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with UNetLab. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Andrea Dainese <andrea.dainese@gmail.com>
+ * @copyright 2014-2015 Andrea Dainese
+ * @license http://www.gnu.org/licenses/gpl.html
+ * @link http://www.unetlab.com/
+ * @version 20150522
+ */
+
+* {
+	border: 0px;
+	margin: 0px;
+	padding: 0px;
+	resize: both;
+}
+
+body, html {
+	height: 100%;
+	overflow: auto;
+	position: relative;
+	width: 100%;
+}
+
+input[name='login[username]'], input[name='login[password]']{
+	background-color: #96c5cf;
+	border: 0px;
+	color: #58585a;
+	font-family: 'DIN Bold', Helvetica, Arial, sans-serif;
+	font-size: 1.8vmin;
+	height: 5vmin;
+	margin: auto auto 2vmin auto;
+	text-align: center;
+	width: 100%;
+}
+
+img, input[type='image'] {
+	max-height: 100%;
+	max-width: 100%;
+}
+
+/***************************************************************************
+ * Auth page
+ **************************************************************************/
+
+#frame-auth-lx, #frame-auth-rx {
+	bottom: 0px;
+	display: inline-block;
+	height: 100%;
+	position: absolute;
+}
+
+#frame-auth-lx {
+	background: url('/themes/light/images/shade-home.png') #46a6b6 100% repeat-y;
+	background-size: 3% 100%;
+	left: 0px;
+	top: 0px;
+	width: 45%;
+}
+#frame-auth-rx {
+	background-color: #ffffff;
+	right: 0px;
+	top: 0px;
+	width: 55%;
+}
+
+#frame-auth-lx #box-img-login {
+	top: 65%;
+}
+
+#frame-auth-lx #box-img-rr {
+	top: 20%;
+}
+
+#frame-auth-lx #box-img-signup {
+	top: 42%;
+}
+
+#frame-auth-lx #box-img-login, #frame-auth-lx #box-img-rr, #frame-auth-lx #box-img-signup {
+	position: absolute;
+	width: 57%;
+}
+
+#frame-auth-rx #box-img-angular {
+	bottom: 0px;
+	position: absolute;
+	right: 0px;
+	width: 87%;
+}
+
+#frame-auth-rx #box-img-ad {
+	bottom: 8%;
+	position: absolute;
+	right: 3%;
+	width: 28%;
+}
+
+#frame-auth-rx #box-text-info {
+	bottom: 16%;
+	position: absolute;
+	right: 24%;
+	width: 58%;
+}
+
+#frame-auth-rx #box-text-info h1 {
+	color: #96c5cf;
+	font-family: 'DIN Light', Helvetica, Arial, sans-serif;
+	font-size: 3.5vmin;
+	line-height: 200%;
+}
+
+#frame-auth-rx #box-text-info p {
+	color: #58585a;
+	font-family: 'DIN Regular', Helvetica, Arial, sans-serif;
+	font-size: 1.8vmin;
+	line-height: 180%;
+}
+
+#main {
+	height: 100%;
+	width: 100%;
+}
+
+#text-login, #text-signup {
+	color: #ffffff;
+	font-family: 'DIN Light', Helvetica, Arial, sans-serif;
+	font-size: 3vmin;
+	margin: 8px auto 8px auto;
+	text-align: left;
+}
+
+/***************************************************************************
+ * Main page
+ **************************************************************************/
+
+#frame-list-top {
+	background-color: #ffffff;
+	left: 0px;
+	height: 15%;
+	padding: 1vmin;
+	position: absolute;
+	right: 0px;
+	top: 0px;
+}
+
+#frame-list-top-logo {
+	background-color: #46a6b6;
+	display: inline-block;
+	height: 100%;
+	position: relative;
+	vertical-align: bottom;
+	width: 20%;
+}
+
+#frame-list-top-logo #box-img-rr {
+    left: 50%;
+	transform: translate(-50%, -50%);
+	max-height: 95%;
+	max-width: 70%;
+    position: absolute;
+	text-align: center;
+    top: 50%;
+}
+
+#frame-list-top-menu {
+	border-bottom: 2px #88898a dotted;
+	display: inline-block;
+	position: relative;
+	margin-left: 1%;
+	vertical-align: bottom;
+	width: 77%;
+}
+
+#frame-list-top-menu a {
+	color: #58585a;
+	display: inline-block;
+	margin: 1% 1% 0.5vmin 1%;
+	text-decoration: none;
+	width: 15%;
+}
+
+#frame-list-top-menu a:active, #frame-list-top-menu a:hover {
+	border-bottom: 2px #46a6b6 solid;
+	margin-bottom: -2px;
+}
+
+#frame-list-top-menu .box-menu-item {
+	display: inline-block;
+	font-family: 'DIN Regular', Helvetica, Arial, sans-serif;
+	font-size: 1.8vmin;
+	line-height: 75%;
+	vertical-align: bottom;
+	white-space: nowrap;
+}
+
+#frame-list-top-menu .box-menu-spacer {
+	border-left: 2px #88898a dotted;
+	display: inline-block;
+	max-width: 1px;
+	min-height: 36%;
+	vertical-align: bottom;
+}
+
+#frame-list-main {
+	bottom: 0px;
+	left: 0px;
+	height: 80%;
+	padding: 1vmin;
+	position: absolute;
+	right: 0px;
+	z-index: 10;
+}
+
+#frame-list-main-title {
+	background: rgba(60, 153, 171, 0.75);
+	color: #ffffff;
+	font-family: 'DIN Bold', Helvetica, Arial, sans-serif;
+	font-size: 1.8vmin;
+	left: 0%;
+	line-height: 150%;
+	position: absolute;
+	right: 0%;
+	top: 20%;
+	z-index: 20;
+}
+
+#frame-list-main-title #title-folders {
+	display: inline-block;
+	margin-left: 3%;
+	text-transform: uppercase;
+	width: 18%;
+}
+
+#frame-list-main-title #title-labs {
+	display: inline-block;
+	margin-left: 3%;
+	text-transform: uppercase;
+	width: 18%;
+}
+
+#frame-list-main-title #title-info {
+	display: inline-block;
+	margin-left: 3%;
+	text-transform: uppercase;
+}
+
+#frame-list-folders, #frame-list-labs {
+	display: inline-block;
+	height: 100%;
+	overflow: auto;
+	vertical-align: bottom;
+	width: 20%;
+	z-index: 10;
+}
+
+#frame-list-folders {
+	background-color: #e2edef;
+	display: inline-block;
+}
+
+#frame-list-labs {
+	background-color: #babbbd;
+	margin: 0px 1% 0px 1%;
+}
+
+#frame-list-folders ul, #frame-list-labs ul {
+	font-family: 'DIN Regular', Helvetica, Arial, sans-serif;
+	font-size: 2vmin;
+	line-height: 250%;
+	margin: 10% 1% auto 15%;
+}
+
+#frame-list-folders a, #frame-list-labs a {
+	text-decoration: none;
+}
+
+#frame-list-info {
+	display: inline-block;
+	height: 100%;
+	vertical-align: bottom;
+	vertical-align: bottom;
+	width: 58%;
+}
+
+#frame-list-thumbnail {
+	height: 60%;
+	vertical-align: bottom;
+	width: 100%;
+}
+
+#frame-list-desc {
+	height: 38%;
+	width: 100%;
+}
+
+
+
+
+.box-center-container {
+	bottom: 0px;
+	left: 0px;
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	z-index: 10;
+}
+
+.box-center-content {
+	-ms-transform: translate(-50%, -50%); /* IE 9 */
+	-webkit-transform: translate(-50%, -50%); /* Safari */
+	background-color: #ffffff;
+	border: 2px #46a6b6 solid;
+	box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.5);
+	left: 50%;
+	min-width: 25%;
+	padding: 1%;
+	position: absolute;
+	top: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.box-center-head {
+	height: 10%;
+	padding-bottom: 1%;
+}
+
+.box-center-head img {
+	display: inline-block;
+	width: 3%;
+	margin: 2% auto 2% auto;
+	vertical-align: text-top;
+}
+
+.box-center-head div {
+	border-bottom: 2px #46a6b6 solid;
+	color: #46a6b6;
+	display: inline-block;
+	font-family: 'DIN Bold', Helvetica, Arial, sans-serif;
+	font-size: 2.5vmin;
+	margin: 2% auto 2% 2%;
+	text-transform: uppercase; 
+	vertical-align: text-top;
+	width: 90%;
+}
+
+.box-center-body {
+	color: #58585a;
+	font-family: 'DIN Regular', Helvetica, Arial, sans-serif;
+	font-size: 2.9vmin;
+	height: 78%;
+	margin: 2% 5% 4% 5%;
+	overflow: auto;
+}
+
+.box-center-buttons {
+	text-align: center;
+	margin: 3% 0px 2% 0px;
+	width: 100%;
+}
+
+.box-center-buttons input[type='submit'] {
+	background-size: 100% 100%;
+	color: #ffffff;
+	display: inline;
+	font-family: 'DIN Bold', Helvetica, Arial, sans-serif;
+	font-size: 2vmin;
+	padding: 1%;
+	margin: auto 5% auto 5%;
+	width: 35%;
+}
+
+.box-center-buttons input[type='submit']:active {
+	box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.5);
+	border-radius: 20px;
+}
+
+.box-close {
+	position: absolute;
+	right: 1%;
+	top: 3%;
+	width: 4%;
+}
+
+.button-blue {
+	background: url('/themes/light/images/button-blue.png') 100% no-repeat;
+}
+
+.button-grey {
+	background: url('/themes/light/images/button-grey.png') 100% no-repeat;
+}
+
+.center {
+	-ms-transform: translate(-50%, -50%); /* IE 9 */
+	-webkit-transform: translate(-50%, -50%); /* Safari */
+	left: 50%;
+	margin-right: -50%;
+	transform: translate(-50%, -50%);
+}
+
+.opaque {
+	opacity: 0.5;
+}
+
+.top img {
+	vertical-align: top;
+}
+
+div {
+	border: 0px #321123 solid;
+}

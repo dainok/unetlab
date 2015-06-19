@@ -17,17 +17,17 @@
  *
  * UNetLab is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with UNetLab.  If not, see <http://www.gnu.org/licenses/>.
+ * along with UNetLab. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150428
+ * @version 20150527
  */
 
 /*
@@ -42,15 +42,17 @@
 
 /*
  * Testing from CLI
- *   curl -X GET -i -H "Content-type: application/json" http://127.0.0.1/api/status/mem
- *   curl -X PUT -i -H "Content-type: application/json" -d '{...}' http://127.0.0.1/api/folders/a/b)
- *   curl -X POST -i -H "Content-type: application/json" -d '{...}' http://127.0.0.1/api/folders/a/b)
- *   curl -X DELETE -i -H "Content-type: application/json" http://127.0.0.1/api/folders/a/b)
- *  In PUT and POST parameters use the following syntax: "var1":"value1", "var2":"value2", ...
+ * - curl -c cookie -b cookie -X POST -H "Content-type: application/json" -d '{"username":"admin","password":"unl"}' http://127.0.0.1/api/auth/login
+ * - curl -b cookie -c cookie -X GET -i -H "Content-type: application/json" http://127.0.0.1/api/status/mem
+ * - curl -b cookie -c cookie -X PUT -i -H "Content-type: application/json" -d '{...}' http://127.0.0.1/api/folders/a/b)
+ * - curl -b cookie -c cookie -X POST -i -H "Content-type: application/json" -d '{...}' http://127.0.0.1/api/folders/a/b)
+ * - curl -b cookie -c cookie -X DELETE -i -H "Content-type: application/json" http://127.0.0.1/api/folders/a/b)
+ * In PUT and POST parameters use the following syntax: -d '{"var1":"value1", "var2":"value2", ... }'
  */
 
 require_once('/opt/unetlab/html/includes/init.php');
 require_once(BASE_DIR.'/html/includes/Slim/Slim.php');
+require_once(BASE_DIR.'/html/includes/api_authentication.php');
 require_once(BASE_DIR.'/html/includes/api_folders.php');
 require_once(BASE_DIR.'/html/includes/api_labs.php');
 require_once(BASE_DIR.'/html/includes/api_networks.php');
@@ -64,9 +66,9 @@ $tenant = 0;
 
 $app = new \Slim\Slim(Array(
 	'mode' => 'production',
-	'debug' => True,									// Change to False for production
-	'log.level' => \Slim\Log::DEBUG,	// Change to WARN for production
-	'log.enabled' => True,
+	'debug' => True,					// Change to False for production
+	'log.level' => \Slim\Log::WARN,		// Change to WARN for production, DEBUG to decelop
+	'log.enabled' => False,
 	'log.writer' => new \Slim\LogWriter(fopen('/opt/unetlab/data/Logs/api.txt', 'a'))
 ));
 
@@ -86,14 +88,92 @@ $app -> response -> headers -> set('X-Powered-By', 'Unified Networking Lab API')
 class ResourceNotFoundException extends Exception {}
 class AuthenticateFailedException extends Exception {}
 
+$db = checkDatabase();
+if ($db === False) {
+	// Database is not available
+	$app -> map('/api/(:path+)', function() use ($app) {
+		$output['code'] = 500;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages']['90003'];
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+	}) -> via('DELETE', 'GET', 'POST');
+	$app -> run();
+}
+
+if (updateDatabase($db) == False) {
+	// Failed to update database
+	// TODO should run una tantum
+	$app -> map('/api/(:path+)', function() use ($app) {
+		$output['code'] = 500;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages']['90006'];
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+	}) -> via('DELETE', 'GET', 'POST');
+	$app -> run();
+}
+
+/***************************************************************************
+ * Authentication
+ **************************************************************************/
+$app -> post('/api/auth/login', function() use ($app, $db) {
+	// Login
+	$event = json_decode($app -> request() -> getBody());
+	$p = json_decode(json_encode($event), True);	// Reading options from POST/PUT
+	$cookie = genUuid();
+	$output = apiLogin($db, $p, $cookie);
+	if ($output['code'] == 200) {
+		// User is authenticated, need to set the cookie
+		$app -> setCookie('unetlab_session', $cookie, SESSION, '/api/', $_SERVER['HTTP_HOST'], False, False);
+	}
+	$app -> response -> setStatus($output['code']);
+	$app -> response -> setBody(json_encode($output));
+});
+
+$app -> get('/api/auth/logout', function() use ($app, $db) {
+	// Logout (DELETE request does not work with cookies)
+	$cookie = $app -> getCookie('unetlab_session');
+	$app -> deleteCookie('unetlab_session');
+	$output = apiLogout($db, $cookie);
+	$app -> response -> setStatus($output['code']);
+	$app -> response -> setBody(json_encode($output));
+});
+
+$app -> get('/api/auth', function() use ($app, $db) {
+	list($username, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($username === False) {
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+
+	$output['code'] = 200;
+	$output['status'] = 'success';
+	$output['message'] = $GLOBALS['messages']['90002'];
+	$output['data'] = Array(
+		'username' => $username,
+		'tenant' => $tenant
+	);
+
+	$app -> response -> setStatus($output['code']);
+	$app -> response -> setBody(json_encode($output));
+});
+
+$app -> put('/api/auth', function() use ($app, $db) {
+	// Set tenant
+	// TODO should be used by admin user on single-user mode only
+});
+
 /***************************************************************************
  * Status
  **************************************************************************/
-$app -> get('/api/status', function() use ($app, $tenant) {
+$app -> get('/api/status', function() use ($app, $db) {
 	$output['code'] = 200;
 	$output['status'] = 'success';
 	$output['message'] = $GLOBALS['messages']['60001'];
 	$output['data'] = Array();
+	$output['data']['version'] = VERSION;
 	$output['data']['cpu'] = apiGetCPUUsage();
 	$output['data']['disk'] = apiGetDiskUsage();
 	list($output['data']['cached'], $output['data']['mem']) = apiGetMemUsage();
@@ -112,7 +192,14 @@ $app -> get('/api/status', function() use ($app, $tenant) {
  * List Objects
  **************************************************************************/
 // Node templates
-$app -> get('/api/list/templates/(:template)', function($template = '') use ($app, $tenant) {
+$app -> get('/api/list/templates/(:template)', function($template = '') use ($app, $db) {
+	list($username, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($username === False) {
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+
 	if (!isset($template) || $template == '') {
 		// Print all available templates
 		$output['code'] = 200;
@@ -136,7 +223,14 @@ $app -> get('/api/list/templates/(:template)', function($template = '') use ($ap
 });
 
 // Network types
-$app -> get('/api/list/networks', function() use ($app, $tenant) {
+$app -> get('/api/list/networks', function() use ($app, $db) {
+	list($username, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($username === False) {
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+
 	$output['code'] = 200;
 	$output['status'] = 'success';
 	$output['message'] = $GLOBALS['messages']['60002'];
@@ -149,28 +243,51 @@ $app -> get('/api/list/networks', function() use ($app, $tenant) {
 /***************************************************************************
  * Folders
  **************************************************************************/
-
 // Get folder content
-$app -> get('/api/folders/(:path+)', function($path = array()) use ($app, $tenant) {
+$app -> get('/api/folders/(:path+)', function($path = array()) use ($app, $db) {
+	list($username, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($username === False) {
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+
 	$s = '/'.implode('/', $path);
 	$output = apiGetFolders($s);
+
 	$app -> response -> setStatus($output['code']);
 	$app -> response -> setBody(json_encode($output));
 });
 
 // Add a new folder
-$app -> post('/api/folders', function() use ($app, $tenant) {
+$app -> post('/api/folders', function() use ($app, $db) {
+	list($username, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($username === False) {
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+
 	$event = json_decode($app -> request() -> getBody());
 	$p = json_decode(json_encode($event), True);
 	$output = apiAddFolder($p['name'], $p['path']);
+
 	$app -> response -> setStatus($output['code']);
 	$app -> response -> setBody(json_encode($output));
 });
 
 // Delete an existing folder
-$app -> delete('/api/folders/(:path+)', function($path = array()) use ($app, $tenant) {
+$app -> delete('/api/folders/(:path+)', function($path = array()) use ($app, $db) {
+	list($username, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($username === False) {
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+
 	$s = '/'.implode('/', $path);
 	$output = apiDeleteFolder($s);
+
 	$app -> response -> setStatus($output['code']);
 	$app -> response -> setBody(json_encode($output));
 });
@@ -179,16 +296,22 @@ $app -> delete('/api/folders/(:path+)', function($path = array()) use ($app, $te
  * Labs
  **************************************************************************/
 // Get an object
-$app -> get('/api/labs/(:path+)', function($path = array()) use ($app, $tenant) {
+$app -> get('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
+	list($username, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($username === False) {
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
 	$s = '/'.implode('/', $path);
 
-	$patterns[0] = '/(.+).unl.*$/';           // Drop after lab file (ending with .unl)
+	$patterns[0] = '/(.+).unl.*$/';			// Drop after lab file (ending with .unl)
 	$replacements[0] = '$1.unl';
-	$patterns[1] = '/.+\/([0-9]+)\/*.*$/';    // Drop after lab file (ending with .unl)
+	$patterns[1] = '/.+\/([0-9]+)\/*.*$/';	// Drop after lab file (ending with .unl)
 	$replacements[1] = '$1';
 
 	$lab_file = preg_replace($patterns[0], $replacements[0], $s);
-	$id = preg_replace($patterns[1], $replacements[1], $s);    // Intefer after lab_file.unl
+	$id = preg_replace($patterns[1], $replacements[1], $s);	// Intefer after lab_file.unl
 
 	if (!is_file(BASE_LAB.$lab_file)) {
 		// Lab file does not exists
@@ -226,6 +349,8 @@ $app -> get('/api/labs/(:path+)', function($path = array()) use ($app, $tenant) 
 		$output = apiStopLabNodes($lab, $tenant);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/wipe$/', $s)) {
 		$output = apiWipeLabNodes($lab, $tenant);
+	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/export$/', $s)) {
+		$output = apiExportLabNodes($lab, $tenant);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/[0-9]+$/', $s)) {
 		$output = apiGetLabNode($lab, $id);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/[0-9]+\/interfaces$/', $s)) {
@@ -236,6 +361,8 @@ $app -> get('/api/labs/(:path+)', function($path = array()) use ($app, $tenant) 
 		$output = apiStopLabNode($lab, $id, $tenant);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/[0-9]+\/wipe$/', $s)) {
 		$output = apiWipeLabNode($lab, $id, $tenant);
+	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/[0-9]+\/export$/', $s)) {
+		$output = apiExportLabNode($lab, $id, $tenant);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/topology$/', $s)) {
 		$output = apiGetLabTopology($lab);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/pictures$/', $s)) {
@@ -277,18 +404,25 @@ $app -> get('/api/labs/(:path+)', function($path = array()) use ($app, $tenant) 
 });
 
 // Edit an existing object
-$app -> put('/api/labs/(:path+)', function($path = array()) use ($app, $tenant) {
+$app -> put('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
+	list($username, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($username === False) {
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+
 	$event = json_decode($app -> request() -> getBody());
-	$p = json_decode(json_encode($event), True);    // Reading options from POST/PUT
+	$p = json_decode(json_encode($event), True);	// Reading options from POST/PUT
 	$s = '/'.implode('/', $path);
 
-	$patterns[0] = '/(.+).unl.*$/';           // Drop after lab file (ending with .unl)
+	$patterns[0] = '/(.+).unl.*$/';			// Drop after lab file (ending with .unl)
 	$replacements[0] = '$1.unl';
-	$patterns[1] = '/.+\/([0-9]+)\/*.*$/';    // Drop after lab file (ending with .unl)
+	$patterns[1] = '/.+\/([0-9]+)\/*.*$/';	// Drop after lab file (ending with .unl)
 	$replacements[1] = '$1';
 
 	$lab_file = preg_replace($patterns[0], $replacements[0], $s);
-	$id = preg_replace($patterns[1], $replacements[1], $s);    // Intefer after lab_file.unl
+	$id = preg_replace($patterns[1], $replacements[1], $s);	// Intefer after lab_file.unl
 
 	if (!is_file(BASE_LAB.$lab_file)) {
 		// Lab file does not exists
@@ -336,7 +470,14 @@ $app -> put('/api/labs/(:path+)', function($path = array()) use ($app, $tenant) 
 });
 
 // Add new lab
-$app -> post('/api/labs', function() use ($app, $tenant) {
+$app -> post('/api/labs', function() use ($app, $db) {
+	list($username, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($username === False) {
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+
 	$event = json_decode($app -> request() -> getBody());
 	$p = json_decode(json_encode($event), True);;
 	$output = apiAddLab($p, $tenant);
@@ -346,19 +487,26 @@ $app -> post('/api/labs', function() use ($app, $tenant) {
 });
 
 // Add new object
-$app -> post('/api/labs/(:path+)', function($path = array()) use ($app, $tenant) {
+$app -> post('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
+	list($username, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($username === False) {
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+
 	$event = json_decode($app -> request() -> getBody());
-	$p = json_decode(json_encode($event), True);    // Reading options from POST/PUT
+	$p = json_decode(json_encode($event), True);	// Reading options from POST/PUT
 	$s = '/'.implode('/', $path);
 	$o = False;
 
-	$patterns[0] = '/(.+).unl.*$/';           // Drop after lab file (ending with .unl)
+	$patterns[0] = '/(.+).unl.*$/';			// Drop after lab file (ending with .unl)
 	$replacements[0] = '$1.unl';
-	$patterns[1] = '/.+\/([0-9]+)\/*.*$/';    // Drop after lab file (ending with .unl)
+	$patterns[1] = '/.+\/([0-9]+)\/*.*$/';	// Drop after lab file (ending with .unl)
 	$replacements[1] = '$1';
 
 	$lab_file = preg_replace($patterns[0], $replacements[0], $s);
-	$id = preg_replace($patterns[1], $replacements[1], $s);    // Intefer after lab_file.unl
+	$id = preg_replace($patterns[1], $replacements[1], $s);	// Intefer after lab_file.unl
 
 	// Reading options from POST/PUT
 	if (isset($event -> postfix) && $event -> postfix == True) $o = True;
@@ -417,17 +565,24 @@ $app -> post('/api/labs/(:path+)', function($path = array()) use ($app, $tenant)
 });
 
 // Delete an object
-$app -> delete('/api/labs/(:path+)', function($path = array()) use ($app, $tenant) {
+$app -> delete('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
+	list($username, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($username === False) {
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+
 	$event = json_decode($app -> request() -> getBody());
 	$s = '/'.implode('/', $path);
 
-	$patterns[0] = '/(.+).unl.*$/';           // Drop after lab file (ending with .unl)
+	$patterns[0] = '/(.+).unl.*$/';			// Drop after lab file (ending with .unl)
 	$replacements[0] = '$1.unl';
-	$patterns[1] = '/.+\/([0-9]+)\/*.*$/';    // Drop after lab file (ending with .unl)
+	$patterns[1] = '/.+\/([0-9]+)\/*.*$/';	// Drop after lab file (ending with .unl)
 	$replacements[1] = '$1';
 
 	$lab_file = preg_replace($patterns[0], $replacements[0], $s);
-	$id = preg_replace($patterns[1], $replacements[1], $s);    // Intefer after lab_file.unl
+	$id = preg_replace($patterns[1], $replacements[1], $s);	// Intefer after lab_file.unl
 
 	if (!is_file(BASE_LAB.$lab_file)) {
 		// Lab file does not exists
@@ -443,9 +598,22 @@ $app -> delete('/api/labs/(:path+)', function($path = array()) use ($app, $tenan
 		$lab = new Lab(BASE_LAB.$lab_file, $tenant);
 	} catch(Exception $e) {
 		// Lab file is invalid
-		$output['code'] = 400;
-		$output['status'] = 'fail';
-		$output['message'] = $GLOBALS['messages'][$e -> getMessage()];
+		if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl$/', $s)) {
+			// Delete the lab
+			if (unlink(BASE_LAB.$lab_file)) {
+				$output['code'] = 200;
+				$output['status'] = 'success';
+			} else {
+				$output['code'] = 400;
+				$output['status'] = 'fail';
+				$output['message'] = $GLOBALS['messages'][60021];
+			}
+		} else {
+			// Cannot delete objects on non-valid lab
+			$output['code'] = 400;
+			$output['status'] = 'fail';
+			$output['message'] = $GLOBALS['messages'][$e -> getMessage()];
+		}
 		$app -> response -> setStatus($output['code']);
 		$app -> response -> setBody(json_encode($output));
 		return;

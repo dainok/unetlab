@@ -3,7 +3,6 @@ $section = 'Home';
 $subsection = 'Home';
 $title = 'UnetLab - Home';
 
-include('/opt/unetlab/html/includes/init.php');
 include('/opt/unetlab/html/themes/default/includes/header.php');
 include('/opt/unetlab/html/themes/default/includes/navbar.php');
 ?>
@@ -17,7 +16,7 @@ include('/opt/unetlab/html/themes/default/includes/navbar.php');
         <div class="container">
             <div class="row">
                 <div class="col-md-5">
-                    <h2>Version <?php print VERSION ?></h2>
+                    <h2 id="status-version">Version (Loading content...)</h2>
                     <p>UNetLab is a new generation software for networking labs. It can be considered the next major version of iou-web, but the software has been rewritten from scratch. The major advantage over GNS3 and iou-web itself is about multi-hypervisor support within a single entity. UNetLab allows to design labs using IOU, Dynamips and QEMU nodes without dealing with multi virtual machines: everything run inside a UNetLab host, and a lab is a single file including all information needed.</p>
                     <p>Currenlty UNetLab is used by some of the top network engineers all around the world.</p>
                     <p><a class="btn btn-default" href="http://www.unetlab.com/tag/release/" role="button">View details &raquo;</a></p>

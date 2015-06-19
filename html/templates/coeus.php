@@ -17,26 +17,26 @@
  *
  * UNetLab is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with UNetLab.  If not, see <http://www.gnu.org/licenses/>.
+ * along with UNetLab.If not, see <http:
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150428
+ * @version 20150521
  */
 
-$p['type'] = 'qemu';          // Must be iol, dynamips or qemu
-$p['name'] = 'WSA';           // Can be empty
-$p['icon'] = 'Firewall.png';  // Can be empty, or a icon inside /opt/unetlab/html/images/icons/
-$p['cpu'] = 1;                // Must be integer
-$p['ram'] = 4096;             // Must be integer
-$p['ethernet'] = 1;           // Must be integer
-$p['console'] = 'telnet';     // Must be telnet or vnc
+$p['type'] = 'qemu';
+$p['name'] = 'WSA'; 
+$p['icon'] = 'Firewall.png';
+$p['cpu'] = 1;
+$p['ram'] = 4096; 
+$p['ethernet'] = 1; 
+$p['console'] = 'telnet'; 
 $p['qemu_arch'] = 'x86_64';
 $p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -nographic -rtc base=utc -no-shutdown';
 ?>

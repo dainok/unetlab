@@ -27,7 +27,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150428
+ * @version 20150527
  */
 
 /**
@@ -105,6 +105,64 @@ function apiEditLabNode($lab, $p) {
 	return $output;
 }
 
+/**
+ * Function to export a single node.
+ *
+ * @param   Lab     $lab                Lab
+ * @param   int     $id                 Node ID
+ * @param   int     $tenant             Tenant ID
+ * @return  Array                       Return code (JSend data)
+ */
+function apiExportLabNode($lab, $id, $tenant) {
+	$cmd = 'sudo /opt/unetlab/wrappers/unl_wrapper';
+	$cmd .= ' -a export';
+	$cmd .= ' -T '.$tenant;
+	$cmd .= ' -D '.$id;
+	$cmd .= ' -F "'.$lab -> getPath().'/'.$lab -> getFilename().'"';
+	$cmd .= ' 2>> /opt/unetlab/data/Logs/unl_wrapper.txt';
+	exec($cmd, $o, $rc);
+	if ($rc == 0) {
+		// Config exported
+		$output['code'] = 200;
+		$output['status'] = 'success';
+		$output['message'] = $GLOBALS['messages'][80058];
+	} else {
+		// Failed to export
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][$rc];
+	}
+	return $output;
+}
+
+/**
+ * Function to export all nodes.
+ *
+ * @param   Lab     $lab                Lab
+ * @param   int     $tenant             Tenant ID
+ * @return  Array                       Return code (JSend data)
+ */
+function apiExportLabNodes($lab, $tenant) {
+	$cmd = 'sudo /opt/unetlab/wrappers/unl_wrapper';
+	$cmd .= ' -a export';
+	$cmd .= ' -T '.$tenant;
+	$cmd .= ' -F "'.$lab -> getPath().'/'.$lab -> getFilename().'"';
+	$cmd .= ' 2>> /opt/unetlab/data/Logs/unl_wrapper.txt';
+	exec($cmd, $o, $rc);
+	if ($rc == 0) {
+		// Nodes started
+		$output['code'] = 200;
+		$output['status'] = 'success';
+		$output['message'] = $GLOBALS['messages'][80057];
+	} else {
+		// Failed to start
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][$rc];
+	}
+	return $output;
+}
+
 /*
  * Function to get a single lab node.
  *
@@ -147,6 +205,7 @@ function apiGetLabNode($lab, $id) {
 		$output['message'] = $GLOBALS['messages'][60025];
 		$output['data'] = Array(
 			'console' => $node -> getConsole(),
+			'config' => $node -> getConfig(),
 			'delay' => $node -> getDelay(),
 			'left' => $node -> getLeft(),
 			'icon' => $node -> getIcon(),
@@ -430,8 +489,11 @@ function apiGetLabNodeTemplate($p) {
 	if (in_array($p['type'], Array('dynamips', 'iol'))) $output['data']['options']['config'] = Array(
 		'name' => $GLOBALS['messages'][70013],
 		'type' => 'list',
-		'value' => '',
-		'list' => Array('TODO')
+		'value' => 'Unconfigured',
+		'list' => Array(
+			'Saved' => 'Saved',
+			'Unconfigured' => 'Unconfigured'
+		)
 	);
 
 	// Delay
@@ -616,7 +678,7 @@ function apiWipeLabNode($lab, $id, $tenant) {
 }
 
 /**
- * Function to stop all nodes.
+ * Function to wipe all nodes.
  *
  * @param   Lab     $lab                Lab
  * @param   int     $tenant             Tenant ID

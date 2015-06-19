@@ -20,18 +20,19 @@ php_value session.gc_maxlifetime 86400
 	RewriteEngine On
 	RewriteBase /
 
-	# If not a dir, if not a file and if /api, call API router
-	RewriteCond %{REQUEST_FILENAME} !-d
-	RewriteCond %{REQUEST_FILENAME} !-f
-	RewriteCond %{REQUEST_URI} /api
+	# If starts with /api, call API router
+	RewriteCond %{REQUEST_URI} ^/api/
 	RewriteRule ^(.*)$ /api.php [B,L,QSA]
 
-	# If URL is empty, call the theme
-	RewriteRule ^$ /themes/default/ [B,L,QSA] TODO
+	# If starts with /auth, call Opauth
+	RewriteCond %{REQUEST_URI} ^/auth/
+	RewriteRule ^(.*)$ /auth.php [B,L,QSA]
 
-	# If not a dir and if not a file, call the theme
+	# If not an auth call, if not a dir and if not a file, call the theme
 	RewriteCond %{REQUEST_FILENAME} !-d
 	RewriteCond %{REQUEST_FILENAME} !-f
-	RewriteCond %{REQUEST_URI} !/iou-web
 	RewriteRule ^(.*)$ /themes/default/$1 [B,L,QSA]
+
+	# If URL is empty, call the theme
+	RewriteRule ^$ /themes/default/ [B,L,QSA]
 </IfModule>

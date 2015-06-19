@@ -2,10 +2,12 @@ UNetLab is a new generation software for networking lab. It can be considered th
 
 LICENSE
 
-- UNetLab is licensed under the GNU GPLv3.
+- UNetLab is licensed under the GNU GPLv3 (https://github.com/dainok/unetlab).
 - Dynamips is licensed under the GNU GPLv2 (https://github.com/GNS3/dynamips/blob/v0.2.10/README).
+- IOUTools is licensed under the GNU GPLv2 (https://github.com/ehlers/IOUtools/blob/master/LICENSE).
 - Linux is licensed under the GNU GPLv2 (https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/COPYING?id=refs/tags/v4.0).
 - QEMU is licensed under the GNU GPLv2 (http://wiki.qemu.org/License).
+- Slim Framework is provided "AS IS" (https://github.com/slimphp/Slim/blob/master/LICENSE).
 
 UNetLab includes QEMU 2.1.2 (default) and QEMU 1.3.1 (for IPS) configured and compiled with the following line:
 ./configure --prefix=/opt/qemu --target-list="i386-softmmu x86_64-softmmu" --enable-sdl --enable-vnc --disable-xen --enable-curses --enable-kvm --enable-uuid

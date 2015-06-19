@@ -27,7 +27,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150508
+ * @version 20150527
  */
 
 /**
@@ -105,7 +105,6 @@ function addNetwork($p) {
 				return 80020;
 			}
 			break;
-			// dainok TODO
 		case 'bridge':
 			if (!isInterface($p['name'])) {
 				// Interface does not exist -> create bridge
@@ -379,6 +378,126 @@ function delTap($s) {
 }
 
 /**
+ * Function to push startup-config to a file
+ *
+ * @param   string  $config_data        The startup-config
+ * @param   string  $file_path          File with full path where config is stored
+ * @return  bool                        true if configured
+ */
+function dumpConfig($config_data, $file_path) {
+	$fp = fopen($file_path, 'w');
+	if (!isset($fp)) {
+		// Cannot open file
+		error_log('ERROR: '.$GLOBALS['messages'][80068]);
+		return False;
+	}
+
+	if (!fwrite($fp, $config_data)) {
+		// Cannot write file
+		error_log('ERROR: '.$GLOBALS['messages'][80069]);
+		return False;
+	}
+
+    return True;
+}
+
+/**
+ * Function to export a node running-config.
+ *
+ * @param   int     $node_id            Node ID
+ * @param   Node    $n                  Node
+ * @param   Lab     $lab                Lab
+ * @return  int                         0 means ok
+ */
+function export($node_id, $n, $lab) {
+	$tmp = tempnam(sys_get_temp_dir(), 'unl_cfg_'.$node_id.'_');
+
+	if (is_file($tmp) && !unlink($tmp)) {
+		// Cannot delete tmp file
+		error_log('ERROR: '.$GLOBALS['messages'][80059]);
+		return 80059;
+	}
+
+	switch ($n -> getNType()) {
+		default:
+			// Unsupported
+			error_log('ERROR: '.$GLOBALS['messages'][80061]);
+			return 80061;
+			break;
+		case 'dynamips':
+			foreach (scandir($n -> getRunningPath()) as $filename) {
+				if (preg_match('/_nvram$/', $filename)) {
+					$nvram = $n -> getRunningPath().'/'.$filename;
+				}
+			}
+
+			if (!isset($nvram) || !is_file($nvram)) {
+				// NVRAM file not found
+				error_log('ERROR: '.$GLOBALS['messages'][80066]);
+				return 80066;
+			}
+			$cmd = '/usr/bin/nvram_export '.$nvram.' '.$tmp;
+			exec($cmd, $o, $rc);
+			error_log('INFO: exporting '.$cmd);
+			if ($rc != 0) {
+				error_log('ERROR: '.$GLOBALS['messages'][80060]);
+				error_log((string) $o);
+				return 80060;
+			}
+			break;
+		case 'iol':
+			$nvram = $n -> getRunningPath().'/nvram_'.sprintf('%05u', $node_id);
+			if (!is_file($nvram)) {
+				// NVRAM file not found
+				error_log('ERROR: '.$GLOBALS['messages'][80066]);
+				return 80066;
+			}
+			$cmd = '/opt/unetlab/scripts/iou_export '.$nvram.' '.$tmp;
+			exec($cmd, $o, $rc);
+			error_log('INFO: exporting '.$cmd);
+			if ($rc != 0) {
+				error_log('ERROR: '.$GLOBALS['messages'][80060]);
+				error_log((string) $o);
+				return 80060;
+			}
+			break;
+	}
+
+	if (!is_file($tmp)) {
+		// File not found
+		error_log('ERROR: '.$GLOBALS['messages'][80062]);
+		return 80062;
+	}
+
+	// Now save the config file within the lab
+	$fp = fopen($tmp, 'r');
+	if (!isset($fp)) {
+		// Cannot open file
+		error_log('ERROR: '.$GLOBALS['messages'][80064]);
+		return 80064;
+	}
+	$config_data = fread($fp ,filesize($tmp));
+	if ($config_data === False || $config_data === ''){
+		// Cannot read file
+		error_log('ERROR: '.$GLOBALS['messages'][80065]);
+		return 80065;
+	}
+	
+	if ($lab -> setNodeConfigData($node_id, $config_data) !== 0) {
+		// Failed to save startup-config
+		error_log('ERROR: '.$GLOBALS['messages'][80063]);
+		return 80063;
+	}
+
+	if(!unlink($tmp)) {
+		// Failed to remove tmp file
+		error_log('WARNING: '.$GLOBALS['messages'][80070]);
+	}
+
+	return 0;
+}
+
+/**
  * Function to check if a bridge exists
  *
  * @param   string  $s                  Bridge name
@@ -547,19 +666,22 @@ function prepareNode($n, $id, $t, $nets) {
 					return 80040;
 				}
 
-				// TODO startup configuration
-				// if (dumpConfig($t, $n, $cwd)) {
-				// // Adding stratup-config
-				// $cmd .= ' -c startup-config';
-				// }
+				if ($n -> getConfig() == 'Saved') {
+					// Node should use saved startup-config
+					if (!dumpConfig($n -> getConfigData(), $n -> getRunningPath().'/startup-config')) {
+						// Cannot dump config to startup-config file
+						error_log('WARNING: '.$GLOBALS['messages'][80067]);
+					}
+				}
 				break;
 			case 'dynamips':
-				// Nothing to do here
-				// TODO startup configuration
-				// if (dumpConfig($t, $n, $cwd)) {
-				// // Adding stratup-config
-				// $cmd .= ' -c startup-config';
-				// }
+				if ($n -> getConfig() == 'Saved') {
+					// Node should use saved startup-config
+					if (!dumpConfig($n -> getConfigData(), $n -> getRunningPath().'/startup-config')) {
+						// Cannot dump config to startup-config file
+						error_log('WARNING: '.$GLOBALS['messages'][80067]);
+					}
+				}
 				break;
 			case 'qemu':
 				$image = '/opt/unetlab/addons/qemu/'.$n -> getImage();
@@ -701,115 +823,32 @@ function stop($n) {
 	}
 }
 
-
-
-
-
-
-
-
-// TODO make serial cmd_ser on __node.php
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// TODO from here
-/*
-
-/**
- * Function to push startup-config to a file
- *
- * @param   string  $t                  The tenant ID
- * @param   string  $n                  The node
- * @param   string  $cwd                Current path
- * @return  bool                        true if configured
-function dumpConfig($tenant, $node, $cwd) {
-    if (is_file($cwd.'/.configured')) {
-        // The node has already been configured
-        return False;
-    } else {
-        // The node has never been configured
-        if (is_file(BASE_DIR.'/html/configs/'.$node -> getConfig())) {
-            // Using a template
-            ob_start();
-            require_once(BASE_DIR.'/html/configs/'.$node -> getConfig());
-            $config = ob_get_contents();
-            ob_end_clean();
-        } else if ($node -> getConfig() == 1) {
-            // Using config inside the lab file
-        }
-
-        // Write the startup-config
-        if (isset($config)) {
-            $fp = fopen($cwd.'/startup-config', 'w');
-            if (isset($config) && !fwrite($fp, $config)) {
-                // Failed to write
-                error_log('ERROR: failed to write "'.$cwd.'/startup-config").');
-                fclose($fp);
-                return False;
-            } else {
-                // Write OK
-                fclose($fp);
-            }
-        }
-
-        if (!touch($cwd.'/.configured')) {
-            $p['severity'] = 'ERROR';
-            $p['message'] = "Cannot write configuration on running directory (\"".$cwd."\").\n";
-            output($p);
-            return False;
-        }
-    }
-    return True;
-}
-
-
-
-
-
-/*
 /**
  * Function to print how to use the unl_wrapper
  *
  * @return  string                      usage output
-function usage() {
-    global $argv;
-    $output = '';
-    $output .= "Usage: ".$argv[0]." <standard options>\n";
-    $output .= "Standard Options:\n";
-    $output .= "-T <n>     Tenant ID (default 0)\n";
-    $output .= "-D <n>  ***Device ID (default \"all\")\n";
-    $output .= "-F <n>   **Lab file\n";
-    $output .= "-a <n>    *Action (\"fixpermissions\", \"clean\", \"start\", \"stop\", \"kill\", \"status\" or \"console\")\n";
-    $output .= "  * Mandatory option\n";
-    $output .= " ** Not required for \"fixpermissions\" or \"kill\"\n";
-    $output .= "*** Action \"console\" must have a numeric Device ID\n";
-    return $output;
-}
  */
+function usage() {
+	global $argv;
+	$output = '';
+	$output .= "Usage: ".$argv[0]." -a <action> <options>\n";
+	$output .= "-a <s>     Action can be:\n";
+	$output .= "           - delete: delete a lab file even if it's not valid\n";
+	$output .= "                     requires -T, -F\n";
+	$output .= "           - export: export a runnign-config to a file\n";
+	$output .= "                     requires -T, -F, -D is optional\n";
+	$output .= "           - fixpermissions: fix file/dir permissions\n";
+	$output .= "           - platform: print the hardware platform\n";
+	$output .= "           - start: fix file/dir permissions\n";
+	$output .= "                     requires -T, -F, -D is optional\n";
+	$output .= "           - stop: fix file/dir permissions\n";
+	$output .= "                     requires -T, -F, -D is optional\n";
+	$output .= "           - wipe: fix file/dir permissions\n";
+	$output .= "                     requires -T, -F, -D is optional\n";
+	$output .= "Options:\n";
+	$output .= "-F <n>     Lab file\n";
+	$output .= "-T <n>     Tenant ID\n";
+	$output .= "-D <n>     Device ID (if not used, all devices will be impacted)\n";
+	print($output);
+}
 ?>

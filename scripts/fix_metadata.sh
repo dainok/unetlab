@@ -8,6 +8,9 @@ COPYRIGHT="2014-2015 Andrea Dainese"
 LICENSE="http:\/\/www.gnu.org\/licenses\/gpl.html"
 LINK="http:\/\/www.unetlab.com\/"
 
+#TODO  exiftool -owner='Andrea Dainese <andrea.dainese@gmail.com>' -copyright='Andrea Dainese <andrea.dainese@gmail.com>' -author='Eugenia Paffile <eugenia.paffile@gmail.com>' -comment='Part of UNetLab software (http://www.unetlab.com/)' *
+
+
 for f in ${FILES}; do
     VERSION=$(date -d @$(stat --printf '%Y' ${f}) +%Y%m%d)
 	TIMESTAMP=$(date -d @$(stat --printf '%Y' ${f}) +%Y%m%d%H%M)

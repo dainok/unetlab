@@ -39,11 +39,15 @@ if ($section == 'Labs' && $subsection == 'List') {
                             <li><a class="node_start_all" href="#"><i class="glyphicon glyphicon-play"></i> Start all nodes</a></li>
                             <li><a class="node_stop_all" href="#"><i class="glyphicon glyphicon-stop"></i> Stop all nodes</a></li>
                             <li><a class="node_wipe_all" href="#"><i class="glyphicon glyphicon-trash"></i> Wipe all nodes</a></li>
+                            <li><a class="node_export_all" href="#"><i class="glyphicon glyphicon-save"></i> Export all CFG</a></li>
                         </ul>
                     </li>
 <?php
 }
 ?>
+                </ul>
+                <ul id="auth" class="nav navbar-nav navbar-right">
+					<li><a href="#" id="button-logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
                 </ul>
             </div>
         </div>

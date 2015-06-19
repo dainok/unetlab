@@ -1,0 +1,96 @@
+body, html {
+	height: 100%;
+	overflow: hidden;
+	width: 100%;
+}
+
+img, input[type='image'] {
+	display: block;
+	height: auto;
+	max-width: 100%;
+}
+
+input[name='login[username]'], input[name='login[password]']{
+	background-color: #96c5cf;
+	border: 0px;
+	color: #58585a;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-size: 1.8vmin;
+	height: 5vmin;
+	text-align: center;
+	width: 100%;
+}
+
+#body {
+	height: 100%;
+}
+
+#auth-left {
+	background: url('/themes/default/images/shade-home.png') #46a6b6 100% repeat-y;
+	background-size: 3% 100%;
+	color: #ffffff;
+	display: table;
+	font-family: 'Ubuntu Light', Helvetica, Arial, sans-serif;
+	font-size: 2.8vmin;
+	table-layout: fixed;
+}
+
+#auth-left .row {
+	margin: 15px 0px 15px 0px;
+	margin: 2vmin 0px 2vmin 0px;
+}
+
+#auth-right {
+	background-color: #ffffff;
+	height: 100%;
+}
+
+#auth-right #logo-angular {
+	bottom: 0px;
+	max-height: 90%;
+	position: absolute;
+	right: 0px;
+	width: 90%;
+}
+
+#auth-right #logo-ad {
+	bottom: 10%;
+	position: absolute;
+	right: 3%;
+	max-width: 25%;
+	max-width: 30vmin;
+}
+
+#auth-right #logo-text {
+	bottom: 16%;
+	bottom: 15vmin;
+	position: absolute;
+	right: 24%;
+	right: 20vmin;
+	width: 58%;
+}
+
+#auth-right #logo-text h1 {
+	color: #46a6b6;
+	font-family: 'Ubuntu Light', Helvetica, Arial, sans-serif;
+	font-size: 3.5vmin;
+	line-height: 200%;
+}
+
+#auth-right #logo-text p {
+	color: #58585a;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-size: 1.8vmin;
+	line-height: 180%;
+}
+
+.full-height {
+	height: 100%;
+}
+
+.middle {
+	/* parent must use: "display: table; table-layout: fixed;" */
+	display: table-cell;
+	height: 100%;
+	vertical-align: middle;
+}

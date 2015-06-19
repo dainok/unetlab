@@ -27,7 +27,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150428
+ * @version 20150515
  */
 
 /**
@@ -44,7 +44,7 @@ function apiGetLabTopology($lab) {
 	$output['data'] = Array();
 	foreach ($lab -> getNodes() as $node_id => $node) {
 		foreach ($node -> getEthernets() as $interface) {
-			if ($interface -> getNetworkId() != '') {
+			if ($interface -> getNetworkId() != '' && isset($lab -> getNetworks()[$interface -> getNetworkId()])) {
 				// Interface is connected
 				switch ($lab -> getNetworks()[$interface -> getNetworkId()] -> getCount()) {
 					default:

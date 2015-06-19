@@ -6,7 +6,7 @@
  * @copyright   2011 Josh Lockhart
  * @link        http://www.slimframework.com
  * @license     http://www.slimframework.com/license
- * @version     2.4.2
+ * @version     2.6.1
  * @package     Slim
  *
  * MIT LICENSE
@@ -288,6 +288,9 @@ class Route
     public function appendHttpMethods()
     {
         $args = func_get_args();
+        if(count($args) && is_array($args[0])){
+            $args = $args[0];
+        }
         $this->methods = array_merge($this->methods, $args);
     }
 
@@ -298,6 +301,9 @@ class Route
     public function via()
     {
         $args = func_get_args();
+        if(count($args) && is_array($args[0])){
+            $args = $args[0];
+        }
         $this->methods = array_merge($this->methods, $args);
 
         return $this;

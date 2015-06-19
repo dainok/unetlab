@@ -3,7 +3,6 @@ $section = 'Labs';
 $subsection = 'Open';
 $title = 'UNetLab - Open Lab';
 
-include('/opt/unetlab/html/includes/init.php');
 include('/opt/unetlab/html/themes/default/includes/header.php');
 include('/opt/unetlab/html/themes/default/includes/navbar.php');
 ?>

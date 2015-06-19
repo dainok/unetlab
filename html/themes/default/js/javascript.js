@@ -1,4 +1,11 @@
 $(document).ready(function() {
+	$.when(getUserInfo()).done(function(data) {
+		// User is authenticated
+	}).fail(function() {
+		// User is not authenticated, or error on API
+		window.location = '/themes/default/auth.html';
+	});
+
     if ($(location).attr('pathname') == '/lab_list.php') {
         // Page: lab_list
         path = getParameter('path');

@@ -117,6 +117,7 @@ $('body').on('contextmenu', '.node_menu', function(e) {
         menu += '<li><a data-action="startLabNodes" data-id="' + node_id + '" tabindex="-1" href="#"><i class="glyphicon glyphicon-play"></i> Start</a></span></li>';
         menu += '<li><a data-action="stopLabNodes" data-id="' + node_id + '" tabindex="-1" href="#"><i class="glyphicon glyphicon-stop"></i> Stop</a></span></li>';
         menu += '<li><a data-action="wipeLabNodes" data-id="' + node_id + '" tabindex="-1" href="#"><i class="glyphicon glyphicon-trash"></i> Wipe</a></span></li>';
+        menu += '<li><a data-action="exportLabNodes" data-id="' + node_id + '" tabindex="-1" href="#"><i class="glyphicon glyphicon-save"></i> Export CFG</a></span></li>';
         menu += '</ul>';
         menu += '</div>';
     }

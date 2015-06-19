@@ -17,26 +17,26 @@
  *
  * UNetLab is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with UNetLab.  If not, see <http://www.gnu.org/licenses/>.
+ * along with UNetLab.If not, see <http:
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150511
+ * @version 20150521
  */
 
-$p['type'] = 'qemu';        // Must be iol, dynamips or qemu
-$p['name'] = '7750SR';      // Can be empty
-$p['icon'] = 'Router.png';  // Can be empty, or a icon inside /opt/unetlab/html/images/icons/
-$p['cpu'] = 2;              // Must be integer
-$p['ram'] = 2048;           // Must be integer
-$p['ethernet'] = 4;         // Must be integer
-$p['console'] = 'telnet';   // Must be telnet or vnc
+$p['type'] = 'qemu';
+$p['name'] = '7750SR';
+$p['icon'] = 'Router.png';
+$p['cpu'] = 2;
+$p['ram'] = 2048; 
+$p['ethernet'] = 6; 
+$p['console'] = 'telnet'; 
 $p['qemu_arch'] = 'i386';
 if (function_exists('isVirtual') && isVirtual()) {
 	$p['qemu_options'] = '-machine type=pc-1.0,accel=tcg';

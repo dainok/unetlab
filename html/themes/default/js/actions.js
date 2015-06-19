@@ -29,6 +29,12 @@ $('.node_wipe_all').click(function() {
     wipeLabNodes(lab_file, 'all');
 });
 
+// Wipe all nodes
+$('.node_export_all').click(function() {
+    lab_file = getParameter('filename');
+    exportLabNodes(lab_file, 'all');
+});
+
 // Add a network
 $('.node_add').click(function() {
     lab_file = getParameter('filename');
@@ -81,11 +87,11 @@ $('body').on('submit', '#form-folder_add', function(e) {
                 raiseMessage('SUCCESS', 'Folder added.');
             } else {
                 // Fetching failed
-                raiseMessage('DANGER', 'Cannot add folder.');
+                raiseMessage('DANGER', data['status']);
             }
         },
         error: function(data) {
-            raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+            raiseMessage('DANGER', getJsonMessage(data['responseText']));
         }
     });
 
@@ -129,11 +135,11 @@ $('body').on('submit', '#form-lab_add', function(e) {
                 window.location.href = '/lab_edit.php?filename=' + lab_file;
             } else {
                 // Fetching failed
-                raiseMessage('DANGER', 'Cannot add folder.');
+                raiseMessage('DANGER', data['status']);
             }
         },
         error: function(data) {
-            raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+            raiseMessage('DANGER', getJsonMessage(data['responseText']));
         }
     });
 
@@ -167,11 +173,11 @@ $('body').on('submit', '#form-lab_edit', function(e) {
                 raiseMessage('SUCCESS', 'Lab saved.');
             } else {
                 // Fetching failed
-                raiseMessage('DANGER', 'Cannot save lab.');
+                raiseMessage('DANGER', data['status']);
             }
         },
         error: function(data) {
-            raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+            raiseMessage('DANGER', getJsonMessage(data['responseText']));
         }
     });
 
@@ -209,11 +215,11 @@ $('body').on('submit', '#form-network_add', function(e) {
                     window.location.href = '/lab_edit.php' + window.location.search;
                 } else {
                     // Fetching failed
-                    raiseMessage('DANGER', 'Cannot add network.');
+                    raiseMessage('DANGER', data['status']);
                 }
             },
             error: function(data) {
-                raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+                raiseMessage('DANGER', getJsonMessage(data['responseText']));
             }
         });
     }
@@ -255,11 +261,11 @@ $('body').on('submit', '#form-network_edit', function(e) {
                 window.location.href = '/lab_edit.php' + window.location.search;
             } else {
                 // Fetching failed
-                raiseMessage('DANGER', 'Cannot save network.');
+                raiseMessage('DANGER', data['status']);
             }
         },
         error: function(data) {
-            raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+            raiseMessage('DANGER', getJsonMessage(data['responseText']));
         }
     });
 
@@ -308,11 +314,11 @@ $('body').on('submit', '#form-picture_add', function(e) {
                 window.location.href = '/lab_edit.php' + window.location.search;
             } else {
                 // Fetching failed
-                raiseMessage('DANGER', 'Cannot add picture.');
+                raiseMessage('DANGER', data['status']);
             }
         },
         error: function(data) {
-            raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+            raiseMessage('DANGER', getJsonMessage(data['responseText']));
         }
     });
 
@@ -351,11 +357,11 @@ $('body').on('submit', '#form-picture_edit', function(e) {
                 window.location.href = '/lab_edit.php' + window.location.search;
             } else {
                 // Fetching failed
-                raiseMessage('DANGER', 'Cannot save picture.');
+                raiseMessage('DANGER', data['status']);
             }
         },
         error: function(data) {
-            raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+            raiseMessage('DANGER', getJsonMessage(data['responseText']));
         }
     });
 
@@ -420,11 +426,11 @@ $('body').on('submit', '#form-node_add', function(e) {
                     window.location.href = '/lab_edit.php' + window.location.search;
                 } else {
                     // Fetching failed
-                    raiseMessage('DANGER', 'Cannot add node.');
+                    raiseMessage('DANGER', data['status']);
                 }
             },
             error: function(data) {
-                raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+                raiseMessage('DANGER', getJsonMessage(data['responseText']));
             }
         });
     }
@@ -463,11 +469,11 @@ $('body').on('submit', '#form-node_edit', function(e) {
                 window.location.href = '/lab_edit.php' + window.location.search;
             } else {
                 // Fetching failed
-                raiseMessage('DANGER', 'Cannot save node.');
+                raiseMessage('DANGER', data['status']);
             }
         },
         error: function(data) {
-            raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+            raiseMessage('DANGER', getJsonMessage(data['responseText']));
         }
     });
 
@@ -516,11 +522,11 @@ if ($(location).attr('pathname') == '/lab_edit.php') {
                         jsPlumb.repaintEverything();
                     } else {
                         // Fetching failed
-                        raiseMessage('DANGER', 'Cannot save node.');
+                        raiseMessage('DANGER', data['status']);
                     }
                 },
                 error: function() {
-                    raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+                    raiseMessage('DANGER', getJsonMessage(data['responseText']));
                 }
             });
         } else if ($(this).hasClass('network_frame')) {
@@ -540,11 +546,11 @@ if ($(location).attr('pathname') == '/lab_edit.php') {
                         jsPlumb.repaintEverything();
                     } else {
                         // Fetching failed
-                        raiseMessage('DANGER', 'Cannot save network.');
+                        raiseMessage('DANGER', data['status']);
                     }
                 },
                 error: function() {
-                    raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+                    raiseMessage('DANGER', getJsonMessage(data['responseText']));
                 }
             });
         } else {
@@ -582,11 +588,11 @@ $('body').on('submit', '#form-node_connect', function(e) {
                 window.location.href = '/lab_edit.php' + window.location.search;
             } else {
                 // Fetching failed
-                raiseMessage('DANGER', 'Cannot save node.');
+                raiseMessage('DANGER', data['status']);
             }
         },
         error: function(data) {
-            raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+            raiseMessage('DANGER', getJsonMessage(data['responseText']));
         }
     });
 
@@ -596,3 +602,30 @@ $('body').on('submit', '#form-node_connect', function(e) {
     // Stop or form will follow the action link
     return false;
 });
+
+// Logout button
+$(document).on('click', '#button-logout', function(e) {
+    e.preventDefault();  // Prevent default behaviour
+    var url = '/api/auth/logout';
+    var type = 'GET'
+    $.ajax({
+        timeout: TIMEOUT,
+        type: type,
+        url: encodeURI(url),
+        dataType: 'json',
+        success: function(data) {
+            if (data['status'] == 'success') {
+				window.location = '/themes/default/auth.html';
+            } else {
+                // Authentication error
+				window.location = '/themes/default/auth.html';
+            }
+        },
+        error: function(data) {
+            // Authentication error
+			window.location = '/themes/default/auth.html';
+        }
+    });
+    return false;
+});
+

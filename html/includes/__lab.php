@@ -27,7 +27,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150428
+ * @version 20150527
  * @property type $author Author name of the lab. It's optional.
  * @property type $description Description of the lab. It's optional
  * @property type $filename The filename of the lab (without path). It's mandatory and automatically set.
@@ -147,7 +147,7 @@ class Lab {
 			// Lab description
 			$result = (string) array_pop($xml -> xpath('//lab/description'));
 			if (strlen($result) !== 0) {
-				$this -> description = htmlspecialchars_decode($result);
+				$this -> description = htmlspecialchars($result, ENT_DISALLOWED, 'UTF-8', TRUE);
 			} else if (strlen($result) !== 0) {
 				error_log('WARNING: '.$f.' '.$GLOBALS['messages'][20006]);
 			}
@@ -155,7 +155,7 @@ class Lab {
 			// Lab author
 			$result = (string) array_pop($xml -> xpath('//lab/@author'));
 			if (strlen($result) !== 0) {
-				$this -> author = htmlspecialchars_decode($result);
+				$this -> author = htmlspecialchars($result, ENT_DISALLOWED, 'UTF-8', TRUE);
 			} else if (strlen($result) !== 0) {
 				error_log('WARNING: '.$f.' '.$GLOBALS['messages'][20007]);
 			}
@@ -254,6 +254,21 @@ class Lab {
 							}
 							break;
 					}
+				}
+			}
+
+			// startup-config
+			foreach ($xml -> xpath('//lab/objects/configs/config') as $config) {
+				$node_id = 0;
+				$config_data = '';
+				if (isset($config -> attributes() -> id)) $node_id = (string) $config -> attributes() -> id;
+				$result = (string) array_pop($config -> xpath('.'));
+				if (strlen($result) > 0) $config_data = base64_decode($result);
+
+				$rc = $this -> nodes[$node_id] -> setConfigData($config_data);
+				if ($rc != 0) {
+					error_log('WARNING: '.$f.':cfg'.$node_id.' '.$GLOBALS['messages'][20037]);
+					continue;
 				}
 			}
 
@@ -456,7 +471,7 @@ class Lab {
 			unset($this -> author);
 			$modified = True;
 		} else if (isset($p['author'])) {
-			$this -> author = htmlentities($p['author']);
+			$this -> author = htmlspecialchars($p['author'], ENT_DISALLOWED, 'UTF-8', TRUE);
 			$modified = True;
 		}
 
@@ -465,7 +480,7 @@ class Lab {
 			unset($this -> description);
 			$modified = True;
 		} else if (isset($p['description'])) {
-			$this -> description = htmlentities($p['description']);
+			$this -> description = htmlspecialchars($p['description'], ENT_DISALLOWED, 'UTF-8', TRUE);
 			$modified = True;
 		}
 
@@ -525,7 +540,7 @@ class Lab {
 			return $this -> save();
 		} else {
 			error_log('ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$p['id'].' '.$GLOBALS['messages'][20026]);
-			return False;
+			return 20026;
 		}
 	}
 
@@ -880,7 +895,7 @@ class Lab {
 
 					// Add Ethernet interfaces
 					foreach ($node -> getEthernets() as $interface_id => $interface) {
-						if ($interface -> getNetworkId() > 0) {
+						if ($interface -> getNetworkId() > 0 && isset($this -> getNetworks()[$interface -> getNetworkId()])) {
 							$e = $d -> addChild('interface');
 							$e -> addAttribute('id', $interface_id);
 							$e -> addAttribute('name', $interface -> getName());
@@ -891,7 +906,7 @@ class Lab {
 
 					// Add Serial interfaces
 					foreach ($node -> getSerials() as $interface_id => $interface) {
-						if ($interface -> getRemoteId() > 0) {
+						if ($interface -> getRemoteId() > 0 && isset($this -> getNodes()[$interface -> getRemoteId()])) {
 							$e = $d -> addChild('interface');
 							$e -> addAttribute('id', $interface_id);
 							$e -> addAttribute('type', $interface -> getNType());
@@ -921,24 +936,43 @@ class Lab {
 		}
 
 		// Add objects
-		if (!empty($this -> getPictures())) {
-			$xml -> addChild('objects');
-		}
+		$objects = False;
 
 		// Add pictures
 		if (!empty($this -> getPictures())) {
+			$objects = True;
+			$xml -> addChild('objects');
 			$xml -> objects -> addChild('pictures');
-			foreach ($this -> getPictures() as $picture_id => $picture) {
-				$p = $xml -> objects -> pictures -> addChild('picture');
-				$p -> addAttribute('id', $picture_id);
-				$p -> addAttribute('name', $picture -> getName());
-				$p -> addAttribute('type', $picture -> getNType());
-				$p -> addAttribute('width', $picture -> getWidth());
-				$p -> addAttribute('height', $picture -> getHeight());
-				$p -> addChild('data', base64_encode($picture -> getData()));
-				$p -> addChild('map', htmlentities($picture -> getMap()));
+		}
+		foreach ($this -> getPictures() as $picture_id => $picture) {
+			$p = $xml -> objects -> pictures -> addChild('picture');
+			$p -> addAttribute('id', $picture_id);
+			$p -> addAttribute('name', $picture -> getName());
+			$p -> addAttribute('type', $picture -> getNType());
+			$p -> addAttribute('width', $picture -> getWidth());
+			$p -> addAttribute('height', $picture -> getHeight());
+			$p -> addChild('data', base64_encode($picture -> getData()));
+			$p -> addChild('map', htmlspecialchars($picture -> getMap()));
+		}
+
+		// Add configs
+		$configs = False;
+		foreach ($this -> getNodes() as $node_id => $node) {
+			$config_data = $node -> getConfigData();
+			if ($config_data !== '') {
+				if ($objects == False) {
+					$xml -> addChild('objects');
+					$objects = True;
+				}
+				if ($configs == False) {
+					$xml -> objects -> addChild('configs');
+					$configs = True;
+				}
+				$c = $xml -> objects -> configs -> addChild('config', base64_encode($config_data));
+				$c -> addAttribute('id', $node_id);
 			}
 		}
+
 
 		// Well format the XML
 		$dom = new DOMDocument('1.0');
@@ -992,6 +1026,28 @@ class Lab {
 			}
 			$network -> setCount($i);
 		}
+	}
+
+	/**
+	 * Method to set startup-config for a specific node
+	 *
+	 * @param   int		$node_id			Node ID
+	 * @param   string  $config_data         Binary config
+	 * @return  int                         0 means ok
+	 */
+	public function setNodeConfigData($node_id, $config_data) {
+		if (!isset($this -> nodes[$node_id])) {
+			// Node not found
+			error_log('ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$node_id.' '.$GLOBALS['messages'][20024]);
+			return 20024;
+		} else if ($this -> nodes[$node_id] -> setConfigData($config_data) === 0) {
+			$this -> nodes[$node_id] -> edit(Array('config' => 'Saved'));
+			return $this -> save();
+		} else {
+			error_log('ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$node_id.' '.$GLOBALS['messages'][20036]);
+			return False;
+		}
+
 	}
 }
 ?>

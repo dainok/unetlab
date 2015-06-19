@@ -27,11 +27,12 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150507
+ * @version 20150527
  * @property type $flags_eth CMD flags related to Ethernet interfaces. It's mandatory and automatically set.
  * @property type $flags_ser CMD flags related to Serial interfaces. It's mandatory and automatically set.
  * @property type $console protocol. It's optional.
  * @property type $config Filename for the startup configuration. It's optional.
+ * @property type $config_data The full startup configuration. It's optional.
  * @property type $cpu CPUs configured on the node. It's optional.
  * @property type $delay Seconds before starting the node. It's optional.
  * @property type $id Device ID. It's mandatory and set during contruction phase.
@@ -60,6 +61,7 @@ class Node {
 	private $flags_eth;
 	private $flags_ser;
 	private $config;
+	private $config_data;
 	private $console;
 	private $cpu;
 	private $delay;
@@ -267,7 +269,7 @@ class Node {
 		$this -> tenant = (int) $tenant;
 		$this -> type = $p['type'];
 		$this -> image = $p['image'];
-		if (isset($p['config'])) $this -> config = htmlentities($p['config']);		// TODO it's a file and must exists or set to saved
+		if (isset($p['config'])) $this -> config = htmlentities($p['config']);		// TODO it's a template and must exists or set to saved
 		if (isset($p['delay'])) $this -> delay = (int) $p['delay'];
 		if (isset($p['icon'])) $this -> icon = $p['icon'];
 		if (isset($p['left'])) $this -> left = $p['left'];
@@ -335,19 +337,21 @@ class Node {
 	public function edit($p) {
 		$modified = False;
 
-		// TODO it's a file and must exists or set to saved
 		if (isset($p['config']) && $p['config'] === '') {
 			// Config is empty, unset the current one
-			unset($p['config']);
+			unset($this -> config);
 			$modified = True;
+		} else if (isset($p['config']) && !checkNodeConfig($p['config'])) {
+			// Config is invalid, ingored
+			error_log('WARNING: '.$GLOBALS['messages'][40003]);
 		} else if (isset($p['config'])) {
-			$this -> config = htmlentities($p['config']);
+			$this -> config = $p['config'];
 			$modified = True;
 		}
 
 		if (isset($p['delay']) && $p['delay'] === '') {
 			// Delay is empty, unset the current one
-			unset($p['delay']);
+			unset($this -> delay);
 			$modified = True;
 		} else if (isset($p['delay']) && (int) $p['delay'] < 0) {
 			// Delay is invalid, ignored
@@ -358,7 +362,7 @@ class Node {
 
 		if (isset($p['icon']) && $p['icon'] === '') {
 			// Icon is empty, unset the current one
-			unset($p['icon']);
+			unset($this -> icon);
 			$modified = True;
 		} else if (isset($p['icon']) && !checkNodeIcon($p['icon'])) {
 			// Icon is invalid, ignored
@@ -391,8 +395,11 @@ class Node {
 			// Name is empty, unset the current one
 			unset($this -> name);
 			$modified = True;
+		} else if (isset($p['name']) && !checkNodeName($p['name'])) {
+			// Name is not valid, ignored
+			error_log('WARNING: '.$GLOBALS['messages'][40008]);
 		} else if (isset($p['name'])) {
-			$this -> name = htmlentities($p['name']);
+			$this -> name = $p['name'];
 			$modified = True;
 		}
 
@@ -407,6 +414,18 @@ class Node {
 			$this -> top = $p['top'];
 			$modified = True;
 		}
+
+		if (isset($p['ram']) && $p['ram'] === '') {
+			// RAM is empty, unset the current one
+			unset($p['ram']);
+			$modified = True;
+		} else if (isset($p['ram']) && (int) $p['ram'] <= 0) {
+			// RAM is invalid, ignored
+			error_log('WARNING: '.$GLOBALS['messages'][40009]);
+		} else if (isset($p['ram'])) {
+			$this -> ram = (int) $p['ram'];
+		}
+
 
 		// Specific parameters
 		if ($this -> type == 'iol') {
@@ -432,17 +451,6 @@ class Node {
 				error_log('WARNING: '.$GLOBALS['messages'][40011]);
 			} else if (isset($p['nvram'])) {
 				$this -> nvram = (int) $p['nvram'];
-			}
-
-			if (isset($p['ram']) && $p['ram'] === '') {
-				// RAM is empty, unset the current one
-				unset($p['ram']);
-				$modified = True;
-			} else if (isset($p['ram']) && (int) $p['ram'] <= 0) {
-				// RAM is invalid, ignored
-				error_log('WARNING: '.$GLOBALS['messages'][40009]);
-			} else if (isset($p['ram'])) {
-				$this -> ram = (int) $p['ram'];
 			}
 
 			if (isset($p['serial']) && $p['serial'] === '') {
@@ -584,6 +592,9 @@ class Node {
 			// -c config TODO                      // Configuration file name
 			$flags .= ' -q';                       // Suppress informational messages
 			$flags .= ' -m '.$this -> getRam();    // Megabytes of router memory
+			if ($this -> getConfig() == 'Saved') {
+				$flags .= ' -c startup-config';		// Configuration file name
+			}
 		}
 
 		if ($this -> type == 'dynamips') {
@@ -609,6 +620,9 @@ class Node {
 			$flags .= ' -r '.$this -> getRam();            // Set the virtual RAM size
 			$flags .= ' -n '.$this -> getNvram();          // Set the NVRAM size
 			$flags .= ' '.$this -> flags_eth;              // Adding Ethernet flags
+			if ($this -> getConfig() == 'Saved') {
+				$flags .= ' -C startup-config';			   // Import IOS configuration file into NVRAM
+			}
 		}
 
 		if ($this -> type == 'qemu') {
@@ -660,7 +674,7 @@ class Node {
 					$flags .= ' -cdrom /opt/unetlab/addons/qemu/'.$this -> getImage().'/cdrom.iso';
 				} else if (preg_match('/^megasas[a-z]+.qcow2$/', $filename)) {
 					// MegaSAS
-					$patterns[0] = '/^hd([a-z]+).qcow2$/';
+					$patterns[0] = '/^megasas([a-z]+).qcow2$/';
 					$replacements[0] = '$1';
 					$disk_id = preg_replace($patterns, $replacements, $filename);
 					$lun = (int) ord(strtolower($disk_id)) - 96;
@@ -675,11 +689,18 @@ class Node {
 					$flags .= ' -hd'.$disk_id.' '.$filename;
 				} else if (preg_match('/^virtio[a-z]+.qcow2$/', $filename)) {
 					// VirtIO
-					$patterns[0] = '/^hd([a-z]+).qcow2$/';
+					$patterns[0] = '/^virtio([a-z]+).qcow2$/';
 					$replacements[0] = '$1';
 					$disk_id = preg_replace($patterns, $replacements, $filename);
 					$lun = (int) ord(strtolower($disk_id)) - 96;
 					$flags .= ' -drive file='.$filename.',if=virtio,bus=0,unit='.$lun.',cache=none';
+				} else if (preg_match('/^scsci[a-z]+.qcow2$/', $filename)) {
+					// SCSI
+					$patterns[0] = '/^scsi([a-z]+).qcow2$/';
+					$replacements[0] = '$1';
+					$disk_id = preg_replace($patterns, $replacements, $filename);
+					$lun = (int) ord(strtolower($disk_id)) - 96;
+					$flags .= ' -drive file='.$filename.',if=scsi,bus=0,unit='.$lun.',cache=none';
 				}
 			}
 
@@ -700,11 +721,25 @@ class Node {
 	/**
 	 * Method to get config.
 	 * 
-	 * @return	string                      Configured startup-config
+	 * @return	string                      Where the node take the startup-config
 	 */
 	public function getConfig() {
 		if (isset($this -> config)) {
 			return $this -> config;
+		} else {
+			// By default return 'Unconfigured'
+			return 'Unconfigured';
+		}
+	}
+
+	/**
+	 * Method to get config bin.
+	 * 
+	 * @return	string                      Configured startup-config
+	 */
+	public function getConfigData() {
+		if (isset($this -> config_data)) {
+			return $this -> config_data;
 		} else {
 			// By default return ''
 			return '';
@@ -1041,6 +1076,25 @@ class Node {
 		// Non existent interface
 		error_log('ERROR: '.$GLOBALS['messages'][40018]);
 		return 40018;
+	}
+
+	/**
+	 * Method to set config bin.
+	 * 
+	 * @param   string  $config_data         Binary config
+	 * @return  int                         0 means ok
+	 */
+	public function setConfigData($config_data) {
+		if ($config_data === '') {
+			// Config is empty, unset the current one
+			unset($this -> config_data);
+			if ($this -> config = 'Saved') {
+				$this -> config = 'Unconfigured';
+			}
+		} else {
+			$this -> config_data = $config_data;
+		}
+		return 0;
 	}
 
 	/**

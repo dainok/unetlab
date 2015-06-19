@@ -18,6 +18,7 @@ rsync -a --delete html ${DATA_DIR}/opt/unetlab/
 cat html/includes/init.php | sed "s/define('VERSION', .*/define('VERSION', '${VERSION}-${RELEASE}');/g" > ${DATA_DIR}/opt/unetlab/html/includes/init.php
 cp -a scripts/set_uuid.php ${DATA_DIR}/opt/unetlab/scripts/
 cp -a scripts/fix_iol_nvram.sh ${DATA_DIR}/opt/unetlab/scripts/
+cp -a IOUtools/iou_export ${DATA_DIR}/opt/unetlab/scripts/
 chown -R root:root ${DATA_DIR}/opt/unetlab
 chown -R www-data:www-data ${DATA_DIR}/opt/unetlab/data ${DATA_DIR}/opt/unetlab/labs
 chown -R root:unl ${DATA_DIR}/opt/unetlab/tmp

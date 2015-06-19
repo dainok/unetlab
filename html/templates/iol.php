@@ -17,24 +17,24 @@
  *
  * UNetLab is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with UNetLab.  If not, see <http://www.gnu.org/licenses/>.
+ * along with UNetLab.If not, see <http:
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150428
+ * @version 20150521
  */
 
-$p['type'] = 'iol';         // Must be iol, dynamips or qemu
-$p['name'] = 'R';           // Can be empty
-$p['icon'] = 'Router.png';  // Can be empty, or a icon inside /opt/unetlab/html/images/icons/
-$p['nvram'] = 1024;         // Must be integer
-$p['ram'] = 256;            // Must be integer
-$p['ethernet'] = 1;         // Must be integer
-$p['serial'] = 1;           // Must be integer
+$p['type'] = 'iol'; 
+$p['name'] = 'R'; 
+$p['icon'] = 'Router.png';
+$p['nvram'] = 1024; 
+$p['ram'] = 256;
+$p['ethernet'] = 1; 
+$p['serial'] = 1; 
 ?>

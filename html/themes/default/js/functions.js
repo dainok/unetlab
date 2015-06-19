@@ -1,6 +1,17 @@
 // Base64 encode/decode
 var Base64={_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",encode:function(e){var t="";var n,r,i,s,o,u,a;var f=0;e=Base64._utf8_encode(e);while(f<e.length){n=e.charCodeAt(f++);r=e.charCodeAt(f++);i=e.charCodeAt(f++);s=n>>2;o=(n&3)<<4|r>>4;u=(r&15)<<2|i>>6;a=i&63;if(isNaN(r)){u=a=64}else if(isNaN(i)){a=64}t=t+this._keyStr.charAt(s)+this._keyStr.charAt(o)+this._keyStr.charAt(u)+this._keyStr.charAt(a)}return t},decode:function(e){var t="";var n,r,i;var s,o,u,a;var f=0;e=e.replace(/[^A-Za-z0-9\+\/\=]/g,"");while(f<e.length){s=this._keyStr.indexOf(e.charAt(f++));o=this._keyStr.indexOf(e.charAt(f++));u=this._keyStr.indexOf(e.charAt(f++));a=this._keyStr.indexOf(e.charAt(f++));n=s<<2|o>>4;r=(o&15)<<4|u>>2;i=(u&3)<<6|a;t=t+String.fromCharCode(n);if(u!=64){t=t+String.fromCharCode(r)}if(a!=64){t=t+String.fromCharCode(i)}}t=Base64._utf8_decode(t);return t},_utf8_encode:function(e){e=e.replace(/\r\n/g,"\n");var t="";for(var n=0;n<e.length;n++){var r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r)}else if(r>127&&r<2048){t+=String.fromCharCode(r>>6|192);t+=String.fromCharCode(r&63|128)}else{t+=String.fromCharCode(r>>12|224);t+=String.fromCharCode(r>>6&63|128);t+=String.fromCharCode(r&63|128)}}return t},_utf8_decode:function(e){var t="";var n=0;var r=c1=c2=0;while(n<e.length){r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r);n++}else if(r>191&&r<224){c2=e.charCodeAt(n+1);t+=String.fromCharCode((r&31)<<6|c2&63);n+=2}else{c2=e.charCodeAt(n+1);c3=e.charCodeAt(n+2);t+=String.fromCharCode((r&15)<<12|(c2&63)<<6|c3&63);n+=3}}return t}}
 
+// Get JSon message from HTTP response
+function getJsonMessage(response) {
+    var message = '';
+    try {
+        message = JSON.parse(response)['message'];
+    } catch(e) {
+        message = 'Undefined message, see logs under "/opt/unetlab/data/Logs/".';
+    }
+    return message;
+}
+
 // Get GET parameter
 function getParameter(s) {
     s = s.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
@@ -45,6 +56,7 @@ function displaySystemStatus() {
         success: function(data) {
             if (data['status'] == 'success') {
                 // Fetching ok
+                version = data['data']['version'];
                 cpu_percent = data['data']['cpu'];
                 disk_percent = data['data']['disk'];
                 mem_percent = data['data']['mem'];
@@ -53,6 +65,8 @@ function displaySystemStatus() {
                 qemu_count = data['data']['qemu'];
                 dynamips_count = data['data']['dynamips'];
                 iol_count = data['data']['iol'];
+
+                $('#status-version').text('Version ' + version);
 
                 if (disk_percent >= 0) {
                     $('#status-disk').removeClass('progress-bar-striped');
@@ -120,12 +134,12 @@ function displaySystemStatus() {
                 deferred.resolve();
             } else {
                 // Fetching failed
-                raiseMessage('DANGER', 'Cannot get disk usage.');
+                raiseMessage('DANGER', data['status']);
                 deferred.reject();
             }
         },
         error: function(data) {
-            raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+            raiseMessage('DANGER', getJsonMessage(data['responseText']));
             deferred.reject();
         }
     });
@@ -239,16 +253,16 @@ function displayFolder(path) {
                 deferred.resolve();
             } else {
                 // Fetching failed
-                content += '<h1>Cannot get folder "' + path + '"</h1>';
-                raiseMessage('DANGER', 'Cannot get folder "' + path + '".');
+                content += '<h1>"' + data['status'] + '"</h1>';
+                raiseMessage('DANGER', data['status']);
                 deferred.reject();
             }
             $('#folder_content').html(content);
         },
         error: function(data) {
-            var content = '<h1>Cannot call API ("' + url + '")</h1>';
+            var content = '<h1>' + getJsonMessage(data['responseText']) + '</h1>';
             $('#folder_content').html(content);
-            raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+            raiseMessage('DANGER', getJsonMessage(data['responseText']));
             deferred.reject();
         }
     });
@@ -276,12 +290,12 @@ function deleteFolder(lab_file, folder) {
                 deferred.resolve(data);
             } else {
                 // Fetching failed
-                raiseMessage('DANGER', 'Cannot delete folder "' + folder + '".');
+                raiseMessage('DANGER', data['status']);
                 deferred.reject();
             }
         },
         error: function(data) {
-            raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+            raiseMessage('DANGER', getJsonMessage(data['responseText']));
             deferred.reject();
         }
     });
@@ -314,12 +328,12 @@ function deleteLab(lab_file, lab) {
                 deferred.resolve(data);
             } else {
                 // Fetching failed
-                raiseMessage('DANGER', 'Cannot delete lab "' + lab + '".');
+                raiseMessage('DANGER', data['status']);
                 deferred.reject();
             }
         },
         error: function(data) {
-            raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+            raiseMessage('DANGER', getJsonMessage(data['responseText']));
             deferred.reject();
         }
     });
@@ -373,12 +387,12 @@ function displayLabInfo(lab_file) {
                 deferred.resolve();
             } else {
                 // Fetching failed
-                raiseMessage('DANGER', 'Cannot get lab info "' + lab_file + '".');
+                raiseMessage('DANGER', data['status']);
                 deferred.reject();
             }
         },
         error: function(data) {
-            raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+            raiseMessage('DANGER', getJsonMessage(data['responseText']));
             deferred.reject();
         }
     });
@@ -439,12 +453,12 @@ function displayLabNetworks(lab_file) {
                 deferred.resolve();
             } else {
                 // Fetching failed
-                raiseMessage('DANGER', 'Cannot get lab networks ("' + lab_file + '").');
+                raiseMessage('DANGER', data['status']);
                 deferred.reject();
             }
         },
         error: function(data) {
-            raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+            raiseMessage('DANGER', getJsonMessage(data['responseText']));
             deferred.reject();
         }
     });
@@ -506,12 +520,12 @@ function displayLabNodes(lab_file) {
                 deferred.resolve();
             } else {
                 // Fetching failed
-                raiseMessage('DANGER', 'Cannot get lab nodes ("' + lab_file + '").');
+                raiseMessage('DANGER', data['status']);
                 deferred.reject();
             }
         },
         error: function(data) {
-            raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+            raiseMessage('DANGER', getJsonMessage(data['responseText']));
             deferred.reject();
         }
     });
@@ -556,12 +570,12 @@ function displayLabPictures(lab_file) {
                 deferred.resolve();
             } else {
                 // Fetching failed
-                raiseMessage('DANGER', 'Cannot get lab networks ("' + lab_file + '").');
+                raiseMessage('DANGER', data['status']);
                 deferred.reject();
             }
         },
         error: function(data) {
-            raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+            raiseMessage('DANGER', getJsonMessage(data['responseText']));
             deferred.reject();
         }
     });
@@ -598,12 +612,12 @@ function displayLabStatus() {
                 deferred.resolve();
             } else {
                 // Fetching failed
-                raiseMessage('DANGER', 'Cannot get lab status ("' + lab_file + '").');
+                raiseMessage('DANGER', data['status']);
                 deferred.reject();
             }
         },
         error: function(data) {
-            raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+            raiseMessage('DANGER', getJsonMessage(data['responseText']));
             deferred.reject();
         }
     });
@@ -691,12 +705,12 @@ function displayLabTopology(lab_file) {
                     deferred.resolve();
                 } else {
                     // Fetching failed
-                    raiseMessage('DANGER', 'Cannot get lab topology ("' + lab_file + '").');
+                    raiseMessage('DANGER', data['status']);
                     deferred.reject();
                 }
             },
             error: function() {
-                raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+                raiseMessage('DANGER', getJsonMessage(data['responseText']));
                 deferred.reject();
             }
         });
@@ -726,12 +740,12 @@ function stopLabNodes(lab_file, node_id) {
                 deferred.resolve();
             } else {
                 // Fetching failed
-                raiseMessage('DANGER', 'Cannot stop node(s).');
+                raiseMessage('DANGER', data['status']);
                 deferred.reject();
             }
         },
         error: function(data) {
-            raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+            raiseMessage('DANGER', getJsonMessage(data['responseText']));
             deferred.reject();
         }
     });
@@ -760,12 +774,12 @@ function startLabNodes(lab_file, node_id) {
                 deferred.resolve();
             } else {
                 // Fetching failed
-                raiseMessage('DANGER', 'Cannot start node(s).');
+                raiseMessage('DANGER', data['status']);
                 deferred.reject();
             }
         },
         error: function(data) {
-            raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+            raiseMessage('DANGER', getJsonMessage(data['responseText']));
             deferred.reject();
         }
     });
@@ -794,12 +808,46 @@ function wipeLabNodes(lab_file, node_id) {
                 deferred.resolve();
             } else {
                 // Fetching failed
-                raiseMessage('DANGER', 'Cannot wipe node(s).');
+                raiseMessage('DANGER', data['status']);
                 deferred.reject();
             }
         },
         error: function(data) {
-            raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+            raiseMessage('DANGER', getJsonMessage(data['responseText']));
+            deferred.reject();
+        }
+    });
+    return deferred.promise();
+}
+
+// Export CFG(s)
+function exportLabNodes(lab_file, node_id) {
+    var deferred = $.Deferred();
+
+    // Get action URL
+    if (node_id == 'all') {
+        var url = '/api/labs' + lab_file + '/nodes/export';
+    } else {
+        var url = '/api/labs' + lab_file + '/nodes/' + node_id + '/export';
+    }
+    $.ajax({
+        timeout: TIMEOUT,
+        type: 'GET',
+        url: encodeURI(url),
+        dataType: 'json',
+        success: function(data) {
+            if (data['status'] == 'success') {
+                // Fetching ok
+                raiseMessage('SUCCESS', 'CFG(s) exported.');
+                deferred.resolve();
+            } else {
+                // Fetching failed
+                raiseMessage('DANGER', data['status']);
+                deferred.reject();
+            }
+        },
+        error: function(data) {
+            raiseMessage('DANGER', getJsonMessage(data['responseText']));
             deferred.reject();
         }
     });
@@ -829,12 +877,12 @@ function getNetwork(lab_file, network_id) {
                     deferred.resolve(data);
                 } else {
                     // Fetching failed
-                    raiseMessage('DANGER', 'Cannot get network (network_id = ' + network_id + ').');
+                    raiseMessage('DANGER', data['status']);
                     deferred.reject();
                 }
             },
             error: function(data) {
-                raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+                raiseMessage('DANGER', getJsonMessage(data['responseText']));
                 deferred.reject();
             }
         });
@@ -864,12 +912,12 @@ function getPicture(lab_file, picture_id) {
                     deferred.resolve(picture);
                 } else {
                     // Fetching failed
-                    raiseMessage('DANGER', 'Cannot get picture (picture_id = ' + picture_id + ').');
+                    raiseMessage('DANGER', data['status']);
                     deferred.reject();
                 }
             },
             error: function(data) {
-                raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+                raiseMessage('DANGER', getJsonMessage(data['responseText']));
                 deferred.reject();
             }
         });
@@ -950,12 +998,12 @@ function displayNetworkForm(lab_file, network_id) {
                 });
             } else {
                 // Fetching failed
-                raiseMessage('DANGER', 'Cannot list network types.');
+                raiseMessage('DANGER', data['status']);
                 deferred.reject();
             }
         },
         error: function(data) {
-            raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+            raiseMessage('DANGER', getJsonMessage(data['responseText']));
             deferred.reject();
         }
     });
@@ -1078,12 +1126,12 @@ function deleteLabNetwork(lab_file, network_id) {
                 deferred.resolve(data);
             } else {
                 // Fetching failed
-                raiseMessage('DANGER', 'Cannot delete network (network_id = ' + network_id + ').');
+                raiseMessage('DANGER', data['status']);
                 deferred.reject();
             }
         },
         error: function(data) {
-            raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+            raiseMessage('DANGER', getJsonMessage(data['responseText']));
             deferred.reject();
         }
     });
@@ -1111,12 +1159,12 @@ function deletePicture(lab_file, picture_id) {
                 deferred.resolve(data);
             } else {
                 // Fetching failed
-                raiseMessage('DANGER', 'Cannot delete picture (picture_id = ' + picture_id + ').');
+                raiseMessage('DANGER', data['status']);
                 deferred.reject();
             }
         },
         error: function(data) {
-            raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+            raiseMessage('DANGER', getJsonMessage(data['responseText']));
             deferred.reject();
         }
     });
@@ -1146,12 +1194,12 @@ function displayTemplateForm() {
                 deferred.resolve(form);
             } else {
                 // Fetching failed
-                raiseMessage('DANGER', 'Cannot list node templates.');
+                raiseMessage('DANGER', data['status']);
                 deferred.reject();
             }
         },
         error: function(data) {
-            raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+            raiseMessage('DANGER', getJsonMessage(data['responseText']));
             deferred.reject();
         }
     });
@@ -1226,12 +1274,12 @@ function displayNodeForm(lab_file, node_id) {
                     });
                 } else {
                     // Fetching failed
-                    raiseMessage('DANGER', 'Cannot get node.');
+                    raiseMessage('DANGER', data['status']);
                     deferred.reject();
                 }
             },
             error: function(data) {
-                raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+                raiseMessage('DANGER', getJsonMessage(data['responseText']));
                 deferred.reject();
             }
         });
@@ -1334,12 +1382,12 @@ function deleteLabNode(lab_file, node_id) {
                 deferred.resolve(data);
             } else {
                 // Fetching failed
-                raiseMessage('DANGER', 'Cannot delete node (node_id = ' + noed_id + ').');
+                raiseMessage('DANGER', data['status']);
                 deferred.reject();
             }
         },
         error: function(data) {
-            raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+            raiseMessage('DANGER', getJsonMessage(data['responseText']));
             deferred.reject();
         }
     });
@@ -1363,12 +1411,12 @@ function getLabLinks(lab_file) {
                 deferred.resolve(data['data']);
             } else {
                 // Fetching failed
-                raiseMessage('DANGER', 'Cannot get lab links.');
+                raiseMessage('DANGER', data['status']);
                 deferred.reject();
             }
         },
         error: function(data) {
-            raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+            raiseMessage('DANGER', getJsonMessage(data['responseText']));
             deferred.reject();
         }
     });
@@ -1451,12 +1499,12 @@ function displayNodeInterfacesForm(lab_file, node_id) {
                     deferred.resolve();
                 } else {
                     // Fetching failed
-                    raiseMessage('DANGER', 'Cannot get node interfaces.');
+                    raiseMessage('DANGER', data['status']);
                     deferred.reject();
                 }
             },
             error: function(data) {
-                raiseMessage('DANGER', 'Cannot call API ("' + url + '").');
+                raiseMessage('DANGER', getJsonMessage(data['responseText']));
                 deferred.reject();
             }
         });
@@ -1466,3 +1514,28 @@ function displayNodeInterfacesForm(lab_file, node_id) {
 
     return deferred.promise();
 }
+
+// Get user info
+function getUserInfo() {
+    var deferred = $.Deferred();
+    var url = '/api/auth';
+    var type = 'GET'
+    $.ajax({
+        timeout: TIMEOUT,
+        type: type,
+        url: encodeURI(url),
+        dataType: 'json',
+        success: function(data) {
+            if (data['status'] == 'success') {
+                deferred.resolve(data);
+            } else {
+                deferred.reject(data);
+            }
+        },
+        error: function(data) {
+            deferred.reject();
+        }
+    });
+    return deferred.promise();
+}
+
