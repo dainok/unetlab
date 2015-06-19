@@ -199,9 +199,9 @@ int is_eth(int i) {
 // Receiving packet from AF_UNIX
 int packet_af(int af_socket, int *iol_fd, int *udp_fd, int *remote_id, int *remote_if) {
     char *iol_frame;
-    char eth_frame[1514];
+    char eth_frame[1518];
     memset(&eth_frame, 0, sizeof(eth_frame));
-    char ser_frame[1522];
+    char ser_frame[1526];
     memset(&ser_frame, 0, sizeof(ser_frame));
     char tmp_frame[BUFFER];
     memset(&tmp_frame, 0, sizeof(tmp_frame));
