@@ -137,6 +137,12 @@ int mk_afsocket(int *wrapper_socket, int *iol_socket) {
     strncat(wrapper_socketfile, "/", sizeof(*wrapper_socketfile));
     sprintf(tmp, "%u", wrapper_id);
     strcat(wrapper_socketfile, tmp);
+
+    if ( *wrapper_socket != -1 ) {
+      close(*wrapper_socket);
+      *wrapper_socket = -1;
+    }
+
     if (access(wrapper_socketfile, F_OK) != -1 && remove(wrapper_socketfile) != 0) {
         rc = 1;
         if (DEBUG > 0) printf("DEBUG: cannot access AF_UNIX (%s).\n", tmp);
