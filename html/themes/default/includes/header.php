@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="">
         <meta name="author" content="">
-        <link rel="icon" href="/themes/default/favicon.ico">
+        <link rel="icon" href="/themes/default/images/favicon.ico">
         <title><?php print $title ?></title>
         <link href="/themes/default/css/bootstrap.min.css" rel="stylesheet">
         <link href="/themes/default/css/bootstrap-theme.min.css" rel="stylesheet">

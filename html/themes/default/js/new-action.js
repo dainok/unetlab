@@ -48,7 +48,7 @@ $(document).on('submit', '#form-login', function(e) {
 			} else {
 				// Authentication error
                 logger(1, 'DEBUG: internal error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-				// TODO
+				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
 			}
 		},
 		error: function(data) {
@@ -56,7 +56,7 @@ $(document).on('submit', '#form-login', function(e) {
 			var message = getJsonMessage(data['responseText']);
             logger(1, 'DEBUG: Ajax error (' + data['status'] + ') on ' + type + ' ' + url + '.');
 			logger(1, 'DEBUG: ' + message);
-			// TODO
+			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
 		}
 	});
     return false;  // Stop to avoid POST
@@ -80,7 +80,7 @@ $(document).on('click', '#button-logout', function(e) {
 			} else {
 				// Authentication error
                 logger(1, 'DEBUG: internal error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-				raisePermanentMessage('ERROR', data['status']);
+				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
 			}
 		},
 		error: function(data) {
@@ -88,65 +88,15 @@ $(document).on('click', '#button-logout', function(e) {
 			var message = getJsonMessage(data['responseText']);
             logger(1, 'DEBUG: Ajax error (' + data['status'] + ') on ' + type + ' ' + url + '.');
 			logger(1, 'DEBUG: ' + message);
-			raisePermanentMessage('ERROR', message);
+			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
 		}
 	});
     return false;
 });
 
-// Close button
-$(document).on('click', '.close', function(e) {
-	closeCenterBox($(this));
-});
-
-// Key-up event
-$(document).keyup(function(e) {
-	if (e.keyCode == 27) {
-		// ESC
-		$('.close').each(function() {
-			closeCenterBox($(this));
-		});
-	}
-});
-
-// Click away from center box
-$(document).on('click', '.box-center-content', function(e) {
-	// Do not close if click is on content
-	e.stopPropagation();
-});
-$(document).on('click', '.box-center-container', function(e) {
-	// Click is on container, close the box
-	$('.close').each(function() {
-		closeCenterBox($(this));
+// Close Modal
+$('.modal').on('hidden.bs.modal', function () {
+	$('.modal').each(function() {
+		$(this).remove();
 	});
-});
-
-// Open a folder
-$(document).on('click', '.folder-link', function(e) {
-	var folder_path = $(this).attr('data-path');
-	$.when(getFolderContent(folder_path)).done(function(data) {
-		// Folder loaded
-		logger(1, 'DEBUG: folder "' + folder_path + '" loaded.');
-		$('#main').html(getPageHome(data['data']['folders'], data['data']['labs']));
-	}).fail(function(data) {
-		// Cannot load folder content
-		var message = getJsonMessage(data['responseText']);
-		logger(1, 'DEBUG: cannot load folder "' + folder_path + '".');
-		raisePermanentMessage('ERROR', message);
-	});;
-});
-
-// Preview a lab
-$(document).on('click', '.lab-link', function(e) {
-	var lab_path = $(this).attr('data-path');
-	$.when(getLabPreview(lab_path)).done(function(data) {
-		// Lab loaded
-		logger(1, 'DEBUG: lab "' + lab_path + '" loaded.');
-		//$('#main').html(getPageHome(data['data']['folders'], data['data']['labs']));
-	}).fail(function(data) {
-		// Cannot preview lab
-		var message = getJsonMessage(data['responseText']);
-		logger(1, 'DEBUG: cannot preview lab "' + lab_path + '".');
-		raisePermanentMessage('ERROR', message);
-	});;
 });

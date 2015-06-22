@@ -327,16 +327,16 @@ function checkUuid($s) {
 function configureUserPod($db, $username) {
 	// Check if a POD is already been assigned
 	try {
-		$query = 'SELECT COUNT(*) AS rows FROM pods LEFT JOIN users ON pods.user_id = users.id WHERE users.username = :username;';
+		$query = 'SELECT COUNT(*) AS rows FROM pods LEFT JOIN users ON pods.username = users.username WHERE users.username = :username;';
 		$statement = $db -> prepare($query);
-		$statement -> bindParam(':username', $cookie, PDO::PARAM_STR);
+		$statement -> bindParam(':username', $username, PDO::PARAM_STR);
 		$statement -> execute();
 		$result = $statement -> fetch();
 		if ($result['rows'] > 1) {
 			// We expect one or none rows
 			error_log('ERROR: '.$GLOBALS['messages'][90015]);
 			return 90015;
-		} else if ($result['rows'] == 0) {
+		} else if ($result['rows'] == 1) {
 			// POD already assigned
 			return 0;
 		}
@@ -348,9 +348,8 @@ function configureUserPod($db, $username) {
 			
 	try {
 		// List assigned PODS
-		$query = 'SELECT id, user_id FROM pods;';	// List also expired lab, because they are not cleared yet
+		$query = 'SELECT id, username FROM pods;';	// List also expired lab, because they are not cleared yet
 		$statement = $db -> prepare($query);
-		$statement -> bindParam(':expiration', $now, PDO::PARAM_INT);
 		$statement -> execute();
 		$result = $statement -> fetchAll(PDO::FETCH_KEY_PAIR|PDO::FETCH_GROUP);
 	} catch (Exception $e) {
@@ -375,7 +374,7 @@ function configureUserPod($db, $username) {
 	} else {
 		// Assign the POD
 		try {
-			$query = 'INSERT INTO pods (id, user_id) SELECT :pod_id, id FROM users WHERE username = :username;';
+			$query = 'INSERT INTO pods (id, username) VALUES(:pod_id, :username);';
 			$statement = $db -> prepare($query);
 			$statement -> bindParam(':pod_id', $pod, PDO::PARAM_INT);
 			$statement -> bindParam(':username', $username, PDO::PARAM_STR);
@@ -436,13 +435,13 @@ function deleteSessions($db) {
  * @param   string  $cookie             Session cookie
  * @return  bool                        True if valid
  */
-function getUsernameByCookie($db, $cookie) {
+function getUserByCookie($db, $cookie) {
 	$now = time();
 	try {
-		$query = 'SELECT users.email AS email, users.name AS name, pods.id AS pod, users.username AS username FROM users LEFT JOIN pods ON users.id = pods.user_id WHERE cookie = :cookie AND users.web_expiration >= :web_expiration AND (users.expiration < 0 OR users.expiration >= :user_expiration) AND (pods.expiration < 0 OR pods.expiration > :pod_expiration);';
+		$query = 'SELECT users.email AS email, users.name AS name, pods.id AS pod, users.username AS username FROM users LEFT JOIN pods ON users.username = pods.username WHERE cookie = :cookie AND users.session >= :session AND (users.expiration < 0 OR users.expiration >= :user_expiration) AND (pods.expiration < 0 OR pods.expiration > :pod_expiration);';
 		$statement = $db -> prepare($query);
 		$statement -> bindParam(':cookie', $cookie, PDO::PARAM_STR);
-		$statement -> bindParam(':web_expiration', $now, PDO::PARAM_INT);
+		$statement -> bindParam(':session', $now, PDO::PARAM_INT);
 		$statement -> bindParam(':user_expiration', $now, PDO::PARAM_INT);
 		$statement -> bindParam(':pod_expiration', $now, PDO::PARAM_INT);
 		$statement -> execute();
@@ -474,7 +473,7 @@ function getUsernameByCookie($db, $cookie) {
  */
 function getUserPod($db, $cookie) {
 	try {
-		$query = 'SELECT COUNT(*) AS rows FROM pods LEFT JOIN users ON pods.user_id = users.id WHERE users.cookie = :cookie;';
+		$query = 'SELECT COUNT(*) AS rows FROM pods LEFT JOIN users ON pods.username = users.username WHERE users.cookie = :cookie;';
 		$statement = $db -> prepare($query);
 		$statement -> bindParam(':cookie', $cookie, PDO::PARAM_STR);
 		$statement -> execute();
@@ -491,7 +490,7 @@ function getUserPod($db, $cookie) {
 	}
 
 	try {
-		$query = 'SELECT pods.id FROM pods LEFT JOIN users ON pods.user_id = users.id WHERE users.cookie = :cookie;';
+		$query = 'SELECT pods.id FROM pods LEFT JOIN users ON pods.username = users.username WHERE users.cookie = :cookie;';
 		$statement = $db -> prepare($query);
 		$statement -> bindParam(':cookie', $cookie, PDO::PARAM_STR);
 		$statement -> execute();
@@ -729,7 +728,7 @@ function updateDatabase($db) {
 		if ($result['name'] != 'users') {
 			// User table is missing
 			$db -> beginTransaction();
-			$query = 'CREATE TABLE users (username TEXT PRIMARY KEY, cookie TEXT, email TEXT, expiration INTEGER DEFAULT -1, name, TEXT, password TEXT, lab_id TEXT);';
+			$query = 'CREATE TABLE users (username TEXT PRIMARY KEY, cookie TEXT, email TEXT, expiration INTEGER DEFAULT -1, name TEXT, password TEXT, session INT);';
 			$statement = $db -> prepare($query);
 			$statement -> execute();
 
@@ -747,7 +746,8 @@ function updateDatabase($db) {
 		return False;
 	}
 
-	// Roles table
+	/*
+	// Permissions table
 	try {
 		$query = "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'permissions';";
 		$statement = $db -> prepare($query);
@@ -773,30 +773,7 @@ function updateDatabase($db) {
 		error_log((string) $e);
 		return False;
 	}
-
-	// Sessions table
-	try {
-		$query = "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'sessions';";
-		$statement = $db -> prepare($query);
-		$statement -> execute();
-		$result = $statement -> fetch();
-		if ($result['name'] != 'sessions') {
-			// User table is missing
-			$db -> beginTransaction();
-			$query = 'CREATE TABLE sessions (cookie TEXT PRIMARY KEY, expiration INTEGER DEFAULT -1, username TEXT);';
-			$statement = $db -> prepare($query);
-			$statement -> execute();
-			$query = 'CREATE INDEX username_sessions ON sessions (username);';
-			$statement = $db -> prepare($query);
-			$statement -> execute();
-			$db -> commit();
-			error_log('ERROR: '.$GLOBALS['messages'][90028]);
-		}
-	} catch (Exception $e) {
-		error_log('ERROR: '.$GLOBALS['messages'][90029]);
-		error_log((string) $e);
-		return False;
-	}
+	 */
 
 	// Pods table
 	try {
@@ -813,7 +790,14 @@ function updateDatabase($db) {
 			$query = 'CREATE INDEX username_pods ON pods (username);';
 			$statement = $db -> prepare($query);
 			$statement -> execute();
+
+			// Adding admin user
+			$query = "INSERT INTO pods (id, expiration, username) SELECT 0, -1, 'admin';";
+			$statement = $db -> prepare($query);
+			$statement -> execute();
 			$db -> commit();
+			$db -> commit();
+
 			error_log('ERROR: '.$GLOBALS['messages'][90009]);
 		}
 	} catch (Exception $e) {
@@ -836,7 +820,7 @@ function updateDatabase($db) {
 function updateUserCookie($db, $username, $cookie) {
 	try {
 		$now = time() + SESSION;
-		$query = 'INSERT OR REPLACE INTO sessions SET cookie = :cookie, expiration = :expiration, username = :username;';
+		$query = 'UPDATE users SET cookie = :cookie, session = :session WHERE username = :username;';
 		$statement = $db -> prepare($query);
 		$statement -> bindParam(':cookie', $cookie, PDO::PARAM_STR);
 		$statement -> bindParam(':session', $now, PDO::PARAM_INT);

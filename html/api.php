@@ -62,8 +62,6 @@ require_once(BASE_DIR.'/html/includes/api_status.php');
 require_once(BASE_DIR.'/html/includes/api_topology.php');
 \Slim\Slim::registerAutoloader();
 
-$tenant = 0;
-
 $app = new \Slim\Slim(Array(
 	'mode' => 'production',
 	'debug' => True,					// Change to False for production
@@ -84,6 +82,9 @@ $app -> hook('slim.after.router', function () use ($app) {
 
 $app -> response -> headers -> set('Content-Type', 'application/json');
 $app -> response -> headers -> set('X-Powered-By', 'Unified Networking Lab API');
+$app -> response -> headers -> set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+$app -> response -> headers -> set('Cache-Control', 'post-check=0, pre-check=0');
+$app -> response -> headers -> set('Pragma', 'no-cache');
 
 class ResourceNotFoundException extends Exception {}
 class AuthenticateFailedException extends Exception {}
@@ -141,8 +142,8 @@ $app -> get('/api/auth/logout', function() use ($app, $db) {
 });
 
 $app -> get('/api/auth', function() use ($app, $db) {
-	list($username, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
-	if ($username === False) {
+	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($user === False) {
 		$app -> response -> setStatus($output['code']);
 		$app -> response -> setBody(json_encode($output));
 		return;
@@ -151,10 +152,7 @@ $app -> get('/api/auth', function() use ($app, $db) {
 	$output['code'] = 200;
 	$output['status'] = 'success';
 	$output['message'] = $GLOBALS['messages']['90002'];
-	$output['data'] = Array(
-		'username' => $username,
-		'tenant' => $tenant
-	);
+	$output['data'] = $user;
 
 	$app -> response -> setStatus($output['code']);
 	$app -> response -> setBody(json_encode($output));
@@ -193,8 +191,8 @@ $app -> get('/api/status', function() use ($app, $db) {
  **************************************************************************/
 // Node templates
 $app -> get('/api/list/templates/(:template)', function($template = '') use ($app, $db) {
-	list($username, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
-	if ($username === False) {
+	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($user === False) {
 		$app -> response -> setStatus($output['code']);
 		$app -> response -> setBody(json_encode($output));
 		return;
@@ -224,8 +222,8 @@ $app -> get('/api/list/templates/(:template)', function($template = '') use ($ap
 
 // Network types
 $app -> get('/api/list/networks', function() use ($app, $db) {
-	list($username, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
-	if ($username === False) {
+	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($user === False) {
 		$app -> response -> setStatus($output['code']);
 		$app -> response -> setBody(json_encode($output));
 		return;
@@ -245,8 +243,8 @@ $app -> get('/api/list/networks', function() use ($app, $db) {
  **************************************************************************/
 // Get folder content
 $app -> get('/api/folders/(:path+)', function($path = array()) use ($app, $db) {
-	list($username, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
-	if ($username === False) {
+	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($user === False) {
 		$app -> response -> setStatus($output['code']);
 		$app -> response -> setBody(json_encode($output));
 		return;
@@ -261,8 +259,8 @@ $app -> get('/api/folders/(:path+)', function($path = array()) use ($app, $db) {
 
 // Add a new folder
 $app -> post('/api/folders', function() use ($app, $db) {
-	list($username, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
-	if ($username === False) {
+	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($user === False) {
 		$app -> response -> setStatus($output['code']);
 		$app -> response -> setBody(json_encode($output));
 		return;
@@ -278,8 +276,8 @@ $app -> post('/api/folders', function() use ($app, $db) {
 
 // Delete an existing folder
 $app -> delete('/api/folders/(:path+)', function($path = array()) use ($app, $db) {
-	list($username, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
-	if ($username === False) {
+	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($user === False) {
 		$app -> response -> setStatus($output['code']);
 		$app -> response -> setBody(json_encode($output));
 		return;
@@ -297,8 +295,8 @@ $app -> delete('/api/folders/(:path+)', function($path = array()) use ($app, $db
  **************************************************************************/
 // Get an object
 $app -> get('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
-	list($username, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
-	if ($username === False) {
+	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($user === False) {
 		$app -> response -> setStatus($output['code']);
 		$app -> response -> setBody(json_encode($output));
 		return;
@@ -405,8 +403,8 @@ $app -> get('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 
 // Edit an existing object
 $app -> put('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
-	list($username, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
-	if ($username === False) {
+	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($user === False) {
 		$app -> response -> setStatus($output['code']);
 		$app -> response -> setBody(json_encode($output));
 		return;
@@ -471,8 +469,8 @@ $app -> put('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 
 // Add new lab
 $app -> post('/api/labs', function() use ($app, $db) {
-	list($username, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
-	if ($username === False) {
+	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($user === False) {
 		$app -> response -> setStatus($output['code']);
 		$app -> response -> setBody(json_encode($output));
 		return;
@@ -488,8 +486,8 @@ $app -> post('/api/labs', function() use ($app, $db) {
 
 // Add new object
 $app -> post('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
-	list($username, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
-	if ($username === False) {
+	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($user === False) {
 		$app -> response -> setStatus($output['code']);
 		$app -> response -> setBody(json_encode($output));
 		return;
@@ -566,8 +564,8 @@ $app -> post('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 
 // Delete an object
 $app -> delete('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
-	list($username, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
-	if ($username === False) {
+	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($user === False) {
 		$app -> response -> setStatus($output['code']);
 		$app -> response -> setBody(json_encode($output));
 		return;

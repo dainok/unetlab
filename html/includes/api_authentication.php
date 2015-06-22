@@ -92,8 +92,6 @@ function apiLogin($db, $p, $cookie) {
 			return $output;
 		}
 
-		// TODO ex updateUserSession
-
 		$rc = updateUserCookie($db, $username, $cookie);
 		if ($rc !== 0) {
 			// Cannot update user cookie
@@ -129,7 +127,7 @@ function apiLogin($db, $p, $cookie) {
  * @return	bool						True if valid
  */
 function apiLogout($db, $cookie) {
-	$query = 'UPDATE users SET cookie = NULL, web_expiration = NULL WHERE cookie = :cookie;';
+	$query = 'UPDATE users SET cookie = NULL, session = NULL WHERE cookie = :cookie;';
 	$statement = $db -> prepare($query);
 	$statement -> bindParam(':cookie', $cookie, PDO::PARAM_STR);
 	$statement -> execute();
@@ -146,13 +144,13 @@ function apiLogout($db, $cookie) {
  *
  * @param	PDO			$db				PDO object for database connection
  * @param	String		$cookie			Session cookie
- * @return	Array						Username, tenant if logged in; JSend data if not authorized
+ * @return	Array						Username, role, tenant if logged in; JSend data if not authorized
  */
 function apiAuthorization($db, $cookie) {
 	$output = Array();
-	$u = getUsernameByCookie($db, $cookie);	// This will check session/web/pod expiration too
+	$user = getUserByCookie($db, $cookie);	// This will check session/web/pod expiration too
 
-	if (empty($u)) {
+	if (empty($user)) {
 		// Used not logged in
 		$output['code'] = 401;
 		$output['status'] = 'unauthorized';
@@ -160,9 +158,16 @@ function apiAuthorization($db, $cookie) {
 		return Array(False, False, $output);
 	} else {
 		// User logged in
-		// TODO ex updateUserSession
+		$rc = updateUserCookie($db, $user['username'], $cookie);
+		if ($rc !== 0) {
+			// Cannot update user cookie
+			$output['code'] = 500;
+			$output['status'] = 'error';
+			$output['message'] = $GLOBALS['messages'][$rc];
+			return Array(False, False, $output);
+		}
 	}
 
-	return Array($u, getUserPod($db, $cookie), False);
+	return Array($user, getUserPod($db, $cookie), False);
 }
 ?>
