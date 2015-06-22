@@ -173,7 +173,7 @@ int main (int argc, char *argv[]) {
             case 'd':
                 // Optional: child's startup delay (default 0)
                 *child_delay = atoi(optarg);
-                if (child_delay < 0) {
+                if (*child_delay < 0) {
                     printf("ERR: delay must be integer.\n");
                     exit(1);
                 }
@@ -238,7 +238,7 @@ int main (int argc, char *argv[]) {
     if ((rc = fork()) == 0) {
         // Child: stating subprocess
         if (DEBUG > 0) printf("DEBUG: starting child (%s).\n", cmd);
-        if (child_delay > 0) {
+        if (*child_delay > 0) {
             // Delay is set, waiting
             for (; *child_delay > 0;) {
                 rc = write(outfd[1], ".", 1);

@@ -52,7 +52,7 @@ int serial2udp_listen(int port, int *server_socket) {
 
     // Opening sock
     *server_socket = socket(AF_INET6, SOCK_DGRAM, 0);
-    if (server_socket < 0) {
+    if (*server_socket < 0) {
         rc = 1;
         if (DEBUG > 0) printf("DEBUG: error while listening for serial2udp wrapper.\n");
         printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);

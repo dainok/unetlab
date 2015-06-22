@@ -75,7 +75,7 @@ int ts_listen(int port, int *server_socket) {
     
     // Opening socket
     *server_socket = socket(AF_INET6, SOCK_STREAM, 0);
-    if (server_socket < 0) {
+    if (*server_socket < 0) {
         rc = 1;
         if (DEBUG > 0) printf("DEBUG: error while setting TS (socket).\n");
         printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
