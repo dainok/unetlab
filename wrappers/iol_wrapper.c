@@ -103,6 +103,8 @@ int main (int argc, char *argv[]) {
     char *tmp = NULL;                       // Generic char string
     struct sigaction sa;                    // Manage signals (SIGHUP, SIGTERM...)
 
+    setpgrp();
+
     // Check for iourc file
     tmp = (char *) malloc(m * sizeof(char));
     sprintf(tmp, "iourc");
@@ -424,9 +426,14 @@ int main (int argc, char *argv[]) {
                 for (i = 0; i <= 63; i++) {
                     if (eth_socket[i] > 0 && FD_ISSET(eth_socket[i], &read_fd_set)) {
                         if ((rc = packet_tap(eth_socket[i], child_afsocket, i)) != 0) {
-                            printf("%u:%u ERR: error forwarding packet from TAP to AF_UNIX socket (%i).\n", tenant_id, device_id, rc);
-                            kill(0, SIGTERM);
-                            break;
+                            if (rc == 3) {
+                              af_ready = 0;
+                              printf("Failed to write to AF_UNIX. Will try to recreate it later...\n");
+                            } else {
+                              printf("%u:%u ERR: error forwarding packet from TAP to AF_UNIX socket (%i).\n", tenant_id, device_id, rc);
+                              kill(0, SIGTERM);
+                              break;
+                            }
                         }
                     }
                 }
