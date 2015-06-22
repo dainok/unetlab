@@ -168,6 +168,6 @@ function apiAuthorization($db, $cookie) {
 		}
 	}
 
-	return Array($user, getUserPod($db, $cookie), False);
+	return Array($user, $user['tenant'], False);
 }
 ?>

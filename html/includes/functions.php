@@ -465,45 +465,6 @@ function getUserByCookie($db, $cookie) {
 }
 
 /**
- * Function to get a POD configured for a user.
- *
- * @param   PDO     $db                 PDO object for database connection
- * @param   string  $cookie				Cookie
- * @return  int							The assigned POD
- */
-function getUserPod($db, $cookie) {
-	try {
-		$query = 'SELECT COUNT(*) AS rows FROM pods LEFT JOIN users ON pods.username = users.username WHERE users.cookie = :cookie;';
-		$statement = $db -> prepare($query);
-		$statement -> bindParam(':cookie', $cookie, PDO::PARAM_STR);
-		$statement -> execute();
-		$result = $statement -> fetch();
-		if ($result['rows'] > 1) {
-			// We expect one or none row
-			error_log('ERROR: '.$GLOBALS['messages'][90015]);
-			return -1;
-		}
-	} catch (Exception $e) {
-		error_log('ERROR: '.$GLOBALS['messages'][90027]);
-		error_log((string) $e);
-		return False;
-	}
-
-	try {
-		$query = 'SELECT pods.id FROM pods LEFT JOIN users ON pods.username = users.username WHERE users.cookie = :cookie;';
-		$statement = $db -> prepare($query);
-		$statement -> bindParam(':cookie', $cookie, PDO::PARAM_STR);
-		$statement -> execute();
-		$result = $statement -> fetch();
-		return 0;
-	} catch (Exception $e) {
-		error_log('ERROR: '.$GLOBALS['messages'][90027]);
-		error_log((string) $e);
-		return -1;
-	}
-}
-
-/**
  * Function to generate a v4 UUID.
  *
  * @return  string                      The generated UUID
