@@ -43,7 +43,6 @@ extern int tenant_id;
 // AF_UNIX socket: listen
 int afsocket_listen(char *server_socketfile, char *remote_socketfile, int *server_socket, int *remote_socket) {
     int rc = -1;
-    int t = 0;
     struct sockaddr_un remote_addr;
     memset(&remote_addr, 0, sizeof(remote_addr));
     struct sockaddr_un server_addr;
@@ -64,7 +63,6 @@ int afsocket_listen(char *server_socketfile, char *remote_socketfile, int *serve
         if (DEBUG > 0) printf("DEBUG: error while connecting local AF_UNIX.\n");
         printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
         return rc;
-        t++;
     }
 
     // Setting AF_UNIX local (receiving) socket

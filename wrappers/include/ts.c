@@ -112,7 +112,7 @@ int ts_listen(int port, int *server_socket) {
 
 // Terminal Server: accept new connection
 int ts_accept(fd_set *fd_set, int server_socket, char *xtitle, int *client_socket) {
-    char header[] = {
+    unsigned char header[] = {
         IAC, WILL, ECHO,        // Sending IAC WILL ECHO
         IAC, WILL, SGA,         // Sending IAC WILL SGA
         IAC, WILL, BINARY,      // Sending IAC WILL BINARY
