@@ -70,6 +70,7 @@ if (!isset($node_templates)) {
 		'c7200'			=>	'Cisco IOS 7206VXR (Dynamips)',
 		'iol'			=>	'Cisco IOL',
 		'titanium'		=>	'Cisco NX-OSv (Titanium)',
+		'sourcefire'	=>	'Cisco Sourcefire',
 		'vios'			=>	'Cisco vIOS',
 		'viosl2'		=>	'Cisco vIOS L2',
 		'vwlc'			=>	'Cisco vWLC',

@@ -30,12 +30,18 @@
  */
 
 $(document).ready(function() {
-	$.when(getUserInfo()).done(function(data) {
-		// User is authenticated
-		logger(1, 'DEBUG: loading home page.');
-		window.location = '/themes/default/index.php';
-	}).fail(function() {
-		// User is not authenticated, or error on API
-		logger(1, 'DEBUG: loading authentication page.');
-	});
+	if ($.cookie('privacy') != 'true') {
+		logger(1, 'DEBUG: need to accept privacy.');
+		var message = '<p>We use cookies on this site for our own business purposes including collecting aggregated statistics to analyze how our site is used, integrating social networks and forums and to show you ads tailored to your interests. Find out our <a href="http://www.unetlab.com/about/privacy.html" title="Privacy Policy">privacy policy</a> for more information.</p><p>By continuing to browse the site, you are agreeing to our use of cookies.</p>';
+		addModal('Privacy Policy', message, '<button id="privacy" type="button" class="btn btn-aqua" data-dismiss="modal">Accept</button>');
+	} else {
+		$.when(getUserInfo()).done(function(data) {
+			// User is authenticated
+			logger(1, 'DEBUG: loading home page.');
+			window.location = '/themes/default/index.php';
+		}).fail(function() {
+			// User is not authenticated, or error on API
+			logger(1, 'DEBUG: loading authentication page.');
+		});
+	}
 });

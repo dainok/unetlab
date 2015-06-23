@@ -101,3 +101,14 @@ $(document).on('hidden.bs.modal', '.modal', function () {
 		$(this).remove();
 	});
 });
+
+// Accept privacy
+$(document).on('click', '#privacy', function () {
+	$.cookie('privacy', 'true', {
+		expires: 90,
+		path: '/'
+	});
+	if ($.cookie('privacy') == 'true') {
+		window.location.reload();
+	}
+});
