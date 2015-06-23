@@ -694,7 +694,7 @@ class Node {
 					$disk_id = preg_replace($patterns, $replacements, $filename);
 					$lun = (int) ord(strtolower($disk_id)) - 96;
 					$flags .= ' -drive file='.$filename.',if=virtio,bus=0,unit='.$lun.',cache=none';
-				} else if (preg_match('/^scsci[a-z]+.qcow2$/', $filename)) {
+				} else if (preg_match('/^scsi[a-z]+.qcow2$/', $filename)) {
 					// SCSI
 					$patterns[0] = '/^scsi([a-z]+).qcow2$/';
 					$replacements[0] = '$1';
