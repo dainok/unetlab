@@ -206,13 +206,12 @@ $('body').on('submit', '#form-network_add', function(e) {
             timeout: TIMEOUT,
             type: 'POST',
             url: encodeURI(url),
+			async: false,
             dataType: 'json',
             data: JSON.stringify(form_data),
             success: function(data) {
                 if (data['status'] == 'success') {
                     raiseMessage('SUCCESS', 'Network "' + form_data['name'] + '" added.');
-                    // Folder added -> reopen this page (not reload, or will be posted twice)
-                    window.location.href = '/lab_edit.php' + window.location.search;
                 } else {
                     // Fetching failed
                     raiseMessage('DANGER', data['status']);
@@ -223,6 +222,8 @@ $('body').on('submit', '#form-network_add', function(e) {
             }
         });
     }
+	// Network added -> reopen this page (not reload, or will be posted twice)
+	window.location.href = '/lab_edit.php' + window.location.search;
 
     // Hide and delete the modal (or will be posted twice)
     $('#form_frame > div').modal('hide');
@@ -416,14 +417,13 @@ $('body').on('submit', '#form-node_add', function(e) {
             timeout: TIMEOUT,
             type: 'POST',
             url: encodeURI(url),
+			async: false,
             dataType: 'json',
             data: JSON.stringify(form_data),
             success: function(data) {
                 if (data['status'] == 'success') {
                     // Fetching ok
                     raiseMessage('SUCCESS', 'Node "' + form_data['name'] + '" added.');
-                    // Node saved  -> reopen this page (not reload, or will be posted twice)
-                    window.location.href = '/lab_edit.php' + window.location.search;
                 } else {
                     // Fetching failed
                     raiseMessage('DANGER', data['status']);
@@ -434,6 +434,8 @@ $('body').on('submit', '#form-node_add', function(e) {
             }
         });
     }
+	// Node saved  -> reopen this page (not reload, or will be posted twice)
+	window.location.href = '/lab_edit.php' + window.location.search;
 
     // Hide and delete the modal (or will be posted twice)
     $('#form_frame > div').modal('hide');

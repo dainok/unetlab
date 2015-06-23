@@ -95,8 +95,9 @@ $(document).on('click', '#button-logout', function(e) {
 });
 
 // Close Modal
-$('.modal').on('hidden.bs.modal', function () {
+$(document).on('hidden.bs.modal', '.modal', function () {
 	$('.modal').each(function() {
+		// Delete all modals on close
 		$(this).remove();
 	});
 });

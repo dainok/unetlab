@@ -4,7 +4,7 @@ Name: Unified Networking Lab
 Architecture: amd64
 Maintainer: Andrea Dainese <andrea.dainese@gmail.com>
 Homepage: http://www.unetlab.com/
-Installed-Size: 1768
+Installed-Size: 9912
 Section: devel
 Priority: optional
 Depends: apache2, bridge-utils, cpulimit, dialog, dmidecode, lib32gcc1, lib32z1, libapache2-mod-php5, libc6, libc6-i386, libelf1, libpcap0.8, libsdl1.2debian, linux-headers-3.16.7-ckt8-unetlab, linux-image-3.16.7-ckt8-unetlab, lvm2, openvswitch-controller, openvswitch-switch, php5, php5-cli, php5-imagick, php5-sqlite, plymouth-label, uml-utilities, unetlab-dynamips, unetlab-qemu

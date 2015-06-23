@@ -4,7 +4,7 @@ Name: Unified Networking Lab - QEMU
 Architecture: amd64
 Maintainer: Andrea Dainese <andrea.dainese@gmail.com>
 Homepage: http://www.unetlab.com/
-Installed-Size: 95564
+Installed-Size: 80420
 Section: devel
 Priority: optional
 Description: QEMU files for UNetLab.
