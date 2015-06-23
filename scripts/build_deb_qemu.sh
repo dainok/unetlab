@@ -15,7 +15,6 @@ mkdir -p ${DATA_DIR}/opt
 cp -a /opt/qemu ${DATA_DIR}/opt
 cp -a /opt/qemu-1.3.1 ${DATA_DIR}/opt
 cp -a /opt/qemu-2.0.2 ${DATA_DIR}/opt
-cp -a /opt/qemu-2.1.2-esxi ${DATA_DIR}/opt
 
 # Building the package
 cd ${DATA_DIR}

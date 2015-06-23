@@ -835,6 +835,7 @@ class Lab {
 	 * @return  int                         0 means ok
 	 */
 	public function save() {
+		// TODO should lock file before editing it
 		// XML header is splitted because of a highlight syntax bug on VIM
 		$xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8" standalone="yes"?'.'><lab></lab>');
 		$xml -> addAttribute('name', $this -> name);
