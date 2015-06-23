@@ -434,7 +434,7 @@ int packet_udp(int udp_socket, int af_socket) {
         iol_frame[5] = dst_device_if;       // WRAPPER device ID
         iol_frame[6] = 1;
         iol_frame[7] = 0;
-		if (DEBUG > 2) printf("DEBUG: received UDP packet from device %u:%u:%u to device %u:%u:%u\n", src_tenant_id, src_device_id, src_device_if, dst_tenant_id, dst_device_id, dst_device_if);
+        if (DEBUG > 2) printf("DEBUG: received UDP packet from device %u:%u:%u to device %u:%u:%u\n", src_tenant_id, src_device_id, src_device_if, dst_tenant_id, dst_device_id, dst_device_if);
         if ((write(af_socket, iol_frame, length)) < 0) {
             rc = 3;
             if (DEBUG > 0) printf("DEBUG: failed forwarding data to AF_UNIX (%i) socket.\n", af_socket);

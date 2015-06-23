@@ -428,7 +428,7 @@ int main (int argc, char *argv[]) {
                         if ((rc = packet_tap(eth_socket[i], child_afsocket, i)) != 0) {
                             if (rc == 3) {
                               af_ready = 0;
-                              printf("Failed to write to AF_UNIX. Will try to recreate it later...\n");
+                              printf("Failed to forward TAP => AF_UNIX. Will try to recreate it later...\n");
                             } else {
                               printf("%u:%u ERR: error forwarding packet from TAP to AF_UNIX socket (%i).\n", tenant_id, device_id, rc);
                               kill(0, SIGTERM);
@@ -442,9 +442,14 @@ int main (int argc, char *argv[]) {
                 if (udpserver_socket > 0) {
                     if (FD_ISSET(udpserver_socket, &read_fd_set)) {
                         if ((rc = packet_udp(udpserver_socket, child_afsocket)) != 0) {
-                            printf("%u:%u ERR: error forwarding packet from UDP to AF_UNIX (%i).\n", tenant_id, device_id, rc);
-                            kill(0, SIGTERM);
-                            break;
+                            if (rc == 3) {
+                                af_ready = 0;
+                                printf("Failed to forward UDP => AF_UNIX. Will try to recreate it later...\n");
+                            } else {
+                                printf("%u:%u ERR: error forwarding packet from UDP to AF_UNIX (%i).\n", tenant_id, device_id, rc);
+                                kill(0, SIGTERM);
+                                break;
+                            }
                         }
                     }
                 }
