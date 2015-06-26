@@ -132,7 +132,7 @@ while ($result_labs = $statement_labs -> fetch(PDO::FETCH_ASSOC)) {
 			'data' => $result_pictures['img_content']
 		);
 		if (!empty($result_pictures['img_name'])) $p_picture['name'] =  $result_pictures['img_name'];
-		if (!empty($result_pictures['img_map'])) $p_picture['map'] =  preg_replace('/20*([0-9]+)/', '{{NODE$1}}', $result_pictures['img_map']);
+		if (!empty($result_pictures['img_map'])) $p_picture['map'] =  preg_replace('/:20*([0-9]+)/', ':{{NODE$1}}', $result_pictures['img_map']);
 		$rc = $lab -> addPicture($p_picture);
 		if ($rc !== 0) {
 			error_log('ERROR: skipping picture img_id = '.$result_pictures['img_id'].', error while creating picture.');
