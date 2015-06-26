@@ -21,8 +21,32 @@ input[name='login[username]'], input[name='login[password]']{
 	width: 100%;
 }
 
+#small {
+	background-color: #46a6b6;
+	height: 100%;
+	width: 100%;
+}
+
+#small .jumbotron {
+	background-color: #ffffff;
+	box-shadow: 0 0 30px black;
+}
+
+#small h1 {
+	color: #46a6b6;
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+	font-size: 8vmin;
+}
+
+#small p {
+	color: #58585a;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-size: 4vmin;
+}
+
 #body {
 	height: 100%;
+	width: 100%;
 }
 
 #auth-left {

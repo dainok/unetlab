@@ -85,7 +85,6 @@ class Lab {
 			$this -> name = substr(basename($f), 0, -4);
 			$this -> id = genUuid();
 			$modified = True;
-			error_log('WARNING: '.$f.' '.$GLOBALS['messages'][20000]);
 		} else {
 			// Load the existent lab
 			$this -> filename = basename($f);
@@ -736,7 +735,7 @@ class Lab {
 	public function connectNode($n, $p) {
 		if (!isset($this -> nodes[$n])) {
 			// Node not found
-			error_log('ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$i.' '.$GLOBALS['messages'][20032]);
+			error_log('ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$n.' '.$GLOBALS['messages'][20032]);
 			return 20032;
 		}
 
