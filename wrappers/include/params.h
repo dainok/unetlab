@@ -30,5 +30,4 @@
  */
 
 #define BUFFER 10000
-#define DEBUG 0
 #define VERSION "20150504"

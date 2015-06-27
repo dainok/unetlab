@@ -84,6 +84,7 @@ A
 #include "include/serial2udp.h"
 #include "include/tap.h"
 #include "include/ts.h"
+#include "include/log.h"
 #include "dynamips_functions.h"
 
 #include "include/params.h"
@@ -153,6 +154,7 @@ int main (int argc, char *argv[]) {
                     printf("ERR: tenant_id must be integer.\n");
                     exit(1);
                 }
+                UNLLog(LLINFO, "Tennant_id = %i\n", tenant_id);
                 break;
             case 'D':
                 // Mandatory: Device ID
@@ -161,6 +163,7 @@ int main (int argc, char *argv[]) {
                     printf("ERR: device_id must be integer.\n");
                     exit(1);
                 }
+                UNLLog(LLINFO, "Device_id = %i\n", device_id);
                 break;
             case 'F':
                 // Mandatory: IOS
@@ -199,7 +202,7 @@ int main (int argc, char *argv[]) {
 
     // Checking if child_file is set
     if (child_file == NULL) {
-        printf("%u:%u ERR: subprocess executable not set.\n", tenant_id, device_id);
+        printf("ERR: subprocess executable not set.\n");
         exit(1);
     }
 
@@ -230,14 +233,14 @@ int main (int argc, char *argv[]) {
 
     // Creating PIPEs for select()
     if ((pipe(infd)) < 0 || pipe(outfd) < 0) {
-         printf("%u:%u ERR: failed to create PIPEs (%s).\n", tenant_id, device_id, strerror(errno));
+         UNLLog(LLERROR, "Failed to create PIPEs (%s).\n", strerror(errno));
          exit(1);
     }
 
     // Forking
     if ((rc = fork()) == 0) {
         // Child: stating subprocess
-        if (DEBUG > 0) printf("DEBUG: starting child (%s).\n", cmd);
+        UNLLog(LLINFO, "Starting child (%s).\n", cmd);
         if (*child_delay > 0) {
             // Delay is set, waiting
             for (; *child_delay > 0;) {
@@ -259,7 +262,7 @@ int main (int argc, char *argv[]) {
         // Start process
         rc = cmd_start(cmd);
         // Subprocess terminated, killing the parent
-        printf("%u:%u ERR: child terminated (%i).\n", tenant_id, device_id, rc);
+        UNLLog(LLERROR,"Child terminated (%i).\n", rc);
     } else if (rc > 0) {
         // Parent
         close(infd[0]);                     // Used by the child
@@ -277,13 +280,13 @@ int main (int argc, char *argv[]) {
 
         // Intercept SIGHUP, SIGINT, SIGUSR1 and SIGTERM
         if (sigaction(SIGHUP, &sa, NULL) == -1) {
-            printf("%u:%u ERR: cannot handle SIGHUP (%s).\n", tenant_id, device_id, strerror(errno));
+            UNLLog(LLERROR, "Cannot handle SIGHUP (%s).\n", strerror(errno));
         }
         if (sigaction(SIGINT, &sa, NULL) == -1) {
-            printf("%u:%u ERR: cannot handle SIGINT (%s).\n", tenant_id, device_id, strerror(errno));
+            UNLLog(LLERROR, "Cannot handle SIGINT (%s).\n", strerror(errno));
         }
         if (sigaction(SIGTERM, &sa, NULL) == -1) {
-            printf("%u:%u ERR: cannot handle SIGTERM (%s).\n", tenant_id, device_id, strerror(errno));
+            UNLLog(LLERROR, "Cannot handle SIGTERM (%s).\n", strerror(errno));
         }
 
         // Preparing select()
@@ -296,9 +299,9 @@ int main (int argc, char *argv[]) {
         // While subprocess is running, check IO from subprocess, telnet clients, socket and network
         waitpid(child_pid, &child_status, 0);
         // Child is no more running
-        printf("%u:%u ERR: child is no more running.\n", tenant_id, device_id);
+        UNLLog(LLERROR, "Child is no more running.\n");
     } else {
-        printf("%u:%u ERR: failed to fork (%s).\n", tenant_id, device_id, strerror(errno));
+        UNLLog(LLERROR, "Failed to fork (%s).\n", strerror(errno));
         exit(1);
     }
     exit(0);

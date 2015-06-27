@@ -34,6 +34,7 @@
 #include <unistd.h>
 
 #include "params.h"
+#include "log.h"
 
 //--[ Telnet Commands ]--------------------------------------------------------
 #define IS       0 // Sub-process negotiation IS command
@@ -77,8 +78,7 @@ int ts_listen(int port, int *server_socket) {
     *server_socket = socket(AF_INET6, SOCK_STREAM, 0);
     if (*server_socket < 0) {
         rc = 1;
-        if (DEBUG > 0) printf("DEBUG: error while setting TS (socket).\n");
-        printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
+        UNLLog(LLERROR, "Error while setting TS (socket).  ERR: %s (%i).\n", strerror(errno), rc);
         return rc;
     }
 
@@ -88,25 +88,22 @@ int ts_listen(int port, int *server_socket) {
     server_addr.sin6_addr = in6addr_any;
     if (setsockopt(*server_socket, SOL_SOCKET, SO_REUSEADDR, &y, sizeof(int)) < 0) {
         rc = 2;
-        if (DEBUG > 0) printf("DEBUG: error while setting TS (setsockopt).\n");
-        printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
+        UNLLog(LLERROR, "Error while setting TS (setsockopt). ERR: %s (%i).\n", strerror(errno), rc);
         return rc;
     }
 
     // Binding (checking if address is already in use)
     if (bind(*server_socket, (struct sockaddr *) &server_addr, sizeof(server_addr)) < 0) {
         rc = 3;
-        if (DEBUG > 0) printf("DEBUG: error while setting TS (binding).\n");
-        printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
+        UNLLog(LLERROR, "Error while setting TS (binding). ERR: %s (%i).\n", strerror(errno), rc);
         return rc;
     }
     if (listen(*server_socket, 5) < 0) {
         rc = 4;
-        if (DEBUG > 0) printf("DEBUG: error while setting TS (listening).\n");
-        printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
+        UNLLog(LLERROR, "Error while setting TS (listening). ERR: %s (%i).\n", strerror(errno), rc);
         return rc;
     }
-    if (DEBUG > 1) printf("DEBUG: TS configured.\n");
+    UNLLog(LLINFO, "TS configured.\n");
     return 0;
 }
 
@@ -129,16 +126,14 @@ int ts_accept(fd_set *fd_set, int server_socket, char *xtitle, int *client_socke
     if ((newclient_socket = accept(server_socket, (struct sockaddr *) &client_addr, &client_addrlen)) < 0) {
         // Failed to accept
         rc = 1;
-        if (DEBUG > 0) printf("DEBUG: failed to accept new TS client (accept).\n");
-        printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
+        UNLLog(LLERROR, "Failed to accept new TS client (accept). ERR: %s (%i).\n", strerror(errno), rc);
         close(newclient_socket);
         return rc;
     } else {
         if (client_socket[0] + 1 > FD_SETSIZE) {
             // Maximum FD reached
             rc = 2;
-            if (DEBUG > 0) printf("DEBUG: failed to accept new TS client (MAX FD).\n");
-            printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
+            UNLLog(LLERROR, "Failed to accept new TS client (MAX FD). ERR: %s (%i).\n", strerror(errno), rc);
             close(newclient_socket);
             return rc;
         }
@@ -147,12 +142,12 @@ int ts_accept(fd_set *fd_set, int server_socket, char *xtitle, int *client_socke
         send(newclient_socket, xtitle, strlen(xtitle), 0);
         send(newclient_socket, &trailer, sizeof(trailer) / sizeof(trailer[0]), 0);
         // Add client to the FDSET
-        if (DEBUG > 0) printf("DEBUG: adding client socket descriptor (%i).\n", newclient_socket);
+        UNLLog(LLINFO, "Adding client socket descriptor (%i).\n", newclient_socket);
         FD_SET(newclient_socket, fd_set);
         // Add client to the active client list
         client_socket[++client_socket[0]] = newclient_socket;
     }
-    if (DEBUG > 1) printf("DEBUG: new client connected (%i), total is %i.\n", newclient_socket, client_socket[0]);
+    UNLLog(LLINFO, "New client connected (%i), total is %i.\n", newclient_socket, client_socket[0]);
     return 0;
 }
 
@@ -163,7 +158,7 @@ void ts_broadcast(char c, fd_set *fd_set, int *client_socket) {
     for (i = 1; i <= client_socket[0]; i++) {
         if (send(client_socket[i], &c, 1, 0) < 0) {
             // Failed to send, remove client from FD SET
-            if (DEBUG > 1) printf("DEBUG: failed to send data to client, closing it (%i).\n", client_socket[i]);
+            UNLLog(LLERROR, "Failed to send data to client, closing it (%i).\n", client_socket[i]);
             close(client_socket[i]);
             FD_CLR(client_socket[i], fd_set);
             // Remove client from client_socket array
@@ -189,7 +184,7 @@ int ts_receive(char *c, fd_set *fd_read, fd_set *fd_active, int *client_socket) 
         if (FD_ISSET(client_socket[i], fd_read)) {
             if (recv(client_socket[i], c, 1, 0) < 0) {
                 // Failed to receive, remove client from FD SET
-                if (DEBUG > 1) printf("DEBUG: failed to receive data from client, closing it (%i).\n", client_socket[i]);
+                UNLLog(LLERROR, "Failed to receive data from client, closing it (%i).\n", client_socket[i]);
                 close(client_socket[i]);
                 FD_CLR(client_socket[i], fd_active);
                 // Remove client from client_socket array

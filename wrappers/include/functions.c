@@ -44,6 +44,7 @@
 #include <unistd.h>
 
 #include "params.h"
+#include "log.h"
 
 extern int device_id;
 extern int tenant_id;
@@ -93,22 +94,22 @@ void signal_handler(int signal) {
     switch (signal) {
         case SIGHUP:
             // Signal 1
-            if (DEBUG > 0) printf("DEBUG: Caught SIGHUP, closing clients.\n");
+            UNLLog(LLINFO, "Caught SIGHUP, closing clients.\n");
             for (i = tsclients_socket[0]; i > 0; i++) {
-                if (DEBUG > 1) printf("DEBUG: closing client (%i).\n", tsclients_socket[i]);
+                UNLLog(LLINFO, "Closing client (%i).\n", tsclients_socket[i]);
                 close(tsclients_socket[i]);
             }
             break;
         case SIGINT:
             // Signal 2
-            if (DEBUG > 0) printf("DEBUG: Caught SIGINT, killing child.\n");
+            UNLLog(LLINFO, "Caught SIGINT, killing child.\n");
             break;
         case SIGTERM:
             // Signal 15
-            if (DEBUG > 0) printf("DEBUG: Caught SIGTERM, killing child.\n");
+            UNLLog(LLINFO, "Caught SIGTERM, killing child.\n");
             break;
         default:
-            if (DEBUG > 0) printf("DEBUG: caught wrong signal (%d).\n", signal);
+            UNLLog(LLWARNING, "Caught wrong signal (%d).\n", signal);
             break;
     }
 }

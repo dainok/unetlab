@@ -37,6 +37,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "log.h"
+
 #include "params.h"
 
 extern int device_id;
@@ -54,8 +56,7 @@ int serial2udp_listen(int port, int *server_socket) {
     *server_socket = socket(AF_INET6, SOCK_DGRAM, 0);
     if (*server_socket < 0) {
         rc = 1;
-        if (DEBUG > 0) printf("DEBUG: error while listening for serial2udp wrapper.\n");
-        printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
+        UNLLog(LLERROR, "Error while listening for serial2udp wrapper. ERR: %s (%i).\n", strerror(errno), rc);
         return rc;
     }
 
@@ -67,8 +68,7 @@ int serial2udp_listen(int port, int *server_socket) {
     // Binding (checking if address is already in use)
     if (bind(*server_socket, (struct sockaddr *) &server_addr, sizeof(server_addr)) < 0) {
         rc = 2;
-        if (DEBUG > 0) printf("DEBUG: error while binding for serial2udp wrapper.\n");
-        printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
+        UNLLog(LLERROR, "Error while binding for serial2udp wrapper. ERR: %s (%i).\n", strerror(errno), rc);
         return rc;
     }
     return 0;
@@ -102,7 +102,7 @@ int serial2udp_add(int *remote_socket, int *remote_id, int *remote_if, char *ser
     for (; serial2udp_map[i] != ':'; i++) {
         if (serial2udp_map[i] == '\0') {
             rc = 3;
-            printf("%u:%u ERR: invalid map (%s).\n", tenant_id, device_id, serial2udp_map);
+            UNLLog(LLERROR, "Invalid map (%s).\n", serial2udp_map);
             return 3;
         }
         strncat(tmp_srcif, &serial2udp_map[i], 1);
@@ -111,7 +111,7 @@ int serial2udp_add(int *remote_socket, int *remote_id, int *remote_if, char *ser
     for (++i; serial2udp_map[i] != ':'; i++) {
         if (serial2udp_map[i] == '\0') {
             rc = 3;
-            printf("%u:%u ERR: invalid map (%s).\n", tenant_id, device_id, serial2udp_map);
+            UNLLog(LLERROR, "Invalid map (%s).\n", serial2udp_map);
             return 3;
         }
         strncat(tmp_dst, &serial2udp_map[i], 1);
@@ -120,7 +120,7 @@ int serial2udp_add(int *remote_socket, int *remote_id, int *remote_if, char *ser
     for (++i; serial2udp_map[i] != ':'; i++) {
         if (serial2udp_map[i] == '\0') {
             rc = 3;
-            printf("%u:%u ERR: invalid map (%s).\n", tenant_id, device_id, serial2udp_map);
+            UNLLog(LLERROR, "Invalid map (%s).\n", serial2udp_map);
             return 3;
         }
         strncat(tmp_dstid, &serial2udp_map[i], 1);
@@ -129,7 +129,7 @@ int serial2udp_add(int *remote_socket, int *remote_id, int *remote_if, char *ser
     for (++i; serial2udp_map[i] != ',' && serial2udp_map[i] != 0; i++) {
         if (serial2udp_map[i] == ':') {
             rc = 3;
-            printf("%u:%u ERR: invalid map (%s).\n", tenant_id, device_id, serial2udp_map);
+            UNLLog(LLERROR, "Invalid map (%s).\n", serial2udp_map);
             return 3;
         }
         strncat(tmp_dstif, &serial2udp_map[i], 1);
@@ -137,14 +137,13 @@ int serial2udp_add(int *remote_socket, int *remote_id, int *remote_if, char *ser
     // Setting the destination UDP port
     sprintf(tmp_dstport, "%i", 32768 + 128 * tenant_id + atoi(tmp_dstid));
 
-    if (DEBUG > 0) printf("DEBUG: creating UDP MAP (src: %i:%s, dst: %s:%s, dst_id %s:%s).\n", device_id, tmp_srcif, tmp_dst, tmp_dstport, tmp_dstid, tmp_dstif);
+    UNLLog(LLINFO, "Creating UDP MAP (src: %i:%s, dst: %s:%s, dst_id %s:%s).\n", device_id, tmp_srcif, tmp_dst, tmp_dstport, tmp_dstid, tmp_dstif);
 
     // Looking for an IPv4 or IPv6 address
     if ((rc = getaddrinfo(tmp_dst, tmp_dstport, &testing_addr, &result_addr)) != 0) {
         // Failed to get address
         rc = 4;
-        if (DEBUG > 0) printf("DEBUG: failed to create UDP map (getaddrinfo).\n");
-        printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
+        UNLLog(LLERROR, "Failed to create UDP map (getaddrinfo). ERR: %s (%i).\n", strerror(errno), rc);
         return rc;
     }
     for (remote_addr = result_addr; remote_addr != NULL; remote_addr = remote_addr -> ai_next) {
@@ -162,8 +161,7 @@ int serial2udp_add(int *remote_socket, int *remote_id, int *remote_if, char *ser
     if (remote_addr == NULL) {
         // Failed to get address
         rc = 5;
-        if (DEBUG > 0) printf("DEBUG: failed to create UDP map (cannot find a working address).\n");
-        printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
+        UNLLog(LLERROR, "Failed to create UDP map (cannot find a working address). ERR: %s (%i).\n", strerror(errno), rc);
         return rc;
     }
 
@@ -173,7 +171,7 @@ int serial2udp_add(int *remote_socket, int *remote_id, int *remote_if, char *ser
 
     freeaddrinfo(result_addr);  // Nod needed anymore
 
-    if (DEBUG > 1) printf("DEBUG: configured serial2udp wrapper (s=%i, int=%i, remote_id=%i, remote_if=%i.\n", remote_socket[atoi(tmp_srcif)], atoi(tmp_srcif), remote_id[atoi(tmp_srcif)], remote_if[atoi(tmp_srcif)]);
+    UNLLog(LLINFO, "Configured serial2udp wrapper (s=%i, int=%i, remote_id=%i, remote_if=%i.\n", remote_socket[atoi(tmp_srcif)], atoi(tmp_srcif), remote_id[atoi(tmp_srcif)], remote_if[atoi(tmp_srcif)]);
     return 0;
 }
 
@@ -184,10 +182,9 @@ int serial2udp_receive(char **c, int server_socket) {
 
     if ((length = read(server_socket, c, BUFFER)) <= 0) {
         // Read error
-        if (DEBUG > 0) printf("DEBUG: failed to receive data from UDP (s=%i, l=%i).\n", server_socket, length);
-        printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), length);
+        UNLLog(LLERROR, "Failed to receive data from UDP (s=%i, l=%i). ERR: %s (%i).\n", server_socket, length, strerror(errno), length);
         return length;
     }
-    if (DEBUG > 1) printf("DEBUG: received data from UDP (s=%i, l=%i).\n", server_socket, length);
+    UNLLog(LLVERBOSE, "Received data from UDP (s=%i, l=%i).\n", server_socket, length);
     return length;
 }

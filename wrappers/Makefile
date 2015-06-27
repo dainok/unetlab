@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-Wall -O2
-INC=include/ts.c include/serial2udp.c include/afsocket.c include/tap.c include/cmd.c include/functions.c
+INC=include/ts.c include/serial2udp.c include/afsocket.c include/tap.c include/cmd.c include/functions.c include/log.c
 DST=/opt/unetlab/wrappers
 
 all:

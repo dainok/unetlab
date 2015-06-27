@@ -52,6 +52,7 @@
 #include "include/serial2udp.h"
 #include "include/tap.h"
 #include "include/ts.h"
+#include "include/log.h"
 
 #include "include/params.h"
 
@@ -92,22 +93,20 @@ int mk_netmap() {
     int wrapper_id = iol_id + 512;
     if (access("NETMAP", F_OK) != -1 && remove("NETMAP") != 0) {
         rc = 1;
-        if (DEBUG > 0) printf("DEBUG: cannot create NETMAP file (access).\n");
-        printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
+        UNLLog(LLERROR, "Cannot create NETMAP file (access). ERR: %s (%i)\n", strerror(errno), rc);
         return rc;
     }
     f_iol_netmap = fopen("NETMAP", "a");
     if (f_iol_netmap == NULL) {
         rc = 2;
-        if (DEBUG > 0) printf("DEBUG: cannot create NETMAP file (fopen).\n");
-        printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
+        UNLLog(LLERROR, "Cannot create NETMAP file (fopen). ERR: %s (%i).\n", strerror(errno), rc);
         return rc;
     }
     for (d = 0; d < 64; d++) {
         fprintf(f_iol_netmap, "%u:%u %u:%u\n", iol_id, d, wrapper_id, d);
     }
     fclose(f_iol_netmap);
-    if (DEBUG > 1) printf("DEBUG: NETMAP file created.\n");
+    UNLLog(LLINFO, "NETMAP file created.\n");
     return 0;
 }
 
@@ -145,8 +144,7 @@ int mk_afsocket(int *wrapper_socket, int *iol_socket) {
 
     if (access(wrapper_socketfile, F_OK) != -1 && remove(wrapper_socketfile) != 0) {
         rc = 1;
-        if (DEBUG > 0) printf("DEBUG: cannot access AF_UNIX (%s).\n", tmp);
-        printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
+        UNLLog(LLERROR, "Cannot access AF_UNIX (%s). ERR: %s (%i).\n", tmp,  strerror(errno), rc);
         return rc;
     }
 
@@ -159,8 +157,7 @@ int mk_afsocket(int *wrapper_socket, int *iol_socket) {
 
     // Creating sockets
     if ((rc = afsocket_listen(wrapper_socketfile, iol_socketfile, wrapper_socket, iol_socket)) != 0) {
-        if (DEBUG > 0) printf("DEBUG: cannot listen at AF_UNIX (%s).\n", tmp);
-        printf("%u:%u ERR: Cannot open AF_UNIX sockets (%i).\n", tenant_id, device_id, rc);
+        UNLLog(LLERROR, "Cannot listen at AF_UNIX (%s). ERR: Cannot open AF_UNIX sockets (%i).\n", tmp, rc);
         return 2;
     }
 
@@ -182,7 +179,7 @@ int mk_tap(int child_eth, int *iol_tap) {
             sprintf(tap_name, "vunl%u_%u_%u", tenant_id, device_id, i + 16 * j);
             if ((rc = tap_listen(tap_name, &tap_fd)) != 0) {
                 rc = 1;
-                if (DEBUG > 0) printf("DEBUG: skipping TAP (%s) interface (%i).\n", tap_name, rc);
+                UNLLog(LLINFO, "Skipping TAP (%s) interface (%i).\n", tap_name, rc);
             } else {
                 // Add TAP interface to the active ethernet list
                 iol_tap[i + 16 * j] = tap_fd;
@@ -238,8 +235,7 @@ int packet_af(int af_socket, int *iol_fd, int *udp_fd, int *remote_id, int *remo
     if ((length = afsocket_receive(&iol_frame, af_socket)) <= 0) {
         // Read error
         rc = 1;
-        if (DEBUG > 0) printf("DEBUG: failed to receive packet from AF_UNIX (%i).\n", length);
-        printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
+        UNLLog(LLERROR, "Failed to receive packet from AF_UNIX (%i). ERR: %s (%i). \n", length, strerror(errno), rc);
         return rc;
     } else {
         memcpy(tmp_frame, &iol_frame, length);
@@ -250,11 +246,10 @@ int packet_af(int af_socket, int *iol_fd, int *udp_fd, int *remote_id, int *remo
             if (iol_fd[iol_ifid] != 0 && write(iol_fd[iol_ifid], eth_frame, length - 8) < 0) {
                 // If TAP interface is configured, send packet through it
                 rc = 3;
-                if (DEBUG > 0) printf("DEBUG: failed to send a packet to TAP (src: vunl%u_%u_%u).\n", tenant_id, device_id, iol_ifid);
-                printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
+                UNLLog(LLERROR, "Failed to send a packet to TAP (src: vunl%u_%u_%u). ERR: %s (%i).\n", tenant_id, device_id, iol_ifid, strerror(errno), rc);
                 return rc;
             }
-            if (DEBUG > 2) printf("DEBUG: sent TAP frame (dst: %02x%02x.%02x%02x.%02x%02x, src: %02x%02x.%02x%02x.%02x%02x, length: %i) to vunl%u_%u_%u.\n",
+            UNLLog(LLVERBOSE, "Sent TAP frame (dst: %02x%02x.%02x%02x.%02x%02x, src: %02x%02x.%02x%02x.%02x%02x, length: %i) to vunl%u_%u_%u.\n",
                      tmp_frame[8] & 0xff, tmp_frame[9] & 0xff, tmp_frame[10] & 0xff, tmp_frame[11] & 0xff, tmp_frame[12] & 0xff, tmp_frame[13] & 0xff,
                      tmp_frame[14] & 0xff, tmp_frame[15] & 0xff, tmp_frame[16] & 0xff, tmp_frame[17] & 0xff, tmp_frame[18] & 0xff, tmp_frame[19] & 0xff,
                      length - 8,
@@ -262,7 +257,7 @@ int packet_af(int af_socket, int *iol_fd, int *udp_fd, int *remote_id, int *remo
             return 0;
         } else {
             if (udp_fd[iol_ifid] == 0) {
-                if (DEBUG > 0) printf("DEBUG: failed to send a packet to unconfigured UDP (src: vunl%u_%u_%u).\n", tenant_id, device_id, iol_ifid);
+                UNLLog(LLERROR, "Failed to send a packet to unconfigured UDP (src: vunl%u_%u_%u).\n", tenant_id, device_id, iol_ifid);
                 return 0;
             }
             // Now send packet via UDP
@@ -277,14 +272,14 @@ int packet_af(int af_socket, int *iol_fd, int *udp_fd, int *remote_id, int *remo
             ser_frame[5] = device_id & 255;
             ser_frame[6] = remote_if[iol_ifid];         // Destination Interface ID
             ser_frame[7] = iol_ifid;                    // Source Interface ID (TODO)
-			if (DEBUG > 2) printf("DEBUG: received IOL packet from device %u:%u:%u to device %u:%u:%u\n", tenant_id, device_id, iol_ifid, dst_tenant_id, remote_id[iol_ifid], remote_if[iol_ifid]);
+            UNLLog(LLVERBOSE, "Received IOL packet from device %u:%u:%u to device %u:%u:%u\n", tenant_id, device_id, iol_ifid, dst_tenant_id, remote_id[iol_ifid], remote_if[iol_ifid]);
 
             if (write(udp_fd[iol_ifid], ser_frame, length) < 0) {
                 // Sometimes packets cannot be delivered if end point is not active (Connection refused)
-                if (DEBUG > 0) printf("DEBUG: failed to send a packet to UDP (src: vunl%u_%u_%u).\n", tenant_id, device_id, iol_ifid);
+                UNLLog(LLERROR, "Failed to send a packet to UDP (src: vunl%u_%u_%u).\n", tenant_id, device_id, iol_ifid);
                 return 0;
             }
-            if (DEBUG > 2) printf("DEBUG: sent UDP (s=%i, l=%i)\n", udp_fd[iol_ifid], length);
+            UNLLog(LLVERBOSE, "Sent UDP (s=%i, l=%i)\n", udp_fd[iol_ifid], length);
             return 0;
         }
     }
@@ -315,11 +310,10 @@ int packet_tap(int tap_socket, int af_socket, int iol_ifid) {
     if ((length = tap_receive(&eth_frame, tap_socket)) <= 0) {
         // Read error
         rc = 1;
-        if (DEBUG > 0) printf("DEBUG: failed to receive packet from TAP (%i, %i).\n", tap_socket, length);
-        printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
+        UNLLog(LLERROR, "Failed to receive packet from TAP (%i, %i). ERR: %s (%i).\n", tap_socket, length, strerror(errno), rc);
         return rc;
     } else if (length > 1514) {
-        printf("%u:%u ERR: ignoring frame from TAP because too long (%i).\n", tenant_id, device_id, length);
+        UNLLog(LLERROR, "Ignoring frame from TAP (%i) because too long (%i).\n", tap_socket, length);
         return 0;
     } else {
         memcpy(tmp_frame, &eth_frame, length);
@@ -335,15 +329,14 @@ int packet_tap(int tap_socket, int af_socket, int iol_ifid) {
         memcpy(&iol_frame[8], &tmp_frame, length);
         if ((write(af_socket, iol_frame, length + 8)) < 0) {
             rc = 3;
-            if (DEBUG > 0) printf("DEBUG: failed forwarding data to AF_UNIX (%i) socket.\n", af_socket);
-            printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
+            UNLLog(LLERROR, "Failed forwarding data to AF_UNIX (%i) socket. ERR: %s (%i).\n", af_socket, strerror(errno), rc);
             return rc;
         } else {
-            if (DEBUG > 2) printf("DEBUG: sent eth frame (dst: %02x%02x.%02x%02x.%02x%02x, src: %02x%02x.%02x%02x.%02x%02x, length: %i) to AF_UNIX\n",
+            UNLLog(LLVERBOSE, "Sent eth frame (dst: %02x%02x.%02x%02x.%02x%02x, src: %02x%02x.%02x%02x.%02x%02x, length: %i) to AF_UNIX\n",
                     iol_frame[8] & 0xff, iol_frame[9] & 0xff, iol_frame[10] & 0xff, iol_frame[11] & 0xff, iol_frame[12] & 0xff, iol_frame[13] & 0xff,
                     iol_frame[14] & 0xff, iol_frame[15] & 0xff, iol_frame[16] & 0xff, iol_frame[17] & 0xff, iol_frame[18] & 0xff, iol_frame[19] & 0xff,
                     length);
-            if (DEBUG > 2) printf("DEBUG: sent eth frame to AF_UNIX (dst: %u:%u, src: %u:%u\n",
+            UNLLog(LLVERBOSE, "Sent eth frame to AF_UNIX (dst: %u:%u, src: %u:%u\n",
                     256 * (int) iol_frame[0] + (int) iol_frame[1], (int) iol_frame[4],
                     256 * (int) iol_frame[2] + (int) iol_frame[3], (int) iol_frame[5]);
             return 0;
@@ -399,14 +392,13 @@ int packet_udp(int udp_socket, int af_socket) {
     if ((length = serial2udp_receive(&ser_frame, udp_socket)) <= 0) {
         // Read error
         rc = 1;
-        if (DEBUG > 0) printf("DEBUG: failed to receive packet from UDP (%i).\n", length);
-        printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
+        UNLLog(LLERROR, "Failed to receive packet from UDP (%i). ERR: %s (%i).\n", length, strerror(errno), rc);
         return rc;
     } else if (length > 1522) {
-        printf("%u:%u ERR: ignoring frame from UDP because too long (%i).\n", tenant_id, device_id, length);
+        UNLLog(LLERROR, "Ignoring frame from UDP because too long (%i).\n", length);
         return 0;
     } else if (length < 8) {
-        printf("%u:%u ERR: ignoring frame from UDP because too short (%i).\n", tenant_id, device_id, length);
+        UNLLog(LLERROR, "Ignoring frame from UDP because too short (%i).\n", length);
         return 0;
     } else {
         memcpy(tmp_frame, &ser_frame, length);
@@ -418,11 +410,11 @@ int packet_udp(int udp_socket, int af_socket) {
         dst_device_if = tmp_frame[6];
         src_device_if = tmp_frame[7];
         if (dst_tenant_id != tenant_id) {
-            printf("%u:%u ERR: ignoring frame from UDP because wrong tenant_id (%i).\n", tenant_id, device_id, dst_tenant_id);
+            UNLLog(LLERROR, "Ignoring frame from UDP because wrong tenant_id (%i).\n", dst_tenant_id);
             return 0;
         }
         if (dst_device_id != device_id) {
-            printf("%u:%u ERR: ignoring frame from UDP because wrong device_id (%i).\n", tenant_id, device_id, dst_device_id);
+            UNLLog(LLERROR, "Ignoring frame from UDP because wrong device_id (%i).\n", dst_device_id);
             return 0;
         }
         // Now send packet to AF_UNIX
@@ -434,14 +426,13 @@ int packet_udp(int udp_socket, int af_socket) {
         iol_frame[5] = dst_device_if;       // WRAPPER device ID
         iol_frame[6] = 1;
         iol_frame[7] = 0;
-        if (DEBUG > 2) printf("DEBUG: received UDP packet from device %u:%u:%u to device %u:%u:%u\n", src_tenant_id, src_device_id, src_device_if, dst_tenant_id, dst_device_id, dst_device_if);
+        UNLLog(LLVERBOSE, "Received UDP packet from device %u:%u:%u to device %u:%u:%u\n", src_tenant_id, src_device_id, src_device_if, dst_tenant_id, dst_device_id, dst_device_if);
         if ((write(af_socket, iol_frame, length)) < 0) {
             rc = 3;
-            if (DEBUG > 0) printf("DEBUG: failed forwarding data to AF_UNIX (%i) socket.\n", af_socket);
-            printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
+            UNLLog(LLERROR, "Failed forwarding data to AF_UNIX (%i) socket.  ERR: %s (%i). \n", af_socket, strerror(errno), rc);
             return rc;
         } else {
-            if (DEBUG > 2) printf("DEBUG: sent ser frame to AF_UNIX (dst: %u:%u, src: %u:%u)\n",
+            UNLLog(LLVERBOSE, "Sent ser frame to AF_UNIX (dst: %u:%u, src: %u:%u)\n",
                     256 * (int) iol_frame[0] + (int) iol_frame[1], (int) iol_frame[4],
                     256 * (int) iol_frame[2] + (int) iol_frame[3], (int) iol_frame[5]);
             return 0;

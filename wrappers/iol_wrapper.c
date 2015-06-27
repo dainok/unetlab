@@ -39,6 +39,7 @@
 #include <sys/select.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <stdarg.h>
 
 #include "include/afsocket.h"
 #include "include/cmd.h"
@@ -47,7 +48,7 @@
 #include "include/tap.h"
 #include "include/ts.h"
 #include "iol_functions.h"
-
+#include "include/log.h"
 #include "include/params.h"
 
 int device_id = -1;                         // Device ID
@@ -57,6 +58,9 @@ int child_eth = 2;                          // Ethernet porgroups
 int child_ser = 2;                          // Serial portgroups
 
 int main (int argc, char *argv[]) {
+    CheckLogLevelFileTrigger("/tmp/unl_ll_debug",LLDEBUG);
+    CheckLogLevelFileTrigger("/tmp/unl_ll_verbose",LLVERBOSE);
+
     // Child's CMD line
     int m = sysconf(_SC_ARG_MAX);           // Maximum CMD line length
     char *cmd;                              // Store child's CMD line
@@ -109,7 +113,7 @@ int main (int argc, char *argv[]) {
     tmp = (char *) malloc(m * sizeof(char));
     sprintf(tmp, "iourc");
     if (is_file(tmp) != 0) {
-        printf("ERR: file '%s' does not exist.\n", tmp);
+        UNLLog( LLERROR, "File '%s' does not exist.\n", tmp);
         exit(1);
     }
     free(tmp);
@@ -128,22 +132,24 @@ int main (int argc, char *argv[]) {
                 // Mandatory: Tenant ID
                 tenant_id = atoi(optarg);
                 if (tenant_id < 0) {
-                    printf("ERR: tenant_id must be integer.\n");
+                    UNLLog( LLERROR, "Tenant_id must be integer.\n");
                     exit(1);
                 }
+                UNLLog(LLINFO, "Tennant_id = %i\n", tenant_id);
                 break;
             case 'D':
                 // Mandatory: Device ID
                 device_id = atoi(optarg);
                 if (tenant_id < 0) {
-                    printf("ERR: device_id must be integer.\n");
+                    UNLLog( LLERROR, "Device_id must be integer.\n");
                     exit(1);
                 }
+                UNLLog(LLINFO, "Device_id = %i\n", device_id);
                 break;
             case 'F':
                 child_file = optarg;
                 if (is_file(child_file) != 0) {
-                    printf("ERR: file '%s' does not exist.\n", child_file);
+                    UNLLog( LLERROR, "File '%s' does not exist.\n", child_file);
                     exit(1);
                 }
                 break;
@@ -151,7 +157,7 @@ int main (int argc, char *argv[]) {
                 // Optional: child's startup delay (default 0)
                 *child_delay = atoi(optarg);
                 if (*child_delay < 0) {
-                    printf("ERR: delay must be integer.\n");
+                    UNLLog( LLERROR, "Delay must be integer.\n");
                     exit(1);
                 }
                 break;
@@ -164,7 +170,7 @@ int main (int argc, char *argv[]) {
             case 'e':
                 child_eth = atoi(optarg);
                 if (child_eth < 0) {
-                    printf("ERR: Ethernet portgroup must be integer.\n");
+                    UNLLog( LLERROR, "Ethernet portgroup must be integer.\n");
                     exit(1);
                 }
                 break;
@@ -172,7 +178,7 @@ int main (int argc, char *argv[]) {
             case 's':
                 child_ser = atoi(optarg);
                 if (child_ser < 0) {
-                    printf("ERR: Serial portgroup must be numeric.\n");
+                    UNLLog( LLERROR, "Serial portgroup must be numeric.\n");
                     exit(1);
                 }
                 break;
@@ -181,22 +187,22 @@ int main (int argc, char *argv[]) {
                 if (udpserver_socket == -1 && tenant_id != -1 && device_id != -1) {
                     // First Serial2UDP definition, must listen()
                     if ((rc = serial2udp_listen(32768 + 128 * tenant_id + device_id, &udpserver_socket)) != 0) {
-                        printf("%u:%u ERR: failed to open UDP socket (%i).\n", tenant_id, device_id, rc);
+                        UNLLog( LLERROR, "Failed to open UDP socket (%i).\n", rc);
                         exit(1);
                     }
                     // Now add serial end-point
                     if ((rc = serial2udp_add(ser_socket, ser_remoteid, ser_remoteif, optarg)) != 0) {
-                        printf("%u:%u ERR: failed to add serial end-point (%i).\n", tenant_id, device_id, rc);
+                        UNLLog( LLERROR, "Failed to add serial end-point (%i).\n", rc);
                         exit(1);
                     }
                 } else if (udpserver_socket > 0) {
                     // Serial2UDP wrapper already started, add serial end-point
                     if ((rc = serial2udp_add(ser_socket, ser_remoteid, ser_remoteif, optarg)) != 0) {
-                        printf("%u:%u ERR: failed to add serial end-point (%i).\n", tenant_id, device_id, rc);
+                        UNLLog( LLERROR, "Failed to add serial end-point (%i).\n", rc);
                         exit(1);
                     }
                 } else {
-                    printf("ERR: flag '-l' must be after '-T' and '-D'.\n");
+                    UNLLog( LLERROR, "Flag '-l' must be after '-T' and '-D'.\n");
                     exit(1);
                 }
                 break;
@@ -205,25 +211,25 @@ int main (int argc, char *argv[]) {
 
     // Checking if tenant_id is set
     if (tenant_id < 0) {
-        printf("ERR: tenant ID not set.\n");
+        UNLLog( LLERROR, "Tenant ID not set.\n");
         exit(1);
     }
 
     // Checking if device_id is set
     if (device_id < 0) {
-        printf("ERR: device ID not set.\n");
+        UNLLog( LLERROR, "Device ID not set.\n");
         exit(1);
     }
 
     // Checking if child_file is set
     if (child_file == NULL) {
-        printf("%u:%u ERR: subprocess executable not set.\n", tenant_id, device_id);
+        UNLLog( LLERROR, "Subprocess executable not set.\n");
         exit(1);
     }
 
     // Checking total interfaces
     if (child_eth + child_ser > 16) {
-        printf("%u:%u ERR: Ethernet + Serial portgroups must lower equal than 16.\n", tenant_id, device_id);
+        UNLLog( LLERROR, "Ethernet + Serial portgroups must lower equal than 16.\n");
         exit(1);
     }
 
@@ -260,13 +266,13 @@ int main (int argc, char *argv[]) {
 
     // Creating NETMAP
     if ((rc = mk_netmap()) != 0) {
-        printf("%u:%u ERR: failed to create NETMAP file (%i).\n", tenant_id, device_id, rc);
+        UNLLog( LLERROR, "Failed to create NETMAP file (%i).\n", rc);
         exit(1);
     }
 
     // Creating PIPEs for select()
     if ((pipe(infd)) < 0 || pipe(outfd) < 0) {
-         printf("%u:%u ERR: failed to create PIPEs (%s).\n", tenant_id, device_id, strerror(errno));
+         UNLLog( LLERROR, "Failed to create PIPEs (%s).\n", strerror(errno));
          exit(1);
     }
 
@@ -274,13 +280,13 @@ int main (int argc, char *argv[]) {
     ts_port = 32768 + 128 * tenant_id + device_id;
     tsclients_socket[0] = 0;
     if ((rc = ts_listen(ts_port, &ts_socket)) != 0) {
-        printf("%u:%u ERR: failed to open TCP socket (%i).\n", tenant_id, device_id, rc);
+        UNLLog( LLERROR, "Failed to open TCP socket (%i).\n", rc);
         exit(1);
     }
 
     // Creating TAP interfaces
     if ((rc = mk_tap(child_eth, eth_socket)) != 0) {
-        printf("%u:%u ERR: failed to create TAP interfaces (%i).\n", tenant_id, device_id, rc);
+        UNLLog( LLERROR, "Failed to create TAP interfaces (%i).\n", rc);
         kill(0, SIGTERM);
         exit(1);
     }
@@ -288,7 +294,7 @@ int main (int argc, char *argv[]) {
     // Forking
     if ((rc = fork()) == 0) {
         // Child: starting subprocess
-        if (DEBUG > 0) printf("DEBUG: starting child (%s).\n", cmd);
+        UNLLog( LLINFO, "Starting child (%s).\n", cmd);
         if (*child_delay > 0) {
             // Delay is set, waiting
             for (; *child_delay > 0;) {
@@ -310,7 +316,7 @@ int main (int argc, char *argv[]) {
         // Start process
         rc = cmd_start(cmd);
         // Subprocess terminated, killing the parent
-        printf("%u:%u ERR: child terminated (%i).\n", tenant_id, device_id, rc);
+        UNLLog( LLERROR, "Child terminated (%i).\n", rc);
     } else if (rc > 0) {
         // Parent
         close(infd[0]);                     // Used by the child
@@ -328,31 +334,31 @@ int main (int argc, char *argv[]) {
 
         // Intercept SIGHUP, SIGINT, SIGUSR1 and SIGTERM
         if (sigaction(SIGHUP, &sa, NULL) == -1) {
-            printf("%u:%u ERR: cannot handle SIGHUP (%s).\n", tenant_id, device_id, strerror(errno));
+            UNLLog( LLERROR, "Cannot handle SIGHUP (%s).\n", strerror(errno));
         }
         if (sigaction(SIGINT, &sa, NULL) == -1) {
-            printf("%u:%u ERR: cannot handle SIGINT (%s).\n", tenant_id, device_id, strerror(errno));
+            UNLLog( LLERROR, "Cannot handle SIGINT (%s).\n", strerror(errno));
         }
         if (sigaction(SIGTERM, &sa, NULL) == -1) {
-            printf("%u:%u ERR: cannot handle SIGTERM (%s).\n", tenant_id, device_id, strerror(errno));
+            UNLLog( LLERROR, "Cannot handle SIGTERM (%s).\n", strerror(errno));
         }
 
         // Preparing select()
         FD_ZERO(&active_fd_set);
         FD_ZERO(&read_fd_set);
-        if (DEBUG > 0) printf("DEBUG: adding subprocess stdout descriptor (%i).\n", outfd[0]);
+        UNLLog( LLINFO, "Adding subprocess stdout descriptor (%i).\n", outfd[0]);
         FD_SET(outfd[0], &active_fd_set);         // Adding subprocess stdout
-        if (DEBUG > 0) printf("DEBUG: adding telnet socket descriptor (%i).\n", ts_socket);
+        UNLLog( LLINFO, "Adding telnet socket descriptor (%i).\n", ts_socket);
         FD_SET(ts_socket, &active_fd_set);        // Adding telnet socket
         if (udpserver_socket > 0) {
-            if (DEBUG > 0) printf("DEBUG: adding UDP socket descriptor (%i).\n", udpserver_socket);
+            UNLLog( LLINFO, "Adding UDP socket descriptor (%i).\n", udpserver_socket);
             FD_SET(udpserver_socket, &active_fd_set); // Adding UDP socket
         }
 
         // Adding TAP interfaces for select()
         for (i = 0; i <= 63; i++) {
             if (eth_socket[i] > 0) {
-                if (DEBUG > 0) printf("DEBUG: adding TAP interface descriptor (%i).\n", eth_socket[i]);
+                UNLLog( LLINFO, "Adding TAP interface descriptor (%i).\n", eth_socket[i]);
                 FD_SET(eth_socket[i], &active_fd_set);
             }
         }
@@ -364,28 +370,28 @@ int main (int argc, char *argv[]) {
                 // wait 3 seconds for AF_UNIX
                 sleep(3);
                 if ((rc = mk_afsocket(&wrapper_afsocket, &child_afsocket)) != 0) {;
-                    printf("%u:%u ERR: failed to create AF_UNIX socket file (%i).\n", tenant_id, device_id, rc);
+                    UNLLog(LLERROR, "Failed to create AF_UNIX socket file (%i).\n", rc);
                     kill(0, SIGTERM);
                     break;
                 }
                 af_ready = 1;
-                if (DEBUG > 0) printf("DEBUG: adding wrapper socket descriptor (%i).\n", wrapper_afsocket);
+                UNLLog(LLINFO, "Adding wrapper socket descriptor (%i).\n", wrapper_afsocket);
                 FD_SET(wrapper_afsocket, &active_fd_set);   // Adding subprocess AF_UNIX socket
             }
 
             // Check if select() is valid
             read_fd_set = active_fd_set;
             if ((active_fd = select(FD_SETSIZE, &read_fd_set, NULL, NULL, NULL)) <= 0) {
-                printf("%u:%u ERR: failed to select().\n", tenant_id, device_id);
+                UNLLog(LLERROR, "Failed to select().\n");
                 kill(0, SIGTERM);
                 break;
             }
-            if (DEBUG > 2) printf("DEBUG: data from select descriptor (%i).\n", active_fd);
+            UNLLog(LLVERBOSE, "Data from select descriptor (%i).\n", active_fd);
 
             // Check if output from child
             if (FD_ISSET(outfd[0], &read_fd_set)) {
                 if (read(outfd[0], &child_output, 1) <= 0) {
-                    printf("%u:%u ERR: error while reading data from the subprocess, killing it.\n", tenant_id, device_id);
+                    UNLLog(LLERROR, "Error while reading data from the subprocess, killing it.\n");
                     kill(0, SIGTERM);
                     break;
                 }
@@ -396,7 +402,7 @@ int main (int argc, char *argv[]) {
             // Check if new client is coming
             if (FD_ISSET(ts_socket, &read_fd_set)) {
                 if ((rc = ts_accept(&active_fd_set, ts_socket, xtitle, tsclients_socket)) != 0) {
-                    printf("%u:%u ERR: failed to accept a new client (%i).\n", tenant_id, device_id, rc);
+                    UNLLog(LLERROR, "Failed to accept a new client (%i).\n", rc);
                 }
             }
 
@@ -405,7 +411,7 @@ int main (int argc, char *argv[]) {
                 // Write to child
                 rc = write(infd[1], &client_input, 1);
                 if (rc < 0) {
-                    printf("%u:%u ERR: error writing to the subprocess, closing.\n", tenant_id, device_id);
+                    UNLLog(LLERROR, "Error writing to the subprocess, closing.\n");
                     kill(0, SIGTERM);
                     break;
                 }
@@ -416,7 +422,7 @@ int main (int argc, char *argv[]) {
                 // Check for packets from subprocess
                 if (FD_ISSET(wrapper_afsocket, &read_fd_set)) {
                     if ((rc = packet_af(wrapper_afsocket, eth_socket, ser_socket, ser_remoteid, ser_remoteif)) != 0) {
-                        printf("%u:%u ERR: error forwarding packet from AF_UNIX socket to TAP/UDP (%i).\n", tenant_id, device_id, rc);
+                        UNLLog(LLERROR, "Error forwarding packet from AF_UNIX socket to TAP/UDP (%i).\n", rc);
                         kill(0, SIGTERM);
                         break;
                     }
@@ -428,9 +434,9 @@ int main (int argc, char *argv[]) {
                         if ((rc = packet_tap(eth_socket[i], child_afsocket, i)) != 0) {
                             if (rc == 3) {
                               af_ready = 0;
-                              printf("Failed to forward TAP => AF_UNIX. Will try to recreate it later...\n");
+                              UNLLog(LLERROR, "Failed to forward TAP => AF_UNIX. Will try to recreate it later...\n");
                             } else {
-                              printf("%u:%u ERR: error forwarding packet from TAP to AF_UNIX socket (%i).\n", tenant_id, device_id, rc);
+                              UNLLog(LLERROR, "Error forwarding packet from TAP to AF_UNIX socket (%i).\n", rc);
                               kill(0, SIGTERM);
                               break;
                             }
@@ -444,9 +450,9 @@ int main (int argc, char *argv[]) {
                         if ((rc = packet_udp(udpserver_socket, child_afsocket)) != 0) {
                             if (rc == 3) {
                                 af_ready = 0;
-                                printf("Failed to forward UDP => AF_UNIX. Will try to recreate it later...\n");
+                                UNLLog(LLERROR, "Failed to forward UDP => AF_UNIX. Will try to recreate it later...\n");
                             } else {
-                                printf("%u:%u ERR: error forwarding packet from UDP to AF_UNIX (%i).\n", tenant_id, device_id, rc);
+                                UNLLog(LLERROR, "Error forwarding packet from UDP to AF_UNIX (%i).\n", rc);
                                 kill(0, SIGTERM);
                                 break;
                             }
@@ -459,9 +465,9 @@ int main (int argc, char *argv[]) {
         }
 
         // Child is no more running
-        printf("%u:%u ERR: child is no more running.\n", tenant_id, device_id);
+        UNLLog(LLERROR, "Child is no more running.\n");
     } else {
-        printf("%u:%u ERR: failed to fork.\n", tenant_id, device_id);
+        UNLLog(LLERROR, "Failed to fork.\n");
         exit(1);
     }
     close(ts_socket);

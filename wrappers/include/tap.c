@@ -40,7 +40,7 @@
 #include <linux/if_tun.h>
 
 #include "functions.h"
-
+#include "log.h"
 #include "params.h"
 
 extern int device_id;
@@ -62,30 +62,28 @@ int tap_listen(char *tap_name, int *tap_fd) {
     sprintf(tmp, "/sys/class/net/%s/dev_id", tap_name);
     if (is_file(tmp) != 0) {
         rc = 1;
-        if (DEBUG > 0) printf("DEBUG: skipping non existent TAP interface (%s).\n", tap_name);
+        UNLLog(LLINFO, "Skipping non existent TAP interface (%s).\n", tap_name);
         return rc;
     }
 
     // Open the clone device
     if ((*tap_fd = open(tun_dev, O_RDWR)) < 0) {
         rc = 2;
-        if (DEBUG > 0) printf("DEBUG: error while calling open TUN (%s).\n", tap_name);
-        printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
+        UNLLog(LLERROR, "Error while calling open TUN (%s). ERR: %s (%i)\n", tap_name, strerror(errno), rc);
         return rc;
     }
 
     // Creating TAP interface
     if (ioctl(*tap_fd, TUNSETIFF, (void *)&ifr) < 0) {
         rc = 3;
-        if (DEBUG > 0) printf("DEBUG: skipping TAP (%s), maybe it's not used (%s).\n", tap_name, strerror(errno));
+        UNLLog(LLINFO, "Skipping TAP (%s), maybe it's not used (%s).\n", tap_name, strerror(errno));
         return rc;
     }
 
     // Activate interface
     if ((tap_socket = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
         rc = 4;
-        if (DEBUG > 0) printf("DEBUG: error while activating TAP interface (%s).\n", tap_name);
-        printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
+        UNLLog(LLERROR, "Error while activating TAP interface (%s). ERR: %s (%i).\n", tap_name, strerror(errno), rc);
         return rc;
     }
 
@@ -93,12 +91,11 @@ int tap_listen(char *tap_name, int *tap_fd) {
     ifr.ifr_flags |= IFF_UP;
     if (ioctl(tap_socket, SIOCSIFFLAGS, &ifr) < 0) {
         rc = 5;
-        if (DEBUG > 0) printf("DEBUG: error while putting TAP interface up (%s).\n", tap_name);
-        printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
+        UNLLog(LLERROR, "Error while putting TAP interface up (%s). ERR: %s (%i).\n", tap_name, strerror(errno), rc);
         // unl_wrapper will bring the interface in up state
         //return rc;
     }
-    if (DEBUG > 1) printf("DEBUG: TAP interface configured (s=%i, n=%s).\n", *tap_fd, tap_name);
+    UNLLog(LLINFO, "TAP interface configured (s=%i, n=%s).\n", *tap_fd, tap_name);
     return 0;
 }
 
@@ -109,10 +106,9 @@ int tap_receive(char **c, int server_socket) {
 
     if ((length = read(server_socket, c, BUFFER)) <= 0) {
         // Read error
-        if (DEBUG > 0) printf("DEBUG: failed to receive data from TAP (s=%i, l=%i).\n", server_socket, length);
-        printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), length);
+        UNLLog(LLERROR, "Failed to receive data from TAP (s=%i, l=%i). ERR: %s (%i).\n", server_socket, length, strerror(errno), length);
         return length;
     }
-    if (DEBUG > 1) printf("DEBUG: received data from TAP (s=%i, l=%i).\n", server_socket, length);
+    UNLLog(LLVERBOSE, "Received data from TAP (s=%i, l=%i).\n", server_socket, length);
     return length;
 }

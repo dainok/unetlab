@@ -35,6 +35,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "log.h"
+
 #include "params.h"
 
 extern int device_id;
@@ -44,7 +46,7 @@ extern int tenant_id;
 void cmd_add(char **cmd_line, const char *cmd) {
     if ((int) strnlen(*cmd_line, sizeof(*cmd_line)) + (int) strnlen(cmd, sizeof(*cmd)) + 1 > sysconf(_SC_ARG_MAX)) {
         // String too long
-        printf("ERR: cannot add command '%s' (string too long).\n", cmd);
+        UNLLog(LLERROR, "Cannot add command '%s' (string too long).\n", cmd);
         exit(1);
     }
     strncat(*cmd_line, cmd, strlen(cmd));

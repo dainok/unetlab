@@ -35,6 +35,7 @@
 #include <sys/un.h>
 #include <unistd.h>
 
+#include "log.h"
 #include "params.h"
 
 extern int device_id;
@@ -52,16 +53,14 @@ int afsocket_listen(char *server_socketfile, char *remote_socketfile, int *serve
     *remote_socket = socket(AF_UNIX, SOCK_DGRAM, 0);
     if (*remote_socket < 0) {
         rc = 1;
-        if (DEBUG > 0) printf("DEBUG: error while setting remote AF_UNIX.\n");
-        printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
+        UNLLog(LLERROR, "Error while setting remote AF_UNIX: %s (%i)\n",strerror(errno), rc);
         return rc;
     }
     remote_addr.sun_family = AF_UNIX;
     strncpy(remote_addr.sun_path, remote_socketfile, sizeof(remote_addr.sun_path) - 1);
     while (connect(*remote_socket, (struct sockaddr *)&remote_addr, sizeof(struct sockaddr_un)) < 0) {
         rc = 2;
-        if (DEBUG > 0) printf("DEBUG: error while connecting local AF_UNIX.\n");
-        printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
+        UNLLog(LLERROR, "Error while connecting local AF_UNIX: %s (%i)\n",strerror(errno), rc);
         return rc;
     }
 
@@ -69,19 +68,17 @@ int afsocket_listen(char *server_socketfile, char *remote_socketfile, int *serve
     *server_socket = socket(AF_UNIX, SOCK_DGRAM, 0);
     if (*server_socket < 0) {
         rc = 3;
-        if (DEBUG > 0) printf("DEBUG: error while setting local AF_UNIX.\n");
-        printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
+        UNLLog(LLERROR, "Error while setting local AF_UNIX: %s (%i)\n",strerror(errno), rc);
         return rc;
     }
     server_addr.sun_family = AF_UNIX;
     strncpy(server_addr.sun_path, server_socketfile, sizeof(server_addr.sun_path) -1 );
     if (bind(*server_socket, (struct sockaddr *)&server_addr, sizeof(struct sockaddr_un))) {
         rc = 4;
-        if (DEBUG > 0) printf("DEBUG: error while binding local AF_UNIX.\n");
-        printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), rc);
+        UNLLog(LLERROR, "Error while binding local AF_UNIX: %s (%i)\n", strerror(errno), rc);
         return rc;
     }
-    if (DEBUG > 1) printf("DEBUG: local (%i) and remote (%i) AF_UNIX are configured.\n", *server_socket, *remote_socket);
+    UNLLog(LLINFO, "Local (%i) and remote (%i) AF_UNIX are configured.\n", *server_socket, *remote_socket);
     return 0;
 }
 
@@ -92,10 +89,9 @@ int afsocket_receive(char **c, int server_socket) {
 
     if ((length = read(server_socket, c, BUFFER)) <= 0) {
         // Read error
-        if (DEBUG > 0) printf("DEBUG: failed to receive data from local AF_UNIX (s=%i, l=%i).\n", server_socket, length);
-        printf("%u:%u ERR: %s (%i).\n", tenant_id, device_id, strerror(errno), length);
+        UNLLog(LLERROR, "Failed to receive data from local AF_UNIX (s=%i, l=%i): %s (%i)\n", server_socket, length, strerror(errno), length);
         return length;
     }
-    if (DEBUG > 1) printf("DEBUG: received data from local AF_UNIX (s=%i, l=%i).\n", server_socket, length);
+    UNLLog(LLVERBOSE, "Received data from local AF_UNIX (s=%i, l=%i).\n", server_socket, length);
     return length;
 }
