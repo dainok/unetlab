@@ -3,7 +3,7 @@ $(document).ready(function() {
 		// User is authenticated
 	}).fail(function() {
 		// User is not authenticated, or error on API
-		window.location = '/themes/default/auth.html';
+		window.location = '/themes/default/lab_list.php';
 	});
 
     if ($(location).attr('pathname') == '/lab_list.php') {

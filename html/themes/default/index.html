@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<link href="/themes/default/images/favicon.ico" rel="shortcut icon" />
+		<link href="/themes/default/images/favicon-16x16.ico" rel="shortcut icon" />
+		<link href="/themes/default/images/favicon-32x32.ico" rel="shortcut icon" />
+		<link href="/themes/default/images/favicon-96x96.ico" rel="shortcut icon" />
+		<link href="/themes/default/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+		<link href="/themes/default/css/fonts.css" rel="stylesheet" />
+		<link href="/themes/default/css/new-style.css" rel="stylesheet" />
+		<meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="description" content="Unified Networking Lab software" />
+		<meta name="author" content="Andrea Dainese <andrea.dainese@gmail.com>" />
+		<title>Unified Networking Lab</title>
+	</head>
+	<body>
+		<div class="hidden-md hidden-lg container" id="small">
+			<div class="jumbotron">
+				<div class="container">
+					<h1>Display too small</h1>
+					<p>This device is not large enough, you need 992px width at least.</p>
+				</div>
+			</div>
+		</div>
+		<div class="hidden-xs hidden-sm container-fluid" id="body" style="background-color: #46a6b6">
+			<div class="jumbotron" style="background-color: #46a6b6">
+				<div class="container">
+					<img alt="Wait Icon" src="/themes/default/images/wait.gif" style="-ms-transform: translate(-50%, -50%); -webkit-transform: translate(-50%, -50%); border: 0px; left: 50%; max-height: 100%; max-width: 100%; position: absolute; top: 50%; transform: translate(-50%, -50%);"/>
+				</div>
+			</div>
+		</div>
+		<script>var DEBUG = 5; TIMEOUT = 30000;</script>
+		<script src="/themes/default/bootstrap/js/jquery-1.11.3.min.js"></script>
+		<script src="/themes/default/bootstrap/js/jquery-cookie-1.4.1.js"></script>
+		<script src="/themes/default/bootstrap/js/bootstrap.min.js"></script>
+		<script src="/themes/default/js/new-action.js"></script>
+		<script src="/themes/default/js/new-functions.js"></script>
+		<script src="/themes/default/js/new-javascript.js"></script>
+		<script type="text/javascript">
+			if ($.cookie('privacy') == 'true') {
+				(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+				})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+				ga('create', 'UA-426446-19', 'auto');
+				ga('send', 'pageview');
+			}
+		</script>
+	</body>
+</html>

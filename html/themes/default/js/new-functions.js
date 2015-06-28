@@ -29,6 +29,13 @@
  * @version 20150522
  */
 
+// Add Modal
+function addModal(title, body, footer) {
+	var html = '<div aria-hidden="false" style="display: block;" class="modal fade in" tabindex="-1" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">' + title + '</h4></div><div class="modal-body">' + body + '</div><div class="modal-footer">' + footer + '</div></div></div></div>';
+	$('body').append(html);
+	$('body > .modal').modal('show');
+}
+
 // HTML Form to array
 function form2Array(form_name) {
 	var form_array = {};
@@ -37,6 +44,35 @@ function form2Array(form_name) {
 		form_array[$(this).attr('name').substr(form_name.length + 1, $(this).attr('name').length - form_name.length - 2)] = $(this).val();
 	});
 	return form_array;
+}
+
+// Get JSon message from HTTP response
+function getJsonMessage(response) {
+	var message = '';
+	try {
+		message = JSON.parse(response)['message'];
+	} catch(e) {
+		message = 'Undefined message, see logs under "/opt/unetlab/data/Logs/".';
+	}
+	return message;
+}
+
+// Return Authentication Page
+function getPageAuthentication() {
+	return '<div class="row full-height"><div class="col-md-5 col-lg-5 full-height" id="auth-left"><div class="middle"><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><img alt="Logo RR" src="/themes/default/images/logo-rr.png" /></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><img alt="Signup Icon" src="/themes/default/images/button-signup.png"></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2">to access more features</div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2">Existing user...</div></div><form id="form-login"><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input name="login[username]" placeholder="USERNAME" type="text" /></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input name="login[password]" placeholder="PASSWORD" type="password" /></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input alt="Login Icon" src="/themes/default/images/button-login.png" type="image" /></div></div></form></div></div><div class="col-md-7 col-lg-7" id="auth-right"><div id="logo-angular"><img alt="Logo Angular" src="/themes/default/images/logo-angular.png" /></div><div id="logo-ad"><img alt="Logo AD" src="/themes/default/images/logo-ad.png" /></div><div id="logo-text"><h1>Unified Networking Lab</h1><p>UNetLab can be considered the next major version of<br>iou-web, but the software has been rewritten from<br>scratch. The major advantage over GNS3 and<br>iou-web itself is about multi-hypervisor<br>support within a single entity. UNetLab<br>allows to design labs using IOU, Dy-<br>namips and QEMU nodes without<br>dealing with multi virtual ma-<br>chines: everything run in-<br>side a UNetLab host,<br>and a lab is a single<br>file including all<br>information<br>needed.</p></div></div></div>'
+}
+
+// Return Lab List page
+function getPageLabList() {
+	var html = '';
+	
+html += '<div class="row full-height">';
+html += '<div class="col-md-3 col-lg-3 full-height" id="list_folders">folders</div>';
+html += '<div class="col-md-3 col-lg-3 full-height" id="list_labs">labs</div>';
+html += '<div class="col-md-6 col-lg-6 full-height" id="preview_lab">lab</div>';
+html += '</div>';
+
+	return html;
 }
 
 // Get user info
@@ -73,22 +109,4 @@ function logger(severity, message) {
 	if (DEBUG >= severity) {
 		console.log(message);
 	}
-}
-
-// Get JSon message from HTTP response
-function getJsonMessage(response) {
-	var message = '';
-	try {
-		message = JSON.parse(response)['message'];
-	} catch(e) {
-		message = 'Undefined message, see logs under "/opt/unetlab/data/Logs/".';
-	}
-	return message;
-}
-
-// Add Modal
-function addModal(title, body, footer) {
-	var html = '<div aria-hidden="false" style="display: block;" class="modal fade in" tabindex="-1" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">' + title + '</h4></div><div class="modal-body">' + body + '</div><div class="modal-footer">' + footer + '</div></div></div></div>';
-	$('body').append(html);
-	$('body > .modal').modal('show');
 }

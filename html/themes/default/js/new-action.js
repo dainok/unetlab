@@ -44,7 +44,8 @@ $(document).on('submit', '#form-login', function(e) {
 		success: function(data) {
 			if (data['status'] == 'success') {
                 logger(1, 'DEBUG: user is authenticated.');
-				window.location = '/themes/default/index.php';
+				logger(1, 'DEBUG: loading home page.');
+				$('#body').html(getPageLabList());
 			} else {
 				// Authentication error
                 logger(1, 'DEBUG: internal error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
