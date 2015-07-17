@@ -108,6 +108,9 @@ input[name='login[username]'], input[name='login[password]']{
 	line-height: 180%;
 }
 
+#list-navbar {
+}
+
 .btn-aqua {
 	/* http://charliepark.org/bootstrap_buttons/ */
 	-webkit-font-smoothing: antialiased;

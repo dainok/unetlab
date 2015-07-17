@@ -58,21 +58,37 @@ function getJsonMessage(response) {
 }
 
 // Return Authentication Page
-function getPageAuthentication() {
-	return '<div class="row full-height"><div class="col-md-5 col-lg-5 full-height" id="auth-left"><div class="middle"><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><img alt="Logo RR" src="/themes/default/images/logo-rr.png" /></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><img alt="Signup Icon" src="/themes/default/images/button-signup.png"></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2">to access more features</div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2">Existing user...</div></div><form id="form-login"><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input name="login[username]" placeholder="USERNAME" type="text" /></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input name="login[password]" placeholder="PASSWORD" type="password" /></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input alt="Login Icon" src="/themes/default/images/button-login.png" type="image" /></div></div></form></div></div><div class="col-md-7 col-lg-7" id="auth-right"><div id="logo-angular"><img alt="Logo Angular" src="/themes/default/images/logo-angular.png" /></div><div id="logo-ad"><img alt="Logo AD" src="/themes/default/images/logo-ad.png" /></div><div id="logo-text"><h1>Unified Networking Lab</h1><p>UNetLab can be considered the next major version of<br>iou-web, but the software has been rewritten from<br>scratch. The major advantage over GNS3 and<br>iou-web itself is about multi-hypervisor<br>support within a single entity. UNetLab<br>allows to design labs using IOU, Dy-<br>namips and QEMU nodes without<br>dealing with multi virtual ma-<br>chines: everything run in-<br>side a UNetLab host,<br>and a lab is a single<br>file including all<br>information<br>needed.</p></div></div></div>'
+function printPageAuthentication() {
+	var html = '<div class="row full-height"><div class="col-md-5 col-lg-5 full-height" id="auth-left"><div class="middle"><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><img alt="Logo RR" src="/themes/default/images/logo-rr.png" /></div></div><!-- <div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><img alt="Signup Icon" src="/themes/default/images/button-signup.png"></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2">to access more features</div></div> --><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2">Existing user...</div></div><form id="form-login"><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input name="login[username]" placeholder="USERNAME" type="text" /></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input name="login[password]" placeholder="PASSWORD" type="password" /></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input alt="Login Icon" src="/themes/default/images/button-login.png" type="image" /></div></div></form></div></div><div class="col-md-7 col-lg-7" id="auth-right"><div id="logo-angular"><img alt="Logo Angular" src="/themes/default/images/logo-angular.png" /></div><div id="logo-ad"><img alt="Logo AD" src="/themes/default/images/logo-ad.png" /></div><div id="logo-text"><h1>Unified Networking Lab</h1><p>UNetLab can be considered the next major version of<br>iou-web, but the software has been rewritten from<br>scratch. The major advantage over GNS3 and<br>iou-web itself is about multi-hypervisor<br>support within a single entity. UNetLab<br>allows to design labs using IOU, Dy-<br>namips and QEMU nodes without<br>dealing with multi virtual ma-<br>chines: everything run in-<br>side a UNetLab host,<br>and a lab is a single<br>file including all<br>information<br>needed.</p></div></div></div>'
+	$('#body').html(html);
 }
 
 // Return Lab List page
-function getPageLabList() {
+function printPageLabList() {
 	var html = '';
+
+html += '<div id="navbar-list" class="navbar" role="navigation">';
+html += '<div class="container-fluid">';
+html += '<div class="navbar-header" style="background-color: #46a6b6; padding: 20px 58px 20px 58px;"><img height=100" src="/themes/default/images/logo-rr.png" width="266"/></div>'; 
+html += '<div class="collapse navbar-collapse navbar-menubuilder">';
+html += '<ul class="nav navbar-nav navbar-left">';
+html += '<li><a href="#">Home</a></li>';
+html += '<li><a href="#">User Menu</a></li>';
+html += '<li><a href="#">Lab</a></li>';
+html += '<li><a href="#">System Status</a></li>';
+html += '<li><a href="#">Logout</a></li>';
+html += '</ul>';
+html += '</div>';
+html += '</div>';
+html += '</div>';
 	
-html += '<div class="row full-height">';
+html += '<div class="row full-height" style="background-color: #ffffff;">';
 html += '<div class="col-md-3 col-lg-3 full-height" id="list_folders">folders</div>';
 html += '<div class="col-md-3 col-lg-3 full-height" id="list_labs">labs</div>';
 html += '<div class="col-md-6 col-lg-6 full-height" id="preview_lab">lab</div>';
 html += '</div>';
 
-	return html;
+	$('#body').html(html);
 }
 
 // Get user info

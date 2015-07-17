@@ -38,11 +38,11 @@ $(document).ready(function() {
 		$.when(getUserInfo()).done(function(data) {
 			// User is authenticated
 			logger(1, 'DEBUG: loading home page.');
-			$('#body').html(getPageLabList());
+			printPageLabList();
 		}).fail(function() {
 			// User is not authenticated, or error on API
 			logger(1, 'DEBUG: loading authentication page.');
-			$('#body').html(getPageAuthentication());
+			printPageAuthentication();
 		});
 	}
 });

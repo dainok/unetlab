@@ -45,7 +45,7 @@ $(document).on('submit', '#form-login', function(e) {
 			if (data['status'] == 'success') {
                 logger(1, 'DEBUG: user is authenticated.');
 				logger(1, 'DEBUG: loading home page.');
-				$('#body').html(getPageLabList());
+				printPageLabList();
 			} else {
 				// Authentication error
                 logger(1, 'DEBUG: internal error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
@@ -77,7 +77,7 @@ $(document).on('click', '#button-logout', function(e) {
 			if (data['status'] == 'success') {
                 logger(1, 'DEBUG: user is logged off.');
 				raiseMessage('SUCCESS', data['message']);
-				$('body').html(getPageAuthentication());
+				printPageAuthentication();
 			} else {
 				// Authentication error
                 logger(1, 'DEBUG: internal error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
