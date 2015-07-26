@@ -45,7 +45,7 @@ $(document).on('submit', '#form-login', function(e) {
 			if (data['status'] == 'success') {
                 logger(1, 'DEBUG: user is authenticated.');
 				logger(1, 'DEBUG: loading home page.');
-				printPageLabList();
+				printPageLabList('/');
 			} else {
 				// Authentication error
                 logger(1, 'DEBUG: internal error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
@@ -64,7 +64,7 @@ $(document).on('submit', '#form-login', function(e) {
 });
 
 // Logout button
-$(document).on('click', '#button-logout', function(e) {
+$(document).on('click', '.button-logout', function(e) {
 	e.preventDefault();  // Prevent default behaviour
 	var url = '/api/auth/logout';
     var type = 'GET'
@@ -76,7 +76,6 @@ $(document).on('click', '#button-logout', function(e) {
 		success: function(data) {
 			if (data['status'] == 'success') {
                 logger(1, 'DEBUG: user is logged off.');
-				raiseMessage('SUCCESS', data['message']);
 				printPageAuthentication();
 			} else {
 				// Authentication error
@@ -112,4 +111,16 @@ $(document).on('click', '#privacy', function () {
 	if ($.cookie('privacy') == 'true') {
 		window.location.reload();
 	}
+});
+
+// Open folder
+$(document).on('click', 'a.folder', function(e) {
+	logger(1, 'DEBUG: opening folder "' + $(this).attr('data-path') + '".');
+	printPageLabList($(this).attr('data-path'));
+});
+
+// Preview lab
+$(document).on('click', 'a.lab', function(e) {
+	logger(1, 'DEBUG: opening a preview of lab "' + $(this).attr('data-path') + '".');
+	printPageLabPreview($(this).attr('data-path'));
 });

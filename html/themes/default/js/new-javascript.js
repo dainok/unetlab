@@ -38,7 +38,7 @@ $(document).ready(function() {
 		$.when(getUserInfo()).done(function(data) {
 			// User is authenticated
 			logger(1, 'DEBUG: loading home page.');
-			printPageLabList();
+			printPageLabList('/');
 		}).fail(function() {
 			// User is not authenticated, or error on API
 			logger(1, 'DEBUG: loading authentication page.');

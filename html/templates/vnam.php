@@ -32,7 +32,7 @@
 
 $p['type'] = 'qemu';
 $p['name'] = 'vNAM';
-$p['icon'] = ''Network Analyzer.png';
+$p['icon'] = 'Network Analyzer.png';
 $p['cpu'] = 2;
 $p['ram'] = 4096; 
 $p['ethernet'] = 2; 

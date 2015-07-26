@@ -1,7 +1,7 @@
 // vim: syntax=javascript tabstop=4 softtabstop=0 noexpandtab laststatus=1 ruler
 
 /**
- * html/themes/light/js/functions.js
+ * html/themes/default/js/functions.js
  *
  * Functions
  *
@@ -52,7 +52,7 @@ function getJsonMessage(response) {
 	try {
 		message = JSON.parse(response)['message'];
 	} catch(e) {
-		message = 'Undefined message, see logs under "/opt/unetlab/data/Logs/".';
+		message = 'Undefined message, check if the UNetLab VM is powered on. If it is, see logs under "/opt/unetlab/data/Logs/".';
 	}
 	return message;
 }
@@ -64,31 +64,114 @@ function printPageAuthentication() {
 }
 
 // Return Lab List page
-function printPageLabList() {
+function printPageLabList(folder) {
 	var html = '';
+	var url = '/api/folders' + folder;
+	var type = 'GET'
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: folder "' + folder + '" found.');
+				
 
-html += '<div id="navbar-list" class="navbar" role="navigation">';
+html += '<div id="list-navbar" class="navbar" role="navigation">';
 html += '<div class="container-fluid">';
-html += '<div class="navbar-header" style="background-color: #46a6b6; padding: 20px 58px 20px 58px;"><img height=100" src="/themes/default/images/logo-rr.png" width="266"/></div>'; 
+html += '<div class="col-md-3 col-lg-3 navbar-header"><img height=100" src="/themes/default/images/logo-rr.png"/></div>'; 
 html += '<div class="collapse navbar-collapse navbar-menubuilder">';
 html += '<ul class="nav navbar-nav navbar-left">';
 html += '<li><a href="#">Home</a></li>';
 html += '<li><a href="#">User Menu</a></li>';
 html += '<li><a href="#">Lab</a></li>';
 html += '<li><a href="#">System Status</a></li>';
-html += '<li><a href="#">Logout</a></li>';
+html += '<li><a class="button-logout" href="#">Logout</a></li>';
 html += '</ul>';
 html += '</div>';
 html += '</div>';
 html += '</div>';
-	
-html += '<div class="row full-height" style="background-color: #ffffff;">';
-html += '<div class="col-md-3 col-lg-3 full-height" id="list_folders">folders</div>';
-html += '<div class="col-md-3 col-lg-3 full-height" id="list_labs">labs</div>';
-html += '<div class="col-md-6 col-lg-6 full-height" id="preview_lab">lab</div>';
+
+html += '<div id="list-title"><div id="list-title-folders" class="col-md-3 col-lg-3">Folders</div><div id="list-title-labs" class="col-md-3 col-lg-3" style="margin-left: 10px; margin-right: 10px;">Labs</div><div id="list-title-info" class="col-md-6 col-lg-6" style="margin-right: -20px; padding-right: 20px;"></div></div>';	
+html += '<div id="list-body" class="full-height">';
+html += '<div class="col-md-3 col-lg-3 full-height" id="list-folders"><ul>';
+$.each(data['data']['folders'], function(id, object) {
+	html += '<li><a class="folder" data-path="' + object['path'] + '" href="#">' + object['name'] + '</a></li>';
+});
+html += '</ul></div>';
+html += '<div class="col-md-3 col-lg-3 full-height" id="list-labs"><ul>';
+$.each(data['data']['labs'], function(id, object) {
+	html += '<li><a class="lab" data-path="' + object['path'] + '" href="#">' + object['file'] + '</a></li>';
+});
+html += '</ul></div>';
+html += '<div class="col-md-6 col-lg-6 full-height" id="list-info"></div>';
 html += '</div>';
 
 	$('#body').html(html);
+				
+				
+				
+				
+				
+				
+			} else {
+				logger(1, 'DEBUG: internal error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+			}
+		},
+		error: function(data) {
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: Ajax error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+		}
+	});
+}
+
+// Return Lab preview section
+function printPageLabPreview(lab) {
+	var html = '';
+	var url = '/api/labs' + lab;
+	var type = 'GET'
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: lab "' + lab + '" found.');
+				
+html += '<ul>';
+html += '<li>Name: ' + data['data']['name'] + '</li>';
+html += '<li>ID: <code>' + data['data']['id'] + '</code></li>';
+html += '<li>Version: <code>' + data['data']['version'] + '</code></li>';
+html += '<li>Author: ' + data['data']['author'] + '</li>';
+html += '<li>Description:<br/>' + data['data']['description'] + '</li>';
+html += '<li><a href="/lab_open.php?filename=' + lab + '">Load this lab</a></li>';
+html += '</ul>';
+	$('#list-title-info').html('FILE: ' + lab.replace(/\\/g,'/').replace(/.*\//, ''));
+	$('#list-info').html(html);
+	
+				
+				
+				
+				
+				
+				
+			} else {
+				logger(1, 'DEBUG: internal error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+			}
+		},
+		error: function(data) {
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: Ajax error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+		}
+	});
 }
 
 // Get user info
