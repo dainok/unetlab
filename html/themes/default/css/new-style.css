@@ -120,7 +120,21 @@ input[name='login[username]'], input[name='login[password]']{
 
 #list-navbar  .navbar-header {
 	background-color: #46a6b6;
-	padding: 20px 40px 20px 40px;"
+	padding: 20px 40px 20px 40px;
+}
+
+#list-navbar ul {
+	border-bottom: 1px dotted #8B8C90;
+	margin-bottom: 15px;
+}
+
+#list-navbar a.item {
+	display: inline-block;
+	line-height: 6vw;
+	width: 14.4vw;	/* Divide 72 by the number of items */
+}
+
+#list-navbar img.item {
 }
 
 #list-title {
