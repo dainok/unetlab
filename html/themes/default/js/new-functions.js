@@ -77,15 +77,15 @@ function printPageLabList(folder) {
 			if (data['status'] == 'success') {
 				logger(1, 'DEBUG: folder "' + folder + '" found.');
 				
-
+// TODO
 html += '<div id="list-navbar" class="navbar" role="navigation">';
 html += '<div class="container-fluid">';
 html += '<div class="col-md-3 col-lg-3 navbar-header"><img height=100" src="/themes/default/images/logo-rr.png"/></div>'; 
 html += '<div class="collapse navbar-collapse navbar-menubuilder">';
 html += '<ul class="nav navbar-nav navbar-left">';
 html += '<li><a href="#">Home</a></li>';
-html += '<li><a href="#">User Menu</a></li>';
-html += '<li><a href="#">Lab</a></li>';
+html += '<li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Actions <span class="caret"></span></a><ul class="dropdown-menu"><li><a class="folder-add" href="#"><i class="glyphicon glyphicon-folder-close"></i> Add a new folder</a></li><li><a class="lab-add" href="#"><i class="glyphicon glyphicon-file"></i> Add a new lab</a></li><li><a class="selected-delete" href="#"><i class="glyphicon glyphicon-trash"></i> Delete selected objects</a></li></ul></li>';
+html += '<li><a href="/lab_list.php?path=/">Labs (old view)</a></li>';
 html += '<li><a href="#">System Status</a></li>';
 html += '<li><a class="button-logout" href="#">Logout</a></li>';
 html += '</ul>';
@@ -94,19 +94,44 @@ html += '</div>';
 html += '</div>';
 
 html += '<div id="list-title"><div id="list-title-folders" class="col-md-3 col-lg-3">Folders</div><div id="list-title-labs" class="col-md-3 col-lg-3" style="margin-left: 10px; margin-right: 10px;">Labs</div><div id="list-title-info" class="col-md-6 col-lg-6" style="margin-right: -20px; padding-right: 20px;"></div></div>';	
+
+//html += '<div class="row"><div class="row-height"><div class="col-xs-6 col-height"><div class="inside"><div class="content"><br><br><br><br><br><br><br></div></div></div><div class="col-xs-3 col-height col-top"><div class="inside"><div class="content"></div></div></div><div class="col-xs-2 col-height col-middle"><div class="inside"><div class="content"></div></div></div><div class="col-xs-1 col-height col-bottom"><div class="inside"><div class="content"></div></div></div></div></div>';
+
+/*
+html += '<div id="list-body" class="row">';
+html += '<div class="row-height">';
+html += '<div class="col-md-3 col-lg-3">';
+html += '<div id="list-body" class="inside">';
+$.each(data['data']['folders'], function(id, object) {
+	html += '<li><a class="folder" data-path="' + object['path'] + '" href="#" title="Double click to open, single click to select.">' + object['name'] + '</a></li>';
+});
+html += '</div>';
+html += '</div>';
+html += '<div class="col-md-3 col-lg-3">';
+html += '<div id="list-labs" class="inside"></div>';
+html += '</div>';
+html += '<div class="col-md-6 col-lg-6">';
+html += '<div id="list-info" class="inside"></div>';
+html += '</div>';
+html += '</div>';
+html += '</div>';
+*/
+
+
 html += '<div id="list-body" class="full-height">';
 html += '<div class="col-md-3 col-lg-3 full-height" id="list-folders"><ul>';
 $.each(data['data']['folders'], function(id, object) {
-	html += '<li><a class="folder" data-path="' + object['path'] + '" href="#">' + object['name'] + '</a></li>';
+	html += '<li><a class="folder" data-path="' + object['path'] + '" href="#" title="Double click to open, single click to select.">' + object['name'] + '</a></li>';
 });
 html += '</ul></div>';
 html += '<div class="col-md-3 col-lg-3 full-height" id="list-labs"><ul>';
 $.each(data['data']['labs'], function(id, object) {
-	html += '<li><a class="lab" data-path="' + object['path'] + '" href="#">' + object['file'] + '</a></li>';
+	html += '<li><a class="lab" data-path="' + object['path'] + '" href="#" title="Double click to open, single click to select.">' + object['file'] + '</a></li>';
 });
 html += '</ul></div>';
 html += '<div class="col-md-6 col-lg-6 full-height" id="list-info"></div>';
 html += '</div>';
+
 
 	$('#body').html(html);
 				
@@ -142,7 +167,7 @@ function printPageLabPreview(lab) {
 		success: function(data) {
 			if (data['status'] == 'success') {
 				logger(1, 'DEBUG: lab "' + lab + '" found.');
-				
+// TODO
 html += '<ul>';
 html += '<li>Name: ' + data['data']['name'] + '</li>';
 html += '<li>ID: <code>' + data['data']['id'] + '</code></li>';

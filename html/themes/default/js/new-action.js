@@ -114,13 +114,37 @@ $(document).on('click', '#privacy', function () {
 });
 
 // Open folder
-$(document).on('click', 'a.folder', function(e) {
+$(document).on('dblclick', 'a.folder', function(e) {
 	logger(1, 'DEBUG: opening folder "' + $(this).attr('data-path') + '".');
 	printPageLabList($(this).attr('data-path'));
 });
 
 // Preview lab
-$(document).on('click', 'a.lab', function(e) {
+$(document).on('dblclick', 'a.lab', function(e) {
 	logger(1, 'DEBUG: opening a preview of lab "' + $(this).attr('data-path') + '".');
+	$('.lab-opened').each(function() {
+		// Remove all previous selected lab
+		$(this).removeClass('lab-opened');
+	});
+	$(this).addClass('lab-opened');
 	printPageLabPreview($(this).attr('data-path'));
+});
+
+// Select folder or lab
+$(document).on('click', 'a.folder, a.lab', function(e) {
+	logger(1, 'DEBUG: selected "' + $(this).attr('data-path') + '".');
+	if ($(this).hasClass('selected')) {
+		// Already selected -> unselect it
+		$(this).removeClass('selected');
+	} else {
+		// Selected it
+		$(this).addClass('selected');
+	}
+});
+
+// Add a folder
+$(document).on('click', 'a.folder-add', function(e) {
+	var html = '<form method="post" class="form-horizontal form-folder-add" action="#"><div class="form-group"><label class="col-md-3 control-label">Path</label><div class="col-md-5"><input class="form-control autofocus" name="folder[path]" value="/" disabled="" type="text"></div></div><div class="form-group"><label class="col-md-3 control-label">Name</label><div class="col-md-5"><input class="form-control autofocus" name="folder[name]" value="" type="text"></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">Add</button> <button type="button" class="btn btn-grey" data-dismiss="modal">Cancel</button></div></div></form>';
+	logger(1, 'DEBUG: popping up the folder-add form.');
+	addModal('Add a new folder', html, '');
 });

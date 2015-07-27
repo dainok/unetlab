@@ -139,6 +139,7 @@ input[name='login[username]'], input[name='login[password]']{
 
 #list-body {
 	padding: 5px;
+	padding-bottom: 210px;	/* don't know why this exceed lower margin */
 }
 
 #list-body ul {
@@ -156,6 +157,7 @@ input[name='login[username]'], input[name='login[password]']{
 
 #list-folders {
 	background-color: #e2edef;
+	overflow-y: auto;
 }
 
 #list-title-labs {
@@ -169,6 +171,7 @@ input[name='login[username]'], input[name='login[password]']{
 	background-color: #babbbd;
 	margin-left: 10px;
 	margin-right: 10px;
+	overflow-y: auto;
 }
 
 #list-labs ul {
@@ -229,17 +232,18 @@ input[name='login[username]'], input[name='login[password]']{
 	text-transform: uppercase;
 }
 
-.folder, a.folder:visited {
+.folder, .folder:visited {
 	border-bottom: 1px dotted #46a6b6;
 	color: #58585a;
 	float: left;
 	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
 	font-weight: bold;
+	padding-left: 5px;
 	text-decoration: none;
 	width: 100%;
 }
 
-.folder:active, a.folder:hover {
+.folder:active, .folder:hover {
 	border-bottom: 1px solid #46a6b6;
 	color: #46a6b6;
 	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
@@ -248,7 +252,7 @@ input[name='login[username]'], input[name='login[password]']{
 	width: 100%;
 }
 
-.lab, a.lab:visited {
+.lab, .lab:visited {
 	border-bottom: 1px dotted #ffffff;
 	color: #ffffff;
 	float: left;
@@ -259,7 +263,7 @@ input[name='login[username]'], input[name='login[password]']{
 	width: 100%;
 }
 
-.lab:active, a.lab:hover {
+.lab:active, .lab:hover, .lab-opened, .lab-opened:visited, .lab-opened:active, .lab-opened:hover {
 	background-color: #ffffff;
 	border-bottom: 1px dotted #ffffff;
 	color: #46a6b6;
@@ -267,6 +271,10 @@ input[name='login[username]'], input[name='login[password]']{
 	font-weight: bold;
 	text-decoration: none;
 	width: 100%;
+}
+
+.selected, .selected:visited, .selected:active, .selected:hover {
+	background: rgba(60, 153, 171, 0.75);
 }
 
 .full-height {
