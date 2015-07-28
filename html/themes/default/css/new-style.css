@@ -46,6 +46,7 @@ input[name='login[username]'], input[name='login[password]']{
 
 #body {
 	height: 100%;
+	padding: 0;
 	width: 100%;
 }
 
@@ -108,6 +109,100 @@ input[name='login[username]'], input[name='login[password]']{
 	line-height: 180%;
 }
 
+#list-navbar {
+	padding: 5px;
+	margin: 0px;
+}
+
+#list-navbar  .container-fluid {
+	padding: 0px;
+}
+
+#list-navbar  .navbar-header {
+	background-color: #46a6b6;
+	padding: 20px 40px 20px 40px;
+}
+
+#list-navbar ul {
+	border-bottom: 1px dotted #8B8C90;
+	margin-bottom: 15px;
+}
+
+#list-navbar a.item {
+	display: inline-block;
+	line-height: 6vw;
+	width: 14.4vw;	/* Divide 72 by the number of items */
+}
+
+#list-navbar img.item {
+}
+
+#list-title {
+	background: rgba(60, 153, 171, 0.75);
+	color: #ffffff;
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+	font-size: 1.1em;
+	left: 0px;
+	line-height: 1.2em;
+	padding: 0px 5px 0px 5px;
+	position: absolute;
+	right: 0px;
+	top: 12.5vw;
+	z-index: 10;
+}
+
+#list-body {
+	padding: 5px;
+	padding-bottom: 210px;	/* don't know why this exceed lower margin */
+}
+
+#list-body ul {
+	line-height: 3em;
+	list-style-type: none;
+	margin-left: -30px;
+	margin-right: -15px;
+	margin-top: 3vw;	/* must reflect #list-title top attribute */
+}
+
+#list-title-folders {
+	padding-left: 20px;
+	text-transform: uppercase;
+}
+
+#list-folders {
+	background-color: #e2edef;
+	overflow-y: auto;
+}
+
+#list-title-labs {
+	margin-left: 10px;
+	margin-right: 10px;
+	padding-left: 20px;
+	text-transform: uppercase;
+}
+
+#list-labs {
+	background-color: #babbbd;
+	margin-left: 10px;
+	margin-right: 10px;
+	overflow-y: auto;
+}
+
+#list-labs ul {
+	margin-left: -55px;		/* must reflect a.lab padding-left attribute */
+}
+
+#list-title-info {
+	margin-right: -20px;	/* previous column get a 20px margin */
+	padding-left: 20px;
+	padding-right: 20px;	/* reduce available space of 20px */
+}
+
+#list-info {
+	margin-right: -20px;	/* previous column get a 20px margin */
+	padding-right: 20px;	/* reduce available space of 20px */
+}
+
 .btn-aqua {
 	/* http://charliepark.org/bootstrap_buttons/ */
 	-webkit-font-smoothing: antialiased;
@@ -149,6 +244,51 @@ input[name='login[username]'], input[name='login[password]']{
 	font-size: 2.5vmin;
 	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.49);
 	text-transform: uppercase;
+}
+
+.folder, .folder:visited {
+	border-bottom: 1px dotted #46a6b6;
+	color: #58585a;
+	float: left;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-weight: bold;
+	padding-left: 5px;
+	text-decoration: none;
+	width: 100%;
+}
+
+.folder:active, .folder:hover {
+	border-bottom: 1px solid #46a6b6;
+	color: #46a6b6;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-weight: bold;
+	text-decoration: none;
+	width: 100%;
+}
+
+.lab, .lab:visited {
+	border-bottom: 1px dotted #ffffff;
+	color: #ffffff;
+	float: left;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-weight: bold;
+	padding-left: 30px;	/* must reflect #list-labs ul margin-left attribute */
+	text-decoration: none;
+	width: 100%;
+}
+
+.lab:active, .lab:hover, .lab-opened, .lab-opened:visited, .lab-opened:active, .lab-opened:hover {
+	background-color: #ffffff;
+	border-bottom: 1px dotted #ffffff;
+	color: #46a6b6;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-weight: bold;
+	text-decoration: none;
+	width: 100%;
+}
+
+.selected, .selected:visited, .selected:active, .selected:hover {
+	background: rgba(60, 153, 171, 0.75);
 }
 
 .full-height {

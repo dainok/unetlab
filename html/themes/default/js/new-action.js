@@ -45,7 +45,7 @@ $(document).on('submit', '#form-login', function(e) {
 			if (data['status'] == 'success') {
                 logger(1, 'DEBUG: user is authenticated.');
 				logger(1, 'DEBUG: loading home page.');
-				$('#body').html(getPageLabList());
+				printPageLabList('/');
 			} else {
 				// Authentication error
                 logger(1, 'DEBUG: internal error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
@@ -64,7 +64,7 @@ $(document).on('submit', '#form-login', function(e) {
 });
 
 // Logout button
-$(document).on('click', '#button-logout', function(e) {
+$(document).on('click', '.button-logout', function(e) {
 	e.preventDefault();  // Prevent default behaviour
 	var url = '/api/auth/logout';
     var type = 'GET'
@@ -76,8 +76,7 @@ $(document).on('click', '#button-logout', function(e) {
 		success: function(data) {
 			if (data['status'] == 'success') {
                 logger(1, 'DEBUG: user is logged off.');
-				raiseMessage('SUCCESS', data['message']);
-				$('body').html(getPageAuthentication());
+				printPageAuthentication();
 			} else {
 				// Authentication error
                 logger(1, 'DEBUG: internal error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
@@ -112,4 +111,40 @@ $(document).on('click', '#privacy', function () {
 	if ($.cookie('privacy') == 'true') {
 		window.location.reload();
 	}
+});
+
+// Open folder
+$(document).on('dblclick', 'a.folder', function(e) {
+	logger(1, 'DEBUG: opening folder "' + $(this).attr('data-path') + '".');
+	printPageLabList($(this).attr('data-path'));
+});
+
+// Preview lab
+$(document).on('dblclick', 'a.lab', function(e) {
+	logger(1, 'DEBUG: opening a preview of lab "' + $(this).attr('data-path') + '".');
+	$('.lab-opened').each(function() {
+		// Remove all previous selected lab
+		$(this).removeClass('lab-opened');
+	});
+	$(this).addClass('lab-opened');
+	printPageLabPreview($(this).attr('data-path'));
+});
+
+// Select folder or lab
+$(document).on('click', 'a.folder, a.lab', function(e) {
+	logger(1, 'DEBUG: selected "' + $(this).attr('data-path') + '".');
+	if ($(this).hasClass('selected')) {
+		// Already selected -> unselect it
+		$(this).removeClass('selected');
+	} else {
+		// Selected it
+		$(this).addClass('selected');
+	}
+});
+
+// Add a folder
+$(document).on('click', 'a.folder-add', function(e) {
+	var html = '<form method="post" class="form-horizontal form-folder-add" action="#"><div class="form-group"><label class="col-md-3 control-label">Path</label><div class="col-md-5"><input class="form-control autofocus" name="folder[path]" value="/" disabled="" type="text"></div></div><div class="form-group"><label class="col-md-3 control-label">Name</label><div class="col-md-5"><input class="form-control autofocus" name="folder[name]" value="" type="text"></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">Add</button> <button type="button" class="btn btn-grey" data-dismiss="modal">Cancel</button></div></div></form>';
+	logger(1, 'DEBUG: popping up the folder-add form.');
+	addModal('Add a new folder', html, '');
 });

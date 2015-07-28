@@ -1,7 +1,7 @@
 // vim: syntax=javascript tabstop=4 softtabstop=0 noexpandtab laststatus=1 ruler
 
 /**
- * html/themes/light/js/functions.js
+ * html/themes/default/js/functions.js
  *
  * Functions
  *
@@ -52,27 +52,151 @@ function getJsonMessage(response) {
 	try {
 		message = JSON.parse(response)['message'];
 	} catch(e) {
-		message = 'Undefined message, see logs under "/opt/unetlab/data/Logs/".';
+		message = 'Undefined message, check if the UNetLab VM is powered on. If it is, see logs under "/opt/unetlab/data/Logs/".';
 	}
 	return message;
 }
 
 // Return Authentication Page
-function getPageAuthentication() {
-	return '<div class="row full-height"><div class="col-md-5 col-lg-5 full-height" id="auth-left"><div class="middle"><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><img alt="Logo RR" src="/themes/default/images/logo-rr.png" /></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><img alt="Signup Icon" src="/themes/default/images/button-signup.png"></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2">to access more features</div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2">Existing user...</div></div><form id="form-login"><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input name="login[username]" placeholder="USERNAME" type="text" /></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input name="login[password]" placeholder="PASSWORD" type="password" /></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input alt="Login Icon" src="/themes/default/images/button-login.png" type="image" /></div></div></form></div></div><div class="col-md-7 col-lg-7" id="auth-right"><div id="logo-angular"><img alt="Logo Angular" src="/themes/default/images/logo-angular.png" /></div><div id="logo-ad"><img alt="Logo AD" src="/themes/default/images/logo-ad.png" /></div><div id="logo-text"><h1>Unified Networking Lab</h1><p>UNetLab can be considered the next major version of<br>iou-web, but the software has been rewritten from<br>scratch. The major advantage over GNS3 and<br>iou-web itself is about multi-hypervisor<br>support within a single entity. UNetLab<br>allows to design labs using IOU, Dy-<br>namips and QEMU nodes without<br>dealing with multi virtual ma-<br>chines: everything run in-<br>side a UNetLab host,<br>and a lab is a single<br>file including all<br>information<br>needed.</p></div></div></div>'
+function printPageAuthentication() {
+	var html = '<div class="row full-height"><div class="col-md-5 col-lg-5 full-height" id="auth-left"><div class="middle"><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><img alt="Logo RR" src="/themes/default/images/logo-rr.png" /></div></div><!-- <div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><img alt="Signup Icon" src="/themes/default/images/button-signup.png"></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2">to access more features</div></div> --><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2">Existing user...</div></div><form id="form-login"><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input name="login[username]" placeholder="USERNAME" type="text" /></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input name="login[password]" placeholder="PASSWORD" type="password" /></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input alt="Login Icon" src="/themes/default/images/button-login.png" type="image" /></div></div></form></div></div><div class="col-md-7 col-lg-7" id="auth-right"><div id="logo-angular"><img alt="Logo Angular" src="/themes/default/images/logo-angular.png" /></div><div id="logo-ad"><img alt="Logo AD" src="/themes/default/images/logo-ad.png" /></div><div id="logo-text"><h1>Unified Networking Lab</h1><p>UNetLab can be considered the next major version of<br>iou-web, but the software has been rewritten from<br>scratch. The major advantage over GNS3 and<br>iou-web itself is about multi-hypervisor<br>support within a single entity. UNetLab<br>allows to design labs using IOU, Dy-<br>namips and QEMU nodes without<br>dealing with multi virtual ma-<br>chines: everything run in-<br>side a UNetLab host,<br>and a lab is a single<br>file including all<br>information<br>needed.</p></div></div></div>'
+	$('#body').html(html);
 }
 
 // Return Lab List page
-function getPageLabList() {
+function printPageLabList(folder) {
 	var html = '';
-	
-html += '<div class="row full-height">';
-html += '<div class="col-md-3 col-lg-3 full-height" id="list_folders">folders</div>';
-html += '<div class="col-md-3 col-lg-3 full-height" id="list_labs">labs</div>';
-html += '<div class="col-md-6 col-lg-6 full-height" id="preview_lab">lab</div>';
+	var url = '/api/folders' + folder;
+	var type = 'GET'
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: folder "' + folder + '" found.');
+				
+// TODO
+html += '<div id="list-navbar" class="navbar" role="navigation">';
+html += '<div class="container-fluid">';
+html += '<div class="col-md-3 col-lg-3 navbar-header"><img height=100" src="/themes/default/images/logo-rr.png"/></div>'; 
+html += '<div class="collapse navbar-collapse navbar-menubuilder">';
+html += '<ul class="nav navbar-nav navbar-right">';
+html += '<li><a class="item" href="#">Home</a></li><li><img class="item" src="/themes/default/images/vertical_dots.gif"></li>';
+html += '<li class="dropdown"><a class="dropdown-toggle item" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Actions <span class="caret"></span></a><ul class="dropdown-menu"><li><a class="folder-add" href="#"><i class="glyphicon glyphicon-folder-close"></i> Add a new folder</a></li><li><a class="lab-add" href="#"><i class="glyphicon glyphicon-file"></i> Add a new lab</a></li><li><a class="selected-delete" href="#"><i class="glyphicon glyphicon-trash"></i> Delete selected objects</a></li></ul></li>';
+html += '<li><a class="item" href="/lab_list.php?path=/">Labs (old view)</a></li>';
+html += '<li><a class="item" href="#">System Status</a></li>';
+html += '<li><a class="button-logout item" href="#">Logout</a></li>';
+html += '</ul>';
+html += '</div>';
+html += '</div>';
 html += '</div>';
 
-	return html;
+html += '<div id="list-title"><div id="list-title-folders" class="col-md-3 col-lg-3">Folders</div><div id="list-title-labs" class="col-md-3 col-lg-3" style="margin-left: 10px; margin-right: 10px;">Labs</div><div id="list-title-info" class="col-md-6 col-lg-6" style="margin-right: -20px; padding-right: 20px;"></div></div>';	
+
+//html += '<div class="row"><div class="row-height"><div class="col-xs-6 col-height"><div class="inside"><div class="content"><br><br><br><br><br><br><br></div></div></div><div class="col-xs-3 col-height col-top"><div class="inside"><div class="content"></div></div></div><div class="col-xs-2 col-height col-middle"><div class="inside"><div class="content"></div></div></div><div class="col-xs-1 col-height col-bottom"><div class="inside"><div class="content"></div></div></div></div></div>';
+
+/*
+html += '<div id="list-body" class="row">';
+html += '<div class="row-height">';
+html += '<div class="col-md-3 col-lg-3">';
+html += '<div id="list-body" class="inside">';
+$.each(data['data']['folders'], function(id, object) {
+	html += '<li><a class="folder" data-path="' + object['path'] + '" href="#" title="Double click to open, single click to select.">' + object['name'] + '</a></li>';
+});
+html += '</div>';
+html += '</div>';
+html += '<div class="col-md-3 col-lg-3">';
+html += '<div id="list-labs" class="inside"></div>';
+html += '</div>';
+html += '<div class="col-md-6 col-lg-6">';
+html += '<div id="list-info" class="inside"></div>';
+html += '</div>';
+html += '</div>';
+html += '</div>';
+*/
+
+
+html += '<div id="list-body" class="full-height">';
+html += '<div class="col-md-3 col-lg-3 full-height" id="list-folders"><ul>';
+$.each(data['data']['folders'], function(id, object) {
+	html += '<li><a class="folder" data-path="' + object['path'] + '" href="#" title="Double click to open, single click to select.">' + object['name'] + '</a></li>';
+});
+html += '</ul></div>';
+html += '<div class="col-md-3 col-lg-3 full-height" id="list-labs"><ul>';
+$.each(data['data']['labs'], function(id, object) {
+	html += '<li><a class="lab" data-path="' + object['path'] + '" href="#" title="Double click to open, single click to select.">' + object['file'] + '</a></li>';
+});
+html += '</ul></div>';
+html += '<div class="col-md-6 col-lg-6 full-height" id="list-info"></div>';
+html += '</div>';
+
+
+	$('#body').html(html);
+				
+				
+				
+				
+				
+				
+			} else {
+				logger(1, 'DEBUG: internal error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+			}
+		},
+		error: function(data) {
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: Ajax error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+		}
+	});
+}
+
+// Return Lab preview section
+function printPageLabPreview(lab) {
+	var html = '';
+	var url = '/api/labs' + lab;
+	var type = 'GET'
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: lab "' + lab + '" found.');
+// TODO
+html += '<ul>';
+html += '<li>Name: ' + data['data']['name'] + '</li>';
+html += '<li>ID: <code>' + data['data']['id'] + '</code></li>';
+html += '<li>Version: <code>' + data['data']['version'] + '</code></li>';
+html += '<li>Author: ' + data['data']['author'] + '</li>';
+html += '<li>Description:<br/>' + data['data']['description'] + '</li>';
+html += '<li><a href="/lab_open.php?filename=' + lab + '">Load this lab</a></li>';
+html += '</ul>';
+	$('#list-title-info').html('FILE: ' + lab.replace(/\\/g,'/').replace(/.*\//, ''));
+	$('#list-info').html(html);
+	
+				
+				
+				
+				
+				
+				
+			} else {
+				logger(1, 'DEBUG: internal error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+			}
+		},
+		error: function(data) {
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: Ajax error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+		}
+	});
 }
 
 // Get user info

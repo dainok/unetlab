@@ -2,9 +2,9 @@
 # vim: syntax=php tabstop=4 softtabstop=0 noexpandtab laststatus=1 ruler
 
 /**
- * html/templates/win.php
+ * html/templates/vnam.php
  *
- * win template for UNetLab.
+ * Cisco vNAM template for UNetLab.
  *
  * LICENSE:
  *
@@ -17,11 +17,11 @@
  *
  * UNetLab is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with UNetLab. If not, see <http:
+ * along with UNetLab.If not, see <http:
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
  * @copyright 2014-2015 Andrea Dainese
@@ -31,13 +31,12 @@
  */
 
 $p['type'] = 'qemu';
-$p['name'] = 'Win';
-$p['icon'] = 'Desktop.png';
-$p['cpu'] = 1;
-$p['ram'] = 2048;
-$p['ethernet'] = 1;
+$p['name'] = 'vNAM';
+$p['icon'] = 'Network Analyzer.png';
+$p['cpu'] = 2;
+$p['ram'] = 4096; 
+$p['ethernet'] = 2; 
 $p['console'] = 'vnc';
 $p['qemu_arch'] = 'x86_64';
-$p['qemu_version'] = '2.0.2';
-$p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -vga std -usbdevice tablet -boot order=dc';
+$p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -nographic -rtc base=utc -no-shutdown';
 ?>

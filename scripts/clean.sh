@@ -10,5 +10,6 @@ chmod 664 /var/log/wtmp
 chown root:utmp /var/log/wtmp
 rm -f /etc/apt/apt.conf.d/00proxy
 rm -f /opt/ovf/.configured
+rm -f /etc/issue
 
 history -c; dd if=/dev/zero of=file bs=1M; rm -f file; poweroff
