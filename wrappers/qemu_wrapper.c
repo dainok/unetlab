@@ -276,7 +276,7 @@ int main (int argc, char *argv[]) {
 
                 // Check if new client is coming
                 if (FD_ISSET(ts_socket, &read_fd_set)) {
-                    if ((rc = ts_accept(&active_fd_set, ts_socket, xtitle, tsclients_socket)) != 0) {
+                    if ((rc = ts_accept(&active_fd_set, ts_socket, xtitle, tsclients_socket,1)) != 0) {
                         printf("%u:%u ERR: failed to accept a new client (%i).\n", tenant_id, device_id, rc);
                     }
                 }

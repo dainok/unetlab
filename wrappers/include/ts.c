@@ -34,6 +34,7 @@
 #include <unistd.h>
 
 #include "params.h"
+#include "ts.h"
 
 //--[ Telnet Commands ]--------------------------------------------------------
 #define IS       0 // Sub-process negotiation IS command
@@ -111,7 +112,7 @@ int ts_listen(int port, int *server_socket) {
 }
 
 // Terminal Server: accept new connection
-int ts_accept(fd_set *fd_set, int server_socket, char *xtitle, int *client_socket) {
+int ts_accept(fd_set *fd_set, int server_socket, char *xtitle, int *client_socket, int sendHeaders) {
     unsigned char header[] = {
         IAC, WILL, ECHO,        // Sending IAC WILL ECHO
         IAC, WILL, SGA,         // Sending IAC WILL SGA
@@ -143,9 +144,11 @@ int ts_accept(fd_set *fd_set, int server_socket, char *xtitle, int *client_socke
             return rc;
         }
         // Initialize the new client
-        send(newclient_socket, &header, sizeof(header) / sizeof(header[0]), 0);
-        send(newclient_socket, xtitle, strlen(xtitle), 0);
-        send(newclient_socket, &trailer, sizeof(trailer) / sizeof(trailer[0]), 0);
+        if (sendHeaders) {
+            send(newclient_socket, &header, sizeof(header) / sizeof(header[0]), 0);
+            send(newclient_socket, xtitle, strlen(xtitle), 0);
+	    send(newclient_socket, &trailer, sizeof(trailer) / sizeof(trailer[0]), 0);
+	}
         // Add client to the FDSET
         if (DEBUG > 0) printf("DEBUG: adding client socket descriptor (%i).\n", newclient_socket);
         FD_SET(newclient_socket, fd_set);
@@ -154,6 +157,13 @@ int ts_accept(fd_set *fd_set, int server_socket, char *xtitle, int *client_socke
     }
     if (DEBUG > 1) printf("DEBUG: new client connected (%i), total is %i.\n", newclient_socket, client_socket[0]);
     return 0;
+}
+
+void ts_broadcast_string(char * string, fd_set *fd_set, int *client_socket) {
+  while(*string != 0) {
+    ts_broadcast(*string,fd_set,client_socket);
+    string++;
+  }
 }
 
 // Terminal Server: broadcast a char to all clients
@@ -187,7 +197,7 @@ int ts_receive(char *c, fd_set *fd_read, fd_set *fd_active, int *client_socket) 
 
     for (i = 1; i <= client_socket[0]; i++) {
         if (FD_ISSET(client_socket[i], fd_read)) {
-            if (recv(client_socket[i], c, 1, 0) < 0) {
+            if (recv(client_socket[i], c, 1, 0) <= 0) {
                 // Failed to receive, remove client from FD SET
                 if (DEBUG > 1) printf("DEBUG: failed to receive data from client, closing it (%i).\n", client_socket[i]);
                 close(client_socket[i]);
