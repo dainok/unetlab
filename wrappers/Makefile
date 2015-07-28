@@ -1,10 +1,16 @@
 CC=gcc
+CXX=g++
 CFLAGS=-Wall -O2
+CXXFLAGS=$(CFLAGS) -Wno-write-strings
 INC=include/ts.c include/serial2udp.c include/afsocket.c include/tap.c include/cmd.c include/functions.c
 DST=/opt/unetlab/wrappers
 
 all:
 	mkdir -p $(DST)
+
+	$(CXX) $(CXXFLAGS) -o $(DST)/simple_forwarder $(INC) simple_forwarder.cpp iol_functions.c
+	chmod 755 $(DST)/simple_forwarder
+	chown root:root $(DST)/simple_forwarder
 
 	$(CC) $(CFLAGS) -o $(DST)/iol_wrapper $(INC) iol_wrapper.c iol_functions.c
 	chmod 755 $(DST)/iol_wrapper
