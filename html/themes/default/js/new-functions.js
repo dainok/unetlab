@@ -76,78 +76,32 @@ function printPageLabList(folder) {
 		success: function(data) {
 			if (data['status'] == 'success') {
 				logger(1, 'DEBUG: folder "' + folder + '" found.');
-				
-// TODO
-html += '<div id="list-navbar" class="navbar" role="navigation">';
-html += '<div class="container-fluid">';
-html += '<div class="col-md-3 col-lg-3 navbar-header"><img height=100" src="/themes/default/images/logo-rr.png"/></div>'; 
-html += '<div class="collapse navbar-collapse navbar-menubuilder">';
-html += '<ul class="nav navbar-nav navbar-right">';
-html += '<li><a class="item" href="#">Home</a></li><li><img class="item" src="/themes/default/images/vertical_dots.gif"></li>';
-html += '<li class="dropdown"><a class="dropdown-toggle item" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Actions <span class="caret"></span></a><ul class="dropdown-menu"><li><a class="folder-add" href="#"><i class="glyphicon glyphicon-folder-close"></i> Add a new folder</a></li><li><a class="lab-add" href="#"><i class="glyphicon glyphicon-file"></i> Add a new lab</a></li><li><a class="selected-delete" href="#"><i class="glyphicon glyphicon-trash"></i> Delete selected objects</a></li></ul></li>';
-html += '<li><a class="item" href="/lab_list.php?path=/">Labs (old view)</a></li>';
-html += '<li><a class="item" href="#">System Status</a></li>';
-html += '<li><a class="button-logout item" href="#">Logout</a></li>';
-html += '</ul>';
-html += '</div>';
-html += '</div>';
-html += '</div>';
+				html += '<div id="main-navbar" class="navbar" role="navigation"><div class="container-fluid"><div class="col-md-3 col-lg-3 navbar-header"><img height=100" src="/themes/default/images/logo-rr.png"/></div><div class="collapse navbar-collapse navbar-menubuilder"><ul class="nav navbar-nav navbar-right"><li class="navbar-item"><a class="item" href="#">Home</a></li><li><img src="/themes/default/images/vertical_dots.gif"></li><li class="dropdown navbar-item"><a class="dropdown-toggle item" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Actions <span class="caret"></span></a><ul class="dropdown-menu"><li><a class="folder-add" href="#"><i class="glyphicon glyphicon-folder-close"></i> Add a new folder</a></li><li><a class="lab-add" href="#"><i class="glyphicon glyphicon-file"></i> Add a new lab</a></li><li><a class="selected-delete" href="#"><i class="glyphicon glyphicon-trash"></i> Delete selected objects</a></li></ul></li><li><img src="/themes/default/images/vertical_dots.gif"></li><li class="navbar-item"><a class="item" href="/lab_list.php?path=/">Labs (old view)</a></li><li><img src="/themes/default/images/vertical_dots.gif"></li><li class="navbar-item"><a class="item" href="#">System Status</a></li><li><img src="/themes/default/images/vertical_dots.gif"></li><li class="navbar-item"><a class="button-logout item" href="#">Logout</a></li></ul></div></div></div><div id="main-body"><div id="list-title"><div id="list-title-folders" class="col-md-3 col-lg-3">Folders</div><div id="list-title-labs" class="col-md-3 col-lg-3" style="margin-left: 10px; margin-right: 10px;">Labs</div><div id="list-title-info" class="col-md-6 col-lg-6" style="margin-right: -20px; padding-right: 20px;"></div></div><div id="list-body" class="full-height"><div class="col-md-3 col-lg-3 full-height" id="list-folders" data-path="' + folder + '"><ul>';
 
-html += '<div id="list-title"><div id="list-title-folders" class="col-md-3 col-lg-3">Folders</div><div id="list-title-labs" class="col-md-3 col-lg-3" style="margin-left: 10px; margin-right: 10px;">Labs</div><div id="list-title-info" class="col-md-6 col-lg-6" style="margin-right: -20px; padding-right: 20px;"></div></div>';	
+				$.each(data['data']['folders'], function(id, object) {
+					// Adding all folders
+					html += '<li><a class="folder" data-path="' + object['path'] + '" href="#" title="Double click to open, single click to select.">' + object['name'] + '</a></li>';
+				});
 
-//html += '<div class="row"><div class="row-height"><div class="col-xs-6 col-height"><div class="inside"><div class="content"><br><br><br><br><br><br><br></div></div></div><div class="col-xs-3 col-height col-top"><div class="inside"><div class="content"></div></div></div><div class="col-xs-2 col-height col-middle"><div class="inside"><div class="content"></div></div></div><div class="col-xs-1 col-height col-bottom"><div class="inside"><div class="content"></div></div></div></div></div>';
+				html += '</ul></div><div class="col-md-3 col-lg-3 full-height" id="list-labs"><ul>';
+			
+				$.each(data['data']['labs'], function(id, object) {
+					// Adding all labs
+					html += '<li><a class="lab" data-path="' + object['path'] + '" href="#" title="Double click to open, single click to select.">' + object['file'] + '</a></li>';
+				});
 
-/*
-html += '<div id="list-body" class="row">';
-html += '<div class="row-height">';
-html += '<div class="col-md-3 col-lg-3">';
-html += '<div id="list-body" class="inside">';
-$.each(data['data']['folders'], function(id, object) {
-	html += '<li><a class="folder" data-path="' + object['path'] + '" href="#" title="Double click to open, single click to select.">' + object['name'] + '</a></li>';
-});
-html += '</div>';
-html += '</div>';
-html += '<div class="col-md-3 col-lg-3">';
-html += '<div id="list-labs" class="inside"></div>';
-html += '</div>';
-html += '<div class="col-md-6 col-lg-6">';
-html += '<div id="list-info" class="inside"></div>';
-html += '</div>';
-html += '</div>';
-html += '</div>';
-*/
-
-
-html += '<div id="list-body" class="full-height">';
-html += '<div class="col-md-3 col-lg-3 full-height" id="list-folders"><ul>';
-$.each(data['data']['folders'], function(id, object) {
-	html += '<li><a class="folder" data-path="' + object['path'] + '" href="#" title="Double click to open, single click to select.">' + object['name'] + '</a></li>';
-});
-html += '</ul></div>';
-html += '<div class="col-md-3 col-lg-3 full-height" id="list-labs"><ul>';
-$.each(data['data']['labs'], function(id, object) {
-	html += '<li><a class="lab" data-path="' + object['path'] + '" href="#" title="Double click to open, single click to select.">' + object['file'] + '</a></li>';
-});
-html += '</ul></div>';
-html += '<div class="col-md-6 col-lg-6 full-height" id="list-info"></div>';
-html += '</div>';
-
-
-	$('#body').html(html);
-				
-				
-				
-				
-				
-				
+				html += '</ul></div><div class="col-md-6 col-lg-6 full-height" id="list-info"></div></div></div>';
+				$('#body').html(html);
 			} else {
-				logger(1, 'DEBUG: internal error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
 				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
 			}
 		},
 		error: function(data) {
+			// Server error
 			var message = getJsonMessage(data['responseText']);
-			logger(1, 'DEBUG: Ajax error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
 			logger(1, 'DEBUG: ' + message);
 			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
 		}
@@ -186,13 +140,15 @@ html += '</ul>';
 				
 				
 			} else {
-				logger(1, 'DEBUG: internal error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
 				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
 			}
 		},
 		error: function(data) {
+			// Server error
 			var message = getJsonMessage(data['responseText']);
-			logger(1, 'DEBUG: Ajax error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
 			logger(1, 'DEBUG: ' + message);
 			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
 		}
@@ -214,13 +170,15 @@ function getUserInfo() {
 				logger(1, 'DEBUG: user is authenticated.');
 				deferred.resolve(data);
 			} else {
-				logger(1, 'DEBUG: internal error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
 				deferred.reject(data);
 			}
 		},
 		error: function(data) {
+			// Server error
 			var message = getJsonMessage(data['responseText']);
-			logger(1, 'DEBUG: Ajax error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
 			logger(1, 'DEBUG: ' + message);
 			deferred.reject();
 		}

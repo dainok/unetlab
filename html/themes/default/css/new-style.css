@@ -109,32 +109,48 @@ input[name='login[username]'], input[name='login[password]']{
 	line-height: 180%;
 }
 
-#list-navbar {
+#main-navbar {
 	padding: 5px;
 	margin: 0px;
 }
 
-#list-navbar  .container-fluid {
+#main-navbar  .container-fluid {
 	padding: 0px;
 }
 
-#list-navbar  .navbar-header {
+#main-navbar  .navbar-header {
 	background-color: #46a6b6;
-	padding: 20px 40px 20px 40px;
+	padding: 1vw 2vw 1vw 2vw;
 }
 
-#list-navbar ul {
+#main-navbar .navbar-nav {
 	border-bottom: 1px dotted #8B8C90;
-	margin-bottom: 15px;
+	margin-top: 3vw;
 }
 
-#list-navbar a.item {
-	display: inline-block;
-	line-height: 6vw;
-	width: 14.4vw;	/* Divide 72 by the number of items */
+#main-navbar .navbar-item {
+	background-color: transparent;
+	margin-right: 5px;
+	margin-top: 2.3vw;
+	width: 14.2vw;	/* Divide 72 by the number of items */
 }
 
-#list-navbar img.item {
+#main-navbar a.item {
+	background-color: transparent;
+	color: #89888c;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-size: 1em;
+	font-weight: bold;
+	text-align: left;
+	text-transform: uppercase;
+}
+
+#main-navbar a.item:link, #main-navbar a.item:visited {
+	border-bottom: 0.3vw solid transparent;
+}
+
+#main-navbar a.item:hover, #main-navbar a.item:active {
+	border-bottom: 0.3vw solid #3ba9ba;
 }
 
 #list-title {

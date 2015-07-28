@@ -29,45 +29,11 @@
  * @version 20150522
  */
 
-// Submit login form
-$(document).on('submit', '#form-login', function(e) {
-	e.preventDefault();  // Prevent default behaviour
-	var form_data = form2Array('login');
-	var url = '/api/auth/login';
-    var type = 'POST'
-	$.ajax({
-		timeout: TIMEOUT,
-		type: type,
-		url: encodeURI(url),
-		dataType: 'json',
-		data: JSON.stringify(form_data),
-		success: function(data) {
-			if (data['status'] == 'success') {
-                logger(1, 'DEBUG: user is authenticated.');
-				logger(1, 'DEBUG: loading home page.');
-				printPageLabList('/');
-			} else {
-				// Authentication error
-                logger(1, 'DEBUG: internal error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-			}
-		},
-		error: function(data) {
-			// Authentication error
-			var message = getJsonMessage(data['responseText']);
-            logger(1, 'DEBUG: Ajax error (' + data['status'] + ') on ' + type + ' ' + url + '.');
-			logger(1, 'DEBUG: ' + message);
-			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-		}
-	});
-    return false;  // Stop to avoid POST
-});
-
 // Logout button
 $(document).on('click', '.button-logout', function(e) {
 	e.preventDefault();  // Prevent default behaviour
 	var url = '/api/auth/logout';
-    var type = 'GET'
+	var type = 'GET'
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,
@@ -75,31 +41,23 @@ $(document).on('click', '.button-logout', function(e) {
 		dataType: 'json',
 		success: function(data) {
 			if (data['status'] == 'success') {
-                logger(1, 'DEBUG: user is logged off.');
+				logger(1, 'DEBUG: user is logged off.');
 				printPageAuthentication();
 			} else {
 				// Authentication error
-                logger(1, 'DEBUG: internal error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				logger(1, 'DEBUG: internal error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
 				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
 			}
 		},
 		error: function(data) {
 			// Authentication error
 			var message = getJsonMessage(data['responseText']);
-            logger(1, 'DEBUG: Ajax error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: Ajax error (' + data['status'] + ') on ' + type + ' ' + url + '.');
 			logger(1, 'DEBUG: ' + message);
 			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
 		}
 	});
-    return false;
-});
-
-// Close Modal
-$(document).on('hidden.bs.modal', '.modal', function () {
-	$('.modal').each(function() {
-		// Delete all modals on close
-		$(this).remove();
-	});
+	return false;
 });
 
 // Accept privacy
@@ -111,6 +69,25 @@ $(document).on('click', '#privacy', function () {
 	if ($.cookie('privacy') == 'true') {
 		window.location.reload();
 	}
+});
+
+// Select folder or lab
+$(document).on('click', 'a.folder, a.lab', function(e) {
+	logger(1, 'DEBUG: selected "' + $(this).attr('data-path') + '".');
+	if ($(this).hasClass('selected')) {
+		// Already selected -> unselect it
+		$(this).removeClass('selected');
+	} else {
+		// Selected it
+		$(this).addClass('selected');
+	}
+});
+
+// Display folder-add form
+$(document).on('click', 'a.folder-add', function(e) {
+	var html = '<form method="post" class="form-horizontal form-folder-add" action="#"><div class="form-group"><label class="col-md-3 control-label">Path</label><div class="col-md-5"><input class="form-control autofocus" name="folder[path]" value="' + $('#list-folders').attr('data-path') + '" disabled="" type="text"></div></div><div class="form-group"><label class="col-md-3 control-label">Name</label><div class="col-md-5"><input class="form-control autofocus" name="folder[name]" value="" type="text"></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">Add</button> <button type="button" class="btn btn-grey" data-dismiss="modal">Cancel</button></div></div></form>';
+	logger(1, 'DEBUG: popping up the folder-add form.');
+	addModal('Add a new folder', html, '');
 });
 
 // Open folder
@@ -130,21 +107,78 @@ $(document).on('dblclick', 'a.lab', function(e) {
 	printPageLabPreview($(this).attr('data-path'));
 });
 
-// Select folder or lab
-$(document).on('click', 'a.folder, a.lab', function(e) {
-	logger(1, 'DEBUG: selected "' + $(this).attr('data-path') + '".');
-	if ($(this).hasClass('selected')) {
-		// Already selected -> unselect it
-		$(this).removeClass('selected');
-	} else {
-		// Selected it
-		$(this).addClass('selected');
-	}
+// Close Modal
+$(document).on('hidden.bs.modal', '.modal', function () {
+	$('.modal').each(function() {
+		// Delete all modals on close
+		$(this).remove();
+	});
 });
 
-// Add a folder
-$(document).on('click', 'a.folder-add', function(e) {
-	var html = '<form method="post" class="form-horizontal form-folder-add" action="#"><div class="form-group"><label class="col-md-3 control-label">Path</label><div class="col-md-5"><input class="form-control autofocus" name="folder[path]" value="/" disabled="" type="text"></div></div><div class="form-group"><label class="col-md-3 control-label">Name</label><div class="col-md-5"><input class="form-control autofocus" name="folder[name]" value="" type="text"></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">Add</button> <button type="button" class="btn btn-grey" data-dismiss="modal">Cancel</button></div></div></form>';
-	logger(1, 'DEBUG: popping up the folder-add form.');
-	addModal('Add a new folder', html, '');
+// Submit login form
+$(document).on('submit', '#form-login', function(e) {
+	e.preventDefault();  // Prevent default behaviour
+	var form_data = form2Array('login');
+	var url = '/api/auth/login';
+	var type = 'POST'
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		data: JSON.stringify(form_data),
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: user is authenticated.');
+				logger(1, 'DEBUG: loading home page.');
+				printPageLabList('/');
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+		}
+	});
+	return false;  // Stop to avoid POST
+});
+
+// Submit folder-add form
+$(document).on('submit', '#form-folder-add', function(e) {
+	e.preventDefault();  // Prevent default behaviour
+	var form_data = form2Array('folder');
+	var url = '/api/folders';
+	var type = 'POST'
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		data: JSON.stringify(form_data),
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: folder "' + form_data['name'] + '" added.');
+				// Reload the folder list
+				printPageLabList(form_data['path']);
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+		}
+	});
+	return false;  // Stop to avoid POST
 });
