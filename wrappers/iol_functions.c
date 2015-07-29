@@ -397,7 +397,7 @@ int packet_udp(int udp_socket, int af_socket) {
 	 * [...]
 	 */
 
-    if ((length = serial2udp_receive(&ser_frame, udp_socket)) <= 0) {
+    if ((length = serial2udp_receive(ser_frame, udp_socket)) <= 0) {
         // Read error
         rc = 1;
         if (DEBUG > 0) printf("DEBUG: failed to receive packet from UDP (%i).\n", length);
