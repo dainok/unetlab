@@ -73,7 +73,7 @@ function apiAddLab($p, $tenant) {
 		// Failed to create the lab
 		$output['code'] = 400;
 		$output['status'] = 'fail';
-		$output['messages'] = (string) $e;
+		$output['message'] = (string) $e;
 		return $output;
 	}
 

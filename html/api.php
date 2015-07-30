@@ -52,6 +52,7 @@
 
 require_once('/opt/unetlab/html/includes/init.php');
 require_once(BASE_DIR.'/html/includes/Slim/Slim.php');
+require_once(BASE_DIR.'/html/includes/Slim-Extras/DateTimeFileWriter.php');
 require_once(BASE_DIR.'/html/includes/api_authentication.php');
 require_once(BASE_DIR.'/html/includes/api_folders.php');
 require_once(BASE_DIR.'/html/includes/api_labs.php');
@@ -65,9 +66,16 @@ require_once(BASE_DIR.'/html/includes/api_topology.php');
 $app = new \Slim\Slim(Array(
 	'mode' => 'production',
 	'debug' => True,					// Change to False for production
-	'log.level' => \Slim\Log::WARN,		// Change to WARN for production, DEBUG to decelop
-	'log.enabled' => False,
+	'log.level' => \Slim\Log::WARN,		// Change to WARN for production, DEBUG to develop
+	'log.enabled' => True,
 	'log.writer' => new \Slim\LogWriter(fopen('/opt/unetlab/data/Logs/api.txt', 'a'))
+	/*
+	'log.writer' => new \Slim\Extras\Log\DateTimeFileWriter(Array(
+		'path' => '/opt/unetlab/data/Logs',
+		'name_format' => 'Y-m-d',
+		'message_format' => '%label% - %date% - %message%'
+	))
+	 */
 ));
 
 $app -> hook('slim.after.router', function () use ($app) {
@@ -265,6 +273,8 @@ $app -> post('/api/folders', function() use ($app, $db) {
 		$app -> response -> setBody(json_encode($output));
 		return;
 	}
+
+	// TODO must check before using p name and p path
 
 	$event = json_decode($app -> request() -> getBody());
 	$p = json_decode(json_encode($event), True);

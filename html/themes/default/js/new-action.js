@@ -85,9 +85,64 @@ $(document).on('click', 'a.folder, a.lab', function(e) {
 
 // Display folder-add form
 $(document).on('click', 'a.folder-add', function(e) {
-	var html = '<form method="post" class="form-horizontal form-folder-add" action="#"><div class="form-group"><label class="col-md-3 control-label">Path</label><div class="col-md-5"><input class="form-control autofocus" name="folder[path]" value="' + $('#list-folders').attr('data-path') + '" disabled="" type="text"></div></div><div class="form-group"><label class="col-md-3 control-label">Name</label><div class="col-md-5"><input class="form-control autofocus" name="folder[name]" value="" type="text"></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">Add</button> <button type="button" class="btn btn-grey" data-dismiss="modal">Cancel</button></div></div></form>';
+	var html = '<form id="form-folder-add" class="form-horizontal form-folder-add"><div class="form-group"><label class="col-md-3 control-label">Path</label><div class="col-md-5"><input class="form-control" name="folder[path]" value="' + $('#list-folders').attr('data-path') + '" disabled="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Name</label><div class="col-md-5"><input class="form-control autofocus" name="folder[name]" value="" type="text"/></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">Add</button> <button type="button" class="btn btn-grey" data-dismiss="modal">Cancel</button></div></div></form>';
 	logger(1, 'DEBUG: popping up the folder-add form.');
 	addModal('Add a new folder', html, '');
+});
+
+// Display lab-add form
+$(document).on('click', 'a.lab-add', function(e) {
+	var html = '<form id="form-lab-add" class="form-horizontal form-lab-add"><div class="form-group"><label class="col-md-3 control-label">Path</label><div class="col-md-5"><input class="form-control" name="lab[path]" value="' + $('#list-folders').attr('data-path') + '" disabled="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Name</label><div class="col-md-5"><input class="form-control autofocus" name="lab[name]" value="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Version</label><div class="col-md-5"><input class="form-control" name="lab[version]" value="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Author</label><div class="col-md-5"><input class="form-control" name="lab[author]" value="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Description</label><div class="col-md-5"><textarea class="form-control" name="lab[description]"></textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">Add</button> <button type="button" class="btn btn-grey" data-dismiss="modal">Cancel</button></div></div></form>';
+	logger(1, 'DEBUG: popping up the lab-add form.');
+	addModal('Add a new lab', html, '');
+});
+
+// Delete selected object
+$(document).on('click', '.selected-delete', function(e) {
+	var type = 'DELETE'
+	$('.selected').each(function(id, object) {
+		var path = $(this).attr('data-path');
+		if ($(this).hasClass('folder')) {
+			var object = 'folder';
+		} else {
+			var object = 'lab';
+		}
+		var url = '/api/' + object + 's' + path;
+
+		$.ajax({
+			timeout: TIMEOUT,
+			type: type,
+			url: encodeURI(url),
+			dataType: 'json',
+			success: function(data) {
+				if (data['status'] == 'success') {
+					logger(1, 'DEBUG: ' + object + ' "' + path + '" deleted.');
+					// Remove object
+					$('.' + object + '[data-path="' + path + '"]').fadeOut(300, function() { $(this).remove(); })
+				} else {
+					// Application error
+					logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				}
+			},
+			error: function(data) {
+				// Server error
+				var message = getJsonMessage(data['responseText']);
+				logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+				logger(1, 'DEBUG: ' + message);
+			}
+		});
+	});
+});
+
+// Open lab-list page
+$(document).on('click', '.lab-list', function(e) {
+	printPageLabList('/');
+});
+
+// Open system status page
+$(document).on('click', '.sysstatus', function(e) {
+	// Remove title bar from lab-list page
+	$('#main-body').html('');
 });
 
 // Open folder
@@ -115,12 +170,16 @@ $(document).on('hidden.bs.modal', '.modal', function () {
 	});
 });
 
+$(document).on('hide.bs.modal', '.modal', function () {
+    $(this).remove();
+});
+
 // Submit login form
 $(document).on('submit', '#form-login', function(e) {
 	e.preventDefault();  // Prevent default behaviour
 	var form_data = form2Array('login');
 	var url = '/api/auth/login';
-	var type = 'POST'
+	var type = 'POST';
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,
@@ -131,6 +190,8 @@ $(document).on('submit', '#form-login', function(e) {
 			if (data['status'] == 'success') {
 				logger(1, 'DEBUG: user is authenticated.');
 				logger(1, 'DEBUG: loading home page.');
+				// Close the modal
+				$(e.target).parents('.modal').modal('hide');
 				printPageLabList('/');
 			} else {
 				// Application error
@@ -154,7 +215,7 @@ $(document).on('submit', '#form-folder-add', function(e) {
 	e.preventDefault();  // Prevent default behaviour
 	var form_data = form2Array('folder');
 	var url = '/api/folders';
-	var type = 'POST'
+	var type = 'POST';
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,
@@ -164,7 +225,45 @@ $(document).on('submit', '#form-folder-add', function(e) {
 		success: function(data) {
 			if (data['status'] == 'success') {
 				logger(1, 'DEBUG: folder "' + form_data['name'] + '" added.');
+				// Close the modal
+				$(e.target).parents('.modal').modal('hide');
 				// Reload the folder list
+				printPageLabList(form_data['path']);
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+		}
+	});
+	return false;  // Stop to avoid POST
+});
+
+// Submit lab-add form
+$(document).on('submit', '#form-lab-add', function(e) {
+	e.preventDefault();  // Prevent default behaviour
+	var form_data = form2Array('lab');
+	var url = '/api/labs';
+	var type = 'POST';
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		data: JSON.stringify(form_data),
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: lab "' + form_data['name'] + '" added.');
+				// Close the modal
+				$(e.target).parents('.modal').modal('hide');
+				// Reload the lab list
 				printPageLabList(form_data['path']);
 			} else {
 				// Application error
