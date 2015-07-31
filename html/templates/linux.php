@@ -39,5 +39,5 @@ $p['ethernet'] = 1;
 $p['console'] = 'vnc'; 
 $p['qemu_arch'] = 'x86_64'; 
 $p['qemu_nic'] = 'virtio-net-pci';
-41 $p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -vga std -usbdevice tablet -boot order=dc'; 
-42 ?> 
+$p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -vga std -usbdevice tablet -boot order=dc'; 
+?> 
