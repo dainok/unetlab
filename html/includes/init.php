@@ -74,6 +74,7 @@ if (!isset($node_templates)) {
 		'sourcefire'	=>	'Cisco Sourcefire',
 		'vios'			=>	'Cisco vIOS',
 		'viosl2'		=>	'Cisco vIOS L2',
+		'vnam'			=>	'Cisco vNAM',
 		'vwlc'			=>	'Cisco vWLC',
 		//'vwaas'		=>	'Cisco vWAAS',
 		'coeus'			=>	'Cisco Web Security Appliance',
