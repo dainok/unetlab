@@ -56,14 +56,14 @@ function apiGetDiskUsage() {
 	$cmd = 'df -h /';
 	exec($cmd, $o, $rc);
 	if ($rc == 0) {
-		return preg_replace('/^.+ ([0-9]+)% .+/', '$1', $o[1]);
+		return (int) preg_replace('/^.+ ([0-9]+)% .+/', '$1', $o[1]);
 	} else {
 		return -1;
 	}
 }
 
 /*
- * Function to get disk usage percentage.
+ * Function to get mem usage percentage.
  *
  * @return  Array                       RAM usage (percentage) as cache and data or -1 if not valid
  */

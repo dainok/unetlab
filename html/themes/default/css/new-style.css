@@ -303,6 +303,57 @@ input[name='login[username]'], input[name='login[password]']{
 	width: 100%;
 }
 
+.version {
+	color: #46a6b6;
+	margin-top: 50px;
+	padding-left: 10vw;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-weight: bold;
+	font-size: 5vmin;
+	text-align: left;
+}
+
+.circle {
+	margin-top: 50px;
+	text-align: center;
+}
+
+.circle span {
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-size: 2vmin;
+	text-align: center;
+}
+
+.circle strong {
+	position: absolute;
+	top: 30px;
+	left: 0;
+	width: 100%;
+	text-align: center;
+	line-height: 40px;
+	font-size: 30px;
+}
+
+.count {
+	margin-top: 50px;
+	text-align: center;
+}
+
+.count span {
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-size: 2vmin;
+	text-align: center;
+}
+
+.count strong {
+	text-align: center;
+	line-height: 40px;
+	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	font-size: 30px;
+	line-height: 1.42857;
+	color: #333;
+}
+
 .selected, .selected:visited, .selected:active, .selected:hover {
 	background: rgba(60, 153, 171, 0.75);
 }
@@ -326,6 +377,12 @@ input[name='login[username]'], input[name='login[password]']{
 	color: #58585a;
 	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
 	font-size: 2.8vmin;
+}
+
+.modal-body .error {
+	color: #46a6b6;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-size: 2vmin;
 }
 
 .modal-title {

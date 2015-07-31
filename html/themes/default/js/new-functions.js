@@ -34,6 +34,7 @@ function addModal(title, body, footer) {
 	var html = '<div aria-hidden="false" style="display: block;" class="modal fade in" tabindex="-1" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">' + title + '</h4></div><div class="modal-body">' + body + '</div><div class="modal-footer">' + footer + '</div></div></div></div>';
 	$('body').append(html);
 	$('body > .modal').modal('show');
+	setAutofocus();
 }
 
 // HTML Form to array
@@ -76,7 +77,7 @@ function printPageLabList(folder) {
 		success: function(data) {
 			if (data['status'] == 'success') {
 				logger(1, 'DEBUG: folder "' + folder + '" found.');
-				html += '<div id="main-navbar" class="navbar" role="navigation"><div class="container-fluid"><div class="col-md-3 col-lg-3 navbar-header"><img height=100" src="/themes/default/images/logo-rr.png"/></div><div class="collapse navbar-collapse navbar-menubuilder"><ul class="nav navbar-nav navbar-right"><li class="navbar-item"><a class="item lab-list" href="#">Home</a></li><li><img src="/themes/default/images/vertical_dots.gif"></li><li class="dropdown navbar-item"><a class="dropdown-toggle item" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Actions <span class="caret"></span></a><ul class="dropdown-menu"><li><a class="folder-add" href="#"><i class="glyphicon glyphicon-folder-close"></i> Add a new folder</a></li><li><a class="lab-add" href="#"><i class="glyphicon glyphicon-file"></i> Add a new lab</a></li><li><a class="selected-delete" href="#"><i class="glyphicon glyphicon-trash"></i> Delete selected objects</a></li></ul></li><li><img src="/themes/default/images/vertical_dots.gif"></li><li class="navbar-item"><a class="item" href="/lab_list.php?path=/">Labs (old view)</a></li><li><img src="/themes/default/images/vertical_dots.gif"></li><li class="navbar-item"><a class="sysstatus item" href="#">System Status</a></li><li><img src="/themes/default/images/vertical_dots.gif"></li><li class="navbar-item"><a class="button-logout item" href="#">Logout</a></li></ul></div></div></div><div id="main-body"><div id="list-title"><div id="list-title-folders" class="col-md-3 col-lg-3">Folders</div><div id="list-title-labs" class="col-md-3 col-lg-3" style="margin-left: 10px; margin-right: 10px;">Labs</div><div id="list-title-info" class="col-md-6 col-lg-6" style="margin-right: -20px; padding-right: 20px;"></div></div><div id="list-body" class="full-height"><div class="col-md-3 col-lg-3 full-height" id="list-folders" data-path="' + folder + '"><ul>';
+				html += '<div id="main-navbar" class="navbar" role="navigation"><div class="container-fluid"><div class="col-md-3 col-lg-3 navbar-header"><img height=100" src="/themes/default/images/logo-rr.png"/></div><div class="collapse navbar-collapse navbar-menubuilder"><ul class="nav navbar-nav navbar-right"><li class="navbar-item"><a class="item lab-list" href="#">Home</a></li><li><img src="/themes/default/images/vertical_dots.gif"></li><li class="dropdown navbar-item"><a class="dropdown-toggle item" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Actions <span class="caret"></span></a><ul class="dropdown-menu"><li><a class="folder-add" href="#"><i class="glyphicon glyphicon-folder-close"></i> Add a new folder</a></li><li><a class="lab-add" href="#"><i class="glyphicon glyphicon-file"></i> Add a new lab</a></li><li><a class="selected-delete" href="#"><i class="glyphicon glyphicon-trash"></i> Delete selected objects</a></li></ul></li><li><img src="/themes/default/images/vertical_dots.gif"></li><li class="navbar-item"><a class="sysstatus item" href="#">System&nbsp;Status</a></li><li><img src="/themes/default/images/vertical_dots.gif"></li><li class="navbar-item"><a class="item" href="http://www.unetlab.com/" target="_blank">Help</a></li><li><img src="/themes/default/images/vertical_dots.gif"></li><li class="navbar-item"><a class="button-logout item" href="#">Logout</a></li></ul></div></div></div><div id="main-body" class="full-height"><div id="list-title"><div id="list-title-folders" class="col-md-3 col-lg-3">Folders</div><div id="list-title-labs" class="col-md-3 col-lg-3" style="margin-left: 10px; margin-right: 10px;">Labs</div><div id="list-title-info" class="col-md-6 col-lg-6" style="margin-right: -20px; padding-right: 20px;"></div></div><div id="list-body" class="full-height"><div class="col-md-3 col-lg-3 full-height" id="list-folders" data-path="' + folder + '"><ul>';
 
 				$.each(data['data']['folders'], function(id, object) {
 					// Adding all folders
@@ -191,4 +192,12 @@ function logger(severity, message) {
 	if (DEBUG >= severity) {
 		console.log(message);
 	}
+}
+
+// Set focus on right input element
+function setAutofocus() {
+	$('.autofocus').each(function(id, object) {
+		$(this).focus();
+	});
+	//$(this).find('.autofocus').focus();
 }

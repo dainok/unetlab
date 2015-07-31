@@ -31,7 +31,6 @@
 
 // Logout button
 $(document).on('click', '.button-logout', function(e) {
-	e.preventDefault();  // Prevent default behaviour
 	var url = '/api/auth/logout';
 	var type = 'GET'
 	$.ajax({
@@ -57,7 +56,6 @@ $(document).on('click', '.button-logout', function(e) {
 			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
 		}
 	});
-	return false;
 });
 
 // Accept privacy
@@ -88,6 +86,7 @@ $(document).on('click', 'a.folder-add', function(e) {
 	var html = '<form id="form-folder-add" class="form-horizontal form-folder-add"><div class="form-group"><label class="col-md-3 control-label">Path</label><div class="col-md-5"><input class="form-control" name="folder[path]" value="' + $('#list-folders').attr('data-path') + '" disabled="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Name</label><div class="col-md-5"><input class="form-control autofocus" name="folder[name]" value="" type="text"/></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">Add</button> <button type="button" class="btn btn-grey" data-dismiss="modal">Cancel</button></div></div></form>';
 	logger(1, 'DEBUG: popping up the folder-add form.');
 	addModal('Add a new folder', html, '');
+	validateFolder();
 });
 
 // Display lab-add form
@@ -95,6 +94,7 @@ $(document).on('click', 'a.lab-add', function(e) {
 	var html = '<form id="form-lab-add" class="form-horizontal form-lab-add"><div class="form-group"><label class="col-md-3 control-label">Path</label><div class="col-md-5"><input class="form-control" name="lab[path]" value="' + $('#list-folders').attr('data-path') + '" disabled="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Name</label><div class="col-md-5"><input class="form-control autofocus" name="lab[name]" value="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Version</label><div class="col-md-5"><input class="form-control" name="lab[version]" value="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Author</label><div class="col-md-5"><input class="form-control" name="lab[author]" value="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Description</label><div class="col-md-5"><textarea class="form-control" name="lab[description]"></textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">Add</button> <button type="button" class="btn btn-grey" data-dismiss="modal">Cancel</button></div></div></form>';
 	logger(1, 'DEBUG: popping up the lab-add form.');
 	addModal('Add a new lab', html, '');
+	validateLabInfo();
 });
 
 // Delete selected object
@@ -141,8 +141,103 @@ $(document).on('click', '.lab-list', function(e) {
 
 // Open system status page
 $(document).on('click', '.sysstatus', function(e) {
-	// Remove title bar from lab-list page
-	$('#main-body').html('');
+	var html = '<div class="row"><div class="version col-md-12 col-lg-12"></div></div><div class="row"><div class="circle circle-cpu col-md-3 col-lg-3"><strong></strong><br/><span>CPU usage</span></div><div class="circle circle-memory col-md-3 col-lg-3"><strong></strong><br/><span>Memory usage</span></div><div class="circle circle-swap col-md-3 col-lg-3"><strong></strong><br/><span>Swap usage</span></div><div class="circle circle-disk col-md-3 col-lg-3"><strong></strong><br/><span>Disk usage on /</span></div></div><div class="row"><div class="count count-iol col-md-4 col-lg-4"></div><div class="count count-dynamips col-md-4 col-lg-4"></div><div class="count count-qemu col-md-4 col-lg-4"></div>';
+	var url = '/api/status';
+	var type = 'GET'
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: got system status data.');
+                version = data['data']['version'];
+                cpu_percent = data['data']['cpu'] / 100;
+                disk_percent = data['data']['disk'] / 100;
+                mem_percent = data['data']['mem'] / 100;
+                cached_percent = data['data']['cached'] / 100;
+                swap_percent = data['data']['swap'] / 100;
+                qemu_count = data['data']['qemu'];
+                dynamips_count = data['data']['dynamips'];
+                iol_count = data['data']['iol'];
+
+				$('#main-body').html(html);
+				$('.version').html('Unified Networking Lab version is: <code>' + version + '</code>');
+				$('.circle-cpu').circleProgress({
+					arcCoef: 0.7,
+					value: cpu_percent,
+					thickness: 10,
+					startAngle: -Math.PI / 2,
+					fill: {	gradient: ['#46a6b6'] }
+				}).on('circle-animation-progress', function(event, progress) {
+					if (progress > cpu_percent) {
+						$(this).find('strong').html(parseInt(100 * cpu_percent) + '%');
+					} else {
+						$(this).find('strong').html(parseInt(100 * progress) + '%');
+					}
+				});
+				
+				$('.circle-memory').circleProgress({
+					arcCoef: 0.7,
+					value: mem_percent,
+					thickness: 10,
+					startAngle: -Math.PI / 2,
+					fill: {	gradient: ['#46a6b6'] }
+				}).on('circle-animation-progress', function(event, progress) {
+					if (progress > mem_percent) {
+						$(this).find('strong').html(parseInt(100 * mem_percent) + '%');
+					} else {
+						$(this).find('strong').html(parseInt(100 * progress) + '%');
+					}
+				});
+				
+				$('.circle-swap').circleProgress({
+					arcCoef: 0.7,
+					value: swap_percent,
+					thickness: 10,
+					startAngle: -Math.PI / 2,
+					fill: {	gradient: ['#46a6b6'] }
+				}).on('circle-animation-progress', function(event, progress) {
+					if (progress > swap_percent) {
+						$(this).find('strong').html(parseInt(100 * swap_percent) + '%');
+					} else {
+						$(this).find('strong').html(parseInt(100 * progress) + '%');
+					}
+				});
+				
+				$('.circle-disk').circleProgress({
+					arcCoef: 0.7,
+					value: disk_percent,
+					thickness: 10,
+					startAngle: -Math.PI / 2,
+					fill: {	gradient: ['#46a6b6'] }
+				}).on('circle-animation-progress', function(event, progress) {
+					if (progress > disk_percent) {
+						$(this).find('strong').html(parseInt(100 * disk_percent) + '%');
+					} else {
+						$(this).find('strong').html(parseInt(100 * progress) + '%');
+					}
+				});
+				
+				$('.count-iol').html('<strong>' + iol_count + '</strong><br/><span>running IOL nodes</span>');
+				$('.count-dynamips').html('<strong>' + dynamips_count + '</strong><br/><span>running Dynamips nodes</span>');
+				$('.count-qemu').html('<strong>' + qemu_count + '</strong><br/><span>running QEMU nodes</span>');
+
+			} else {
+				// Application error
+				logger(1, 'DEBUG: internal error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: Ajax error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+		}
+	});
 });
 
 // Open folder
@@ -162,14 +257,7 @@ $(document).on('dblclick', 'a.lab', function(e) {
 	printPageLabPreview($(this).attr('data-path'));
 });
 
-// Close Modal
-$(document).on('hidden.bs.modal', '.modal', function () {
-	$('.modal').each(function() {
-		// Delete all modals on close
-		$(this).remove();
-	});
-});
-
+// Remove modal on close
 $(document).on('hide.bs.modal', '.modal', function () {
     $(this).remove();
 });
