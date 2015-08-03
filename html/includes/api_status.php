@@ -40,7 +40,7 @@ function apiGetCPUUsage() {
 	$cmd = 'top -b -n1 -p1';
 	exec($cmd, $o, $rc);
 	if ($rc == 0) {
-		return 100 - round(preg_replace('/^.+, ([0-9\.]+) id,.+/', '$1', $o[2]));
+		return 100 - (int) round(preg_replace('/^.+ni[, ]+([0-9\.]+) id,.+/', '$1', $o[2]));
 	} else {
 		return -1;
 	}
@@ -72,9 +72,9 @@ function apiGetMemUsage() {
 	$cmd = 'free';
 	exec($cmd, $o, $rc);
 	if ($rc == 0) {
-		$total = preg_replace('/^Mem:\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)$/', '$1', $o[1]);
-		$used = preg_replace('/^Mem:\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)$/', '$2', $o[1]);
-		$cached = preg_replace('/^Mem:\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)$/', '$6', $o[1]);
+		$total = (int) preg_replace('/^Mem:\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)$/', '$1', $o[1]);
+		$used = (int) preg_replace('/^Mem:\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)$/', '$2', $o[1]);
+		$cached = (int) preg_replace('/^Mem:\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)$/', '$6', $o[1]);
 		return Array(round($cached / $total * 100), round(($used - $cached) / $total * 100));
 	} else {
 		return Array(-1, -1);
@@ -107,8 +107,8 @@ function apiGetSwapUsage() {
 	$cmd = 'free';
 	exec($cmd, $o, $rc);
 	if ($rc == 0) {
-		$total = preg_replace('/^Swap:\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)$/', '$1', $o[3]);
-		$used = preg_replace('/^Swap:\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)$/', '$3', $o[3]);
+		$total = (int) preg_replace('/^Swap:\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)$/', '$1', $o[3]);
+		$used = (int) preg_replace('/^Swap:\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)$/', '$3', $o[3]);
 		return 100 - round($used / $total * 100);
 	} else {
 		return -1;

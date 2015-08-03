@@ -110,6 +110,19 @@ $('body').on('contextmenu', '.node_menu', function(e) {
         menu += '</ul>';
         menu += '</div>';
     } else {
+
+		
+		// Get all interfaces
+        var url = '/api/labs' + getParameter('filename') + '/nodes/' + node_id + '/interfaces';
+        $.ajax({
+            timeout: TIMEOUT,
+            type: 'GET',
+            url: encodeURI(url),
+            dataType: 'json',
+            success: function(data) {
+				if (data['status'] == 'success') {
+                    // Fetching ok
+					
         // Menu for open lab
         var menu = '<div class="dropdown clearfix">';
         menu += '<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu" style="display:block;position:static;margin-bottom:5px;">';
@@ -118,15 +131,39 @@ $('body').on('contextmenu', '.node_menu', function(e) {
         menu += '<li><a data-action="stopLabNodes" data-id="' + node_id + '" tabindex="-1" href="#"><i class="glyphicon glyphicon-stop"></i> Stop</a></span></li>';
         menu += '<li><a data-action="wipeLabNodes" data-id="' + node_id + '" tabindex="-1" href="#"><i class="glyphicon glyphicon-trash"></i> Wipe</a></span></li>';
         menu += '<li><a data-action="exportLabNodes" data-id="' + node_id + '" tabindex="-1" href="#"><i class="glyphicon glyphicon-save"></i> Export CFG</a></span></li>';
+		menu += '<li class="menu-item dropdown dropdown-submenu"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-search"></i> Capture</a><ul class="dropdown-menu">';
+					
+                    // For each interface type
+                    $.each(data['data'], function(type_id, type) {
+                        if (type_id == 'ethernet') {
+                            $.each(type, function(interfc_id, interfc) {
+								menu += '<li class="menu-item"><a href="capture://192.168.67.129/vnet0_' + node_id + '_' + interfc_id + '"><i class="glyphicon glyphicon-transfer"></i> ' + interfc['name'] + '</a></li>';
+                            });
+                        }
+                    });
+				}
+				
+        menu += '</ul></li>';
         menu += '</ul>';
         menu += '</div>';
+				
+		var $contextMenu = $('#contextmenu_frame');
+		$contextMenu.html(menu);
+
+		// Setting position
+		setMenuPosition(e, $contextMenu);
+	
+	
+			},
+            error: function(data) {
+                raiseMessage('DANGER', getJsonMessage(data['responseText']));
+                deferred.reject();
+            }
+        });
+
     }
 
-    var $contextMenu = $('#contextmenu_frame');
-    $contextMenu.html(menu);
 
-    // Setting position
-    setMenuPosition(e, $contextMenu);
 
     // Disable the browser context menu
     return false;
