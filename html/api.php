@@ -69,13 +69,6 @@ $app = new \Slim\Slim(Array(
 	'log.level' => \Slim\Log::WARN,		// Change to WARN for production, DEBUG to develop
 	'log.enabled' => True,
 	'log.writer' => new \Slim\LogWriter(fopen('/opt/unetlab/data/Logs/api.txt', 'a'))
-	/*
-	'log.writer' => new \Slim\Extras\Log\DateTimeFileWriter(Array(
-		'path' => '/opt/unetlab/data/Logs',
-		'name_format' => 'Y-m-d',
-		'message_format' => '%label% - %date% - %message%'
-	))
-	 */
 ));
 
 $app -> hook('slim.after.router', function () use ($app) {
@@ -85,7 +78,6 @@ $app -> hook('slim.after.router', function () use ($app) {
 
 	$app -> log -> debug('Request path: ' . $request -> getPathInfo());
 	$app -> log -> debug('Response status: ' . $response -> getStatus());
-	// And so on ...
 });
 
 $app -> response -> headers -> set('Content-Type', 'application/json');
@@ -175,6 +167,13 @@ $app -> put('/api/auth', function() use ($app, $db) {
  * Status
  **************************************************************************/
 $app -> get('/api/status', function() use ($app, $db) {
+	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($user === False) {
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+
 	$output['code'] = 200;
 	$output['status'] = 'success';
 	$output['message'] = $GLOBALS['messages']['60001'];
@@ -311,6 +310,7 @@ $app -> get('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 		$app -> response -> setBody(json_encode($output));
 		return;
 	}
+
 	$s = '/'.implode('/', $path);
 
 	$patterns[0] = '/(.+).unl.*$/';			// Drop after lab file (ending with .unl)
