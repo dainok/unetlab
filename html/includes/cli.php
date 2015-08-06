@@ -428,6 +428,10 @@ function export($node_id, $n, $lab) {
 			foreach (scandir($n -> getRunningPath()) as $filename) {
 				if (preg_match('/_nvram$/', $filename)) {
 					$nvram = $n -> getRunningPath().'/'.$filename;
+					break;
+				} else if (preg_match('/_rom$/', $filename)) {
+					$nvram = $n -> getRunningPath().'/'.$filename;
+					break;
 				}
 			}
 

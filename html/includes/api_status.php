@@ -88,13 +88,13 @@ function apiGetMemUsage() {
  */
 function apiGetRunningWrappers() {
 	// Checking running wrappers
-	$cmd = 'pgrep iol_wrapper';
+	$cmd = 'pgrep -c iol_wrap';
 	exec($cmd, $o_iol, $rc);
-	$cmd = 'pgrep dynamips_wrapper';
+	$cmd = 'pgrep -c dynamips_wrap';
 	exec($cmd, $o_dynamips, $rc);
-	$cmd = 'pgrep qemu_wrapper';
+	$cmd = 'pgrep -c qemu_wrap';
 	exec($cmd, $o_qemu, $rc);
-	return Array((int) current($o_iol), (int) current($o_dynamips), (int) current($o_qemu));
+	return Array((int) current($o_iol) / 2, (int) current($o_dynamips) / 2, (int) current($o_qemu) / 2);
 }
 
 /*
