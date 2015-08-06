@@ -1,7 +1,8 @@
         <!-- Parameters -->
         <script>var TIMEOUT = 30000;</script>
         <!-- Bootstrap core JavaScript -->
-        <script src="/themes/default/js/jquery.min.js"></script>
+		<script src="/themes/default/js/jquery.min.js"></script>
+		<script src="/themes/default/bootstrap/js/jquery-cookie-1.4.1.js"></script>
         <script src="/themes/default/js/jquery-ui.min.js"></script>
         <script src="/themes/default/js/jquery.validate.min.js"></script>
         <script src="/themes/default/js/jquery.jsPlumb-1.6.4-min.js"></script>

@@ -129,7 +129,7 @@ html += '<li>ID: <code>' + data['data']['id'] + '</code></li>';
 html += '<li>Version: <code>' + data['data']['version'] + '</code></li>';
 html += '<li>Author: ' + data['data']['author'] + '</li>';
 html += '<li>Description:<br/>' + data['data']['description'] + '</li>';
-html += '<li><a href="/lab_open.php?filename=' + lab + '">Load this lab</a></li>';
+html += '<li><a href="/lab_open.php?filename=' + lab + '&tenant=' + TENANT + '">Load this lab</a></li>';
 html += '</ul>';
 	$('#list-title-info').html('FILE: ' + lab.replace(/\\/g,'/').replace(/.*\//, ''));
 	$('#list-info').html(html);
@@ -169,7 +169,7 @@ function getUserInfo() {
 		success: function(data) {
 			if (data['status'] == 'success') {
 				logger(1, 'DEBUG: user is authenticated.');
-				deferred.resolve(data);
+				deferred.resolve(data['data']);
 			} else {
 				// Application error
 				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');

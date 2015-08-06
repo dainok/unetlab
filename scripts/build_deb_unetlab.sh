@@ -13,6 +13,7 @@ cat ${CONTROL} | sed "s/%VERSION%/${VERSION}/" | sed "s/%RELEASE%/${RELEASE}/" >
 # UNetLab
 cd ${SRC_DIR}
 rm -f html/includes/config.php
+rm -rf html/files
 mkdir -p ${DATA_DIR}/opt/unetlab ${DATA_DIR}/opt/unetlab/addons ${DATA_DIR}/opt/unetlab/data/Logs ${DATA_DIR}/opt/unetlab/labs ${DATA_DIR}/opt/unetlab/tmp/ ${DATA_DIR}/opt/unetlab/scripts
 rsync -a --delete html ${DATA_DIR}/opt/unetlab/
 cat html/includes/init.php | sed "s/define('VERSION', .*/define('VERSION', '${VERSION}-${RELEASE}');/g" > ${DATA_DIR}/opt/unetlab/html/includes/init.php
@@ -40,6 +41,14 @@ cp -a unl_profile ${DST}/unl_profile
 cp -a unl_wrapper.php ${DST}/unl_wrapper
 cd ..
 cp -a /opt/unetlab/addons/iol/lib/libcrypto.so.4 ${DATA_DIR}/opt/unetlab/addons/iol/lib
+
+# Additional files
+mkdir -p ${DATA_DIR}/opt/unetlab/html/files
+cp -a /usr/src/unetlab/windows ${DATA_DIR}/opt/unetlab/html/files/UNetLab
+cd ${DATA_DIR}/opt/unetlab/html/files
+zip windows.zip UNetLab > /dev/null
+cd ${SRC_DIR}
+rm -rf ${DATA_DIR}/opt/unetlab/html/files/UNetLab
 
 # SUDO
 mkdir -p ${DATA_DIR}/etc/sudoers.d

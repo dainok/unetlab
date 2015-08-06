@@ -29,6 +29,16 @@
  * @version 20150522
  */
 
+// Custom vars
+var DEBUG = 5;
+var TIMEOUT = 30000;
+
+// Global vars
+var EMAIL;
+var NAME;
+var TENANT;
+var USERNAME;
+
 $(document).ready(function() {
 	if ($.cookie('privacy') != 'true') {
 		logger(1, 'DEBUG: need to accept privacy.');
@@ -39,6 +49,10 @@ $(document).ready(function() {
 			// User is authenticated
 			logger(1, 'DEBUG: loading home page.');
 			printPageLabList('/');
+			USERNAME = data['username'];
+			EMAIL = data['email'];
+			TENANT = data['tenant'];
+			NAME = data['name'];
 		}).fail(function() {
 			// User is not authenticated, or error on API
 			logger(1, 'DEBUG: loading authentication page.');

@@ -37,6 +37,10 @@ $('body').on('click', '#contextmenu_frame a', function(e) {
     var action = $(this).attr('data-action');
     var id = $(this).attr('data-id');
 
+	if (action == 'disabled') {
+		return;
+	}
+
     if ($.isFunction(window[action])) {
         // Function exists
         window[action](lab_file, id);
@@ -109,6 +113,11 @@ $('body').on('contextmenu', '.node_menu', function(e) {
         menu += '<li><a data-action="deleteLabNode" data-id="' + node_id + '" tabindex="-1" href="#"><i class="glyphicon glyphicon-trash"></i> Delete</a></span></li>';
         menu += '</ul>';
         menu += '</div>';
+		var $contextMenu = $('#contextmenu_frame');
+		$contextMenu.html(menu);
+
+		// Setting position
+		setMenuPosition(e, $contextMenu);
     } else {
 
 		
@@ -131,13 +140,13 @@ $('body').on('contextmenu', '.node_menu', function(e) {
         menu += '<li><a data-action="stopLabNodes" data-id="' + node_id + '" tabindex="-1" href="#"><i class="glyphicon glyphicon-stop"></i> Stop</a></span></li>';
         menu += '<li><a data-action="wipeLabNodes" data-id="' + node_id + '" tabindex="-1" href="#"><i class="glyphicon glyphicon-trash"></i> Wipe</a></span></li>';
         menu += '<li><a data-action="exportLabNodes" data-id="' + node_id + '" tabindex="-1" href="#"><i class="glyphicon glyphicon-save"></i> Export CFG</a></span></li>';
-		menu += '<li class="menu-item dropdown dropdown-submenu"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-search"></i> Capture</a><ul class="dropdown-menu">';
+		menu += '<li class="menu-item dropdown dropdown-submenu"><a href="#" class="dropdown-toggle" data-toggle="dropdown" data-action="disabled"><i class="glyphicon glyphicon-search"></i> Capture</a><ul class="dropdown-menu">';
 					
                     // For each interface type
                     $.each(data['data'], function(type_id, type) {
                         if (type_id == 'ethernet') {
                             $.each(type, function(interfc_id, interfc) {
-								menu += '<li class="menu-item"><a href="capture://192.168.67.129/vnet0_' + node_id + '_' + interfc_id + '"><i class="glyphicon glyphicon-transfer"></i> ' + interfc['name'] + '</a></li>';
+								menu += '<li class="menu-item"><a href="capture://' + location.hostname + '/vunl' + getParameter('tenant') + '_' + node_id + '_' + interfc_id + '" data-action="disabled"><i class="glyphicon glyphicon-transfer"></i> ' + interfc['name'] + '</a></li>';
                             });
                         }
                     });

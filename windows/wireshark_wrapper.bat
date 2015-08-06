@@ -7,4 +7,6 @@ SET S=%S:capture://=%
 FOR /f "tokens=1,2 delims=/ " %%a IN ("%S%") DO SET HOST=%%a&SET INT=%%b
 IF "%INT%" == "pnet0" SET FILTER=" not port 22"
 
-"C:\Program Files (x86)\PuTTY\plink.exe" -ssh -pw %PASSWORD% %USERNAME%@%HOST% "tcpdump -i %INT% -s0 -w -%FILTER%" | "C:\Program Files\Wireshark\Wireshark.exe" -k -i -
+ECHO "Connecting to %USERNAME%@%HOST%..."
+
+"C:\Program Files\UNetLab\plink.exe" -ssh -pw %PASSWORD% %USERNAME%@%HOST% "tcpdump -i %INT% -s0 -w -%FILTER%" | "C:\Program Files\Wireshark\Wireshark.exe" -k -i -
