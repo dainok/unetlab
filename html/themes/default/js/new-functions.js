@@ -53,7 +53,11 @@ function getJsonMessage(response) {
 	try {
 		message = JSON.parse(response)['message'];
 	} catch(e) {
-		message = 'Undefined message, check if the UNetLab VM is powered on. If it is, see logs under "/opt/unetlab/data/Logs/".';
+		if (response != '') {
+			message = response;
+		} else {
+			message = 'Undefined message, check if the UNetLab VM is powered on. If it is, see logs under "/opt/unetlab/data/Logs/".';
+		}
 	}
 	return message;
 }
@@ -93,6 +97,28 @@ function printPageLabList(folder) {
 
 				html += '</ul></div><div class="col-md-6 col-lg-6 full-height" id="list-info"></div></div></div>';
 				$('#body').html(html);
+				$('.lab').draggable({
+					appendTo: '#body',
+					helper: 'clone',
+					revert: 'invalid',
+					scroll: false,
+					snap: '.folder',
+					stack: '.folder'
+				});
+				$('.folder').droppable({
+					drop: function(e, o) {
+						var lab = o['draggable'].attr('data-path');
+						var path = $(this).attr('data-path');
+						logger(1, 'DEBUG: moving "' + lab + '" to "' + path + '".');
+						$.when(moveLab(lab, path)).done(function(data) {
+							logger(1, 'DEBUG: "' + lab + '" moved to "' + path + '".');
+							o['draggable'].fadeOut(300, function() { o['draggable'].remove(); })
+						}).fail(function(data) {
+							logger(1, 'DEBUG: failed to move "' + lab + '" into "' + path + '".');
+							addModal('ERROR', '<p>' + data + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+						});
+					}
+				});
 			} else {
 				// Application error
 				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
@@ -192,6 +218,40 @@ function logger(severity, message) {
 	if (DEBUG >= severity) {
 		console.log(message);
 	}
+}
+
+// Move lab inside a folder
+function moveLab(lab, path) {
+	var deferred = $.Deferred();
+	var form_data = {};
+	form_data['path'] = path;
+	var url = '/api/labs' + lab + '/move';
+	var type = 'PUT';
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		data: JSON.stringify(form_data),
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: folder is moved.');
+				deferred.resolve();
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject(data['message']);
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
 }
 
 // Set focus on right input element

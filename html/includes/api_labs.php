@@ -17,11 +17,11 @@
  *
  * UNetLab is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with UNetLab.  If not, see <http://www.gnu.org/licenses/>.
+ * along with UNetLab. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
  * @copyright 2014-2015 Andrea Dainese
@@ -33,8 +33,8 @@
 /*
  * Function to add a lab.
  *
- * @param   string     $p               Parameters
- * @return  Array                       Return code (JSend data)
+ * @param	string		$p				Parameters
+ * @return	Array						Return code (JSend data)
  */
 function apiAddLab($p, $tenant) {
 	// Check mandatory parameters
@@ -95,9 +95,9 @@ function apiAddLab($p, $tenant) {
 /*
  * Function to delete a lab.
  *
- * @param   string     $lab_id          Lab ID
- * @param   string     $lab_file        Lab file
- * @return  Array                       Return code (JSend data)
+ * @param	string		$lab_id			Lab ID
+ * @param	string		$lab_file		Lab file
+ * @return	Array						Return code (JSend data)
  */
 function apiDeleteLab($lab) {
 	$tenant = $lab -> getTenant();
@@ -107,7 +107,7 @@ function apiDeleteLab($lab) {
 	$cmd = 'sudo /opt/unetlab/wrappers/unl_wrapper';
 	$cmd .= ' -a delete';
 	$cmd .= ' -F "'.$lab_file.'"';
-	$cmd .= ' -T 0';  // Tenant not required for delete operation
+	$cmd .= ' -T 0';	// Tenant not required for delete operation
 	$cmd .= ' 2>> /opt/unetlab/data/Logs/unl_wrapper.txt';
 	exec($cmd, $o, $rc);
 	if ($rc == 0 && unlink($lab_file)) {
@@ -124,9 +124,9 @@ function apiDeleteLab($lab) {
 /*
  * Function to edit a lab.
  *
- * @param   Lab        $lab             Lab
- * @param   Array      $lab             Parameters
- * @return  Array                       Return code (JSend data)
+ * @param	Lab			$lab			Lab
+ * @param	Array		$lab			Parameters
+ * @return	Array						Return code (JSend data)
  */
 function apiEditLab($lab, $p) {
 	// Set author/description/version
@@ -146,8 +146,8 @@ function apiEditLab($lab, $p) {
 /*
  * Function to get a lab.
  *
- * @param   Lab        $lab             Lab
- * @return  Array                       Return code (JSend data)
+ * @param	Lab			$lab			Lab
+ * @return	Array						Return code (JSend data)
  */
 function apiGetLab($lab) {
 	// Printing info
@@ -167,8 +167,8 @@ function apiGetLab($lab) {
 /*
  * Function to get all lab links (networks and serial endpoints).
  *
- * @param   Lab        $lab             Lab file
- * @return  Array                       Return code (JSend data)
+ * @param	Lab			$lab			Lab file
+ * @return	Array						Return code (JSend data)
  */
 function apiGetLabLinks($lab) {
 	$output['data'] = Array();
@@ -203,6 +203,49 @@ function apiGetLabLinks($lab) {
 	$output['message'] = $GLOBALS['messages'][60024];
 	$output['data']['ethernet'] = $ethernets;
 	$output['data']['serial'] = $serials;
+	return $output;
+}
+
+/*
+ * Function to move a lab inside another folder.
+ *
+ * @param	Lab			$lab			Lab
+ * @param	string		$path			Destination path
+ * @return	Array						Return code (JSend data)
+ */
+function apiMoveLab($lab, $path) {
+	$rc = checkFolder(BASE_LAB.$path);
+	if ($rc === 2) {
+		// Folder is not valid
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][60009];
+		return $output;
+	} else if ($rc === 1) {
+		// Folder does not exist
+		$output['code'] = 404;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][60008];
+		return $output;
+	}
+	
+	if(is_file(BASE_LAB.$path.'/'.$lab -> getFilename())) {
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][60016];
+		return $output;
+	}
+	
+	if (rename($lab -> getPath().'/'.$lab -> getFilename(), BASE_LAB.$path.'/'.$lab -> getFilename())) {
+		$output['code'] = 200;
+		$output['status'] = 'success';
+		$output['message'] = $GLOBALS['messages'][60035];
+	} else {
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][60034];
+		error_log('ERROR: '.$GLOBALS['messages'][60034]);
+	}
 	return $output;
 }
 ?>

@@ -46,7 +46,7 @@ cp -a /opt/unetlab/addons/iol/lib/libcrypto.so.4 ${DATA_DIR}/opt/unetlab/addons/
 mkdir -p ${DATA_DIR}/opt/unetlab/html/files
 cp -a /usr/src/unetlab/windows ${DATA_DIR}/opt/unetlab/html/files/UNetLab
 cd ${DATA_DIR}/opt/unetlab/html/files
-zip windows.zip UNetLab > /dev/null
+zip -r windows.zip UNetLab > /dev/null
 cd ${SRC_DIR}
 rm -rf ${DATA_DIR}/opt/unetlab/html/files/UNetLab
 

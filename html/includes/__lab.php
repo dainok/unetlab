@@ -490,7 +490,7 @@ class Lab {
 		} else if (isset($p['version']) && (int) $p['version'] < 0) {
 			// Version is not valid, ignored
 			error_log('WARNING: '.$GLOBALS['messages'][30008]);
-		} else {
+		} else if (isset($p['version'])) {
 			$this -> version = (int) $p['version'];
 			$modified = True;
 		}

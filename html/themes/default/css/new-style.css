@@ -164,7 +164,7 @@ input[name='login[username]'], input[name='login[password]']{
 	position: absolute;
 	right: 0px;
 	top: 12.5vw;
-	z-index: 10;
+	z-index: 100;
 }
 
 #list-body {
@@ -187,6 +187,7 @@ input[name='login[username]'], input[name='login[password]']{
 
 #list-folders {
 	background-color: #e2edef;
+	overflow-x: hidden;
 	overflow-y: auto;
 }
 
@@ -201,6 +202,7 @@ input[name='login[username]'], input[name='login[password]']{
 	background-color: #babbbd;
 	margin-left: 10px;
 	margin-right: 10px;
+	overflow-x: hidden;
 	overflow-y: auto;
 }
 
@@ -293,7 +295,7 @@ input[name='login[username]'], input[name='login[password]']{
 	width: 100%;
 }
 
-.lab:active, .lab:hover, .lab-opened, .lab-opened:visited, .lab-opened:active, .lab-opened:hover {
+.lab:active, .lab:hover, .lab-opened, .lab-opened:visited, .lab-opened:active, .lab-opened:hover, .lab.ui-draggable-dragging {
 	background-color: #ffffff;
 	border-bottom: 1px dotted #ffffff;
 	color: #46a6b6;
@@ -301,6 +303,11 @@ input[name='login[username]'], input[name='login[password]']{
 	font-weight: bold;
 	text-decoration: none;
 	width: 100%;
+}
+
+.lab.ui-draggable-dragging {
+	line-height: 3em;
+	width: 25%;
 }
 
 .version {

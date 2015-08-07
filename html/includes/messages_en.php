@@ -190,6 +190,8 @@ $messages[60030] = 'Successfully listed node interfaces (60030).';
 $messages[60031] = 'Template does not exists or is not available (60031).';
 $messages[60032] = 'Successfully listed node template (60032).';
 $messages[60033] = 'Requested template is not valid (60033).';
+$messages[60034] = 'Failed to move the lab (60034).';
+$messages[60035] = 'Lab moved (60035).';
 
 // Text (70000-79999)
 $messages[70000] = 'Name/prefix';

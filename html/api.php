@@ -467,6 +467,8 @@ $app -> put('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 		$output = apiEditLabPicture($lab, $p);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl$/', $s)) {
 		$output = apiEditLab($lab, $p);
+	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/move$/', $s)) {
+		$output = apiMoveLab($lab, $p['path']);
 	} else {
 		$output['code'] = 400;
 		$output['status'] = 'fail';
