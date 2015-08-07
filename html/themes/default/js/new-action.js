@@ -97,7 +97,43 @@ $(document).on('click', 'a.lab-add', function(e) {
 	validateLabInfo();
 });
 
-// Delete selected object
+// Clone selected labs
+$(document).on('click', '.selected-clone', function(e) {
+	var type = 'POST'
+	var url = '/api/labs';
+	var path = {};
+	$('.selected').each(function(id, object) {
+		form_data = {};
+		form_data['name'] = 'Copy of ' + $(this).text().slice(0, -4);
+		form_data['source'] = $(this).attr('data-path');
+		$.ajax({
+			timeout: TIMEOUT,
+			type: type,
+			url: encodeURI(url),
+			dataType: 'json',
+			data: JSON.stringify(form_data),
+			success: function(data) {
+				if (data['status'] == 'success') {
+					logger(1, 'DEBUG: created lab "' + form_data['name'] + '" from "' + form_data['source'] + '".');
+				} else {
+					// Application error
+					logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				}
+			},
+			error: function(data) {
+				// Server error
+				var message = getJsonMessage(data['responseText']);
+				logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+				logger(1, 'DEBUG: ' + message);
+			}
+		});
+	});
+	if ($('.selected').size() > 0) {
+		printPageLabList($('#list-folders').attr('data-path'));
+	}
+});
+
+// Delete selected objects
 $(document).on('click', '.selected-delete', function(e) {
 	var type = 'DELETE'
 	$('.selected').each(function(id, object) {

@@ -33,7 +33,7 @@
 /*
  * Function to add a lab.
  *
- * @param	string		$p				Parameters
+ * @param	Array		$p				Parameters
  * @return	Array						Return code (JSend data)
  */
 function apiAddLab($p, $tenant) {
@@ -89,6 +89,70 @@ function apiAddLab($p, $tenant) {
 	$output['code'] = 200;
 	$output['status'] = 'success';
 	$output['message'] = $GLOBALS['messages'][60019];
+	return $output;
+}
+
+/*
+ * Function to add a lab.
+ *
+ * @param	Array		$p				Parameters
+ * @return	Array						Return code (JSend data)
+ */
+function apiCloneLab($p, $tenant) {
+	$rc = checkFolder(BASE_LAB.dirname($p['source']));
+	if ($rc === 2) {
+		// Folder is not valid
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][60009];
+		return $output;
+	} else if ($rc === 1) {
+		// Folder does not exist
+		$output['code'] = 404;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][60008];
+		return $output;
+	}
+	
+	if(!is_file(BASE_LAB.$p['source'])) {
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][60000];
+		return $output;
+	}
+	
+	if (!copy(BASE_LAB.$p['source'], BASE_LAB.dirname($p['source']).'/'.$p['name'].'.unl')) {
+		// Failed to copy
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][60037];
+		error_log('ERROR: '.$GLOBALS['messages'][60037]);
+		return $output;
+	}
+	
+	try {
+		$lab = new Lab(BASE_LAB.dirname($p['source']).'/'.$p['name'].'.unl', $tenant);
+	} catch(Exception $e) {
+		// Lab file is invalid
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][$e -> getMessage()];
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+	
+	$rc = $lab -> edit($p);
+	if ($rc !== 0) {
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][$rc];
+	} else {
+		$output['code'] = 200;
+		$output['status'] = 'success';
+		$output['message'] = $GLOBALS['messages'][60036];
+	}
+	
 	return $output;
 }
 

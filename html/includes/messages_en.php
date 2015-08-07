@@ -101,6 +101,8 @@ $messages[20034] = 'Cannot link node (20034).';
 $messages[20035] = 'Cannot unlink node (20035).';
 $messages[20036] = 'Cannot save startup-config in the selected lab (20036).';
 $messages[20037] = 'Config ignored, cannot load it (20037).';
+$messages[20038] = 'Attribute ignored, invalid lab_name (20038).';
+$messages[20039] = 'Lab already exists (20039).';
 
 // __network.php (30000-39999)
 $messages[30000] = 'Cannot create network, invalid or missing mandatory parameters (30000).';
@@ -192,6 +194,8 @@ $messages[60032] = 'Successfully listed node template (60032).';
 $messages[60033] = 'Requested template is not valid (60033).';
 $messages[60034] = 'Failed to move the lab (60034).';
 $messages[60035] = 'Lab moved (60035).';
+$messages[60036] = 'Lab cloned (60036).';
+$messages[60037] = 'Failed to clone the lab (60037).';
 
 // Text (70000-79999)
 $messages[70000] = 'Name/prefix';

@@ -319,7 +319,7 @@ $app -> get('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 	$replacements[1] = '$1';
 
 	$lab_file = preg_replace($patterns[0], $replacements[0], $s);
-	$id = preg_replace($patterns[1], $replacements[1], $s);	// Intefer after lab_file.unl
+	$id = preg_replace($patterns[1], $replacements[1], $s);	// Interfere after lab_file.unl
 
 	if (!is_file(BASE_LAB.$lab_file)) {
 		// Lab file does not exists
@@ -487,10 +487,15 @@ $app -> post('/api/labs', function() use ($app, $db) {
 		$app -> response -> setBody(json_encode($output));
 		return;
 	}
-
+	
 	$event = json_decode($app -> request() -> getBody());
 	$p = json_decode(json_encode($event), True);;
-	$output = apiAddLab($p, $tenant);
+	
+	if (isset($p['source'])) {
+		$output = apiCloneLab($p, $tenant);
+	} else {
+		$output = apiAddLab($p, $tenant);
+	}
 
 	$app -> response -> setStatus($output['code']);
 	$app -> response -> setBody(json_encode($output));

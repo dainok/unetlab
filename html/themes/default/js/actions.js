@@ -170,7 +170,11 @@ $('body').on('submit', '#form-lab_edit', function(e) {
         data: JSON.stringify(form_data),
         success: function(data) {
             if (data['status'] == 'success') {
-                raiseMessage('SUCCESS', 'Lab saved.');
+				if (lab_file == form_data['name'] + '.unl') {
+					raiseMessage('SUCCESS', 'Lab saved.');
+				} else {
+					window.location.href = '/lab_edit.php?filename=' + dirname(lab_file) + '/' + form_data['name'] + '.unl';
+				}
             } else {
                 // Fetching failed
                 raiseMessage('DANGER', data['status']);

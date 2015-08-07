@@ -465,6 +465,14 @@ class Lab {
 	public function edit($p) {
 		$modified = False;
 
+		if (!isset($p['name']) && !checkLabFilename($p['name'].'.unl')) {
+			// Name is not valid, ignored
+			error_log('WARNING: '.$GLOBALS['messages'][20038]);
+		} else if (isset($p['name'])) {
+			$this -> name = $p['name'];
+			$modified = True;
+		}
+		
 		if (isset($p['author']) && $p['author'] === '') {
 			// Author is empty, unset the current one
 			unset($this -> author);
@@ -981,8 +989,9 @@ class Lab {
 		$dom -> loadXML($xml -> asXML());
 
 		// Write to file
-		$tmp = $this -> path.'/'.$this -> filename.'.swp';
-		$dst = $this -> path.'/'.$this -> filename;
+		$tmp = $this -> path.'/'.$this -> name.'.swp';
+		$old = $this -> path.'/'.$this -> filename;
+		$dst = $this -> path.'/'.$this -> name.'.unl';
 		$fp = fopen($tmp, 'w');
 		if (!fwrite($fp, $dom -> saveXML())) {
 			// Failed to write
@@ -993,15 +1002,20 @@ class Lab {
 		} else {
 			// Write OK
 			fclose($fp);
-			if (is_file($dst) && !unlink($dst)) {
+			if ($old != $dst && is_file($dst)) {
+				// Should rename the lab, but destination file already exists
+				error_log('ERROR: '.$GLOBALS['messages'][20039]);
+				return 20039;
+			}
+			if (is_file($old) && !unlink($old)) {
 				// Cannot delete original lab
 				unlink($tmp);
-				error_log('WARNING: '.$GLOBALS['messages'][20028]);
+				error_log('ERROR: '.$GLOBALS['messages'][20028]);
 				return 20028;
 			}
 			if (!rename($tmp, $dst)) {
 				// Cannot move $tmp to $dst
-				error_log('WARNING: '.$GLOBALS['messages'][20029]);
+				error_log('ERROR: '.$GLOBALS['messages'][20029]);
 				return 20029;
 			}
 		}
