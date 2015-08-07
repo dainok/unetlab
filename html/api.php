@@ -653,6 +653,28 @@ $app -> delete('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 });
 
 /***************************************************************************
+ * Export/Import
+ **************************************************************************/
+// Export labs
+$app -> post('/api/export', function() use ($app, $db) {
+	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($user === False) {
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+	
+	$event = json_decode($app -> request() -> getBody());
+	$p = json_decode(json_encode($event), True);;
+	
+	$output = apiExportLab($p);
+
+	$app -> response -> setStatus($output['code']);
+	$app -> response -> setBody(json_encode($output));
+});
+ 
+
+/***************************************************************************
  * Run
  **************************************************************************/
 $app -> run();

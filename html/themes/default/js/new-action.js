@@ -170,6 +170,42 @@ $(document).on('click', '.selected-delete', function(e) {
 	});
 });
 
+// Clone selected labs
+$(document).on('click', '.selected-export', function(e) {
+	var type = 'POST'
+	var url = '/api/export';
+	var form_data = {};
+	var i = 0;
+	$('.selected').each(function(id, object) {
+		form_data[i] = $(this).attr('data-path');
+		i++;
+	});
+	
+	if ($('.selected').size() > 0) {
+		$.ajax({
+			timeout: TIMEOUT,
+			type: type,
+			url: encodeURI(url),
+			dataType: 'json',
+			data: JSON.stringify(form_data),
+			success: function(data) {
+				if (data['status'] == 'success') {
+					logger(1, 'DEBUG: objects exported.');
+				} else {
+					// Application error
+					logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				}
+			},
+			error: function(data) {
+				// Server error
+				var message = getJsonMessage(data['responseText']);
+				logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+				logger(1, 'DEBUG: ' + message);
+			}
+		});
+	}
+});
+
 // Open lab-list page
 $(document).on('click', '.lab-list', function(e) {
 	printPageLabList('/');

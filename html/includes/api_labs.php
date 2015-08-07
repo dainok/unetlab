@@ -208,6 +208,38 @@ function apiEditLab($lab, $p) {
 }
 
 /*
+ * Function to edit a lab.
+ *
+ * @param	Array		$lab			Parameters
+ * @return	Array						Return code (JSend data)
+ */
+function apiExportLab($p) {
+	print_r($p);
+	$export_file = tempnam('/tmp', 'unetlab_export_');
+	$zip = new ZipArchive();
+	$fp = $zip -> open($export_file, ZipArchive::CREATE);
+	foreach ($p as $value) {
+		if (checkFolder(BASE_LAB.$value) && is_file(BASE_LAB.$value)) {
+			$zip -> addFile(BASE_LAB.$value);
+		}
+	}
+	$zip -> close();
+	
+	// Set author/description/version
+	$rc = 0;
+	if ($rc !== 0) {
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][$rc];
+	} else {
+		$output['code'] = 200;
+		$output['status'] = 'success';
+		$output['message'] = $GLOBALS['messages'][60023];
+	}
+	return $output;
+}
+
+/*
  * Function to get a lab.
  *
  * @param	Lab			$lab			Lab
