@@ -349,10 +349,17 @@ $(document).on('submit', '#form-login', function(e) {
 		success: function(data) {
 			if (data['status'] == 'success') {
 				logger(1, 'DEBUG: user is authenticated.');
-				logger(1, 'DEBUG: loading home page.');
 				// Close the modal
 				$(e.target).parents('.modal').modal('hide');
-				printPageLabList('/');
+				$.when(getUserInfo()).done(function() {
+					// User is authenticated
+					logger(1, 'DEBUG: loading home page.');
+					printPageLabList('/');
+				}).fail(function() {
+					// User is not authenticated, or error on API
+					logger(1, 'DEBUG: loading authentication page.');
+					printPageAuthentication();
+				});
 			} else {
 				// Application error
 				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');

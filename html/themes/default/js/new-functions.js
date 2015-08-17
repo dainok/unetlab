@@ -195,11 +195,15 @@ function getUserInfo() {
 		success: function(data) {
 			if (data['status'] == 'success') {
 				logger(1, 'DEBUG: user is authenticated.');
-				deferred.resolve(data['data']);
+				USERNAME = data['data']['username'];
+				EMAIL = data['data']['email'];
+				TENANT = data['data']['tenant'];
+				NAME = data['data']['name'];
+				deferred.resolve();
 			} else {
 				// Application error
 				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-				deferred.reject(data);
+				deferred.reject();
 			}
 		},
 		error: function(data) {
