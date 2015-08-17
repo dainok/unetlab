@@ -281,6 +281,10 @@ $messages[80068] = 'Cannot open startup-config file (80068).';
 $messages[80069] = 'Cannot write startup-config file (80069).';
 $messages[80070] = 'Failed to remove tmp file (80070).';
 $messages[80071] = 'Failed to disable multicast_snooping on bridge (80071).';
+$messages[80072] = 'Cannot change path to BASE_LAB (80072).';
+$messages[80073] = 'Cannot ZIP file (80073).';
+$messages[80074] = 'Cannot ZIP folder (80074).';
+$messages[80075] = 'Export is ready (80075).';
 
 // Authentication (90000-99999)
 $messages[90001] = 'User is not authenticated (90001).';

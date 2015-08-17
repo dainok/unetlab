@@ -214,28 +214,46 @@ function apiEditLab($lab, $p) {
  * @return	Array						Return code (JSend data)
  */
 function apiExportLab($p) {
-	print_r($p);
-	$export_file = tempnam('/tmp', 'unetlab_export_');
-	$zip = new ZipArchive();
-	$fp = $zip -> open($export_file, ZipArchive::CREATE);
-	foreach ($p as $value) {
-		if (checkFolder(BASE_LAB.$value) && is_file(BASE_LAB.$value)) {
-			$zip -> addFile(BASE_LAB.$value);
-		}
+	$export_file = '/opt/unetlab/data/Exports/unetlab_export-'.date('Ymd-Gis').'.zip';
+	if (is_file($export_file)) {
+		unlink($export_file);
 	}
-	$zip -> close();
-	
-	// Set author/description/version
-	$rc = 0;
-	if ($rc !== 0) {
+	if (!chdir(BASE_LAB)) {
+		// Cannot set CWD
 		$output['code'] = 400;
 		$output['status'] = 'fail';
-		$output['message'] = $GLOBALS['messages'][$rc];
-	} else {
-		$output['code'] = 200;
-		$output['status'] = 'success';
-		$output['message'] = $GLOBALS['messages'][60023];
+		$output['message'] = $GLOBALS[80072];
+		return $output;
 	}
+	
+	foreach ($p as $element) {
+		if (is_file(BASE_LAB.$element)) {
+			// Adding a file
+			$cmd = 'zip '.$export_file.' .'.$element;
+			exec($cmd, $o, $rc);
+			if ($rc != 0) {
+				$output['code'] = 400;
+				$output['status'] = 'fail';
+				$output['message'] = $GLOBALS['messages'][80073];
+				return $output;
+			}
+		}
+		if (checkFolder(BASE_LAB.$element) === 0) {
+			// Adding a dir
+			$cmd = 'zip -r '.$export_file.' .'.$element;
+			exec($cmd, $o, $rc);
+			if ($rc != 0) {
+				$output['code'] = 400;
+				$output['status'] = 'fail';
+				$output['message'] = $GLOBALS['messages'][80074];
+				return $output;
+			}
+		}
+	}
+	$output['code'] = 200;
+	$output['status'] = 'success';
+	$output['message'] = $GLOBALS[80075];
+	$output['data'] = $export_file;
 	return $output;
 }
 

@@ -668,7 +668,6 @@ $app -> post('/api/export', function() use ($app, $db) {
 	$p = json_decode(json_encode($event), True);;
 	
 	$output = apiExportLab($p);
-
 	$app -> response -> setStatus($output['code']);
 	$app -> response -> setBody(json_encode($output));
 });

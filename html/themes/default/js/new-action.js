@@ -190,7 +190,7 @@ $(document).on('click', '.selected-export', function(e) {
 			data: JSON.stringify(form_data),
 			success: function(data) {
 				if (data['status'] == 'success') {
-					logger(1, 'DEBUG: objects exported.');
+					logger(1, 'DEBUG: objects exported into "' + data['data'] + '".');
 				} else {
 					// Application error
 					logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
