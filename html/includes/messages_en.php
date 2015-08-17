@@ -280,6 +280,7 @@ $messages[80067] = 'Failed to dump startup-config (80067).';
 $messages[80068] = 'Cannot open startup-config file (80068).';
 $messages[80069] = 'Cannot write startup-config file (80069).';
 $messages[80070] = 'Failed to remove tmp file (80070).';
+$messages[80071] = 'Failed to disable multicast_snooping on bridge (80071).';
 
 // Authentication (90000-99999)
 $messages[90001] = 'User is not authenticated (90001).';

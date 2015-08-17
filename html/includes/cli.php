@@ -65,6 +65,16 @@ function addBridge($s) {
 			error_log(implode("\n", $o));
 			return 80028;
 		}
+
+		// Disable multicast_snooping
+		$cmd = 'echo 0 > /sys//sys/devices/virtual/net/'.$s.'/bridge/multicast_snooping 2>&1';
+		exec($cmd, $o, $rc);
+		if ($rc != 0) {
+			// Failed to configure multicast_snooping
+			error_log('ERROR: '.$GLOBALS['messages'][80071]);
+			error_log(implode("\n", $o));
+			return 80071;
+		}
 	}
 
 	$cmd = 'brctl setageing '.$s.' 0 2>&1';

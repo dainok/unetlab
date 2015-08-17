@@ -2,7 +2,7 @@
 # vim: syntax=php tabstop=4 softtabstop=0 noexpandtab laststatus=1 ruler 
   
 /** 
-* html/templates/Linux.php 
+* html/templates/linux.php 
 * 
 * win template for UNetLab. 
 * 
