@@ -38,7 +38,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150525
+ * @version 20150817
  */
 
 // Include custom configuration
@@ -61,11 +61,13 @@ if (!isset($node_templates)) {
 		'veos'			=>	'Arista vEOS',
 		'brocadevadx'	=>	'Brocade vADX',
 		'cpsg'			=>	'CheckPoint Security Gateway VE',
+		'acs'                   =>      'Cisco ACS'
 		'asa'			=>	'Cisco ASA',
 		'asav'			=>	'Cisco ASAv',
 		'cda'			=>	'Cisco Context Directory Agent',
 		'csr1000v'		=>	'Cisco CSR 1000V',
 		'cips'			=>	'Cisco IPS',
+		'ise'	                =>      'Cisco ISE'
 		'c1710'			=>	'Cisco IOS 1710 (Dynamips)',
 		'c3725'			=>	'Cisco IOS 3725 (Dynamips)',
 		'c7200'			=>	'Cisco IOS 7206VXR (Dynamips)',
