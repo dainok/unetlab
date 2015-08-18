@@ -56,3 +56,10 @@ $(document).ready(function() {
 		});
 	}
 });
+
+// Attach files
+var ATTACHMENTS;
+$('body').on('change', 'input[type=file]', function(e) {
+    ATTACHMENTS = e.target.files;
+	console.log(ATTACHMENTS);
+});

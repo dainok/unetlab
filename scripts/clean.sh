@@ -1,6 +1,7 @@
 #!/bin/bash
 
 find /opt/unetlab/data/Logs/ -type f -exec rm -f {} \;
+find /opt/unetlab/data/Exports/ -type f -exec rm -f {} \;
 find /var/log/ -type f -exec rm -f {} \;
 find /var/cache/ -type f -exec rm -f {} \;
 apt-get clean

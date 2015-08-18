@@ -117,6 +117,10 @@ require_once(BASE_DIR.'/html/includes/__node.php');
 require_once(BASE_DIR.'/html/includes/__picture.php');
 require_once(BASE_DIR.'/html/includes/functions.php');
 require_once(BASE_DIR.'/html/includes/messages_en.php');
+if (defined('LOCALE') && is_file(BASE_DIR.'/html/includes/messages_'.LOCALE.'.php')) {
+	// Load a custom language
+	require_once(BASE_DIR.'/html/includes/messages_'.LOCALE.'.php');
+}
 
 // Include CLI specific functions
 if (php_sapi_name() === 'cli') {

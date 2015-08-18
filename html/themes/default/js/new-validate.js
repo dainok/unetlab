@@ -35,12 +35,13 @@ $.validator.setDefaults({
 });
 
 // Validate an interger
-$.validator.addMethod('integer', function(value) { 
+$.validator.addMethod('integer', function(value) {
     return /^[0-9]+$/.test(value); 
 }, 'Must be interger ([0-9] chars).');
 
 // Validate a lab name
-$.validator.addMethod('lab_name', function(value) { 
+$.validator.addMethod('lab_name', function(value) {
+	console.log(value);
     return /^[A-Za-z0-9_\-\s]+$/.test(value); 
 }, 'Use only [A-Za-z0-9_- ] chars.');
 
@@ -51,6 +52,25 @@ function validateFolder() {
 			'folder[name]': {
 				required: true,
 				lab_name: true
+			}
+		}
+	});
+	$('#form-folder-rename').validate({
+		rules: {
+			'folder[name]': {
+				required: true,
+				lab_name: true
+			}
+		}
+	});
+}
+
+// Validate import form
+function validateImport() {
+	$('#form-import').validate({
+		rules: {
+			'import[file]': {
+				required: true,
 			}
 		}
 	});

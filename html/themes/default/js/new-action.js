@@ -89,6 +89,22 @@ $(document).on('click', 'a.folder-add', function(e) {
 	validateFolder();
 });
 
+// Display folder-rename form
+$(document).on('click', 'a.folder-rename', function(e) {
+	var html = '<form id="form-folder-rename" class="form-horizontal form-folder-rename"><div class="form-group"><label class="col-md-3 control-label">Path</label><div class="col-md-5"><input class="form-control" name="folder[path]" value="' + $('#list-folders').attr('data-path') + '" disabled="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Name</label><div class="col-md-5"><input class="form-control autofocus" name="folder[name]" value="" type="text"/></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">Rename</button> <button type="button" class="btn btn-grey" data-dismiss="modal">Cancel</button></div></div></form>';
+	logger(1, 'DEBUG: popping up the folder-rename form.');
+	addModal('Rename current folder', html, '');
+	validateFolder();
+});
+
+// Display import form
+$(document).on('click', 'a.import', function(e) {
+	var html = '<form id="form-import" class="form-horizontal form-import"><div class="form-group"><label class="col-md-3 control-label">Path</label><div class="col-md-5"><input class="form-control" name="import[path]" value="' + $('#list-folders').attr('data-path') + '" disabled="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">File</label><div class="col-md-5"><span class="btn btn-default btn-file btn-aqua">Browse <input class="form-control" name="import[file]" value="" type="file"></span></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">Import</button> <button type="button" class="btn btn-grey" data-dismiss="modal">Cancel</button></div></div></form>';
+	logger(1, 'DEBUG: popping up the import form.');
+	addModal('Import labs', html, '');
+	validateImport();
+});
+
 // Display lab-add form
 $(document).on('click', 'a.lab-add', function(e) {
 	var html = '<form id="form-lab-add" class="form-horizontal form-lab-add"><div class="form-group"><label class="col-md-3 control-label">Path</label><div class="col-md-5"><input class="form-control" name="lab[path]" value="' + $('#list-folders').attr('data-path') + '" disabled="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Name</label><div class="col-md-5"><input class="form-control autofocus" name="lab[name]" value="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Version</label><div class="col-md-5"><input class="form-control" name="lab[version]" value="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Author</label><div class="col-md-5"><input class="form-control" name="lab[author]" value="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Description</label><div class="col-md-5"><textarea class="form-control" name="lab[description]"></textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">Add</button> <button type="button" class="btn btn-grey" data-dismiss="modal">Cancel</button></div></div></form>';
@@ -176,6 +192,7 @@ $(document).on('click', '.selected-export', function(e) {
 	var url = '/api/export';
 	var form_data = {};
 	var i = 0;
+	form_data['path'] = $('#list-folders').attr('data-path')
 	$('.selected').each(function(id, object) {
 		form_data[i] = $(this).attr('data-path');
 		i++;
@@ -191,9 +208,11 @@ $(document).on('click', '.selected-export', function(e) {
 			success: function(data) {
 				if (data['status'] == 'success') {
 					logger(1, 'DEBUG: objects exported into "' + data['data'] + '".');
+					window.location = data['data'];
 				} else {
 					// Application error
 					logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+					addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
 				}
 			},
 			error: function(data) {
@@ -201,6 +220,7 @@ $(document).on('click', '.selected-export', function(e) {
 				var message = getJsonMessage(data['responseText']);
 				logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
 				logger(1, 'DEBUG: ' + message);
+				addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
 			}
 		});
 	}
@@ -295,6 +315,7 @@ $(document).on('click', '.sysstatus', function(e) {
 				$('.count-iol').html('<strong>' + iol_count + '</strong><br/><span>running IOL nodes</span>');
 				$('.count-dynamips').html('<strong>' + dynamips_count + '</strong><br/><span>running Dynamips nodes</span>');
 				$('.count-qemu').html('<strong>' + qemu_count + '</strong><br/><span>running QEMU nodes</span>');
+				$('#actions-menu').html('<li><a class="sysstatus" href="#"><i class="glyphicon glyphicon-refresh"></i> Refresh</a></li>');
 
 			} else {
 				// Application error
@@ -396,6 +417,54 @@ $(document).on('submit', '#form-folder-add', function(e) {
 				$(e.target).parents('.modal').modal('hide');
 				// Reload the folder list
 				printPageLabList(form_data['path']);
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+		}
+	});
+	return false;  // Stop to avoid POST
+});
+
+// Submit import form
+$(document).on('submit', '#form-import', function(e) {
+	e.preventDefault();  // Prevent default behaviour
+	var form_data = new FormData();
+	var form_name = 'import';
+	var url = '/api/import';
+	var type = 'POST';
+	// Setting options: cannot use form2Array() because not using JSON to send data
+	$('form :input[name^="' + form_name + '["]').each(function(id, object) {
+		// INPUT name is in the form of "form_name[value]", get value only
+		form_data.append($(this).attr('name').substr(form_name.length + 1, $(this).attr('name').length - form_name.length - 2), $(this).val());
+	});
+	// Add attachments
+    $.each(ATTACHMENTS, function(key, value) {
+        form_data.append(key, value);
+    });
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+        contentType: false, // Set content type to false as jQuery will tell the server its a query string request
+        processData: false, // Don't process the files
+		dataType: 'json',
+		data: form_data,
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: labs imported.');
+				// Close the modal
+				$(e.target).parents('.modal').modal('hide');
+				// Reload the folder list
+				printPageLabList($('#list-folders').attr('data-path'));
 			} else {
 				// Application error
 				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');

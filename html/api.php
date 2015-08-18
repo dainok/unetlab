@@ -667,11 +667,27 @@ $app -> post('/api/export', function() use ($app, $db) {
 	$event = json_decode($app -> request() -> getBody());
 	$p = json_decode(json_encode($event), True);;
 	
-	$output = apiExportLab($p);
+	$output = apiExportLabs($p);
 	$app -> response -> setStatus($output['code']);
 	$app -> response -> setBody(json_encode($output));
 });
- 
+
+// Import labs
+ $app -> post('/api/import', function() use ($app, $db) {
+	// Cannot use $app -> request() -> getBody()
+	$p = $_POST;
+	if (!empty($_FILES)) {
+		foreach ($_FILES as $file) {
+			$p['name'] = $file['name'];
+			$p['file'] = $file['tmp_name'];
+			$p['type'] = $file['type'];
+			$p['error'] = $file['name'];
+		}
+	}
+	$output = apiImportLabs($p);
+	$app -> response -> setStatus($output['code']);
+	$app -> response -> setBody(json_encode($output));
+ });
 
 /***************************************************************************
  * Run

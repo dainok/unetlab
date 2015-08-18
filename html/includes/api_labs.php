@@ -208,17 +208,27 @@ function apiEditLab($lab, $p) {
 }
 
 /*
- * Function to edit a lab.
+ * Function to export labs.
  *
- * @param	Array		$lab			Parameters
+ * @param	Array		$p				Parameters
  * @return	Array						Return code (JSend data)
  */
-function apiExportLab($p) {
-	$export_file = '/opt/unetlab/data/Exports/unetlab_export-'.date('Ymd-Gis').'.zip';
+function apiExportLabs($p) {
+	$export_url = '/Exports/unetlab_export-'.date('Ymd-His').'.zip';
+	$export_file = '/opt/unetlab/data'.$export_url;
 	if (is_file($export_file)) {
 		unlink($export_file);
 	}
-	if (!chdir(BASE_LAB)) {
+	
+	if (checkFolder(BASE_LAB.$p['path']) !== 0) {
+		// Path is not valid
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][80077];
+		return $output;
+	}
+	
+	if (!chdir(BASE_LAB.$p['path'])) {
 		// Cannot set CWD
 		$output['code'] = 400;
 		$output['status'] = 'fail';
@@ -226,10 +236,20 @@ function apiExportLab($p) {
 		return $output;
 	}
 	
-	foreach ($p as $element) {
-		if (is_file(BASE_LAB.$element)) {
+	foreach ($p as $key => $element) {
+		if ($key === 'path') {
+			continue;
+		}
+		
+		// Using "element" relative to "path", adding '/' if missing
+		$relement = substr($element, strlen($p['path']));
+		if (substr($relement, 1) != '/') {
+			$relement = '/'.$relement;
+		}
+		
+		if (is_file(BASE_LAB.$p['path'].$relement)) {
 			// Adding a file
-			$cmd = 'zip '.$export_file.' .'.$element;
+			$cmd = 'zip '.$export_file.' ".'.$relement.'"';
 			exec($cmd, $o, $rc);
 			if ($rc != 0) {
 				$output['code'] = 400;
@@ -238,9 +258,10 @@ function apiExportLab($p) {
 				return $output;
 			}
 		}
-		if (checkFolder(BASE_LAB.$element) === 0) {
+		
+		if (checkFolder(BASE_LAB.$p['path'].$relement) === 0) {
 			// Adding a dir
-			$cmd = 'zip -r '.$export_file.' .'.$element;
+			$cmd = 'zip -r '.$export_file.' ".'.$relement.'"';
 			exec($cmd, $o, $rc);
 			if ($rc != 0) {
 				$output['code'] = 400;
@@ -252,8 +273,8 @@ function apiExportLab($p) {
 	}
 	$output['code'] = 200;
 	$output['status'] = 'success';
-	$output['message'] = $GLOBALS[80075];
-	$output['data'] = $export_file;
+	$output['message'] = $GLOBALS['messages'][80075];
+	$output['data'] = $export_url;
 	return $output;
 }
 
@@ -317,6 +338,52 @@ function apiGetLabLinks($lab) {
 	$output['message'] = $GLOBALS['messages'][60024];
 	$output['data']['ethernet'] = $ethernets;
 	$output['data']['serial'] = $serials;
+	return $output;
+}
+
+/*
+ * Function to import labs.
+ *
+ * @param	Array		$p				Parameters
+ * @return	Array						Return code (JSend data)
+ */
+function apiImportLabs($p) {
+	if (!isset($p['path'])) {
+		// Path is not set
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][80076];
+		return $output;
+	}
+	
+	if (checkFolder(BASE_LAB.$p['path']) !== 0) {
+		// Path is not valid
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][80077];
+		return $output;
+	}
+	
+	if (!isset($p['type']) || $p['type'] != 'application/zip') {
+		// File is not a Zip
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][80078];
+		return $output;	
+	}
+	
+	$cmd = 'unzip -o -d "'.BASE_LAB.$p['path'].'" '.$p['file'].' *.unl';
+	exec($cmd, $o, $rc);
+	if ($rc != 0) {
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][80079];
+		return $output;
+	}
+
+	$output['code'] = 200;
+	$output['status'] = 'success';
+	$output['message'] = $GLOBALS['messages'][80080];
 	return $output;
 }
 
