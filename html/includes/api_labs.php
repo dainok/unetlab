@@ -243,7 +243,7 @@ function apiExportLabs($p) {
 		
 		// Using "element" relative to "path", adding '/' if missing
 		$relement = substr($element, strlen($p['path']));
-		if (substr($relement, 1) != '/') {
+		if (!strcmp(substr($relement, 1), '/')) {
 			$relement = '/'.$relement;
 		}
 		
@@ -364,7 +364,8 @@ function apiImportLabs($p) {
 		return $output;
 	}
 	
-	if (!isset($p['type']) || $p['type'] != 'application/zip') {
+	$finfo = new finfo(FILEINFO_MIME);
+	if (!strcmp($finfo -> file($p['file']), 'application/zip')) {
 		// File is not a Zip
 		$output['code'] = 400;
 		$output['status'] = 'fail';

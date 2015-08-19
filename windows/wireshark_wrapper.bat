@@ -9,4 +9,4 @@ IF "%INT%" == "pnet0" SET FILTER=" not port 22"
 
 ECHO "Connecting to %USERNAME%@%HOST%..."
 
-"C:\Program Files\UNetLab\plink.exe" -ssh -pw %PASSWORD% %USERNAME%@%HOST% "tcpdump -i %INT% -s0 -w -%FILTER%" | "C:\Program Files\Wireshark\Wireshark.exe" -k -i -
+"C:\Program Files\UNetLab\plink.exe" -ssh -pw %PASSWORD% %USERNAME%@%HOST% "tcpdump -l -u -i %INT% -s 0 -w -%FILTER%" | "C:\Program Files\Wireshark\Wireshark.exe" -k -i -

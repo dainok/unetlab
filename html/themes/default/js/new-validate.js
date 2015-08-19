@@ -41,7 +41,6 @@ $.validator.addMethod('integer', function(value) {
 
 // Validate a lab name
 $.validator.addMethod('lab_name', function(value) {
-	console.log(value);
     return /^[A-Za-z0-9_\-\s]+$/.test(value); 
 }, 'Use only [A-Za-z0-9_- ] chars.');
 

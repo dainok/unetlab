@@ -56,7 +56,7 @@ function getJsonMessage(response) {
 		if (response != '') {
 			message = response;
 		} else {
-			message = 'Undefined message, check if the UNetLab VM is powered on. If it is, see logs under "/opt/unetlab/data/Logs/".';
+			message = 'Undefined message, check if the UNetLab VM is powered on. If it is, see <a href="/Logs" target="_blank">logs</a>.';
 		}
 	}
 	return message;

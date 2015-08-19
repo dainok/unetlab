@@ -94,7 +94,7 @@ if (!isset($node_templates)) {
 		'mikrotik'		=>	'MikroTik RouterOS',
 		'paloalto'		=>	'Palo Alto VM-100 Firewall',
 		'vyos'			=>	'VyOS',
-		'esxi'			=>	'VMware ESXi',
+		//'esxi'		=>	'VMware ESXi',
 		'win'			=>	'Windows'
 	);
 }

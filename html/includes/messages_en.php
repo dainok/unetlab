@@ -196,6 +196,7 @@ $messages[60034] = 'Failed to move the lab (60034).';
 $messages[60035] = 'Lab moved (60035).';
 $messages[60036] = 'Lab cloned (60036).';
 $messages[60037] = 'Failed to clone the lab (60037).';
+$messages[60038] = 'Resource not found (60038).';
 
 // Text (70000-79999)
 $messages[70000] = 'Name/prefix';

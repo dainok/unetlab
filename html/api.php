@@ -86,6 +86,14 @@ $app -> response -> headers -> set('Cache-Control', 'no-store, no-cache, must-re
 $app -> response -> headers -> set('Cache-Control', 'post-check=0, pre-check=0');
 $app -> response -> headers -> set('Pragma', 'no-cache');
 
+$app -> notFound(function() use ($app) {
+	$output['code'] = 404;
+	$output['status'] = 'fail';
+	$output['message'] = $GLOBALS['messages']['60038'];
+	$app -> halt($output['code'], json_encode($output));
+});
+
+
 class ResourceNotFoundException extends Exception {}
 class AuthenticateFailedException extends Exception {}
 
@@ -680,7 +688,6 @@ $app -> post('/api/export', function() use ($app, $db) {
 		foreach ($_FILES as $file) {
 			$p['name'] = $file['name'];
 			$p['file'] = $file['tmp_name'];
-			$p['type'] = $file['type'];
 			$p['error'] = $file['name'];
 		}
 	}

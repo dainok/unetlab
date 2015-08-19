@@ -99,7 +99,7 @@ $(document).on('click', 'a.folder-rename', function(e) {
 
 // Display import form
 $(document).on('click', 'a.import', function(e) {
-	var html = '<form id="form-import" class="form-horizontal form-import"><div class="form-group"><label class="col-md-3 control-label">Path</label><div class="col-md-5"><input class="form-control" name="import[path]" value="' + $('#list-folders').attr('data-path') + '" disabled="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">File</label><div class="col-md-5"><span class="btn btn-default btn-file btn-aqua">Browse <input class="form-control" name="import[file]" value="" type="file"></span></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">Import</button> <button type="button" class="btn btn-grey" data-dismiss="modal">Cancel</button></div></div></form>';
+	var html = '<form id="form-import" class="form-horizontal form-import"><div class="form-group"><label class="col-md-3 control-label">Path</label><div class="col-md-7"><input class="form-control" name="import[path]" value="' + $('#list-folders').attr('data-path') + '" disabled="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">File</label><div class="col-md-7"><span class="btn btn-default btn-file btn-aqua">Browse <input class="form-control" name="import[file]" value="" type="file"></span></div></div><div class="form-group"><div class="col-md-7 col-md-offset-3"><button type="submit" class="btn btn-aqua">Import</button> <button type="button" class="btn btn-grey" data-dismiss="modal">Cancel</button></div></div></form>';
 	logger(1, 'DEBUG: popping up the import form.');
 	addModal('Import labs', html, '');
 	validateImport();
