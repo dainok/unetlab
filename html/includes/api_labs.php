@@ -243,7 +243,7 @@ function apiExportLabs($p) {
 		
 		// Using "element" relative to "path", adding '/' if missing
 		$relement = substr($element, strlen($p['path']));
-		if (!strcmp(substr($relement, 1), '/')) {
+		if ($relement[0] != '/') {
 			$relement = '/'.$relement;
 		}
 		
@@ -271,6 +271,20 @@ function apiExportLabs($p) {
 			}
 		}
 	}
+	
+	// Now remove UUID from labs
+	$cmd = BASE_DIR.'/scripts/remove_uuid.sh "'.$export_file.'"';
+	exec($cmd, $o, $rc);
+	if ($rc != 0) {
+		if (is_file($export_file)) {
+			unlink($export_file);
+		}
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][$rc];
+		return $output;
+	}
+	
 	$output['code'] = 200;
 	$output['status'] = 'success';
 	$output['message'] = $GLOBALS['messages'][80075];
