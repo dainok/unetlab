@@ -47,6 +47,7 @@ $messages[11] = 'Failed to create network (11).';
 $messages[12] = 'Failed to start node (12).';
 $messages[13] = 'Unable to wipe node(s) (13).';
 $messages[14] = 'Cannot create username (14).';
+$messages[15] = 'Cannot remove UUID from exported labs (15).';
 
 /***************************************************************************
  * Classes

@@ -20,6 +20,7 @@ cat html/includes/init.php | sed "s/define('VERSION', .*/define('VERSION', '${VE
 cp -a scripts/set_uuid.php ${DATA_DIR}/opt/unetlab/scripts/
 cp -a scripts/import_iou-web.php ${DATA_DIR}/opt/unetlab/scripts/
 cp -a scripts/fix_iol_nvram.sh ${DATA_DIR}/opt/unetlab/scripts/
+cp -a scripts/remove_uuid.sh ${DATA_DIR}/opt/unetlab/scripts/
 cp -a IOUtools/iou_export ${DATA_DIR}/opt/unetlab/scripts/
 chown -R root:root ${DATA_DIR}/opt/unetlab
 chown -R www-data:www-data ${DATA_DIR}/opt/unetlab/data ${DATA_DIR}/opt/unetlab/labs
