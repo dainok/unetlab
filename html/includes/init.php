@@ -92,6 +92,7 @@ if (!isset($node_templates)) {
 		'vsrx'			=>	'Juniper vSRX',
 		'linux'			=>	'Linux',
 		'mikrotik'		=>	'MikroTik RouterOS',
+		'ostinato'		=>	'Ostinato',
 		'paloalto'		=>	'Palo Alto VM-100 Firewall',
 		'vyos'			=>	'VyOS',
 		//'esxi'		=>	'VMware ESXi',
