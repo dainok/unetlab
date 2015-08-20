@@ -160,7 +160,7 @@ input[name='login[username]'], input[name='login[password]']{
 	font-size: 1.1em;
 	left: 0px;
 	line-height: 1.2em;
-	padding: 0px 5px 0px 5px;
+	padding: 1px 5px 3px 5px;
 	position: absolute;
 	right: 0px;
 	top: 12.5vw;
@@ -182,7 +182,14 @@ input[name='login[username]'], input[name='login[password]']{
 
 #list-title-folders {
 	padding-left: 20px;
+	text-overflow: ellipsis;
 	text-transform: uppercase;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+#list-title-folders span {
+	text-transform: none;
 }
 
 #list-folders {
@@ -219,6 +226,9 @@ input[name='login[username]'], input[name='login[password]']{
 #list-info {
 	margin-right: -20px;	/* previous column get a 20px margin */
 	padding-right: 20px;	/* reduce available space of 20px */
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
 }
 
 .btn-aqua {
