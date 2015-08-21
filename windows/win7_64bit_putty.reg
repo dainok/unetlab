@@ -9,7 +9,7 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\telnet\shell\open]
 
 [HKEY_CLASSES_ROOT\telnet\shell\open\command]
-@="\"C:\\Program Files\\PuTTY\\putty.exe\" %1"
+@="\"C:\\Program Files\\UNetLab\\putty.exe\" %1"
 
 [HKEY_CLASSES_ROOT\ssh]
 @="URL:SSH Protocol"
@@ -20,4 +20,4 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\ssh\shell\open]
 
 [HKEY_CLASSES_ROOT\ssh\shell\open\command]
-@="\"C:\\Program Files\\PuTTY\\putty.exe\" %1"
+@="\"C:\\Program Files\\UNetLab\\putty.exe\" %1"

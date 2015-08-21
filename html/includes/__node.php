@@ -705,7 +705,7 @@ class Node {
 			}
 
 			// Adding custom flags
-			if (isset($p['qemu_options']) && preg_match('/^[A-Za-z0-9_+\\s-:.,=]+$/', $p['qemu_options'])) {
+			if (isset($p['qemu_options'])) {
 				// Setting additional QEMU options
 				$flags .= ' '.$p['qemu_options'];
 			} else if (isset($p['qemu_options'])) {

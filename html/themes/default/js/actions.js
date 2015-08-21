@@ -621,15 +621,15 @@ $(document).on('click', '#button-logout', function(e) {
         dataType: 'json',
         success: function(data) {
             if (data['status'] == 'success') {
-				window.location = '/themes/default/auth.html';
+				window.location = '/themes/default/';
             } else {
                 // Authentication error
-				window.location = '/themes/default/auth.html';
+				window.location = '/themes/default/';
             }
         },
         error: function(data) {
             // Authentication error
-			window.location = '/themes/default/auth.html';
+			window.location = '/themes/default/';
         }
     });
     return false;
