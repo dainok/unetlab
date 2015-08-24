@@ -667,6 +667,20 @@ class Node {
 				$flags .= ' -vnc :'.($this -> port - 5900);  // start a VNC server on display
 			}
 
+			// Adding controller
+			foreach(scandir('/opt/unetlab/addons/qemu/'.$this -> getImage()) as $filename) {
+				if (preg_match('/^megasas[a-z]+.qcow2$/', $filename)) {
+					// MegaSAS
+					$flags .= ' -device megasas,id=scsi0,bus=pci.0,addr=0x5';                                             // Define SCSI BUS
+					break;
+				} else if (preg_match('/^lsi[a-z]+.qcow2$/', $filename)) {
+					// LSI
+					$flags .= ' -device lsi,id=scsi0,bus=pci.0,addr=0x5';                                             // Define SCSI BUS
+					break;
+				} 
+
+			}
+
 			// Adding disks
 			foreach(scandir('/opt/unetlab/addons/qemu/'.$this -> getImage()) as $filename) {
 				if ($filename == 'cdrom.iso') {
@@ -677,9 +691,16 @@ class Node {
 					$patterns[0] = '/^megasas([a-z]+).qcow2$/';
 					$replacements[0] = '$1';
 					$disk_id = preg_replace($patterns, $replacements, $filename);
-					$lun = (int) ord(strtolower($disk_id)) - 96;
-					$flags .= ' -device megasas,id=scsi0,bus=pci.0,addr=0x5';                                             // Define SCSI BUS
-					$flags .= ' -device scsi-disk,bus=scsi0.0,scsi-id='.$lun.',drive=drive-scsi0-0-'.$lun.',id=scsi0-0-'.$lun.',bootindex=1';  // Define SCSI disk
+					$lun = (int) ord(strtolower($disk_id)) - 97;
+					$flags .= ' -device scsi-disk,bus=scsi0.0,scsi-id='.$lun.',drive=drive-scsi0-0-'.$lun.',id=scsi0-0-'.$lun.',bootindex='.$lun;  // Define SCSI disk
+					$flags .= ' -drive file='.$filename.',if=none,id=drive-scsi0-0-'.$lun.',cache=none';                        // Define SCSI file
+				} else if (preg_match('/^lsi[a-z]+.qcow2$/', $filename)) {
+					// LSI
+					$patterns[0] = '/^lsi([a-z]+).qcow2$/';
+					$replacements[0] = '$1';
+					$disk_id = preg_replace($patterns, $replacements, $filename);
+					$lun = (int) ord(strtolower($disk_id)) - 97;
+					$flags .= ' -device scsi-disk,bus=scsi0.0,scsi-id='.$lun.',drive=drive-scsi0-0-'.$lun.',id=scsi0-0-'.$lun.',bootindex='.$lun;  // Define SCSI disk
 					$flags .= ' -drive file='.$filename.',if=none,id=drive-scsi0-0-'.$lun.',cache=none';                        // Define SCSI file
 				} else if (preg_match('/^hd[a-z]+.qcow2$/', $filename)) {
 					// IDE
@@ -692,14 +713,14 @@ class Node {
 					$patterns[0] = '/^virtio([a-z]+).qcow2$/';
 					$replacements[0] = '$1';
 					$disk_id = preg_replace($patterns, $replacements, $filename);
-					$lun = (int) ord(strtolower($disk_id)) - 96;
+					$lun = (int) ord(strtolower($disk_id)) - 97;
 					$flags .= ' -drive file='.$filename.',if=virtio,bus=0,unit='.$lun.',cache=none';
 				} else if (preg_match('/^scsi[a-z]+.qcow2$/', $filename)) {
 					// SCSI
 					$patterns[0] = '/^scsi([a-z]+).qcow2$/';
 					$replacements[0] = '$1';
 					$disk_id = preg_replace($patterns, $replacements, $filename);
-					$lun = (int) ord(strtolower($disk_id)) - 96;
+					$lun = (int) ord(strtolower($disk_id)) - 97;
 					$flags .= ' -drive file='.$filename.',if=scsi,bus=0,unit='.$lun.',cache=none';
 				}
 			}

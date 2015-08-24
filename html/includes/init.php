@@ -78,7 +78,7 @@ if (!isset($node_templates)) {
 		'viosl2'		=>	'Cisco vIOS L2',
 		'vnam'			=>	'Cisco vNAM',
 		'vwlc'			=>	'Cisco vWLC',
-		//'vwaas'		=>	'Cisco vWAAS',
+		'vwaas'			=>	'Cisco vWAAS',
 		'coeus'			=>	'Cisco Web Security Appliance',
 		'xrv'			=>	'Cisco XRv',
 		'nsvpx'			=>	'Citrix Netscaler',
