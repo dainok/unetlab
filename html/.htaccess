@@ -11,6 +11,8 @@ php_value error_log /opt/unetlab/data/Logs/php_errors.txt
 
 # PHP settings
 php_value session.gc_maxlifetime 86400
+php_value post_max_size 200M
+php_value upload_max_filesize 180M
 
 # TODO
 # ErrorDocument 403 /error.php

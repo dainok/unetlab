@@ -362,6 +362,14 @@ function apiGetLabLinks($lab) {
  * @return	Array						Return code (JSend data)
  */
 function apiImportLabs($p) {
+	if (!isset($p['file']) || empty($p['file'])) {
+		// Upload failed
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][80081];
+		return $output;
+	}
+
 	if (!isset($p['path'])) {
 		// Path is not set
 		$output['code'] = 400;

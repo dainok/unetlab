@@ -292,6 +292,7 @@ $messages[80077] = 'Import path is not valid (80077).';
 $messages[80078] = 'Import file must be a Zip file (80078).';
 $messages[80079] = 'Cannot import file (80079).';
 $messages[80080] = 'File imported (80080).';
+$messages[80081] = 'Failed to upload file, check file size (80081).';
 
 // Authentication (90000-99999)
 $messages[90001] = 'User is not authenticated (90001).';

@@ -515,7 +515,7 @@ class Node {
 				unset($p['console']);
 				$modified = True;
 			} else if (isset($p['console'])) {
-				$this -> config = htmlentities($p['console']);
+				$this -> console = htmlentities($p['console']);
 				$modified = True;
 			}
 
