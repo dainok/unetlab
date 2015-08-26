@@ -57,6 +57,8 @@ int child_eth = 2;                          // Ethernet porgroups
 int child_ser = 2;                          // Serial portgroups
 
 int main (int argc, char *argv[]) {
+    setpgrp();  // Become the leader of its group.
+
     // Child's CMD line
     int m = sysconf(_SC_ARG_MAX);           // Maximum CMD line length
     char *cmd;                              // Store child's CMD line
@@ -102,8 +104,6 @@ int main (int argc, char *argv[]) {
     int rc = -1;                            // Generic return code
     char *tmp = NULL;                       // Generic char string
     struct sigaction sa;                    // Manage signals (SIGHUP, SIGTERM...)
-
-    setpgrp();
 
     // Check for iourc file
     tmp = (char *) malloc(m * sizeof(char));
@@ -358,7 +358,8 @@ int main (int argc, char *argv[]) {
         }
 
         // While subprocess is running, check IO from subprocess, telnet clients, socket and network
-        while (waitpid(child_pid, &child_status, WNOHANG|WUNTRACED) == 0) {
+        //int rrc = 0;
+        while ( waitpid(child_pid, &child_status, WNOHANG|WUNTRACED) == 0) {
             // Creating AF communication from child
             if (af_ready == 0 && *child_delay == 0) {
                 // wait 3 seconds for AF_UNIX
@@ -376,7 +377,7 @@ int main (int argc, char *argv[]) {
             // Check if select() is valid
             read_fd_set = active_fd_set;
             if ((active_fd = select(FD_SETSIZE, &read_fd_set, NULL, NULL, NULL)) <= 0) {
-                printf("%u:%u ERR: failed to select().\n", tenant_id, device_id);
+                printf("%u:%u ERR: failed to select(). Error: (%s)\n", tenant_id, device_id, strerror(errno));
                 kill(0, SIGTERM);
                 break;
             }
@@ -460,6 +461,8 @@ int main (int argc, char *argv[]) {
 
         // Child is no more running
         printf("%u:%u ERR: child is no more running.\n", tenant_id, device_id);
+        //printf("rrc = %i\n",rrc);
+        //exit(1);
     } else {
         printf("%u:%u ERR: failed to fork.\n", tenant_id, device_id);
         exit(1);
