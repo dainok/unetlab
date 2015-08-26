@@ -38,7 +38,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150817
+ * @version 20150824
  */
 
 // Include custom configuration

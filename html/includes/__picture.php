@@ -27,7 +27,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150428
+ * @version 20150715
  * @property type $data Binary stream of the picture. It's mandatory.
  * @property type $height Width of the picture. It's automatically get from data.
  * @property type $id ID of the picture. It's mandatory and automatically set during contruction phase.

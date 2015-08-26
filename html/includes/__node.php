@@ -27,7 +27,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150527
+ * @version 20150825
  * @property type $flags_eth CMD flags related to Ethernet interfaces. It's mandatory and automatically set.
  * @property type $flags_ser CMD flags related to Serial interfaces. It's mandatory and automatically set.
  * @property type $console protocol. It's optional.

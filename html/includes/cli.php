@@ -27,7 +27,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150527
+ * @version 20150826
  */
 
 /**
@@ -820,7 +820,7 @@ function start($n, $id, $t, $nets) {
  */
 function stop($n) {
 	if ($n -> getStatus() == 1) {
-		$cmd = 'kill -s TERM $(fuser -n tcp '.$n -> getPort().' 2> /dev/null | sed "s/^.* \([0-9]\+\)$/\1/g")';
+		$cmd = 'fuser -n tcp -k -TERM '.$n -> getPort().' > /dev/null 2>&1';
 		exec($cmd, $o, $rc);
 		error_log('INFO: stopping '.$cmd);
 		sleep(1);  // Need to wait a few
