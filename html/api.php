@@ -61,6 +61,7 @@ require_once(BASE_DIR.'/html/includes/api_nodes.php');
 require_once(BASE_DIR.'/html/includes/api_pictures.php');
 require_once(BASE_DIR.'/html/includes/api_status.php');
 require_once(BASE_DIR.'/html/includes/api_topology.php');
+require_once(BASE_DIR.'/html/includes/api_uusers.php');
 \Slim\Slim::registerAutoloader();
 
 $app = new \Slim\Slim(Array(
@@ -656,6 +657,23 @@ $app -> delete('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 		$output['message'] = $GLOBALS['messages'][60027];
 	}
 
+	$app -> response -> setStatus($output['code']);
+	$app -> response -> setBody(json_encode($output));
+});
+
+/***************************************************************************
+ * Users
+ **************************************************************************/
+// Get an object
+$app -> get('/api/users/(:uuser)', function($uuser = '') use ($app, $db) {
+	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($user === False) {
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+	
+	$output = apiGetUUsers($db, $uuser);
 	$app -> response -> setStatus($output['code']);
 	$app -> response -> setBody(json_encode($output));
 });

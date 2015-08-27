@@ -69,8 +69,8 @@ $(document).on('click', '#privacy', function () {
 	}
 });
 
-// Select folder or lab
-$(document).on('click', 'a.folder, a.lab', function(e) {
+// Select user, folder or lab
+$(document).on('click', 'a.folder, a.lab, tr.user', function(e) {
 	logger(1, 'DEBUG: selected "' + $(this).attr('data-path') + '".');
 	if ($(this).hasClass('selected')) {
 		// Already selected -> unselect it
@@ -333,6 +333,64 @@ $(document).on('click', '.sysstatus', function(e) {
 	});
 });
 
+// Open system status page
+$(document).on('click', '.usermgmt', function(e) {
+	var html = '<div id="users" class="col-md-12 col-lg-12"><div class="table-responsive"><table class="table"><thead><tr><th>Username</th><th>Name</th><th>Email</th><th>Expiration</th><th>Last seen</th><th>POD</th><th>POD Expiration</th></tr></thead><tbody></tbody></table></div></div>';
+	var url = '/api/users/';
+	var type = 'GET'
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: got UNetLab users.');
+				$('#main-body').html(html);
+
+				// Adding all data rows
+				$.each(data['data'], function(id, object) {
+					var username = object['username'];
+					var name = object['name'];
+					var email = object['email'];
+					var pod = object['pod'];
+					if (object['expiration'] <= 0) {
+						var expiration = 'never';
+					} else {
+						var d = new Date(object['expiration'] * 1000);
+						expiration = d.toLocaleDateString(); 
+					}
+					if (object['session'] <= 0) {
+						var session = 'never';
+					} else {
+						var d = new Date(object['session'] * 1000);
+						session = d.toLocaleDateString() + ' ' + d.toLocaleTimeString() + ' from ' + object['ip']; 
+					}
+					if (object['pexpiration'] <= 0) {
+						var pexpiration = 'never';
+					} else {
+						var d = new Date(object['pexpiration'] * 1000);
+						pexpiration = d.toLocaleDateString(); 
+					}
+					$('#main-body .table tbody').append('<tr class="user" data-path="' + username + '"><td>' + username + '</td><td>' + name + '</td><td>' + email + '</td><td>' + expiration + '</td><td>' + session + '</td><td>' + pod + '</td><td>' + pexpiration + '</td></tr>');
+					$('#actions-menu').html('<li><a class="user-add" href="#"><i class="glyphicon glyphicon-plus"></i> Add a new user</a></li><li><a class="user-add" href="#"><i class="glyphicon glyphicon-trash"></i> Delete selected users</a></li>');
+				});
+			} else {
+				// Application error
+				logger(1, 'DEBUG: internal error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: Ajax error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+		}
+	});
+});
+
 // Open folder
 $(document).on('dblclick', 'a.folder', function(e) {
 	logger(1, 'DEBUG: opening folder "' + $(this).attr('data-path') + '".');
@@ -348,6 +406,11 @@ $(document).on('dblclick', 'a.lab', function(e) {
 	});
 	$(this).addClass('lab-opened');
 	printPageLabPreview($(this).attr('data-path'));
+});
+
+// Edit a user
+$(document).on('dblclick', 'tr.user', function(e) {
+	alert("TODO");
 });
 
 // Remove modal on close

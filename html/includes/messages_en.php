@@ -198,6 +198,8 @@ $messages[60035] = 'Lab moved (60035).';
 $messages[60036] = 'Lab cloned (60036).';
 $messages[60037] = 'Failed to clone the lab (60037).';
 $messages[60038] = 'Resource not found (60038).';
+$messages[60039] = 'User not found (60039).';
+$messages[60040] = 'Successfully listed users (60040).';
 
 // Text (70000-79999)
 $messages[70000] = 'Name/prefix';
@@ -324,4 +326,6 @@ $messages[90026] = 'Cannot query for users on (90026).';
 $messages[90027] = 'Cannot query for pods on (90027).';
 $messages[90028] = 'Created "sessions" table (90028).';
 $messages[90029] = 'Failed to create "sessions" table (90029).';
+$messages[90030] = 'Failed to update database to latest version (90030).';
+$messages[90031] = 'Database updated (90031).';
 ?>

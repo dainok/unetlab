@@ -699,7 +699,7 @@ function updateDatabase($db) {
 			$statement -> execute();
 			$db -> commit();
 
-			error_log('ERROR: '.$GLOBALS['messages'][90004]);
+			error_log('INFO: '.$GLOBALS['messages'][90004]);
 		}
 	} catch (Exception $e) {
 		error_log('ERROR: '.$GLOBALS['messages'][90005]);
@@ -757,12 +757,41 @@ function updateDatabase($db) {
 			$statement = $db -> prepare($query);
 			$statement -> execute();
 			$db -> commit();
-			$db -> commit();
 
-			error_log('ERROR: '.$GLOBALS['messages'][90009]);
+			error_log('INFO: '.$GLOBALS['messages'][90009]);
 		}
 	} catch (Exception $e) {
 		error_log('ERROR: '.$GLOBALS['messages'][90010]);
+		error_log((string) $e);
+		return False;
+	}
+	
+	// Update old database
+	try {
+		$query = 'PRAGMA user_version;';
+		$version = $db -> query($query) -> fetchColumn();
+		switch ($version) {
+			case 0:
+				// From version 0 to version 1, need to add ip and role columns to users table
+				$db -> beginTransaction();
+				$query = 'ALTER TABLE users ADD COLUMN ip TEXT;';
+				$statement = $db -> prepare($query);
+				$statement -> execute();
+				$query = 'ALTER TABLE users ADD COLUMN role TEXT;';
+				$statement = $db -> prepare($query);
+				$statement -> execute();
+				$db -> commit();
+				$query = 'UPDATE users SET role = "admin";';
+				$statement = $db -> prepare($query);
+				$statement -> execute();
+
+				// Latest database version
+				error_log('INFO: '.$GLOBALS['messages'][90031]);
+				$query = 'PRAGMA user_version = 1;';
+				$version = $db -> query($query);
+		}
+	} catch (Exception $e) {
+		error_log('ERROR: '.$GLOBALS['messages'][90030]);
 		error_log((string) $e);
 		return False;
 	}
@@ -780,12 +809,14 @@ function updateDatabase($db) {
  */
 function updateUserCookie($db, $username, $cookie) {
 	try {
+		$ip = $_SERVER['REMOTE_ADDR'];
 		$now = time() + SESSION;
-		$query = 'UPDATE users SET cookie = :cookie, session = :session WHERE username = :username;';
+		$query = 'UPDATE users SET cookie = :cookie, session = :session, ip = :ip WHERE username = :username;';
 		$statement = $db -> prepare($query);
 		$statement -> bindParam(':cookie', $cookie, PDO::PARAM_STR);
 		$statement -> bindParam(':session', $now, PDO::PARAM_INT);
 		$statement -> bindParam(':username', $username, PDO::PARAM_STR);
+		$statement -> bindParam(':ip', $ip, PDO::PARAM_STR);
 		$statement -> execute();
 		return 0;
 	} catch (Exception $e) {
