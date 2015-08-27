@@ -118,3 +118,14 @@ void signal_handler(int signal) {
 void version() {
     printf("%s\n", VERSION);
 }
+
+unsigned hash(const char * data, int nLength) {
+   int A = 54059; /* a prime */
+   int B = 76963; /* another prime */
+   unsigned h = 31; // prime
+   while (nLength-- > 0) {
+     h = (h * A) ^ (data[0] * B);
+     data++;
+   }
+   return h; // or return h % C;
+}

@@ -48,3 +48,6 @@ void signal_handler(int signal);
 
 // Print version
 void version();
+
+// Just simple hash
+unsigned hash(const char * data, int nLength);

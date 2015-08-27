@@ -105,7 +105,7 @@ int main (int argc, char *argv[]) {
                 // Mandatory: Tenant ID
                 tenant_id = atoi(optarg);
                 if (tenant_id < 0) {
-                    printf("ERR: tenant_id must be integer.\n");
+                    UNLLog(LLERROR,"Tenant_id must be integer.\n");
                     exit(1);
                 }
                 UNLLog(LLINFO, "Tennant_id = %i\n", tenant_id);
@@ -114,7 +114,7 @@ int main (int argc, char *argv[]) {
                 // Mandatory: Device ID
                 device_id = atoi(optarg);
                 if (device_id < 0) {
-                    printf("ERR: device_id must be integer.\n");
+                    UNLLog(LLERROR,"Device_id must be integer.\n");
                     exit(1);
                 }
                 UNLLog(LLINFO, "Device_id = %i\n", device_id);
@@ -123,7 +123,7 @@ int main (int argc, char *argv[]) {
                 // Mandatory: subprocess executable
                 child_file = optarg;
                 if (is_file(child_file) != 0) {
-                    printf("ERR: file '%s' does not exist.\n", child_file);
+                    UNLLog(LLERROR,"File '%s' does not exist.\n", child_file);
                     exit(1);
                 }
                 break;
@@ -131,7 +131,7 @@ int main (int argc, char *argv[]) {
                 // Optional: child's startup delay (default 0)
                 *child_delay = atoi(optarg);
                 if (*child_delay < 0) {
-                    printf("ERR: delay must be integer.\n");
+                    UNLLog(LLERROR,"Delay must be integer.\n");
                     exit(1);
                 }
                 break;

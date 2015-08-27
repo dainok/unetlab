@@ -43,8 +43,8 @@
 #include "log.h"
 #include "params.h"
 
-extern int device_id;
-extern int tenant_id;
+
+extern int sLogLevel;
 
 // TAP interface: listen
 int tap_listen(char *tap_name, int *tap_fd) {
@@ -109,6 +109,8 @@ int tap_receive(char **c, int server_socket) {
         UNLLog(LLERROR, "Failed to receive data from TAP (s=%i, l=%i). ERR: %s (%i).\n", server_socket, length, strerror(errno), length);
         return length;
     }
-    UNLLog(LLVERBOSE, "Received data from TAP (s=%i, l=%i).\n", server_socket, length);
+    if ( sLogLevel >= LLVERBOSE ) { // In order to avoid excessive hash calculation 
+        UNLLog(LLVERBOSE, "Received data from TAP (s=%i, l=%i) Hash = %i\n", server_socket, length, hash((const char*)c, length));
+    }
     return length;
 }
