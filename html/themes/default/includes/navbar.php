@@ -20,7 +20,7 @@ if ($section == 'Labs' && $subsection == 'List') {
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Actions<span class="caret"></span></a>
                         <ul class="dropdown-menu" role="menu">
-                        <li><a href="/lab_open.php?filename=<?php print $_GET['filename'] ?>"><i class="glyphicon glyphicon-folder-open"></i> Open this lab</a></li>
+						<li><a href="/lab_open.php?filename=<?php print $_GET['filename'] ?>&tenant=<?php print $_GET['tenant'] ?>"><i class="glyphicon glyphicon-folder-open"></i> Open this lab</a></li>
                             <li role="presentation" class="divider"></li>
                             <li role="presentation" class="dropdown-header">Add elements</li>
                             <li><a class="network_add" href="#"><i class="glyphicon glyphicon-transfer"></i> Networks</a></li>
@@ -34,7 +34,7 @@ if ($section == 'Labs' && $subsection == 'List') {
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Actions<span class="caret"></span></a>
                         <ul class="dropdown-menu" role="menu">
-                            <li><a href="/lab_edit.php?filename=<?php print $_GET['filename'] ?>"><i class="glyphicon glyphicon-edit"></i> Edit this lab</a></li>
+						<li><a href="/lab_edit.php?filename=<?php print $_GET['filename'] ?>&tenant=<?php print $_GET['tenant'] ?>"><i class="glyphicon glyphicon-edit"></i> Edit this lab</a></li>
                             <li class="divider"></li>
                             <li><a class="node_start_all" href="#"><i class="glyphicon glyphicon-play"></i> Start all nodes</a></li>
                             <li><a class="node_stop_all" href="#"><i class="glyphicon glyphicon-stop"></i> Stop all nodes</a></li>

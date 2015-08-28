@@ -28,7 +28,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150715
+ * @version 20150828
  */
 
 require_once('/opt/unetlab/html/includes/init.php');
@@ -168,6 +168,12 @@ switch ($action) {
 
 		// Wrappers
 		$cmd = '/bin/chmod 755 /opt/unetlab/wrappers/*_wrapper* > /dev/null 2>&1';
+		exec($cmd, $o, $rc);
+
+		// /tmp
+		$cmd = '/bin/chown root:root /tmp 2>&1';
+		exec($cmd, $o, $rc);
+		$cmd = '/bin/chmod u=rwx,g=rwx,o=rwxt /tmp > /dev/null 2>&1';
 		exec($cmd, $o, $rc);
 		break;
 	case 'platform':

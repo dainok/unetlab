@@ -27,7 +27,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150826
+ * @version 20150828
  */
 
 /**
@@ -519,11 +519,13 @@ function export($node_id, $n, $lab) {
  */
 function isBridge($s) {
 	$cmd = 'brctl show '.$s.' 2>&1';
+	error_log($cmd);
 	exec($cmd, $o, $rc);
-	if (preg_match('/can\'t get info No such device/', $o[1])) {
-		return False;
-	} else {
+	if (preg_match('/8000/', $o[1])) {
+		// "brctl show" on a ovs bridge or on a non-existent bridge return 0 -> check for 8000
 		return True;
+	} else {
+		return False;
 	}
 }
 
