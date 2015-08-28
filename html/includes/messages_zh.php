@@ -2,7 +2,7 @@
 # vim: syntax=php tabstop=4 softtabstop=0 noexpandtab laststatus=1 ruler
 
 /**
- * html/includes/messages_en.php
+ * html/includes/messages_zh.php
  *
  * English messages for UNetLab.
  *
@@ -27,7 +27,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150817
+ * @version 20150828
  */
 
 /***************************************************************************
