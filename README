@@ -42,3 +42,7 @@ Here the commands:
 # fakeroot debian/rules editconfigs
 # fakeroot debian/rules binary-headers binary-generic
 
+nsenter is compiled from util-linux-2.27-rc1.tar.gz:
+./configure --enable-static
+make
+

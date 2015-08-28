@@ -27,7 +27,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150527
+ * @version 20150825
  */
 
 /***************************************************************************
@@ -47,6 +47,7 @@ $messages[11] = 'Failed to create network (11).';
 $messages[12] = 'Failed to start node (12).';
 $messages[13] = 'Unable to wipe node(s) (13).';
 $messages[14] = 'Cannot create username (14).';
+$messages[15] = 'Cannot remove UUID from exported labs (15).';
 
 /***************************************************************************
  * Classes
@@ -101,6 +102,8 @@ $messages[20034] = 'Cannot link node (20034).';
 $messages[20035] = 'Cannot unlink node (20035).';
 $messages[20036] = 'Cannot save startup-config in the selected lab (20036).';
 $messages[20037] = 'Config ignored, cannot load it (20037).';
+$messages[20038] = 'Attribute ignored, invalid lab_name (20038).';
+$messages[20039] = 'Lab already exists (20039).';
 
 // __network.php (30000-39999)
 $messages[30000] = 'Cannot create network, invalid or missing mandatory parameters (30000).';
@@ -190,6 +193,13 @@ $messages[60030] = 'Successfully listed node interfaces (60030).';
 $messages[60031] = 'Template does not exists or is not available (60031).';
 $messages[60032] = 'Successfully listed node template (60032).';
 $messages[60033] = 'Requested template is not valid (60033).';
+$messages[60034] = 'Failed to move the lab (60034).';
+$messages[60035] = 'Lab moved (60035).';
+$messages[60036] = 'Lab cloned (60036).';
+$messages[60037] = 'Failed to clone the lab (60037).';
+$messages[60038] = 'Resource not found (60038).';
+$messages[60039] = 'User not found (60039).';
+$messages[60040] = 'Successfully listed users (60040).';
 
 // Text (70000-79999)
 $messages[70000] = 'Name/prefix';
@@ -274,25 +284,36 @@ $messages[80067] = 'Failed to dump startup-config (80067).';
 $messages[80068] = 'Cannot open startup-config file (80068).';
 $messages[80069] = 'Cannot write startup-config file (80069).';
 $messages[80070] = 'Failed to remove tmp file (80070).';
+$messages[80071] = 'Failed to disable multicast_snooping on bridge (80071).';
+$messages[80072] = 'Cannot change path (80072).';
+$messages[80073] = 'Cannot ZIP file (80073).';
+$messages[80074] = 'Cannot ZIP folder (80074).';
+$messages[80075] = 'Export is ready (80075).';
+$messages[80076] = 'Import path is not set (80076).';
+$messages[80077] = 'Import path is not valid (80077).';
+$messages[80078] = 'Import file must be a Zip file (80078).';
+$messages[80079] = 'Cannot import file (80079).';
+$messages[80080] = 'File imported (80080).';
+$messages[80081] = 'Failed to upload file, check file size (80081).';
 
 // Authentication (90000-99999)
 $messages[90001] = 'User is not authenticated (90001).';
 $messages[90002] = 'User has been loaded (90002).';
 $messages[90003] = 'Database error (90003).';
 $messages[90004] = 'Created "users" table (90004).';
-$messages[90005] = 'Failed to create "users" table (90005).';
-$messages[90006] = 'Failed to update database (90006).';
+$messages[90005] = 'Failed to create "users" table, check also disk space (90005).';
+$messages[90006] = 'Failed to update database, check also disk space (90006).';
 $messages[90007] = 'Created "permissions" table (90007).';
-$messages[90008] = 'Failed to create "permissions" table (90008).';
+$messages[90008] = 'Failed to create "permissions" table, check also disk space (90008).';
 $messages[90009] = 'Created "pods" table (90009).';
-$messages[90010] = 'Failed to create "pods" table (90010).';
+$messages[90010] = 'Failed to create "pods" table, check also disk space (90010).';
 $messages[90011] = 'Username not set (90011).';
 $messages[90012] = 'Password not set (90012).';
 $messages[90013] = 'User logged in (90013).';
-$messages[90014] = 'Authentication failed: invalid username/password (90014).';
+$messages[90014] = 'Authentication failed: invalid username/password. Default username is "admin" with password "unl" (90014).';
 $messages[90015] = 'Database corrupted (90015).';
-$messages[90016] = 'Cannot set user expiration on database (90016).';
-$messages[90017] = 'Cannot set user cookie on database (90017).';
+$messages[90016] = 'Cannot set user expiration on database, check also disk space (90016).';
+$messages[90017] = 'Cannot set user cookie on database, check also disk space (90017).';
 $messages[90018] = 'Authentication failed: user has been expired (90018).';
 $messages[90019] = 'User logged out (90019).';
 $messages[90020] = 'Cannot query for expired PODS (90020).';
@@ -305,4 +326,6 @@ $messages[90026] = 'Cannot query for users on (90026).';
 $messages[90027] = 'Cannot query for pods on (90027).';
 $messages[90028] = 'Created "sessions" table (90028).';
 $messages[90029] = 'Failed to create "sessions" table (90029).';
+$messages[90030] = 'Failed to update database to latest version (90030).';
+$messages[90031] = 'Database updated (90031).';
 ?>

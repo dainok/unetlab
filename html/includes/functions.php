@@ -17,23 +17,23 @@
  *
  * UNetLab is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with UNetLab.  If not, see <http://www.gnu.org/licenses/>.
+ * along with UNetLab. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150526
+ * @version 20150817
  */
 
 /**
  * Function to check if database is availalble.
  *
- * @return  PDO                         PDO object if valid, or False if invalid
+ * @return	PDO							PDO object if valid, or False if invalid
  */
 function checkDatabase() {
 	// Database connection
@@ -51,8 +51,8 @@ function checkDatabase() {
 /**
  * Function to check if a string is valid as folder_path.
  *
- * @param   string  $s                  Parameter
- * @return  int                         0 is valid and exists, 1 is valid and does not exists, 2 is invalid
+ * @param	string	$s					Parameter
+ * @return	int							0 is valid and exists, 1 is valid and does not exists, 2 is invalid
  */
 function checkFolder($s) {
 	if (preg_match('/^\/[\/A-Za-z0-9_\\s-]*$/', $s) && is_dir($s)) {
@@ -67,8 +67,8 @@ function checkFolder($s) {
 /**
  * Function to check if a string is valid as interface_type.
  *
- * @param   string  $s                  Parameter
- * @return  bool                        True if valid
+ * @param	string	$s					Parameter
+ * @return	bool						True if valid
  */
 function checkInterfcType($s) {
 	if (in_array($s, Array('ethernet', 'serial'))) {
@@ -81,8 +81,8 @@ function checkInterfcType($s) {
 /**
  * Function to check if a string is valid as lab_filename.
  *
- * @param   string  $s                  String to check
- * @return  bool                        True if valid
+ * @param	string	$s					String to check
+ * @return	bool						True if valid
  */
 function checkLabFilename($s) {
 	if (preg_match('/^[A-Za-z0-9_\\s-]+\.unl$/', $s)) {
@@ -95,8 +95,8 @@ function checkLabFilename($s) {
 /**
  * Function to check if a string is valid as lab_name.
  *
- * @param   string  $s                  String to check
- * @return  bool                        True if valid
+ * @param	string	$s					String to check
+ * @return	bool						True if valid
  */
 function checkLabName($s) {
 	if (preg_match('/^[A-Za-z0-9_\\s-]+$/', $s)) {
@@ -109,8 +109,8 @@ function checkLabName($s) {
 /**
  * Function to check if a string is valid as lab_path.
  *
- * @param   string  $s                  String to check
- * @return  bool                        True if valid
+ * @param	string	$s					String to check
+ * @return	bool						True if valid
  */
 function checkLabPath($s) {
 	if (preg_match('/^\/[\/A-Za-z0-9_\\s-]*$/', $s)) {
@@ -123,8 +123,8 @@ function checkLabPath($s) {
 /**
  * Function to check if a string is valid as network_type.
  *
- * @param   string  $s                  Parameter
- * @return  bool                        True if valid
+ * @param	string	$s					Parameter
+ * @return	bool						True if valid
  */
 function checkNetworkType($s) {
 	if (in_array($s, listNetworkTypes())) {
@@ -137,8 +137,8 @@ function checkNetworkType($s) {
 /**
  * Function to check if a string is valid as node_config.
  *
- * @param   string  $s                  Parameter
- * @return  bool                        True if valid
+ * @param	string	$s					Parameter
+ * @return	bool						True if valid
  */
 function checkNodeConfig($s) {
 	if (in_array($s, Array('Saved', 'Unconfigured'))) {
@@ -152,8 +152,8 @@ function checkNodeConfig($s) {
 /**
  * Function to check if a string is valid as node_console.
  *
- * @param   string  $s                  String to check
- * @return  bool                        True if valid
+ * @param	string	$s					String to check
+ * @return	bool						True if valid
  */
 function checkNodeConsole($s) {
 	if (in_array($s, Array('telnet', 'vnc'))) {
@@ -166,8 +166,8 @@ function checkNodeConsole($s) {
 /**
  * Function to check if a string is valid as node_icon.
  *
- * @param   string  $s                  Parameter
- * @return  bool                        True if valid
+ * @param	string	$s					Parameter
+ * @return	bool						True if valid
  */
 function checkNodeIcon($s) {
 	if (preg_match('/^[A-Za-z0-9_+\\s-]*\.png$/', $s) && is_file(BASE_DIR.'/html/images/icons/'.$s)) {
@@ -180,8 +180,8 @@ function checkNodeIcon($s) {
 /**
  * Function to check if a string is valid as node_idlepc.
  *
- * @param   string  $s                  String to check
- * @return  bool                        True if valid
+ * @param	string	$s					String to check
+ * @return	bool						True if valid
  */
 function checkNodeIdlepc($s) {
 	if (preg_match('/^0x[0-9a-f]+$/', $s)) {
@@ -194,10 +194,10 @@ function checkNodeIdlepc($s) {
 /**
  * Function to check if a string is valid as node_image.
  *
- * @param   string  $s                  String to check
- * @param   string  $s                  Node type
- * @param   string  $s                  Node template
- * @return  bool                        True if valid
+ * @param	string	$s					String to check
+ * @param	string	$s					Node type
+ * @param	string	$s					Node template
+ * @return	bool						True if valid
  */
 function checkNodeImage($s, $t, $p) {
 	if (in_array($s, listNodeImages($t, $p))) {
@@ -210,8 +210,8 @@ function checkNodeImage($s, $t, $p) {
 /**
  * Function to check if a string is valid as node_name.
  *
- * @param   string  $s                  String to check
- * @return  bool                        True if valid
+ * @param	string	$s					String to check
+ * @return	bool						True if valid
  */
 function checkNodeName($s) {
 	if (preg_match('/^[A-Za-z0-9-_]+$/', $s)) {
@@ -224,8 +224,8 @@ function checkNodeName($s) {
 /**
  * Function to check if a string is valid as node_type.
  *
- * @param   string  $s                  Parameter
- * @return  bool                        True if valid
+ * @param	string	$s					Parameter
+ * @return	bool						True if valid
  */
 function checkNodeType($s) {
 	if (in_array($s, listNodeTypes())) {
@@ -238,8 +238,8 @@ function checkNodeType($s) {
 /**
  * Function to check if a string is valid as a picture_map.
  *
- * @param   string  $s                  String to check
- * @return  bool                        True if valid
+ * @param	string	$s					String to check
+ * @return	bool						True if valid
  */
 function checkPictureMap($s) {
 	// TODO
@@ -250,8 +250,8 @@ function checkPictureMap($s) {
  * Function to check if a string is valid as a picture_type. Currently only
  * PNG and JPEG images are supported.
  *
- * @param   string  $s                  String to check
- * @return  bool                        True if valid
+ * @param	string	$s					String to check
+ * @return	bool						True if valid
  */
 function checkPictureType($s) {
 	if (in_array($s, Array('image/png', 'image/jpeg'))) {
@@ -264,8 +264,8 @@ function checkPictureType($s) {
 /**
  * Function to check if a string is valid as a position.
  *
- * @param   string  $s                  String to check
- * @return  bool                        True if valid
+ * @param	string	$s					String to check
+ * @return	bool						True if valid
  */
 function checkPosition($s) {
 	if (preg_match('/^[0-9]+%$/', $s) && substr($s, 0, -1) >= 0 && substr($s, 0, -1) <= 100) {
@@ -278,9 +278,9 @@ function checkPosition($s) {
 /**
  * Function to check user expiration.
  *
- * @param   PDO     $db                 PDO object for database connection
- * @param   string  $username           Username
- * @return  bool                        True if valid
+ * @param	PDO		$db					PDO object for database connection
+ * @param	string	$username			Username
+ * @return	bool						True if valid
  */
 function checkUserExpiration($db, $username) {
 	$now = time() + SESSION;
@@ -306,8 +306,8 @@ function checkUserExpiration($db, $username) {
 /**
  * Function to check if a string is valid as UUID.
  *
- * @param   string  $s                  String to check
- * @return  bool                        True if valid
+ * @param	string	$s					String to check
+ * @return	bool						True if valid
  */
 function checkUuid($s) {
 	if (preg_match('/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/', $s)) {
@@ -320,9 +320,9 @@ function checkUuid($s) {
 /**
  * Function to configure a POD for a user.
  *
- * @param   PDO     $db                 PDO object for database connection
- * @param   string  $username			Username
- * @return  int							0 means ok
+ * @param	PDO		$db					PDO object for database connection
+ * @param	string	$username			Username
+ * @return	int							0 means ok
  */
 function configureUserPod($db, $username) {
 	// Check if a POD is already been assigned
@@ -391,8 +391,8 @@ function configureUserPod($db, $username) {
 /**
  * Function to delete expired sessions.
  *
- * @param   PDO     $db                 PDO object for database connection
- * @param   string  $username			Username
+ * @param	PDO		$db					PDO object for database connection
+ * @param	string	$username			Username
  * @return  int							0 means ok
  */
 function deleteSessions($db) {
@@ -431,9 +431,9 @@ function deleteSessions($db) {
 /**
  * Function to get username by cookie
  *
- * @param   PDO     $db                 PDO object for database connection
- * @param   string  $cookie             Session cookie
- * @return  bool                        True if valid
+ * @param	PDO		$db					PDO object for database connection
+ * @param	string	$cookie				Session cookie
+ * @return	bool						True if valid
  */
 function getUserByCookie($db, $cookie) {
 	$now = time();
@@ -467,7 +467,7 @@ function getUserByCookie($db, $cookie) {
 /**
  * Function to generate a v4 UUID.
  *
- * @return  string                      The generated UUID
+ * @return	string						The generated UUID
  */
 function genUuid() {
 	return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
@@ -494,7 +494,7 @@ function genUuid() {
 /**
  * Function to check if UNetLab is running as a VM.
  *
- * @return  bool                        True is is a VM
+ * @return	bool						True is is a VM
  */
 function isVirtual() {
 	switch (FORCE_VM) {
@@ -532,7 +532,7 @@ function isVirtual() {
 /**
  * Function to list all available cloud interfaces (pnet*).
  *
- * @return  Array                       The list of pnet interfaces
+ * @return	Array						The list of pnet interfaces
  */
 function listClouds() {
 	$results = Array();
@@ -547,7 +547,7 @@ function listClouds() {
 /**
  * Function to list all available network types.
  *
- * @return  Array                       The list of network types
+ * @return	Array						The list of network types
  */
 function listNetworkTypes() {
 	$results = Array();
@@ -567,7 +567,7 @@ function listNetworkTypes() {
 /**
  * Function to list all available icons.
  *
- * @return  Array                       The list of icons
+ * @return	Array						The list of icons
  */
 function listNodeIcons() {
 	$results = Array();
@@ -699,7 +699,7 @@ function updateDatabase($db) {
 			$statement -> execute();
 			$db -> commit();
 
-			error_log('ERROR: '.$GLOBALS['messages'][90004]);
+			error_log('INFO: '.$GLOBALS['messages'][90004]);
 		}
 	} catch (Exception $e) {
 		error_log('ERROR: '.$GLOBALS['messages'][90005]);
@@ -757,12 +757,41 @@ function updateDatabase($db) {
 			$statement = $db -> prepare($query);
 			$statement -> execute();
 			$db -> commit();
-			$db -> commit();
 
-			error_log('ERROR: '.$GLOBALS['messages'][90009]);
+			error_log('INFO: '.$GLOBALS['messages'][90009]);
 		}
 	} catch (Exception $e) {
 		error_log('ERROR: '.$GLOBALS['messages'][90010]);
+		error_log((string) $e);
+		return False;
+	}
+	
+	// Update old database
+	try {
+		$query = 'PRAGMA user_version;';
+		$version = $db -> query($query) -> fetchColumn();
+		switch ($version) {
+			case 0:
+				// From version 0 to version 1, need to add ip and role columns to users table
+				$db -> beginTransaction();
+				$query = 'ALTER TABLE users ADD COLUMN ip TEXT;';
+				$statement = $db -> prepare($query);
+				$statement -> execute();
+				$query = 'ALTER TABLE users ADD COLUMN role TEXT;';
+				$statement = $db -> prepare($query);
+				$statement -> execute();
+				$db -> commit();
+				$query = 'UPDATE users SET role = "admin";';
+				$statement = $db -> prepare($query);
+				$statement -> execute();
+
+				// Latest database version
+				error_log('INFO: '.$GLOBALS['messages'][90031]);
+				$query = 'PRAGMA user_version = 1;';
+				$version = $db -> query($query);
+		}
+	} catch (Exception $e) {
+		error_log('ERROR: '.$GLOBALS['messages'][90030]);
 		error_log((string) $e);
 		return False;
 	}
@@ -780,12 +809,14 @@ function updateDatabase($db) {
  */
 function updateUserCookie($db, $username, $cookie) {
 	try {
+		$ip = $_SERVER['REMOTE_ADDR'];
 		$now = time() + SESSION;
-		$query = 'UPDATE users SET cookie = :cookie, session = :session WHERE username = :username;';
+		$query = 'UPDATE users SET cookie = :cookie, session = :session, ip = :ip WHERE username = :username;';
 		$statement = $db -> prepare($query);
 		$statement -> bindParam(':cookie', $cookie, PDO::PARAM_STR);
 		$statement -> bindParam(':session', $now, PDO::PARAM_INT);
 		$statement -> bindParam(':username', $username, PDO::PARAM_STR);
+		$statement -> bindParam(':ip', $ip, PDO::PARAM_STR);
 		$statement -> execute();
 		return 0;
 	} catch (Exception $e) {

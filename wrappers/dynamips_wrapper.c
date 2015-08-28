@@ -26,7 +26,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150422
+ * @version 20150826
  */
 
 
@@ -94,6 +94,7 @@ int tenant_id = -1;                         // Tenant ID
 int tsclients_socket[FD_SETSIZE];           // Telnet active clients (socket), tsclients_socket[0] is the index
 
 int main (int argc, char *argv[]) {
+    setpgrp();  // Become the leader of its group.
     // Child's CMD line
     int m = sysconf(_SC_ARG_MAX);           // Maximum CMD line length
     char *cmd;                              // Store child's CMD line

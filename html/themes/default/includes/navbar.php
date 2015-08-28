@@ -3,7 +3,7 @@
                 <div class="navbar-brand">Unified Networking Lab</div>
                 <ul class="nav navbar-nav">
                     <li<?php if ($section == 'Home') print " class=\"active\""?>><a href="/">Home</a></li>
-                    <li<?php if ($section == 'Labs') print " class=\"active\""?>><a href="/lab_list.php?path=/">Labs</a></li>
+                    <li<?php if ($section == 'Labs') print " class=\"active\""?>><a href="/">Labs</a></li>
 <?php
 if ($section == 'Labs' && $subsection == 'List') {
 ?>

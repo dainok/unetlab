@@ -24,7 +24,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150422
+ * @version 20150728
  */
 
 #include <sys/types.h>
@@ -33,9 +33,10 @@
 int ts_listen(int port, int *server_socket);
 
 // Terminal Server: accept new connection
-int ts_accept(fd_set *fd_set, int server_socket, char *xtitle, int *client_socket);
+int ts_accept(fd_set *fd_set, int server_socket, char *xtitle, int *client_socket, int sendHeader);
 
 // Terminal Server: broadcast a char to all clients
+void ts_broadcast_string(char * string, fd_set *fd_set, int *client_socket);
 void ts_broadcast(char c, fd_set *fd_set, int *client_socket);
 
 // Terminal Server: receive a char from a client

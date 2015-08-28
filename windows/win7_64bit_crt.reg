@@ -1,0 +1,23 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\telnet]
+@="URL:Telnet Protocol"
+"URL Protocol"=""
+
+[HKEY_CLASSES_ROOT\telnet\shell]
+
+[HKEY_CLASSES_ROOT\telnet\shell\open]
+
+[HKEY_CLASSES_ROOT\telnet\shell\open\command]
+@="\"C:\\Program Files\\VanDyke Software\\SecureCRT\\SecureCRT.exe\" %1 /T"
+
+[HKEY_CLASSES_ROOT\ssh]
+@="URL:SSH Protocol"
+"URL Protocol"=""
+
+[HKEY_CLASSES_ROOT\ssh\shell]
+
+[HKEY_CLASSES_ROOT\ssh\shell\open]
+
+[HKEY_CLASSES_ROOT\ssh\shell\open\command]
+@="\"C:\\Program Files\\VanDyke Software\\SecureCRT\\SecureCRT.exe\" %1 /T"

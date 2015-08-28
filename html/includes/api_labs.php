@@ -17,24 +17,24 @@
  *
  * UNetLab is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with UNetLab.  If not, see <http://www.gnu.org/licenses/>.
+ * along with UNetLab. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150428
+ * @version 20150825
  */
 
 /*
  * Function to add a lab.
  *
- * @param   string     $p               Parameters
- * @return  Array                       Return code (JSend data)
+ * @param	Array		$p				Parameters
+ * @return	Array						Return code (JSend data)
  */
 function apiAddLab($p, $tenant) {
 	// Check mandatory parameters
@@ -73,7 +73,7 @@ function apiAddLab($p, $tenant) {
 		// Failed to create the lab
 		$output['code'] = 400;
 		$output['status'] = 'fail';
-		$output['messages'] = (string) $e;
+		$output['message'] = (string) $e;
 		return $output;
 	}
 
@@ -93,11 +93,75 @@ function apiAddLab($p, $tenant) {
 }
 
 /*
+ * Function to add a lab.
+ *
+ * @param	Array		$p				Parameters
+ * @return	Array						Return code (JSend data)
+ */
+function apiCloneLab($p, $tenant) {
+	$rc = checkFolder(BASE_LAB.dirname($p['source']));
+	if ($rc === 2) {
+		// Folder is not valid
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][60009];
+		return $output;
+	} else if ($rc === 1) {
+		// Folder does not exist
+		$output['code'] = 404;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][60008];
+		return $output;
+	}
+	
+	if(!is_file(BASE_LAB.$p['source'])) {
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][60000];
+		return $output;
+	}
+	
+	if (!copy(BASE_LAB.$p['source'], BASE_LAB.dirname($p['source']).'/'.$p['name'].'.unl')) {
+		// Failed to copy
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][60037];
+		error_log('ERROR: '.$GLOBALS['messages'][60037]);
+		return $output;
+	}
+	
+	try {
+		$lab = new Lab(BASE_LAB.dirname($p['source']).'/'.$p['name'].'.unl', $tenant);
+	} catch(Exception $e) {
+		// Lab file is invalid
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][$e -> getMessage()];
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+	
+	$rc = $lab -> edit($p);
+	if ($rc !== 0) {
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][$rc];
+	} else {
+		$output['code'] = 200;
+		$output['status'] = 'success';
+		$output['message'] = $GLOBALS['messages'][60036];
+	}
+	
+	return $output;
+}
+
+/*
  * Function to delete a lab.
  *
- * @param   string     $lab_id          Lab ID
- * @param   string     $lab_file        Lab file
- * @return  Array                       Return code (JSend data)
+ * @param	string		$lab_id			Lab ID
+ * @param	string		$lab_file		Lab file
+ * @return	Array						Return code (JSend data)
  */
 function apiDeleteLab($lab) {
 	$tenant = $lab -> getTenant();
@@ -107,7 +171,7 @@ function apiDeleteLab($lab) {
 	$cmd = 'sudo /opt/unetlab/wrappers/unl_wrapper';
 	$cmd .= ' -a delete';
 	$cmd .= ' -F "'.$lab_file.'"';
-	$cmd .= ' -T 0';  // Tenant not required for delete operation
+	$cmd .= ' -T 0';	// Tenant not required for delete operation
 	$cmd .= ' 2>> /opt/unetlab/data/Logs/unl_wrapper.txt';
 	exec($cmd, $o, $rc);
 	if ($rc == 0 && unlink($lab_file)) {
@@ -124,9 +188,9 @@ function apiDeleteLab($lab) {
 /*
  * Function to edit a lab.
  *
- * @param   Lab        $lab             Lab
- * @param   Array      $lab             Parameters
- * @return  Array                       Return code (JSend data)
+ * @param	Lab			$lab			Lab
+ * @param	Array		$lab			Parameters
+ * @return	Array						Return code (JSend data)
  */
 function apiEditLab($lab, $p) {
 	// Set author/description/version
@@ -144,10 +208,95 @@ function apiEditLab($lab, $p) {
 }
 
 /*
+ * Function to export labs.
+ *
+ * @param	Array		$p				Parameters
+ * @return	Array						Return code (JSend data)
+ */
+function apiExportLabs($p) {
+	$export_url = '/Exports/unetlab_export-'.date('Ymd-His').'.zip';
+	$export_file = '/opt/unetlab/data'.$export_url;
+	if (is_file($export_file)) {
+		unlink($export_file);
+	}
+	
+	if (checkFolder(BASE_LAB.$p['path']) !== 0) {
+		// Path is not valid
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][80077];
+		return $output;
+	}
+	
+	if (!chdir(BASE_LAB.$p['path'])) {
+		// Cannot set CWD
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS[80072];
+		return $output;
+	}
+	
+	foreach ($p as $key => $element) {
+		if ($key === 'path') {
+			continue;
+		}
+		
+		// Using "element" relative to "path", adding '/' if missing
+		$relement = substr($element, strlen($p['path']));
+		if ($relement[0] != '/') {
+			$relement = '/'.$relement;
+		}
+		
+		if (is_file(BASE_LAB.$p['path'].$relement)) {
+			// Adding a file
+			$cmd = 'zip '.$export_file.' ".'.$relement.'"';
+			exec($cmd, $o, $rc);
+			if ($rc != 0) {
+				$output['code'] = 400;
+				$output['status'] = 'fail';
+				$output['message'] = $GLOBALS['messages'][80073];
+				return $output;
+			}
+		}
+		
+		if (checkFolder(BASE_LAB.$p['path'].$relement) === 0) {
+			// Adding a dir
+			$cmd = 'zip -r '.$export_file.' ".'.$relement.'"';
+			exec($cmd, $o, $rc);
+			if ($rc != 0) {
+				$output['code'] = 400;
+				$output['status'] = 'fail';
+				$output['message'] = $GLOBALS['messages'][80074];
+				return $output;
+			}
+		}
+	}
+	
+	// Now remove UUID from labs
+	$cmd = BASE_DIR.'/scripts/remove_uuid.sh "'.$export_file.'"';
+	exec($cmd, $o, $rc);
+	if ($rc != 0) {
+		if (is_file($export_file)) {
+			unlink($export_file);
+		}
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][$rc];
+		return $output;
+	}
+	
+	$output['code'] = 200;
+	$output['status'] = 'success';
+	$output['message'] = $GLOBALS['messages'][80075];
+	$output['data'] = $export_url;
+	return $output;
+}
+
+/*
  * Function to get a lab.
  *
- * @param   Lab        $lab             Lab
- * @return  Array                       Return code (JSend data)
+ * @param	Lab			$lab			Lab
+ * @return	Array						Return code (JSend data)
  */
 function apiGetLab($lab) {
 	// Printing info
@@ -167,8 +316,8 @@ function apiGetLab($lab) {
 /*
  * Function to get all lab links (networks and serial endpoints).
  *
- * @param   Lab        $lab             Lab file
- * @return  Array                       Return code (JSend data)
+ * @param	Lab			$lab			Lab file
+ * @return	Array						Return code (JSend data)
  */
 function apiGetLabLinks($lab) {
 	$output['data'] = Array();
@@ -203,6 +352,104 @@ function apiGetLabLinks($lab) {
 	$output['message'] = $GLOBALS['messages'][60024];
 	$output['data']['ethernet'] = $ethernets;
 	$output['data']['serial'] = $serials;
+	return $output;
+}
+
+/*
+ * Function to import labs.
+ *
+ * @param	Array		$p				Parameters
+ * @return	Array						Return code (JSend data)
+ */
+function apiImportLabs($p) {
+	if (!isset($p['file']) || empty($p['file'])) {
+		// Upload failed
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][80081];
+		return $output;
+	}
+
+	if (!isset($p['path'])) {
+		// Path is not set
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][80076];
+		return $output;
+	}
+	
+	if (checkFolder(BASE_LAB.$p['path']) !== 0) {
+		// Path is not valid
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][80077];
+		return $output;
+	}
+	
+	$finfo = new finfo(FILEINFO_MIME);
+	if (!strcmp($finfo -> file($p['file']), 'application/zip')) {
+		// File is not a Zip
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][80078];
+		return $output;	
+	}
+	
+	$cmd = 'unzip -o -d "'.BASE_LAB.$p['path'].'" '.$p['file'].' *.unl';
+	exec($cmd, $o, $rc);
+	if ($rc != 0) {
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][80079];
+		return $output;
+	}
+
+	$output['code'] = 200;
+	$output['status'] = 'success';
+	$output['message'] = $GLOBALS['messages'][80080];
+	return $output;
+}
+
+/*
+ * Function to move a lab inside another folder.
+ *
+ * @param	Lab			$lab			Lab
+ * @param	string		$path			Destination path
+ * @return	Array						Return code (JSend data)
+ */
+function apiMoveLab($lab, $path) {
+	$rc = checkFolder(BASE_LAB.$path);
+	if ($rc === 2) {
+		// Folder is not valid
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][60009];
+		return $output;
+	} else if ($rc === 1) {
+		// Folder does not exist
+		$output['code'] = 404;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][60008];
+		return $output;
+	}
+	
+	if(is_file(BASE_LAB.$path.'/'.$lab -> getFilename())) {
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][60016];
+		return $output;
+	}
+	
+	if (rename($lab -> getPath().'/'.$lab -> getFilename(), BASE_LAB.$path.'/'.$lab -> getFilename())) {
+		$output['code'] = 200;
+		$output['status'] = 'success';
+		$output['message'] = $GLOBALS['messages'][60035];
+	} else {
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][60034];
+		error_log('ERROR: '.$GLOBALS['messages'][60034]);
+	}
 	return $output;
 }
 ?>

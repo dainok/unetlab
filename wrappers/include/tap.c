@@ -24,7 +24,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150422
+ * @version 20150715
  */
 
 #include <arpa/inet.h>
@@ -62,7 +62,7 @@ int tap_listen(char *tap_name, int *tap_fd) {
     sprintf(tmp, "/sys/class/net/%s/dev_id", tap_name);
     if (is_file(tmp) != 0) {
         rc = 1;
-        UNLLog(LLINFO, "Skipping non existent TAP interface (%s).\n", tap_name);
+        UNLLog(LLVERBOSE, "Skipping non existent TAP interface (%s).\n", tap_name);
         return rc;
     }
 

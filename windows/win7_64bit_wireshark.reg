@@ -1,0 +1,12 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\capture]
+@="URL:UNetLab interface capture"
+"URL Protocol"=""
+
+[HKEY_CLASSES_ROOT\capture\shell]
+
+[HKEY_CLASSES_ROOT\capture\shell\open]
+
+[HKEY_CLASSES_ROOT\capture\shell\open\command]
+@="\"C:\\Program Files\\UNetLab\\wireshark_wrapper.bat\" %1"

@@ -38,7 +38,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150525
+ * @version 20150824
  */
 
 // Include custom configuration
@@ -59,24 +59,30 @@ if (!isset($node_templates)) {
 		'clearpass'		=>	'Aruba ClearPass',
 		'timos'			=>	'Alcatel 7750 SR',
 		'veos'			=>	'Arista vEOS',
-		'brocadevadx' 	=>	'Brocade vADX',
+		'brocadevadx'	=>	'Brocade vADX',
 		'cpsg'			=>	'CheckPoint Security Gateway VE',
+		'acs'			=>	'Cisco ACS',
 		'asa'			=>	'Cisco ASA',
 		'asav'			=>	'Cisco ASAv',
+		'cda'			=>	'Cisco Context Directory Agent',
 		'csr1000v'		=>	'Cisco CSR 1000V',
 		'cips'			=>	'Cisco IPS',
+		'ise'			=>	'Cisco ISE',
 		'c1710'			=>	'Cisco IOS 1710 (Dynamips)',
 		'c3725'			=>	'Cisco IOS 3725 (Dynamips)',
 		'c7200'			=>	'Cisco IOS 7206VXR (Dynamips)',
 		'iol'			=>	'Cisco IOL',
 		'titanium'		=>	'Cisco NX-OSv (Titanium)',
+		'sourcefire'	=>	'Cisco Sourcefire',
 		'vios'			=>	'Cisco vIOS',
 		'viosl2'		=>	'Cisco vIOS L2',
+		'vnam'			=>	'Cisco vNAM',
 		'vwlc'			=>	'Cisco vWLC',
-		//'vwaas'		=>	'Cisco vWAAS',
+		'vwaas'			=>	'Cisco vWAAS',
 		'coeus'			=>	'Cisco Web Security Appliance',
 		'xrv'			=>	'Cisco XRv',
 		'nsvpx'			=>	'Citrix Netscaler',
+		'cumulus'		=>	'Cumulus VX',
 		'extremexos'	=>	'ExtremeXOS',
 		'bigip'			=>	'F5 BIG-IP LTM VE',
 		'fortinet'		=>	'Fortinet FortiGate',
@@ -84,9 +90,14 @@ if (!isset($node_templates)) {
 		'olive'			=>	'Juniper Olive',
 		'vmx'			=>	'Juniper vMX',
 		'vsrx'			=>	'Juniper vSRX',
+		'linux'			=>	'Linux',
+		'mikrotik'		=>	'MikroTik RouterOS',
+		'ostinato'		=>	'Ostinato',
 		'paloalto'		=>	'Palo Alto VM-100 Firewall',
+		//'riverbed'	=>	'Riverbed',
+		'sterra'		=>	'S-Terra',
 		'vyos'			=>	'VyOS',
-		'esxi'			=>	'VMware ESXi',
+		//'esxi'		=>	'VMware ESXi',
 		'win'			=>	'Windows'
 	);
 }
@@ -109,6 +120,10 @@ require_once(BASE_DIR.'/html/includes/__node.php');
 require_once(BASE_DIR.'/html/includes/__picture.php');
 require_once(BASE_DIR.'/html/includes/functions.php');
 require_once(BASE_DIR.'/html/includes/messages_en.php');
+if (defined('LOCALE') && is_file(BASE_DIR.'/html/includes/messages_'.LOCALE.'.php')) {
+	// Load a custom language
+	require_once(BASE_DIR.'/html/includes/messages_'.LOCALE.'.php');
+}
 
 // Include CLI specific functions
 if (php_sapi_name() === 'cli') {

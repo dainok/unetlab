@@ -7,7 +7,7 @@ setcap cap_net_admin+ep /sbin/brctl
 setcap cap_net_admin+ep /usr/bin/ovs-vsctl
 
 # Deleting logs
-rm -f /opt/unetlab/data/Logs/*
+rm -f /opt/unetlab/data/Logs/* /opt/unetlab/data/Exports/*
 /usr/sbin/apache2ctl graceful
 
 # Setting /etc/issue

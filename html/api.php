@@ -27,7 +27,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150527
+ * @version 20150819
  */
 
 /*
@@ -52,6 +52,7 @@
 
 require_once('/opt/unetlab/html/includes/init.php');
 require_once(BASE_DIR.'/html/includes/Slim/Slim.php');
+require_once(BASE_DIR.'/html/includes/Slim-Extras/DateTimeFileWriter.php');
 require_once(BASE_DIR.'/html/includes/api_authentication.php');
 require_once(BASE_DIR.'/html/includes/api_folders.php');
 require_once(BASE_DIR.'/html/includes/api_labs.php');
@@ -60,13 +61,14 @@ require_once(BASE_DIR.'/html/includes/api_nodes.php');
 require_once(BASE_DIR.'/html/includes/api_pictures.php');
 require_once(BASE_DIR.'/html/includes/api_status.php');
 require_once(BASE_DIR.'/html/includes/api_topology.php');
+require_once(BASE_DIR.'/html/includes/api_uusers.php');
 \Slim\Slim::registerAutoloader();
 
 $app = new \Slim\Slim(Array(
 	'mode' => 'production',
 	'debug' => True,					// Change to False for production
-	'log.level' => \Slim\Log::WARN,		// Change to WARN for production, DEBUG to decelop
-	'log.enabled' => False,
+	'log.level' => \Slim\Log::WARN,		// Change to WARN for production, DEBUG to develop
+	'log.enabled' => True,
 	'log.writer' => new \Slim\LogWriter(fopen('/opt/unetlab/data/Logs/api.txt', 'a'))
 ));
 
@@ -77,7 +79,6 @@ $app -> hook('slim.after.router', function () use ($app) {
 
 	$app -> log -> debug('Request path: ' . $request -> getPathInfo());
 	$app -> log -> debug('Response status: ' . $response -> getStatus());
-	// And so on ...
 });
 
 $app -> response -> headers -> set('Content-Type', 'application/json');
@@ -85,6 +86,14 @@ $app -> response -> headers -> set('X-Powered-By', 'Unified Networking Lab API')
 $app -> response -> headers -> set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
 $app -> response -> headers -> set('Cache-Control', 'post-check=0, pre-check=0');
 $app -> response -> headers -> set('Pragma', 'no-cache');
+
+$app -> notFound(function() use ($app) {
+	$output['code'] = 404;
+	$output['status'] = 'fail';
+	$output['message'] = $GLOBALS['messages']['60038'];
+	$app -> halt($output['code'], json_encode($output));
+});
+
 
 class ResourceNotFoundException extends Exception {}
 class AuthenticateFailedException extends Exception {}
@@ -167,6 +176,13 @@ $app -> put('/api/auth', function() use ($app, $db) {
  * Status
  **************************************************************************/
 $app -> get('/api/status', function() use ($app, $db) {
+	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($user === False) {
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+
 	$output['code'] = 200;
 	$output['status'] = 'success';
 	$output['message'] = $GLOBALS['messages']['60001'];
@@ -266,6 +282,8 @@ $app -> post('/api/folders', function() use ($app, $db) {
 		return;
 	}
 
+	// TODO must check before using p name and p path
+
 	$event = json_decode($app -> request() -> getBody());
 	$p = json_decode(json_encode($event), True);
 	$output = apiAddFolder($p['name'], $p['path']);
@@ -301,6 +319,7 @@ $app -> get('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 		$app -> response -> setBody(json_encode($output));
 		return;
 	}
+
 	$s = '/'.implode('/', $path);
 
 	$patterns[0] = '/(.+).unl.*$/';			// Drop after lab file (ending with .unl)
@@ -309,7 +328,7 @@ $app -> get('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 	$replacements[1] = '$1';
 
 	$lab_file = preg_replace($patterns[0], $replacements[0], $s);
-	$id = preg_replace($patterns[1], $replacements[1], $s);	// Intefer after lab_file.unl
+	$id = preg_replace($patterns[1], $replacements[1], $s);	// Interfere after lab_file.unl
 
 	if (!is_file(BASE_LAB.$lab_file)) {
 		// Lab file does not exists
@@ -457,6 +476,8 @@ $app -> put('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 		$output = apiEditLabPicture($lab, $p);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl$/', $s)) {
 		$output = apiEditLab($lab, $p);
+	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/move$/', $s)) {
+		$output = apiMoveLab($lab, $p['path']);
 	} else {
 		$output['code'] = 400;
 		$output['status'] = 'fail';
@@ -475,10 +496,15 @@ $app -> post('/api/labs', function() use ($app, $db) {
 		$app -> response -> setBody(json_encode($output));
 		return;
 	}
-
+	
 	$event = json_decode($app -> request() -> getBody());
 	$p = json_decode(json_encode($event), True);;
-	$output = apiAddLab($p, $tenant);
+	
+	if (isset($p['source'])) {
+		$output = apiCloneLab($p, $tenant);
+	} else {
+		$output = apiAddLab($p, $tenant);
+	}
 
 	$app -> response -> setStatus($output['code']);
 	$app -> response -> setBody(json_encode($output));
@@ -634,6 +660,59 @@ $app -> delete('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 	$app -> response -> setStatus($output['code']);
 	$app -> response -> setBody(json_encode($output));
 });
+
+/***************************************************************************
+ * Users
+ **************************************************************************/
+// Get an object
+$app -> get('/api/users/(:uuser)', function($uuser = '') use ($app, $db) {
+	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($user === False) {
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+	
+	$output = apiGetUUsers($db, $uuser);
+	$app -> response -> setStatus($output['code']);
+	$app -> response -> setBody(json_encode($output));
+});
+
+/***************************************************************************
+ * Export/Import
+ **************************************************************************/
+// Export labs
+$app -> post('/api/export', function() use ($app, $db) {
+	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($user === False) {
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+	
+	$event = json_decode($app -> request() -> getBody());
+	$p = json_decode(json_encode($event), True);;
+	
+	$output = apiExportLabs($p);
+	$app -> response -> setStatus($output['code']);
+	$app -> response -> setBody(json_encode($output));
+});
+
+// Import labs
+ $app -> post('/api/import', function() use ($app, $db) {
+	// Cannot use $app -> request() -> getBody()
+	$p = $_POST;
+	if (!empty($_FILES)) {
+		foreach ($_FILES as $file) {
+			$p['name'] = $file['name'];
+			$p['file'] = $file['tmp_name'];
+			$p['error'] = $file['name'];
+		}
+	}
+	$output = apiImportLabs($p);
+	$app -> response -> setStatus($output['code']);
+	$app -> response -> setBody(json_encode($output));
+ });
 
 /***************************************************************************
  * Run

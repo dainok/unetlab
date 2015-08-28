@@ -26,7 +26,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150504
+ * @version 20150826
  */
 
 /*
@@ -56,6 +56,7 @@ int tenant_id = -1;                         // Tenant ID
 int tsclients_socket[FD_SETSIZE];           // Telnet active clients (socket), tsclients_socket[0] is the index
 
 int main (int argc, char *argv[]) {
+    setpgrp();  // Become the leader of its group.
     // Child's CMD line
     int m = sysconf(_SC_ARG_MAX);           // Maximum CMD line length
     char *cmd;                              // Store child's CMD line
@@ -279,7 +280,7 @@ int main (int argc, char *argv[]) {
 
                 // Check if new client is coming
                 if (FD_ISSET(ts_socket, &read_fd_set)) {
-                    if ((rc = ts_accept(&active_fd_set, ts_socket, xtitle, tsclients_socket)) != 0) {
+                    if ((rc = ts_accept(&active_fd_set, ts_socket, xtitle, tsclients_socket,1)) != 0) {
                         UNLLog(LLERROR, "Failed to accept a new client (%i).\n", rc);
                     }
                 }

@@ -21,13 +21,13 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with UNetLab. If not, see <http:
+ * along with UNetLab. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150521
+ * @version 20150826
  */
 
 $p['type'] = 'qemu';
@@ -38,5 +38,5 @@ $p['ram'] = 2048;
 $p['ethernet'] = 2;
 $p['console'] = 'vnc';
 $p['qemu_arch'] = 'x86_64';
-$p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -serial none -nographic -nodefconfig -nodefaults -display none -vga std -rtc base=utc -no-shutdown -boot order=c';
+$p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -smbios type=1,manufacturer=\"VMware Inc.\",product=\"VMware Virtual Platform\",serial=\"VMware-12 00 11 22 33 44 55 66-77 88 99 aa bb cc dd ee\"';
 ?>

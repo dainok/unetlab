@@ -26,7 +26,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150504
+ * @version 20150826
  */
 
 #include <ctype.h>
@@ -60,6 +60,8 @@ int child_ser = 2;                          // Serial portgroups
 int main (int argc, char *argv[]) {
     CheckLogLevelFileTrigger("/tmp/unl_ll_debug",LLDEBUG);
     CheckLogLevelFileTrigger("/tmp/unl_ll_verbose",LLVERBOSE);
+
+    setpgrp();  // Become the leader of its group.
 
     // Child's CMD line
     int m = sysconf(_SC_ARG_MAX);           // Maximum CMD line length
@@ -106,8 +108,6 @@ int main (int argc, char *argv[]) {
     int rc = -1;                            // Generic return code
     char *tmp = NULL;                       // Generic char string
     struct sigaction sa;                    // Manage signals (SIGHUP, SIGTERM...)
-
-    setpgrp();
 
     // Check for iourc file
     tmp = (char *) malloc(m * sizeof(char));
@@ -364,7 +364,8 @@ int main (int argc, char *argv[]) {
         }
 
         // While subprocess is running, check IO from subprocess, telnet clients, socket and network
-        while (waitpid(child_pid, &child_status, WNOHANG|WUNTRACED) == 0) {
+        //int rrc = 0;
+        while ( waitpid(child_pid, &child_status, WNOHANG|WUNTRACED) == 0) {
             // Creating AF communication from child
             if (af_ready == 0 && *child_delay == 0) {
                 // wait 3 seconds for AF_UNIX
@@ -382,7 +383,7 @@ int main (int argc, char *argv[]) {
             // Check if select() is valid
             read_fd_set = active_fd_set;
             if ((active_fd = select(FD_SETSIZE, &read_fd_set, NULL, NULL, NULL)) <= 0) {
-                UNLLog(LLERROR, "Failed to select().\n");
+                UNLLog(LLERROR, "Failed to select().Error: %s\n",strerror(errno));
                 kill(0, SIGTERM);
                 break;
             }
@@ -401,7 +402,7 @@ int main (int argc, char *argv[]) {
 
             // Check if new client is coming
             if (FD_ISSET(ts_socket, &read_fd_set)) {
-                if ((rc = ts_accept(&active_fd_set, ts_socket, xtitle, tsclients_socket)) != 0) {
+                if ((rc = ts_accept(&active_fd_set, ts_socket, xtitle, tsclients_socket,1)) != 0) {
                     UNLLog(LLERROR, "Failed to accept a new client (%i).\n", rc);
                 }
             }
@@ -466,6 +467,8 @@ int main (int argc, char *argv[]) {
 
         // Child is no more running
         UNLLog(LLERROR, "Child is no more running.\n");
+        //printf("rrc = %i\n",rrc);
+        //exit(1);
     } else {
         UNLLog(LLERROR, "Failed to fork.\n");
         exit(1);

@@ -26,7 +26,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150504
+ * @version 20150730
  */
 
 #include <arpa/inet.h>
@@ -179,7 +179,7 @@ int mk_tap(int child_eth, int *iol_tap) {
             sprintf(tap_name, "vunl%u_%u_%u", tenant_id, device_id, i + 16 * j);
             if ((rc = tap_listen(tap_name, &tap_fd)) != 0) {
                 rc = 1;
-                UNLLog(LLINFO, "Skipping TAP (%s) interface (%i).\n", tap_name, rc);
+                UNLLog(LLVERBOSE, "Skipping TAP (%s) interface (%i).\n", tap_name, rc);
             } else {
                 // Add TAP interface to the active ethernet list
                 iol_tap[i + 16 * j] = tap_fd;
@@ -350,11 +350,12 @@ int packet_udp(int udp_socket, int af_socket) {
     int length = -1;
     int rc = -1;
     int wrapper_id = iol_id + 512;
-    char *ser_frame;
-    char iol_frame[1522];
-    memset(&iol_frame, 0, sizeof(iol_frame));
-    char tmp_frame[BUFFER];
-    memset(&tmp_frame, 0, sizeof(tmp_frame));
+//    char *ser_frame;
+//    char iol_frame[1522];
+    char ser_frame[BUFFER];
+    memset(ser_frame, 0, sizeof(ser_frame));
+//    char tmp_frame[BUFFER];
+//    memset(&tmp_frame, 0, sizeof(tmp_frame));
     int dst_tenant_id = 0;
     int dst_device_id = 0;
     int dst_device_if = 0;
@@ -389,7 +390,7 @@ int packet_udp(int udp_socket, int af_socket) {
 	 * [...]
 	 */
 
-    if ((length = serial2udp_receive(&ser_frame, udp_socket)) <= 0) {
+    if ((length = serial2udp_receive(ser_frame, udp_socket)) <= 0) {
         // Read error
         rc = 1;
         UNLLog(LLERROR, "Failed to receive packet from UDP (%i). ERR: %s (%i).\n", length, strerror(errno), rc);
@@ -401,14 +402,14 @@ int packet_udp(int udp_socket, int af_socket) {
         UNLLog(LLERROR, "Ignoring frame from UDP because too short (%i).\n", length);
         return 0;
     } else {
-        memcpy(tmp_frame, &ser_frame, length);
-        memcpy(iol_frame, &ser_frame, length);
-        dst_tenant_id = tmp_frame[0];
-        src_tenant_id = tmp_frame[1];
-        dst_device_id = (tmp_frame[2] << 8) + tmp_frame[3];
-        src_device_id = (tmp_frame[4] << 8) + tmp_frame[5];
-        dst_device_if = tmp_frame[6];
-        src_device_if = tmp_frame[7];
+        //memcpy(tmp_frame, &ser_frame, length);
+        //memcpy(iol_frame, &ser_frame, length);
+        dst_tenant_id = ser_frame[0];
+        src_tenant_id = ser_frame[1];
+        dst_device_id = (ser_frame[2] << 8) + ser_frame[3];
+        src_device_id = (ser_frame[4] << 8) + ser_frame[5];
+        dst_device_if = ser_frame[6];
+        src_device_if = ser_frame[7];
         if (dst_tenant_id != tenant_id) {
             UNLLog(LLERROR, "Ignoring frame from UDP because wrong tenant_id (%i).\n", dst_tenant_id);
             return 0;
@@ -418,23 +419,23 @@ int packet_udp(int udp_socket, int af_socket) {
             return 0;
         }
         // Now send packet to AF_UNIX
-        iol_frame[0] = dst_device_id >> 8;  // IOL device ID
-        iol_frame[1] = dst_device_id & 255;
-        iol_frame[2] = wrapper_id >> 8;     // WRAPPER device ID
-        iol_frame[3] = wrapper_id & 255;
-        iol_frame[4] = dst_device_if;       // IOL device ID
-        iol_frame[5] = dst_device_if;       // WRAPPER device ID
-        iol_frame[6] = 1;
-        iol_frame[7] = 0;
+        ser_frame[0] = dst_device_id >> 8;  // IOL device ID
+        ser_frame[1] = dst_device_id & 255;
+        ser_frame[2] = wrapper_id >> 8;     // WRAPPER device ID
+        ser_frame[3] = wrapper_id & 255;
+        ser_frame[4] = dst_device_if;       // IOL device ID
+        ser_frame[5] = dst_device_if;       // WRAPPER device ID
+        ser_frame[6] = 1;
+        ser_frame[7] = 0;
         UNLLog(LLVERBOSE, "Received UDP packet from device %u:%u:%u to device %u:%u:%u\n", src_tenant_id, src_device_id, src_device_if, dst_tenant_id, dst_device_id, dst_device_if);
-        if ((write(af_socket, iol_frame, length)) < 0) {
+        if ((write(af_socket, ser_frame, length)) < 0) {
             rc = 3;
             UNLLog(LLERROR, "Failed forwarding data to AF_UNIX (%i) socket.  ERR: %s (%i). \n", af_socket, strerror(errno), rc);
             return rc;
         } else {
             UNLLog(LLVERBOSE, "Sent ser frame to AF_UNIX (dst: %u:%u, src: %u:%u)\n",
-                    256 * (int) iol_frame[0] + (int) iol_frame[1], (int) iol_frame[4],
-                    256 * (int) iol_frame[2] + (int) iol_frame[3], (int) iol_frame[5]);
+                    256 * (int) ser_frame[0] + (int) ser_frame[1], (int) ser_frame[4],
+                    256 * (int) ser_frame[2] + (int) ser_frame[3], (int) ser_frame[5]);
             return 0;
         }
         return 0;

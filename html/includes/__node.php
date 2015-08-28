@@ -27,7 +27,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150527
+ * @version 20150825
  * @property type $flags_eth CMD flags related to Ethernet interfaces. It's mandatory and automatically set.
  * @property type $flags_ser CMD flags related to Serial interfaces. It's mandatory and automatically set.
  * @property type $console protocol. It's optional.
@@ -515,7 +515,7 @@ class Node {
 				unset($p['console']);
 				$modified = True;
 			} else if (isset($p['console'])) {
-				$this -> config = htmlentities($p['console']);
+				$this -> console = htmlentities($p['console']);
 				$modified = True;
 			}
 
@@ -667,6 +667,20 @@ class Node {
 				$flags .= ' -vnc :'.($this -> port - 5900);  // start a VNC server on display
 			}
 
+			// Adding controller
+			foreach(scandir('/opt/unetlab/addons/qemu/'.$this -> getImage()) as $filename) {
+				if (preg_match('/^megasas[a-z]+.qcow2$/', $filename)) {
+					// MegaSAS
+					$flags .= ' -device megasas,id=scsi0,bus=pci.0,addr=0x5';                                             // Define SCSI BUS
+					break;
+				} else if (preg_match('/^lsi[a-z]+.qcow2$/', $filename)) {
+					// LSI
+					$flags .= ' -device lsi,id=scsi0,bus=pci.0,addr=0x5';                                             // Define SCSI BUS
+					break;
+				} 
+
+			}
+
 			// Adding disks
 			foreach(scandir('/opt/unetlab/addons/qemu/'.$this -> getImage()) as $filename) {
 				if ($filename == 'cdrom.iso') {
@@ -677,9 +691,16 @@ class Node {
 					$patterns[0] = '/^megasas([a-z]+).qcow2$/';
 					$replacements[0] = '$1';
 					$disk_id = preg_replace($patterns, $replacements, $filename);
-					$lun = (int) ord(strtolower($disk_id)) - 96;
-					$flags .= ' -device megasas,id=scsi0,bus=pci.0,addr=0x5';                                             // Define SCSI BUS
-					$flags .= ' -device scsi-disk,bus=scsi0.0,scsi-id='.$lun.',drive=drive-scsi0-0-'.$lun.',id=scsi0-0-'.$lun.',bootindex=1';  // Define SCSI disk
+					$lun = (int) ord(strtolower($disk_id)) - 97;
+					$flags .= ' -device scsi-disk,bus=scsi0.0,scsi-id='.$lun.',drive=drive-scsi0-0-'.$lun.',id=scsi0-0-'.$lun.',bootindex='.$lun;  // Define SCSI disk
+					$flags .= ' -drive file='.$filename.',if=none,id=drive-scsi0-0-'.$lun.',cache=none';                        // Define SCSI file
+				} else if (preg_match('/^lsi[a-z]+.qcow2$/', $filename)) {
+					// LSI
+					$patterns[0] = '/^lsi([a-z]+).qcow2$/';
+					$replacements[0] = '$1';
+					$disk_id = preg_replace($patterns, $replacements, $filename);
+					$lun = (int) ord(strtolower($disk_id)) - 97;
+					$flags .= ' -device scsi-disk,bus=scsi0.0,scsi-id='.$lun.',drive=drive-scsi0-0-'.$lun.',id=scsi0-0-'.$lun.',bootindex='.$lun;  // Define SCSI disk
 					$flags .= ' -drive file='.$filename.',if=none,id=drive-scsi0-0-'.$lun.',cache=none';                        // Define SCSI file
 				} else if (preg_match('/^hd[a-z]+.qcow2$/', $filename)) {
 					// IDE
@@ -692,20 +713,20 @@ class Node {
 					$patterns[0] = '/^virtio([a-z]+).qcow2$/';
 					$replacements[0] = '$1';
 					$disk_id = preg_replace($patterns, $replacements, $filename);
-					$lun = (int) ord(strtolower($disk_id)) - 96;
+					$lun = (int) ord(strtolower($disk_id)) - 97;
 					$flags .= ' -drive file='.$filename.',if=virtio,bus=0,unit='.$lun.',cache=none';
-				} else if (preg_match('/^scsci[a-z]+.qcow2$/', $filename)) {
+				} else if (preg_match('/^scsi[a-z]+.qcow2$/', $filename)) {
 					// SCSI
 					$patterns[0] = '/^scsi([a-z]+).qcow2$/';
 					$replacements[0] = '$1';
 					$disk_id = preg_replace($patterns, $replacements, $filename);
-					$lun = (int) ord(strtolower($disk_id)) - 96;
+					$lun = (int) ord(strtolower($disk_id)) - 97;
 					$flags .= ' -drive file='.$filename.',if=scsi,bus=0,unit='.$lun.',cache=none';
 				}
 			}
 
 			// Adding custom flags
-			if (isset($p['qemu_options']) && preg_match('/^[A-Za-z0-9_+\\s-:.,=]+$/', $p['qemu_options'])) {
+			if (isset($p['qemu_options'])) {
 				// Setting additional QEMU options
 				$flags .= ' '.$p['qemu_options'];
 			} else if (isset($p['qemu_options'])) {
@@ -1283,6 +1304,26 @@ class Node {
 								$this -> flags_eth .= ' -device %NICDRIVER%,netdev=net'.$i.',mac=50:'.sprintf('%02x', $this -> tenant).':'.sprintf('%02x', $this -> id / 512).':'.sprintf('%02x', $this -> id % 512).':00:'.sprintf('%02x', $i);
 								$this -> flags_eth .= ' -netdev tap,id=net'.$i.',ifname=vunl'.$this -> tenant.'_'.$this -> id.'_'.$i.',script=no';
 							}
+						}
+						break;
+					case 'acs':
+						for ($i = 0; $i < $this -> ethernet; $i++) {
+							if (isset($old_ethernets[$i])) {
+								// Previous interface found, copy from old one
+								$this -> ethernets[$i] = $old_ethernets[$i];
+							} else {
+								$n = 'Gi0/'.$i;		// Interface name
+								try {
+									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
+								} catch (Exception $e) {
+									error_log('ERROR: '.$GLOBALS['messages'][40020]);
+									error_log((string) $e);
+									return 40020;
+								}
+							}
+							// Setting CMD flags (virtual device and map to TAP device)
+							$this -> flags_eth .= ' -device %NICDRIVER%,netdev=net'.$i.',mac=50:'.sprintf('%02x', $this -> tenant).':'.sprintf('%02x', $this -> id / 512).':'.sprintf('%02x', $this -> id % 512).':00:'.sprintf('%02x', $i);
+							$this -> flags_eth .= ' -netdev tap,id=net'.$i.',ifname=vunl'.$this -> tenant.'_'.$this -> id.'_'.$i.',script=no';
 						}
 						break;
 					case 'asa':

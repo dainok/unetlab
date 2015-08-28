@@ -27,7 +27,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150428
+ * @version 20150806
  */
 
 /*
@@ -40,7 +40,7 @@ function apiGetCPUUsage() {
 	$cmd = 'top -b -n1 -p1';
 	exec($cmd, $o, $rc);
 	if ($rc == 0) {
-		return 100 - round(preg_replace('/^.+, ([0-9\.]+) id,.+/', '$1', $o[2]));
+		return 100 - (int) round(preg_replace('/^.+ni[, ]+([0-9\.]+) id,.+/', '$1', $o[2]));
 	} else {
 		return -1;
 	}
@@ -56,14 +56,14 @@ function apiGetDiskUsage() {
 	$cmd = 'df -h /';
 	exec($cmd, $o, $rc);
 	if ($rc == 0) {
-		return preg_replace('/^.+ ([0-9]+)% .+/', '$1', $o[1]);
+		return (int) preg_replace('/^.+ ([0-9]+)% .+/', '$1', $o[1]);
 	} else {
 		return -1;
 	}
 }
 
 /*
- * Function to get disk usage percentage.
+ * Function to get mem usage percentage.
  *
  * @return  Array                       RAM usage (percentage) as cache and data or -1 if not valid
  */
@@ -72,9 +72,9 @@ function apiGetMemUsage() {
 	$cmd = 'free';
 	exec($cmd, $o, $rc);
 	if ($rc == 0) {
-		$total = preg_replace('/^Mem:\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)$/', '$1', $o[1]);
-		$used = preg_replace('/^Mem:\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)$/', '$2', $o[1]);
-		$cached = preg_replace('/^Mem:\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)$/', '$6', $o[1]);
+		$total = (int) preg_replace('/^Mem:\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)$/', '$1', $o[1]);
+		$used = (int) preg_replace('/^Mem:\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)$/', '$2', $o[1]);
+		$cached = (int) preg_replace('/^Mem:\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)$/', '$6', $o[1]);
 		return Array(round($cached / $total * 100), round(($used - $cached) / $total * 100));
 	} else {
 		return Array(-1, -1);
@@ -88,13 +88,13 @@ function apiGetMemUsage() {
  */
 function apiGetRunningWrappers() {
 	// Checking running wrappers
-	$cmd = 'pgrep iol_wrapper';
+	$cmd = 'pgrep -c iol_wrap';
 	exec($cmd, $o_iol, $rc);
-	$cmd = 'pgrep dynamips_wrapper';
+	$cmd = 'pgrep -c dynamips_wrap';
 	exec($cmd, $o_dynamips, $rc);
-	$cmd = 'pgrep qemu_wrapper';
+	$cmd = 'pgrep -c qemu_wrap';
 	exec($cmd, $o_qemu, $rc);
-	return Array((int) current($o_iol), (int) current($o_dynamips), (int) current($o_qemu));
+	return Array((int) current($o_iol) / 2, (int) current($o_dynamips) / 2, (int) current($o_qemu) / 2);
 }
 
 /*
@@ -107,8 +107,8 @@ function apiGetSwapUsage() {
 	$cmd = 'free';
 	exec($cmd, $o, $rc);
 	if ($rc == 0) {
-		$total = preg_replace('/^Swap:\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)$/', '$1', $o[3]);
-		$used = preg_replace('/^Swap:\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)$/', '$3', $o[3]);
+		$total = (int) preg_replace('/^Swap:\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)$/', '$1', $o[3]);
+		$used = (int) preg_replace('/^Swap:\ +([0-9\.]+)\ +([0-9\.]+)\ +([0-9\.]+)$/', '$3', $o[3]);
 		return 100 - round($used / $total * 100);
 	} else {
 		return -1;

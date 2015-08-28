@@ -27,7 +27,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150527
+ * @version 20150807
  * @property type $author Author name of the lab. It's optional.
  * @property type $description Description of the lab. It's optional
  * @property type $filename The filename of the lab (without path). It's mandatory and automatically set.
@@ -85,7 +85,6 @@ class Lab {
 			$this -> name = substr(basename($f), 0, -4);
 			$this -> id = genUuid();
 			$modified = True;
-			error_log('WARNING: '.$f.' '.$GLOBALS['messages'][20000]);
 		} else {
 			// Load the existent lab
 			$this -> filename = basename($f);
@@ -466,6 +465,14 @@ class Lab {
 	public function edit($p) {
 		$modified = False;
 
+		if (!isset($p['name']) && !checkLabFilename($p['name'].'.unl')) {
+			// Name is not valid, ignored
+			error_log('WARNING: '.$GLOBALS['messages'][20038]);
+		} else if (isset($p['name'])) {
+			$this -> name = $p['name'];
+			$modified = True;
+		}
+		
 		if (isset($p['author']) && $p['author'] === '') {
 			// Author is empty, unset the current one
 			unset($this -> author);
@@ -491,7 +498,7 @@ class Lab {
 		} else if (isset($p['version']) && (int) $p['version'] < 0) {
 			// Version is not valid, ignored
 			error_log('WARNING: '.$GLOBALS['messages'][30008]);
-		} else {
+		} else if (isset($p['version'])) {
 			$this -> version = (int) $p['version'];
 			$modified = True;
 		}
@@ -736,7 +743,7 @@ class Lab {
 	public function connectNode($n, $p) {
 		if (!isset($this -> nodes[$n])) {
 			// Node not found
-			error_log('ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$i.' '.$GLOBALS['messages'][20032]);
+			error_log('ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$n.' '.$GLOBALS['messages'][20032]);
 			return 20032;
 		}
 
@@ -982,8 +989,9 @@ class Lab {
 		$dom -> loadXML($xml -> asXML());
 
 		// Write to file
-		$tmp = $this -> path.'/'.$this -> filename.'.swp';
-		$dst = $this -> path.'/'.$this -> filename;
+		$tmp = $this -> path.'/'.$this -> name.'.swp';
+		$old = $this -> path.'/'.$this -> filename;
+		$dst = $this -> path.'/'.$this -> name.'.unl';
 		$fp = fopen($tmp, 'w');
 		if (!fwrite($fp, $dom -> saveXML())) {
 			// Failed to write
@@ -994,15 +1002,20 @@ class Lab {
 		} else {
 			// Write OK
 			fclose($fp);
-			if (is_file($dst) && !unlink($dst)) {
+			if ($old != $dst && is_file($dst)) {
+				// Should rename the lab, but destination file already exists
+				error_log('ERROR: '.$GLOBALS['messages'][20039]);
+				return 20039;
+			}
+			if (is_file($old) && !unlink($old)) {
 				// Cannot delete original lab
 				unlink($tmp);
-				error_log('WARNING: '.$GLOBALS['messages'][20028]);
+				error_log('ERROR: '.$GLOBALS['messages'][20028]);
 				return 20028;
 			}
 			if (!rename($tmp, $dst)) {
 				// Cannot move $tmp to $dst
-				error_log('WARNING: '.$GLOBALS['messages'][20029]);
+				error_log('ERROR: '.$GLOBALS['messages'][20029]);
 				return 20029;
 			}
 		}

@@ -27,7 +27,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150527
+ * @version 20150826
  */
 
 /**
@@ -64,6 +64,16 @@ function addBridge($s) {
 			error_log('ERROR: '.$GLOBALS['messages'][80028]);
 			error_log(implode("\n", $o));
 			return 80028;
+		}
+
+		// Disable multicast_snooping
+		$cmd = 'echo 0 > /sys/devices/virtual/net/'.$s.'/bridge/multicast_snooping 2>&1';
+		exec($cmd, $o, $rc);
+		if ($rc != 0) {
+			// Failed to configure multicast_snooping
+			error_log('ERROR: '.$GLOBALS['messages'][80071]);
+			error_log(implode("\n", $o));
+			return 80071;
 		}
 	}
 
@@ -428,6 +438,10 @@ function export($node_id, $n, $lab) {
 			foreach (scandir($n -> getRunningPath()) as $filename) {
 				if (preg_match('/_nvram$/', $filename)) {
 					$nvram = $n -> getRunningPath().'/'.$filename;
+					break;
+				} else if (preg_match('/_rom$/', $filename)) {
+					$nvram = $n -> getRunningPath().'/'.$filename;
+					break;
 				}
 			}
 
@@ -806,7 +820,7 @@ function start($n, $id, $t, $nets) {
  */
 function stop($n) {
 	if ($n -> getStatus() == 1) {
-		$cmd = 'kill -s TERM $(fuser -n tcp '.$n -> getPort().' 2> /dev/null | sed "s/^.* \([0-9]\+\)$/\1/g")';
+		$cmd = 'fuser -n tcp -k -TERM '.$n -> getPort().' > /dev/null 2>&1';
 		exec($cmd, $o, $rc);
 		error_log('INFO: stopping '.$cmd);
 		sleep(1);  // Need to wait a few

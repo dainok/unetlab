@@ -13,10 +13,12 @@ cat ${CONTROL} | sed "s/%VERSION%/${VERSION}/" | sed "s/%RELEASE%/${RELEASE}/" >
 # UNetLab
 cd ${SRC_DIR}
 rm -f html/includes/config.php
-mkdir -p ${DATA_DIR}/opt/unetlab ${DATA_DIR}/opt/unetlab/addons ${DATA_DIR}/opt/unetlab/data/Logs ${DATA_DIR}/opt/unetlab/labs ${DATA_DIR}/opt/unetlab/tmp/ ${DATA_DIR}/opt/unetlab/scripts
+rm -rf html/files
+mkdir -p ${DATA_DIR}/opt/unetlab ${DATA_DIR}/opt/unetlab/addons ${DATA_DIR}/opt/unetlab/data/Logs ${DATA_DIR}/opt/unetlab/labs ${DATA_DIR}/opt/unetlab/tmp/ ${DATA_DIR}/opt/unetlab/scripts ${DATA_DIR}/opt/unetlab/data/Exports
 rsync -a --delete html ${DATA_DIR}/opt/unetlab/
 cat html/includes/init.php | sed "s/define('VERSION', .*/define('VERSION', '${VERSION}-${RELEASE}');/g" > ${DATA_DIR}/opt/unetlab/html/includes/init.php
 cp -a scripts/set_uuid.php ${DATA_DIR}/opt/unetlab/scripts/
+cp -a scripts/import_iou-web.php ${DATA_DIR}/opt/unetlab/scripts/
 cp -a scripts/fix_iol_nvram.sh ${DATA_DIR}/opt/unetlab/scripts/
 cp -a IOUtools/iou_export ${DATA_DIR}/opt/unetlab/scripts/
 chown -R root:root ${DATA_DIR}/opt/unetlab
@@ -39,6 +41,14 @@ cp -a unl_profile ${DST}/unl_profile
 cp -a unl_wrapper.php ${DST}/unl_wrapper
 cd ..
 cp -a /opt/unetlab/addons/iol/lib/libcrypto.so.4 ${DATA_DIR}/opt/unetlab/addons/iol/lib
+
+# Additional files
+mkdir -p ${DATA_DIR}/opt/unetlab/html/files
+cp -a /usr/src/unetlab/windows ${DATA_DIR}/opt/unetlab/html/files/UNetLab
+cd ${DATA_DIR}/opt/unetlab/html/files
+zip -r windows.zip UNetLab > /dev/null
+cd ${SRC_DIR}
+rm -rf ${DATA_DIR}/opt/unetlab/html/files/UNetLab
 
 # SUDO
 mkdir -p ${DATA_DIR}/etc/sudoers.d
@@ -89,13 +99,15 @@ setcap cap_net_admin+ep /sbin/brctl > /dev/null 2>&1
 setcap cap_net_admin+ep /usr/bin/ovs-vsctl > /dev/null 2>&1
 # Check for Intel VT-x/AMD-V
 fgrep -e vmx -e svm /proc/cpuinfo > /dev/null || echo "*** WARNING: neither Intel VT-x or AMD-V found"
-# Cleaning log
+# Cleaning logs
 rm -f /opt/unetlab/data/Logs/*
+# Cleaning exports
+rm -f /opt/unetlab/data/Exports/*
 /usr/sbin/apache2ctl graceful > /dev/null 2>&1
 # Mark official kernels as hold
 apt-mark hold  \$(dpkg -l | grep -e linux-image -e linux-headers -e linux-generic | grep -v unetlab | awk '{print \$2}') > /dev/null 2>&1
 # Setting UUID on labs
-find /opt/unetlab/labs/ -name "*.unl" -exec /opt/unetlab/scripts/set_uuid.php "{}" \;
+find /opt/unetlab/labs/ -name "*.unl" -printf 'Updating lab: %p\n' -exec /opt/unetlab/scripts/set_uuid.php "{}" \;
 find /opt/unetlab/tmp/ -name "nvram_*" -exec /opt/unetlab/scripts/fix_iol_nvram.sh "{}" \;
 EOF
 

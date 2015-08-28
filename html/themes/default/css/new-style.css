@@ -21,8 +21,33 @@ input[name='login[username]'], input[name='login[password]']{
 	width: 100%;
 }
 
+#small {
+	background-color: #46a6b6;
+	height: 100%;
+	width: 100%;
+}
+
+#small .jumbotron {
+	background-color: #ffffff;
+	box-shadow: 0 0 30px black;
+}
+
+#small h1 {
+	color: #46a6b6;
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+	font-size: 8vmin;
+}
+
+#small p {
+	color: #58585a;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-size: 4vmin;
+}
+
 #body {
 	height: 100%;
+	padding: 0;
+	width: 100%;
 }
 
 #auth-left {
@@ -84,6 +109,128 @@ input[name='login[username]'], input[name='login[password]']{
 	line-height: 180%;
 }
 
+#main-navbar {
+	padding: 5px;
+	margin: 0px;
+}
+
+#main-navbar  .container-fluid {
+	padding: 0px;
+}
+
+#main-navbar  .navbar-header {
+	background-color: #46a6b6;
+	padding: 1vw 2vw 1vw 2vw;
+}
+
+#main-navbar .navbar-nav {
+	border-bottom: 1px dotted #8B8C90;
+	margin-top: 3vw;
+}
+
+#main-navbar .navbar-item {
+	background-color: transparent;
+	margin-right: 5px;
+	margin-top: 2.3vw;
+	width: 12vw;	/* Divide 72 by the number of items */
+}
+
+#main-navbar a.item {
+	background-color: transparent;
+	color: #89888c;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-size: 1em;
+	font-weight: bold;
+	text-align: left;
+	text-transform: uppercase;
+}
+
+#main-navbar a.item:link, #main-navbar a.item:visited {
+	border-bottom: 0.3vw solid transparent;
+}
+
+#main-navbar a.item:hover, #main-navbar a.item:active {
+	border-bottom: 0.3vw solid #3ba9ba;
+}
+
+#list-title {
+	background: rgba(60, 153, 171, 0.75);
+	color: #ffffff;
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+	font-size: 1.1em;
+	left: 0px;
+	line-height: 1.2em;
+	padding: 1px 5px 3px 5px;
+	position: absolute;
+	right: 0px;
+	top: 12.5vw;
+	z-index: 100;
+}
+
+#list-body {
+	padding: 5px;
+	padding-bottom: 210px;	/* don't know why this exceed lower margin */
+}
+
+#list-body ul {
+	line-height: 3em;
+	list-style-type: none;
+	margin-left: -30px;
+	margin-right: -15px;
+	margin-top: 3vw;	/* must reflect #list-title top attribute */
+}
+
+#list-title-folders {
+	padding-left: 20px;
+	text-overflow: ellipsis;
+	text-transform: uppercase;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+#list-title-folders span {
+	text-transform: none;
+}
+
+#list-folders {
+	background-color: #e2edef;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+#list-title-labs {
+	margin-left: 10px;
+	margin-right: 10px;
+	padding-left: 20px;
+	text-transform: uppercase;
+}
+
+#list-labs {
+	background-color: #babbbd;
+	margin-left: 10px;
+	margin-right: 10px;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+#list-labs ul {
+	margin-left: -55px;		/* must reflect a.lab padding-left attribute */
+}
+
+#list-title-info {
+	margin-right: -20px;	/* previous column get a 20px margin */
+	padding-left: 20px;
+	padding-right: 20px;	/* reduce available space of 20px */
+}
+
+#list-info {
+	margin-right: -20px;	/* previous column get a 20px margin */
+	padding-right: 20px;	/* reduce available space of 20px */
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
 .btn-aqua {
 	/* http://charliepark.org/bootstrap_buttons/ */
 	-webkit-font-smoothing: antialiased;
@@ -104,6 +251,27 @@ input[name='login[username]'], input[name='login[password]']{
 	font-size: 2.5vmin;
 	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.49);
 	text-transform: uppercase;
+}
+
+.btn-file {
+	position: relative;
+	overflow: hidden;
+}
+
+.btn-file input[type=file] {
+	position: absolute;
+	top: 0;
+	right: 0;
+	min-width: 100%;
+	min-height: 100%;
+	font-size: 100px;
+	text-align: right;
+	filter: alpha(opacity=0);
+	opacity: 0;
+	outline: none;
+	background: white;
+	cursor: inherit;
+	display: block;
 }
 
 .btn-grey {
@@ -127,6 +295,112 @@ input[name='login[username]'], input[name='login[password]']{
 	text-transform: uppercase;
 }
 
+.folder, .folder:visited {
+	border-bottom: 1px dotted #46a6b6;
+	color: #58585a;
+	float: left;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-weight: bold;
+	padding-left: 5px;
+	text-decoration: none;
+	width: 100%;
+}
+
+.folder:active, .folder:hover {
+	border-bottom: 1px solid #46a6b6;
+	color: #46a6b6;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-weight: bold;
+	text-decoration: none;
+	width: 100%;
+}
+
+.lab, .lab:visited {
+	border-bottom: 1px dotted #ffffff;
+	color: #ffffff;
+	float: left;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-weight: bold;
+	padding-left: 30px;	/* must reflect #list-labs ul margin-left attribute */
+	text-decoration: none;
+	width: 100%;
+}
+
+.lab:active, .lab:hover, .lab-opened, .lab-opened:visited, .lab-opened:active, .lab-opened:hover, .lab.ui-draggable-dragging {
+	background-color: #ffffff;
+	border-bottom: 1px dotted #ffffff;
+	color: #46a6b6;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-weight: bold;
+	text-decoration: none;
+	width: 100%;
+}
+
+.lab.ui-draggable-dragging {
+	line-height: 3em;
+	width: 25%;
+}
+
+.version {
+	color: #46a6b6;
+	margin-top: 50px;
+	padding-left: 10vw;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-weight: bold;
+	font-size: 5vmin;
+	text-align: left;
+}
+
+.circle {
+	margin-top: 50px;
+	text-align: center;
+}
+
+.circle span {
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-size: 2vmin;
+	text-align: center;
+}
+
+.circle strong {
+	position: absolute;
+	top: 30px;
+	left: 0;
+	width: 100%;
+	text-align: center;
+	line-height: 40px;
+	font-size: 30px;
+}
+
+.count {
+	margin-top: 50px;
+	text-align: center;
+}
+
+.count span {
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-size: 2vmin;
+	text-align: center;
+}
+
+.count strong {
+	text-align: center;
+	line-height: 40px;
+	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	font-size: 30px;
+	line-height: 1.42857;
+	color: #333;
+}
+
+.selected, .selected:visited, .selected:active, .selected:hover {
+	background: rgba(60, 153, 171, 0.75);
+	text-decoration: underline;
+}
+
+.selected:hover {
+	color: red;
+}
+
 .full-height {
 	height: 100%;
 }
@@ -148,9 +422,34 @@ input[name='login[username]'], input[name='login[password]']{
 	font-size: 2.8vmin;
 }
 
+.modal-body .error {
+	color: #46a6b6;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-size: 2vmin;
+}
+
 .modal-title {
 	border-bottom: 2px solid #46a6b6;
 	color: #46a6b6;
 	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
 	font-size: 2.8vmin;
+}
+
+#users {
+	padding: 5px;
+}
+
+#users thead {
+	background: rgba(60, 153, 171, 0.75);
+	color: #ffffff;
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+	font-size: 1.1em;
+	text-transform: uppercase;
+}
+
+#users tbody {
+	background-color: #babbbd;
+	color: #ffffff;
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+	font-size: 1em;
 }

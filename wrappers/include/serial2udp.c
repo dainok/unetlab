@@ -26,7 +26,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150422
+ * @version 20150730
  */
 
 #include <arpa/inet.h>
@@ -176,9 +176,9 @@ int serial2udp_add(int *remote_socket, int *remote_id, int *remote_if, char *ser
 }
 
 // Serial to UDP Converter: receive
-int serial2udp_receive(char **c, int server_socket) {
+int serial2udp_receive(char *c, int server_socket) {
     int length = 0;
-    memset(c, 0, sizeof(*c));
+    //memset(c, 0, sizeof(*c)); // useless memset
 
     if ((length = read(server_socket, c, BUFFER)) <= 0) {
         // Read error
