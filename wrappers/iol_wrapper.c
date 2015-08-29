@@ -79,7 +79,7 @@ int main (int argc, char *argv[]) {
     int ts_port = -1;                       // TCP (console) and UDP (serial converter) port
     int ts_socket = -1;                     // Telnet server socket
     char child_output = '\0';               // Store single char from child
-    char client_input = '\0';               // Store single char from client
+    unsigned char client_input = '\0';               // Store single char from client
     char *xtitle = "Terminal Server";       // Title for telnet clients
 
     // Select parameters
@@ -184,26 +184,20 @@ int main (int argc, char *argv[]) {
                 break;
             // Optional: Serial link end-point (no default)
             case 'l':
-                if (udpserver_socket == -1 && tenant_id != -1 && device_id != -1) {
-                    // First Serial2UDP definition, must listen()
-                    if ((rc = serial2udp_listen(32768 + 128 * tenant_id + device_id, &udpserver_socket)) != 0) {
-                        UNLLog( LLERROR, "Failed to open UDP socket (%i).\n", rc);
-                        exit(1);
-                    }
-                    // Now add serial end-point
-                    if ((rc = serial2udp_add(ser_socket, ser_remoteid, ser_remoteif, optarg)) != 0) {
-                        UNLLog( LLERROR, "Failed to add serial end-point (%i).\n", rc);
-                        exit(1);
-                    }
-                } else if (udpserver_socket > 0) {
-                    // Serial2UDP wrapper already started, add serial end-point
-                    if ((rc = serial2udp_add(ser_socket, ser_remoteid, ser_remoteif, optarg)) != 0) {
-                        UNLLog( LLERROR, "Failed to add serial end-point (%i).\n", rc);
-                        exit(1);
-                    }
-                } else {
-                    UNLLog( LLERROR, "Flag '-l' must be after '-T' and '-D'.\n");
+                if ((tenant_id == -1) && (device_id == -1)) {
+                  UNLLog( LLERROR, "Flag '-l' must be after '-T' and '-D'.\n");
+                  exit(1);
+                }
+                if (udpserver_socket == -1) {
+                  // First Serial2UDP definition, must listen()
+                  if ((rc = serial2udp_listen(32768 + 128 * tenant_id + device_id, &udpserver_socket)) != 0) {
+                    UNLLog( LLERROR, "Failed to open UDP socket (%i).\n", rc);
                     exit(1);
+                  }
+                }
+                if ((rc = serial2udp_add(ser_socket, ser_remoteid, ser_remoteif, optarg)) != 0) {
+                  UNLLog( LLERROR, "Failed to add serial end-point (%i).\n", rc);
+                  exit(1);
                 }
                 break;
         }
@@ -466,7 +460,7 @@ int main (int argc, char *argv[]) {
         }
 
         // Child is no more running
-        UNLLog(LLERROR, "Child is no more running.\n");
+        UNLLog(LLINFO, "Child is no more running.\n");
         //printf("rrc = %i\n",rrc);
         //exit(1);
     } else {

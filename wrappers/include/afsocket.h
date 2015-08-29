@@ -35,4 +35,4 @@
 int afsocket_listen(char *server_socketfile, char *remote_socketfile, int *server_socket, int *remote_socket);
 
 // AF_UNIX socket: receive
-int afsocket_receive(char **c, int server_socket);
+int afsocket_receive(void *c, int server_socket, int bytesToRead);

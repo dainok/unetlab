@@ -36,4 +36,4 @@ int serial2udp_listen(int port, int *server_socket);
 int serial2udp_add(int *remote_socket, int *remote_id, int *remote_if, char *serial2udp_map);
 
 // Serial to UDP Converter: receive
-int serial2udp_receive(char *c, int server_socket);
+int serial2udp_receive(void *c, int server_socket, int bytesToRead);

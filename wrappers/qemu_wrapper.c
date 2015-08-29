@@ -73,7 +73,7 @@ int main (int argc, char *argv[]) {
     int ts_socket = -1;                     // Telnet server socket
     int ts_port = -1;                       // TCP (console) and UDP (serial converter) port
     char child_output = '\0';               // Store single char from child
-    char client_input = '\0';               // Store single char from client
+    unsigned char client_input = '\0';               // Store single char from client
     char *xtitle = "Terminal Server";       // Title for telnet clients
 
     // Select parameters

@@ -40,4 +40,4 @@ void ts_broadcast_string(char * string, fd_set *fd_set, int *client_socket);
 void ts_broadcast(char c, fd_set *fd_set, int *client_socket);
 
 // Terminal Server: receive a char from a client
-int ts_receive(char *c, fd_set *fd_read, fd_set *fd_active, int *client_socket);
+int ts_receive(unsigned char *c, fd_set *fd_read, fd_set *fd_active, int *client_socket);

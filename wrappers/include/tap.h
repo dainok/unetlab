@@ -33,4 +33,4 @@
 int tap_listen(char *tap_name, int *tap_fd);
 
 // TAP interface: receive
-int tap_receive(char **c, int server_socket);
+int tap_receive(void *c, int server_socket, int bytesToRead);

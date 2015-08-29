@@ -176,11 +176,11 @@ int serial2udp_add(int *remote_socket, int *remote_id, int *remote_if, char *ser
 }
 
 // Serial to UDP Converter: receive
-int serial2udp_receive(char *c, int server_socket) {
+int serial2udp_receive(void *c, int server_socket, int bytesToRead) {
     int length = 0;
     //memset(c, 0, sizeof(*c)); // useless memset
 
-    if ((length = read(server_socket, c, BUFFER)) <= 0) {
+    if ((length = read(server_socket, c, bytesToRead)) <= 0) {
         // Read error
         UNLLog(LLERROR, "Failed to receive data from UDP (s=%i, l=%i). ERR: %s (%i).\n", server_socket, length, strerror(errno), length);
         return length;

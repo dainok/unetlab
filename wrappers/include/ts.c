@@ -186,14 +186,37 @@ void ts_broadcast(char c, fd_set *fd_set, int *client_socket) {
     }
 }
 
+int close_client(int * client_socket, int i, fd_set * fd_active) {
+    UNLLog(LLERROR, "Failed to receive data from client, closing it (%i).\n", client_socket[i]);
+    close(client_socket[i]);
+    FD_CLR(client_socket[i], fd_active);
+    // Remove client from client_socket array
+    if (i == client_socket[0]) {
+        // Last client is failed, simply decrement the total
+        client_socket[0]--;
+        return 0;
+    } else {
+        // Other clients follows, swap with the last
+        client_socket[i] = client_socket[client_socket[0]];
+        client_socket[0]--;
+        // Must select() the current position again
+        //i--;
+        return 1;
+    }
+}
+
 // Terminal Server: receive a char from a client
-int ts_receive(char *c, fd_set *fd_read, fd_set *fd_active, int *client_socket) {
+int ts_receive(unsigned char *c, fd_set *fd_read, fd_set *fd_active, int *client_socket) {
     int i;
 
     for (i = 1; i <= client_socket[0]; i++) {
         if (FD_ISSET(client_socket[i], fd_read)) {
             if (recv(client_socket[i], c, 1, 0) <= 0) {
                 // Failed to receive, remove client from FD SET
+                if (close_client(client_socket,i,fd_active)) {
+                  i--;
+                }
+/*                
                 UNLLog(LLERROR, "Failed to receive data from client, closing it (%i).\n", client_socket[i]);
                 close(client_socket[i]);
                 FD_CLR(client_socket[i], fd_active);
@@ -208,15 +231,20 @@ int ts_receive(char *c, fd_set *fd_read, fd_set *fd_active, int *client_socket) 
                     // Must select() the current position again
                     i--;
                 }
+*/                
             } else {
-                if (*c < 0) {
-                    // Received invalid char
-                    return 1;
-                }
-                if (*c == (char)IAC) {
+                // Whar are invalid characters??? Commented out:
+                //if (*c < 0) {
+                //    // Received invalid char
+                //    return 1;
+                //}
+                if (*c == IAC) {
                     // Received telnet command, skip one more command
-                    recv(i, &c, 1, 0);
-                    recv(i, &c, 1, 0);
+                    char devNull[2];
+                    if (recv(client_socket[i], (void*)devNull, 2, 0) <= 0) { 
+                      close_client(client_socket,i,fd_active);
+                    }
+                    return 1;
                 }
                 return 0;
             }

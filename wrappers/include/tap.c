@@ -53,7 +53,7 @@ int tap_listen(char *tap_name, int *tap_fd) {
     int rc = -1;
     int tap_socket = -1;
     struct ifreq ifr;
-
+    memset(&ifr,0,sizeof(ifr));
     ifr.ifr_flags = IFF_TAP;                    // We want TAP interface (not TUN)
     ifr.ifr_flags |= IFF_NO_PI;                 // Do not add 4 bytes preamble (we want to send RAW packets)
     strncpy(ifr.ifr_name, tap_name, IFNAMSIZ);  // Setting device name
@@ -91,7 +91,7 @@ int tap_listen(char *tap_name, int *tap_fd) {
     ifr.ifr_flags |= IFF_UP;
     if (ioctl(tap_socket, SIOCSIFFLAGS, &ifr) < 0) {
         rc = 5;
-        UNLLog(LLERROR, "Error while putting TAP interface up (%s). ERR: %s (%i).\n", tap_name, strerror(errno), rc);
+        UNLLog(LLVERBOSE, "Error while putting TAP interface up (%s). ERR: %s (%i). Is interface already up?\n", tap_name, strerror(errno), rc);
         // unl_wrapper will bring the interface in up state
         //return rc;
     }
@@ -100,11 +100,11 @@ int tap_listen(char *tap_name, int *tap_fd) {
 }
 
 // TAP interface: receive
-int tap_receive(char **c, int server_socket) {
+int tap_receive(void *c, int server_socket, int bytesToRead) {
     int length = 0;
-    memset(c, 0, sizeof(*c));
+    //memset(c, 0, sizeof(*c));
 
-    if ((length = read(server_socket, c, BUFFER)) <= 0) {
+    if ((length = read(server_socket, c, bytesToRead)) <= 0) {
         // Read error
         UNLLog(LLERROR, "Failed to receive data from TAP (s=%i, l=%i). ERR: %s (%i).\n", server_socket, length, strerror(errno), length);
         return length;

@@ -5,7 +5,7 @@
 #include <signal.h>
 #include <errno.h>
 
-#include "iol_functions.h"
+//#include "iol_functions.h"
 #include "include/ts.h"
 #include "include/log.h"
 #include "include/tap.h"
@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
   CheckLogLevelFileTrigger("/tmp/sf_ll_debug",LLDEBUG);
   CheckLogLevelFileTrigger("/tmp/sf_ll_verbose",LLVERBOSE);
   int rc;
-  char client_input = '\0';               // Store single char from client
+  unsigned char client_input = '\0';      // Store single char from client
   fd_set active_fd_set;                   // Contains active FD using in select()
   FD_ZERO(&active_fd_set);
   fd_set read_fd_set;                     // Contains FD selected in current loop

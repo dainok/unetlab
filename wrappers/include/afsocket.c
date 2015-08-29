@@ -83,11 +83,11 @@ int afsocket_listen(char *server_socketfile, char *remote_socketfile, int *serve
 }
 
 // AF_UNIX socket: receive
-int afsocket_receive(char **c, int server_socket) {
+int afsocket_receive(void *c, int server_socket, int bytesToRead) {
     int length = 0;
-    memset(c, 0, sizeof(*c));
+    //memset(c, 0, sizeof(*c)); what's that for???
 
-    if ((length = read(server_socket, c, BUFFER)) <= 0) {
+    if ((length = read(server_socket, c, bytesToRead)) <= 0) {
         // Read error
         UNLLog(LLERROR, "Failed to receive data from local AF_UNIX (s=%i, l=%i): %s (%i)\n", server_socket, length, strerror(errno), length);
         return length;

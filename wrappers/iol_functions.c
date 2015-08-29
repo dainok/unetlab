@@ -201,13 +201,16 @@ int is_eth(int i) {
 
 // Receiving packet from AF_UNIX
 int packet_af(int af_socket, int *iol_fd, int *udp_fd, int *remote_id, int *remote_if) {
-    char *iol_frame;
-    char eth_frame[1518];
-    memset(&eth_frame, 0, sizeof(eth_frame));
-    char ser_frame[1526];
-    memset(&ser_frame, 0, sizeof(ser_frame));
+  
+//    char *iol_frame;
+//    char eth_frame[1518];
+//    memset(&eth_frame, 0, sizeof(eth_frame));
+//    char ser_frame[1526];
+//    memset(&ser_frame, 0, sizeof(ser_frame));
+  
     char tmp_frame[BUFFER];
     memset(&tmp_frame, 0, sizeof(tmp_frame));
+  
     int iol_ifid = -1;
     int length = -1;
     int rc = -1;
@@ -232,18 +235,18 @@ int packet_af(int af_socket, int *iol_fd, int *udp_fd, int *remote_id, int *remo
      * - 8 bits for the source interface
      */
 
-    if ((length = afsocket_receive(&iol_frame, af_socket)) <= 0) {
+    if ((length = afsocket_receive(&tmp_frame, af_socket,sizeof(tmp_frame))) <= 0) {
         // Read error
         rc = 1;
         UNLLog(LLERROR, "Failed to receive packet from AF_UNIX (%i). ERR: %s (%i). \n", length, strerror(errno), rc);
         return rc;
     } else {
-        memcpy(tmp_frame, &iol_frame, length);
+        //memcpy(tmp_frame, &iol_frame, length);
         iol_ifid = (int) tmp_frame[5];
         if (is_eth(iol_ifid) == 0) {
             // Ethernet: packet to TAP
-            memcpy(eth_frame, &tmp_frame[8], length - 8);
-            if (iol_fd[iol_ifid] != 0 && write(iol_fd[iol_ifid], eth_frame, length - 8) < 0) {
+            //memcpy(eth_frame, &tmp_frame[8], length - 8);
+            if (iol_fd[iol_ifid] != 0 && write(iol_fd[iol_ifid], &tmp_frame[8], length - 8) < 0) {
                 // If TAP interface is configured, send packet through it
                 rc = 3;
                 UNLLog(LLERROR, "Failed to send a packet to TAP (src: vunl%u_%u_%u). ERR: %s (%i).\n", tenant_id, device_id, iol_ifid, strerror(errno), rc);
@@ -263,18 +266,18 @@ int packet_af(int af_socket, int *iol_fd, int *udp_fd, int *remote_id, int *remo
             // Now send packet via UDP
             // TODO: Intra Tenant Link
             int dst_tenant_id = tenant_id;
-            memcpy(ser_frame, &tmp_frame, length);      // size(header(IOL)) == size(header(UNETLAB))
-            ser_frame[0] = dst_tenant_id;               // Destination Tenant ID (TODO Intra Tenant Link)
-            ser_frame[1] = tenant_id;                   // Source Tenant ID
-            ser_frame[2] = remote_id[iol_ifid] >> 8;    // Destination Device ID (TODO)
-            ser_frame[3] = remote_id[iol_ifid] & 255;
-            ser_frame[4] = device_id >> 8;              // Source Device ID
-            ser_frame[5] = device_id & 255;
-            ser_frame[6] = remote_if[iol_ifid];         // Destination Interface ID
-            ser_frame[7] = iol_ifid;                    // Source Interface ID (TODO)
+            //memcpy(ser_frame, &tmp_frame, length);      // size(header(IOL)) == size(header(UNETLAB))
+            tmp_frame[0] = dst_tenant_id;               // Destination Tenant ID (TODO Intra Tenant Link)
+            tmp_frame[1] = tenant_id;                   // Source Tenant ID
+            tmp_frame[2] = remote_id[iol_ifid] >> 8;    // Destination Device ID (TODO)
+            tmp_frame[3] = remote_id[iol_ifid] & 255;
+            tmp_frame[4] = device_id >> 8;              // Source Device ID
+            tmp_frame[5] = device_id & 255;
+            tmp_frame[6] = remote_if[iol_ifid];         // Destination Interface ID
+            tmp_frame[7] = iol_ifid;                    // Source Interface ID (TODO)
             UNLLog(LLVERBOSE, "Received IOL packet from device %u:%u:%u to device %u:%u:%u\n", tenant_id, device_id, iol_ifid, dst_tenant_id, remote_id[iol_ifid], remote_if[iol_ifid]);
 
-            if (write(udp_fd[iol_ifid], ser_frame, length) < 0) {
+            if (write(udp_fd[iol_ifid], tmp_frame, length) < 0) {
                 // Sometimes packets cannot be delivered if end point is not active (Connection refused)
                 UNLLog(LLERROR, "Failed to send a packet to UDP (src: vunl%u_%u_%u).\n", tenant_id, device_id, iol_ifid);
                 return 0;
@@ -291,9 +294,11 @@ int packet_tap(int tap_socket, int af_socket, int iol_ifid) {
     int length = -1;
     int rc = -1;
     int wrapper_id = iol_id + 512;
-    char *eth_frame;
-    char iol_frame[1522];
-    memset(&iol_frame, 0, sizeof(iol_frame));
+  
+//    char *eth_frame;
+//    char iol_frame[1522];
+//    memset(&iol_frame, 0, sizeof(iol_frame));
+  
     char tmp_frame[BUFFER];
     memset(&tmp_frame, 0, sizeof(tmp_frame));
 
@@ -307,41 +312,42 @@ int packet_tap(int tap_socket, int af_socket, int iol_ifid) {
      * Destination TAP interface is: vunlT_U_Z (T = tenant_id, U = device_id, Z = interface_id)
      */
 
-    if ((length = tap_receive(&eth_frame, tap_socket)) <= 0) {
+    if ((length = tap_receive(&tmp_frame[8], tap_socket,sizeof(tmp_frame)-8)) <= 0) {
         // Read error
         rc = 1;
         UNLLog(LLERROR, "Failed to receive packet from TAP (%i, %i). ERR: %s (%i).\n", tap_socket, length, strerror(errno), rc);
         return rc;
     } else if (length > 1514) {
-        UNLLog(LLERROR, "Ignoring frame from TAP (%i) because too long (%i).\n", tap_socket, length);
-        return 0;
+        UNLLog(LLWARNING, "Ignoring frame from TAP (%i) because too long (%i).\n", tap_socket, length);
+        return 0; // The wrapper will continue to work
     } else {
-        memcpy(tmp_frame, &eth_frame, length);
+        //memcpy(tmp_frame, &eth_frame, length);
         // Now send packet to AF_UNIX
-        iol_frame[0] = iol_id >> 8;         // IOL device ID
-        iol_frame[1] = iol_id & 255;
-        iol_frame[2] = wrapper_id >> 8;     // WRAPPER device ID
-        iol_frame[3] = wrapper_id & 255;
-        iol_frame[4] = iol_ifid;            // IOL device ID
-        iol_frame[5] = iol_ifid;            // WRAPPER device ID
-        iol_frame[6] = 1;
-        iol_frame[7] = 0;
-        memcpy(&iol_frame[8], &tmp_frame, length);
-        if ((write(af_socket, iol_frame, length + 8)) < 0) {
+        tmp_frame[0] = iol_id >> 8;         // IOL device ID
+        tmp_frame[1] = iol_id & 255;
+        tmp_frame[2] = wrapper_id >> 8;     // WRAPPER device ID
+        tmp_frame[3] = wrapper_id & 255;
+        tmp_frame[4] = iol_ifid;            // IOL device ID
+        tmp_frame[5] = iol_ifid;            // WRAPPER device ID
+        tmp_frame[6] = 1;
+        tmp_frame[7] = 0;
+        //memcpy(&iol_frame[8], &tmp_frame, length);
+        if ((write(af_socket, tmp_frame, length + 8)) < 0) {
             rc = 3;
             UNLLog(LLERROR, "Failed forwarding data to AF_UNIX (%i) socket. ERR: %s (%i).\n", af_socket, strerror(errno), rc);
             return rc;
         } else {
             UNLLog(LLVERBOSE, "Sent eth frame (dst: %02x%02x.%02x%02x.%02x%02x, src: %02x%02x.%02x%02x.%02x%02x, length: %i) to AF_UNIX\n",
-                    iol_frame[8] & 0xff, iol_frame[9] & 0xff, iol_frame[10] & 0xff, iol_frame[11] & 0xff, iol_frame[12] & 0xff, iol_frame[13] & 0xff,
-                    iol_frame[14] & 0xff, iol_frame[15] & 0xff, iol_frame[16] & 0xff, iol_frame[17] & 0xff, iol_frame[18] & 0xff, iol_frame[19] & 0xff,
+                    tmp_frame[8] & 0xff, tmp_frame[9] & 0xff, tmp_frame[10] & 0xff, tmp_frame[11] & 0xff, tmp_frame[12] & 0xff, tmp_frame[13] & 0xff,
+                    tmp_frame[14] & 0xff, tmp_frame[15] & 0xff, tmp_frame[16] & 0xff, tmp_frame[17] & 0xff, tmp_frame[18] & 0xff, tmp_frame[19] & 0xff,
                     length);
             UNLLog(LLVERBOSE, "Sent eth frame to AF_UNIX (dst: %u:%u, src: %u:%u\n",
-                    256 * (int) iol_frame[0] + (int) iol_frame[1], (int) iol_frame[4],
-                    256 * (int) iol_frame[2] + (int) iol_frame[3], (int) iol_frame[5]);
+                    256 * (int) tmp_frame[0] + (int) tmp_frame[1], (int) tmp_frame[4],
+                    256 * (int) tmp_frame[2] + (int) tmp_frame[3], (int) tmp_frame[5]);
             return 0;
         }
     }
+    return 1; // Dummy return for stupid gcc
 }
 
 // Receiving packet from UDP
@@ -350,12 +356,10 @@ int packet_udp(int udp_socket, int af_socket) {
     int length = -1;
     int rc = -1;
     int wrapper_id = iol_id + 512;
-//    char *ser_frame;
-//    char iol_frame[1522];
+  
     char ser_frame[BUFFER];
     memset(ser_frame, 0, sizeof(ser_frame));
-//    char tmp_frame[BUFFER];
-//    memset(&tmp_frame, 0, sizeof(tmp_frame));
+  
     int dst_tenant_id = 0;
     int dst_device_id = 0;
     int dst_device_if = 0;
@@ -390,7 +394,7 @@ int packet_udp(int udp_socket, int af_socket) {
 	 * [...]
 	 */
 
-    if ((length = serial2udp_receive(ser_frame, udp_socket)) <= 0) {
+    if ((length = serial2udp_receive(ser_frame, udp_socket, sizeof(ser_frame))) <= 0) {
         // Read error
         rc = 1;
         UNLLog(LLERROR, "Failed to receive packet from UDP (%i). ERR: %s (%i).\n", length, strerror(errno), rc);
@@ -402,8 +406,6 @@ int packet_udp(int udp_socket, int af_socket) {
         UNLLog(LLERROR, "Ignoring frame from UDP because too short (%i).\n", length);
         return 0;
     } else {
-        //memcpy(tmp_frame, &ser_frame, length);
-        //memcpy(iol_frame, &ser_frame, length);
         dst_tenant_id = ser_frame[0];
         src_tenant_id = ser_frame[1];
         dst_device_id = (ser_frame[2] << 8) + ser_frame[3];
