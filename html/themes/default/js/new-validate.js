@@ -1,7 +1,7 @@
 // vim: syntax=javascript tabstop=4 softtabstop=0 noexpandtab laststatus=1 ruler
 
 /**
- * html/themes/light/js/new-validate.js
+ * html/themes/default/js/new-validate.js
  *
  * User's input validation scripts
  *
@@ -26,7 +26,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150819
+ * @version 20150828
  */
 
 $.validator.setDefaults({
