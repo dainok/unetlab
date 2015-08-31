@@ -170,6 +170,12 @@ switch ($action) {
 		$cmd = '/bin/chmod 755 /opt/unetlab/wrappers/*_wrapper* > /dev/null 2>&1';
 		exec($cmd, $o, $rc);
 
+		// OVS database
+		$cmd = '/bin/chmod 664 /var/run/openvswitch/db.sock > /dev/null 2>&1';
+		exec($cmd, $o, $rc);
+		$cmd = '/bin/chown root:unl /var/run/openvswitch/db.sock > /dev/null 2>&1';
+		exec($cmd, $o, $rc);
+
 		// /tmp
 		$cmd = '/bin/chown root:root /tmp 2>&1';
 		exec($cmd, $o, $rc);
