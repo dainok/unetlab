@@ -2,7 +2,7 @@
 
 COOKIE=/tmp/cookie
 
-cat << EOF > /usr/src/unetlab.github.io/_posts/2015-09-01-using-uNetlab-apis.md
+cat << EOF > /usr/src/unetlab.github.io/_posts/2015-09-01-using-unetlab-apis.md
 ---
 layout: post
 published: true
@@ -98,7 +98,9 @@ A single template can be listed:
 
 All available images for the selected template will be included in the output:
 
+~~~
 `curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/list/templates/iol | python -m json.tool`
+~~~
 
 ## List network types
 
@@ -106,7 +108,19 @@ All available images for the selected template will be included in the output:
 
 An authenticated user can list all available network types:
 
+~~~
 `curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/list/networks | python -m json.tool`
+~~~
+
+## List user roles
+
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/list/roles\`
+
+An authenticated user can list all user roles:
+
+~~~
+`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/list/roles | python -m json.tool`
+~~~
 
 ## Navigating between folders
 
