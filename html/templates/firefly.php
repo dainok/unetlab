@@ -2,9 +2,9 @@
 # vim: syntax=php tabstop=4 softtabstop=0 noexpandtab laststatus=1 ruler
 
 /**
- * html/templates/vsrx.php
+ * html/templates/firefly.php
  *
- * vsrx template for UNetLab.
+ * juniper firefly permiter template for UNetLab.
  *
  * LICENSE:
  *
@@ -31,7 +31,7 @@
  */
 
 $p['type'] = 'qemu';
-$p['name'] = 'vSRX';
+$p['name'] = 'FireFly';
 $p['icon'] = 'Router.png';
 $p['cpu'] = 2;
 $p['ram'] = 1024;
