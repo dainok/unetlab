@@ -177,6 +177,7 @@ function apiDeleteLab($lab) {
 	if ($rc == 0 && unlink($lab_file)) {
 		$output['code'] = 200;
 		$output['status'] = 'success';
+		$output['message'] = $GLOBALS['messages'][60022];
 	} else {
 		$output['code'] = 400;
 		$output['status'] = 'fail';

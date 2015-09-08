@@ -46,7 +46,7 @@ function raisePermanentMessage(severity, message) {
 function  translateMap(picture_map) {
     var map = picture_map;
     map = map.replace(/{{IP}}/g, location.hostname);
-    map = map.replace(/{{NODE[0-9]+}}/g, function(e) { return parseInt(e.substr(6, e.length - 8)) + 32768});
+    map = map.replace(/{{NODE[0-9]+}}/g, function(e) { return parseInt(e.substr(6, e.length - 8)) + 32768 + 128 * getParameter('tenant')});
     return map;
 }
 

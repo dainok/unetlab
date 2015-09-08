@@ -36,6 +36,7 @@ var TIMEOUT = 30000;
 // Global vars, defined on getUserInfo()
 var EMAIL;
 var NAME;
+var ROLE;
 var TENANT;
 var USERNAME;
 

@@ -34,7 +34,6 @@ function addModal(title, body, footer) {
 	var html = '<div aria-hidden="false" style="display: block;" class="modal fade in" tabindex="-1" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">' + title + '</h4></div><div class="modal-body">' + body + '</div><div class="modal-footer">' + footer + '</div></div></div></div>';
 	$('body').append(html);
 	$('body > .modal').modal('show');
-	setAutofocus();
 }
 
 // HTML Form to array
@@ -49,9 +48,15 @@ function form2Array(form_name) {
 
 // Get JSon message from HTTP response
 function getJsonMessage(response) {
+	console.log(response);
 	var message = '';
 	try {
 		message = JSON.parse(response)['message'];
+		code = JSON.parse(response)['code'];
+		if (code == 401) {
+			// User is no more authenticated
+			//location.reload();
+		}
 	} catch(e) {
 		if (response != '') {
 			message = response;
@@ -62,13 +67,46 @@ function getJsonMessage(response) {
 	return message;
 }
 
-// Return Authentication Page
+// Get roles
+function getRoles() {
+	var deferred = $.Deferred();
+	var form_data = {};
+	var url = '/api/list/roles';
+	var type = 'GET';
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		data: JSON.stringify(form_data),
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: got roles.');
+				deferred.resolve(data['data']);
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject(data['message']);
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
+}
+
+// Print Authentication Page
 function printPageAuthentication() {
 	var html = '<div class="row full-height"><div class="col-md-5 col-lg-5 full-height" id="auth-left"><div class="middle"><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><img alt="Logo RR" src="/themes/default/images/logo-rr.png" /></div></div><!-- <div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><img alt="Signup Icon" src="/themes/default/images/button-signup.png"></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2">to access more features</div></div> --><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2">Existing user...</div></div><form id="form-login"><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input name="login[username]" placeholder="USERNAME" type="text" /></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input name="login[password]" placeholder="PASSWORD" type="password" /></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input alt="Login Icon" src="/themes/default/images/button-login.png" type="image" /></div></div></form></div></div><div class="col-md-7 col-lg-7" id="auth-right"><div id="logo-angular"><img alt="Logo Angular" src="/themes/default/images/logo-angular.png" /></div><div id="logo-ad"><img alt="Logo AD" src="/themes/default/images/logo-ad.png" /></div><div id="logo-text"><h1>Unified Networking Lab</h1><p>UNetLab can be considered the next major version of<br>iou-web, but the software has been rewritten from<br>scratch. The major advantage over GNS3 and<br>iou-web itself is about multi-hypervisor<br>support within a single entity. UNetLab<br>allows to design labs using IOU, Dy-<br>namips and QEMU nodes without<br>dealing with multi virtual ma-<br>chines: everything run in-<br>side a UNetLab host,<br>and a lab is a single<br>file including all<br>information<br>needed.</p></div></div></div>'
 	$('#body').html(html);
 }
 
-// Return Lab List page
+// Print Lab List page
 function printPageLabList(folder) {
 	var html = '';
 	var url = '/api/folders' + folder;
@@ -135,7 +173,7 @@ function printPageLabList(folder) {
 	});
 }
 
-// Return Lab preview section
+// Print Lab preview section
 function printPageLabPreview(lab) {
 	var html = '';
 	var url = '/api/labs' + lab;
@@ -182,6 +220,69 @@ html += '</ul>';
 	});
 }
 
+// Print user management section
+function printPageUserManagement() {
+	var html = '<div id="users" class="col-md-12 col-lg-12"><div class="table-responsive"><table class="table"><thead><tr><th>Username</th><th>Name</th><th>Email</th><th>Role</th><th>Expiration</th><th>Last seen</th><th>POD</th><th>POD Expiration</th></tr></thead><tbody></tbody></table></div></div>';
+	var url = '/api/users/';
+	var type = 'GET'
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: got UNetLab users.');
+				$('#main-body').html(html);
+
+				// Adding all data rows
+				$.each(data['data'], function(id, object) {
+					var username = object['username'];
+					var name = object['name'];
+					var email = object['email'];
+					var role = object['role'];
+					if (object['pod'] == -1) {
+						var pod = 'none';
+					} else {
+						var pod = object['pod'];
+					}
+					if (object['expiration'] <= 0) {
+						var expiration = 'never';
+					} else {
+						var d = new Date(object['expiration'] * 1000);
+						expiration = d.toLocaleDateString(); 
+					}
+					if (object['session'] <= 0) {
+						var session = 'never';
+					} else {
+						var d = new Date(object['session'] * 1000);
+						session = d.toLocaleDateString() + ' ' + d.toLocaleTimeString() + ' from ' + object['ip']; 
+					}
+					if (object['pexpiration'] <= 0) {
+						var pexpiration = 'never';
+					} else {
+						var d = new Date(object['pexpiration'] * 1000);
+						pexpiration = d.toLocaleDateString(); 
+					}
+					$('#main-body .table tbody').append('<tr class="user" data-path="' + username + '"><td>' + username + '</td><td>' + name + '</td><td>' + email + '</td><td>' + role + '</td><td>' + expiration + '</td><td>' + session + '</td><td>' + pod + '</td><td>' + pexpiration + '</td></tr>');
+					$('#actions-menu').html('<li><a class="user-add" href="#"><i class="glyphicon glyphicon-plus"></i> Add a new user</a></li><li><a class="user-add" href="#"><i class="glyphicon glyphicon-trash"></i> Delete selected users</a></li>');
+				});
+			} else {
+				// Application error
+				logger(1, 'DEBUG: internal error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: Ajax error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+		}
+	});
+}
+
 // Get user info
 function getUserInfo() {
 	var deferred = $.Deferred();
@@ -197,6 +298,7 @@ function getUserInfo() {
 				logger(1, 'DEBUG: user is authenticated.');
 				USERNAME = data['data']['username'];
 				EMAIL = data['data']['email'];
+				ROLE = data['data']['role'];
 				TENANT = data['data']['tenant'];
 				NAME = data['data']['name'];
 				deferred.resolve();
@@ -256,12 +358,4 @@ function moveLab(lab, path) {
 		}
 	});
 	return deferred.promise();
-}
-
-// Set focus on right input element
-function setAutofocus() {
-	$('.autofocus').each(function(id, object) {
-		$(this).focus();
-	});
-	//$(this).find('.autofocus').focus();
 }

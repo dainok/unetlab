@@ -194,7 +194,7 @@ class Node {
 		if ($p['type'] == 'iol') {
 			if (isset($p['ethernet']) && (int) $p['ethernet'] < 0) {
 				// Ethernet interfaces is invalid, default to 4
-				$p['ethernet'] = 4;
+				$p['ethernet'] = 2;
 				error_log('WARNING: '.$GLOBALS['messages'][40012]);
 			}
 
@@ -206,7 +206,7 @@ class Node {
 
 			if (isset($p['serial']) && (int) $p['serial'] < 0) {
 				// Serial interfaces is invalid, default to 4
-				$p['serial'] = 4;
+				$p['serial'] = 2;
 				error_log('WARNING: '.$GLOBALS['messages'][40013]);
 			}
 		}
@@ -1684,7 +1684,7 @@ class Node {
 								// Previous interface found, copy from old one
 								$this -> ethernets[$i] = $old_ethernets[$i];
 							} else {
-								$n = 'Gi0'.((int) $i);      // Interface name
+								$n = 'Gi0/'.((int) $i);      // Interface name
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {

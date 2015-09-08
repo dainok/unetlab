@@ -422,6 +422,13 @@ input[name='login[username]'], input[name='login[password]']{
 	font-size: 2.8vmin;
 }
 
+.modal-body h4 {
+	color: #46a6b6;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-size: 2.8vmin;
+	margin-top: 4vmin;
+}
+
 .modal-body .error {
 	color: #46a6b6;
 	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;

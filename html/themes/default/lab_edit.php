@@ -16,7 +16,6 @@ include('/opt/unetlab/html/themes/default/includes/navbar.php');
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Attachments <span class="caret"></span></a>
                         <ul class="dropdown-menu" role="menu">
                             <li><a href="#lab_pictures" tabindex="-1" role="tab" data-toggle="tab">Pictures</a></li>
-                            <li><a href="#lab_configs" tabindex="-1" role="tab" data-toggle="tab">Config</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -46,11 +45,6 @@ include('/opt/unetlab/html/themes/default/includes/navbar.php');
                         </div>
                     </div>
                     <div id="lab_pictures" class="tab-pane fade in">
-                        <div class="progress">
-                            <div class="progress-bar progress-bar-info progress-bar-striped active" style="width: 100%">Loading content...</div>
-                        </div>
-                    </div>
-                    <div id="lab_configs" class="tab-pane fade in">
                         <div class="progress">
                             <div class="progress-bar progress-bar-info progress-bar-striped active" style="width: 100%">Loading content...</div>
                         </div>

@@ -30,26 +30,6 @@
  * @version 20150827
  */
 
-/*
- * Output of REST APIs is an extended JSend message:
- * {
- *	status: 'success' || 'fail' || 'error',
- *	data: { 'var1' : 'value1', ... },
- *	message: 'text message',
- *	code: 'NUMERIC HTTP CODE'
- * }
- */
-
-/*
- * Testing from CLI
- * - curl -c cookie -b cookie -X POST -H "Content-type: application/json" -d '{"username":"admin","password":"unl"}' http://127.0.0.1/api/auth/login
- * - curl -b cookie -c cookie -X GET -i -H "Content-type: application/json" http://127.0.0.1/api/status/mem
- * - curl -b cookie -c cookie -X PUT -i -H "Content-type: application/json" -d '{...}' http://127.0.0.1/api/folders/a/b)
- * - curl -b cookie -c cookie -X POST -i -H "Content-type: application/json" -d '{...}' http://127.0.0.1/api/folders/a/b)
- * - curl -b cookie -c cookie -X DELETE -i -H "Content-type: application/json" http://127.0.0.1/api/folders/a/b)
- * In PUT and POST parameters use the following syntax: -d '{"var1":"value1", "var2":"value2", ... }'
- */
-
 require_once('/opt/unetlab/html/includes/init.php');
 require_once(BASE_DIR.'/html/includes/Slim/Slim.php');
 require_once(BASE_DIR.'/html/includes/Slim-Extras/DateTimeFileWriter.php');
@@ -93,7 +73,6 @@ $app -> notFound(function() use ($app) {
 	$output['message'] = $GLOBALS['messages']['60038'];
 	$app -> halt($output['code'], json_encode($output));
 });
-
 
 class ResourceNotFoundException extends Exception {}
 class AuthenticateFailedException extends Exception {}
@@ -167,10 +146,13 @@ $app -> get('/api/auth', function() use ($app, $db) {
 	$app -> response -> setBody(json_encode($output));
 });
 
+/*
+ * TODO
 $app -> put('/api/auth', function() use ($app, $db) {
 	// Set tenant
 	// TODO should be used by admin user on single-user mode only
 });
+ */
 
 /***************************************************************************
  * Status
@@ -249,6 +231,24 @@ $app -> get('/api/list/networks', function() use ($app, $db) {
 	$output['status'] = 'success';
 	$output['message'] = $GLOBALS['messages']['60002'];
 	$output['data'] = listNetworkTypes();
+
+	$app -> response -> setStatus($output['code']);
+	$app -> response -> setBody(json_encode($output));
+});
+
+// Network types
+$app -> get('/api/list/roles', function() use ($app, $db) {
+	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($user === False) {
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+
+	$output['code'] = 200;
+	$output['status'] = 'success';
+	$output['message'] = $GLOBALS['messages']['60041'];
+	$output['data'] = listRoles();
 
 	$app -> response -> setStatus($output['code']);
 	$app -> response -> setBody(json_encode($output));
@@ -465,6 +465,10 @@ $app -> put('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 
 	if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/networks\/[0-9]+$/', $s)) {
 		$p['id'] = $id;
+		if (isset($p['count'])) {
+			// count cannot be set from API
+			unset($p['count']);
+		}
 		$output = apiEditLabNetwork($lab, $p);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/[0-9]+$/', $s)) {
 		$p['id'] = $id;
@@ -510,7 +514,7 @@ $app -> post('/api/labs', function() use ($app, $db) {
 	$app -> response -> setBody(json_encode($output));
 });
 
-// Add new object
+// Add new object inside a lab
 $app -> post('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
 	if ($user === False) {
@@ -560,6 +564,10 @@ $app -> post('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 	if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/networks$/', $s)) {
 		$output = apiAddLabNetwork($lab, $p, $o);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes$/', $s)) {
+		if (isset($p['count'])) {
+			// count cannot be set from API
+			unset($p['count']);
+		}
 		$output = apiAddLabNode($lab, $p, $o);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/pictures$/', $s)) {
 		// Cannot use $app -> request() -> getBody()
@@ -664,16 +672,54 @@ $app -> delete('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 /***************************************************************************
  * Users
  **************************************************************************/
-// Get an object
-$app -> get('/api/users/(:uuser)', function($uuser = '') use ($app, $db) {
+// Get a user
+$app -> get('/api/users/(:uuser)', function($uuser = False) use ($app, $db) {
 	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
 	if ($user === False) {
 		$app -> response -> setStatus($output['code']);
 		$app -> response -> setBody(json_encode($output));
 		return;
 	}
-	
-	$output = apiGetUUsers($db, $uuser);
+
+	if (empty($uuser)) {
+		$output = apiGetUUsers($db);
+	} else {
+		$output = apiGetUUser($db, $uuser);
+	}
+	$app -> response -> setStatus($output['code']);
+	$app -> response -> setBody(json_encode($output));
+});
+
+// Edit a user
+$app -> put('/api/users/(:uuser)', function($uuser = False) use ($app, $db) {
+	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($user === False) {
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+
+	$event = json_decode($app -> request() -> getBody());
+	$p = json_decode(json_encode($event), True);	// Reading options from POST/PUT
+
+	$output = apiEditUUser($db, $uuser, $p);
+	$app -> response -> setStatus($output['code']);
+	$app -> response -> setBody(json_encode($output));
+});
+
+// Add a user
+$app -> post('/api/users', function($uuser = False) use ($app, $db) {
+	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($user === False) {
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+
+	$event = json_decode($app -> request() -> getBody());
+	$p = json_decode(json_encode($event), True);	// Reading options from POST/PUT
+
+	$output = apiAddUUser($db, $p);
 	$app -> response -> setStatus($output['code']);
 	$app -> response -> setBody(json_encode($output));
 });

@@ -200,6 +200,9 @@ $messages[60037] = 'Failed to clone the lab (60037).';
 $messages[60038] = 'Resource not found (60038).';
 $messages[60039] = 'User not found (60039).';
 $messages[60040] = 'Successfully listed users (60040).';
+$messages[60041] = 'Successfully listed user roles (60041).';
+$messages[60042] = 'User saved (60042).';
+$messages[60043] = 'Cannot create user, missing mandatory parameters (60043).';
 
 // Text (70000-79999)
 $messages[70000] = 'Name/prefix';

@@ -438,7 +438,7 @@ function deleteSessions($db) {
 function getUserByCookie($db, $cookie) {
 	$now = time();
 	try {
-		$query = 'SELECT users.email AS email, users.name AS name, pods.id AS pod, users.username AS username FROM users LEFT JOIN pods ON users.username = pods.username WHERE cookie = :cookie AND users.session >= :session AND (users.expiration < 0 OR users.expiration >= :user_expiration) AND (pods.expiration < 0 OR pods.expiration > :pod_expiration);';
+		$query = 'SELECT users.role AS role, users.email AS email, users.name AS name, pods.id AS pod, users.username AS username FROM users LEFT JOIN pods ON users.username = pods.username WHERE cookie = :cookie AND users.session >= :session AND (users.expiration < 0 OR users.expiration >= :user_expiration) AND (pods.expiration < 0 OR pods.expiration > :pod_expiration);';
 		$statement = $db -> prepare($query);
 		$statement -> bindParam(':cookie', $cookie, PDO::PARAM_STR);
 		$statement -> bindParam(':session', $now, PDO::PARAM_INT);
@@ -451,6 +451,7 @@ function getUserByCookie($db, $cookie) {
 			return Array(
 				'email' => $result['email'],
 				'name' => $result['name'],
+				'role' => $result['role'],
 				'username' => $result['username'],
 				'tenant' => $result['pod']
 			);
@@ -541,6 +542,19 @@ function listClouds() {
 			$results[$interface] = $interface;
 		}
 	}
+	return $results;
+}
+
+/**
+ * Function to list all roles
+ *
+ * @return	Array						The list of roles
+ */
+function listRoles() {
+	$results = Array();
+	$results['admin'] = 'Administrator';
+	$results['editor'] = 'Editor';
+	$results['user'] = 'User';
 	return $results;
 }
 

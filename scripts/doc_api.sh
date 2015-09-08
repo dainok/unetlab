@@ -160,6 +160,77 @@ An authenticated user can delete an existing folder:
 `curl -s -c $COOKIE -b $COOKIE -X DELETE -H "Content-type: application/json" http://127.0.0.1/api/folders/Andrea/Folder%203/New%20Folder | python -m json.tool`
 ~~~
 
+## Managing users
+
+The following API requests allow to manage UNetLab users and permissions.
+
+### Get a user
+
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/users/\`
+
+An authenticated user can get all UNetLab users:
+
+~~~
+`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/users/`
+~~~
+
+A single user can be retrieved:
+
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/users/admin\`
+
+Here the output:
+
+~~~
+`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/users/admin | python -m json.tool`
+~~~
+
+### Add a new user
+
+\`curl -s -c $COOKIE -b $COOKIE -X POST -d '{"username":"testuser","name":"Test User","email":"test@unetlab.com","password":"testpassword1","role":"user","expiration":"-1","pod":127,"pexpiration":"1451520000"}' -H "Content-type: application/json" http://127.0.0.1/api/users\`
+
+An authenticated user can add a new UNetLab user:
+
+~~~
+`curl -s -c $COOKIE -b $COOKIE -X POST -d '{"username":"testuser","name":"Test User","email":"test@unetlab.com","password":"testpassword1","role":"user","expiration":"-1","pod":127,"pexpiration":"1451520000"}' -H "Content-type: application/json" http://127.0.0.1/api/users | python -m json.tool`
+~~~
+
+Parameters:
+
+* email: the email address of the user;
+* expiration: date until the user is valid (UNIX timestamp) or `-1` if never expires;
+* name: a description for the user, usually salutation;
+* password (mandatory): the user password used to login;
+* role: see "List user roles";
+* username (mandatory): a unique alphanumeric string used to login;
+
+### Edit an user
+
+\`curl -s -c $COOKIE -b $COOKIE -X PUT -d '{"name":"New Test User","email":"testuser@unetlab.com","password":"newpassword","role":"user","expiration":"1451520000","pod":127,"pexpiration":"-1"}' -H "Content-type: application/json" http://127.0.0.1/api/users/testuser\`
+
+An authenticated user can edit an existent UNetLab user:
+
+~~~
+`curl -s -c $COOKIE -b $COOKIE -X PUT -d '{"name":"New Test User","email":"testuser@unetlab.com","password":"newpassword","role":"user","expiration":"1451520000","pod":127,"pexpiration":"-1"}' -H "Content-type: application/json" http://127.0.0.1/api/users/testuser | python -m json.tool`
+~~~
+
+Parameters:
+
+* email: the email address of the user;
+* expiration: date until the user is valid (UNIX timestamp) or `-1` if never expires;
+* name: a description for the user, usually salutation;
+* password: the user password used to login;
+* role: see "List user roles";
+
+### Delete an user
+
+\`curl -s -c $COOKIE -b $COOKIE -X DELETE -H "Content-type: application/json" http://127.0.0.1/api/users/testuser\`
+
+An authenticated user can delete an existent UNetLab user:
+
+~~~
+`curl -s -c $COOKIE -b $COOKIE -X DELETE -H "Content-type: application/json" http://127.0.0.1/api/users/testuser | python -m json.tool`
+~~~
+
 ## Managing labs
 
 The following API requests allow to manage labs and object inside a lab, like nodes, networks... and so on.

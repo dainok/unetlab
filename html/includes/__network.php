@@ -215,7 +215,7 @@ class Network {
 			return $this -> name;
 		} else {
 			// By default return an empty string
-			return '';
+			return 'Network '.$this -> id;
 		}
 	}
 

@@ -519,7 +519,6 @@ function export($node_id, $n, $lab) {
  */
 function isBridge($s) {
 	$cmd = 'brctl show '.$s.' 2>&1';
-	error_log($cmd);
 	exec($cmd, $o, $rc);
 	if (preg_match('/8000/', $o[1])) {
 		// "brctl show" on a ovs bridge or on a non-existent bridge return 0 -> check for 8000

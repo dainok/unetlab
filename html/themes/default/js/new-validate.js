@@ -44,6 +44,12 @@ $.validator.addMethod('lab_name', function(value) {
     return /^[A-Za-z0-9_\-\s]+$/.test(value); 
 }, 'Use only [A-Za-z0-9_- ] chars.');
 
+
+// Validate a username
+$.validator.addMethod('username', function(value) {
+    return /^[A-Za-z0-9]+$/.test(value); 
+}, 'Must be alphanumeric ([A-Za-z0-9] chars).');
+
 // Validate folder form
 function validateFolder() {
 	$('#form-folder-add').validate({
@@ -86,6 +92,31 @@ function validateLabInfo() {
 			'lab[version]': {
 				required: false,
 				integer: true
+			}
+		}
+	});
+}
+
+// Validate user form
+function validateUser() {
+	$('#form-user-add, #form-user-edit').validate({
+		rules: {
+			'user[username]': {
+				required: true,
+				username: true
+			},
+			'user[email]': {
+				email: true
+			},
+			'user[expiration]': {
+				dateISO: true
+			},
+			'user[pexpiration]': {
+				dateISO: true
+			},
+			'user[pod]': {
+				required: false,
+				range: [0, 255]
 			}
 		}
 	});

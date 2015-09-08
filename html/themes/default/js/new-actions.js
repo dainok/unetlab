@@ -333,63 +333,36 @@ $(document).on('click', '.sysstatus', function(e) {
 	});
 });
 
-// Open system status page
+// Open user management page
 $(document).on('click', '.usermgmt', function(e) {
-	var html = '<div id="users" class="col-md-12 col-lg-12"><div class="table-responsive"><table class="table"><thead><tr><th>Username</th><th>Name</th><th>Email</th><th>Expiration</th><th>Last seen</th><th>POD</th><th>POD Expiration</th></tr></thead><tbody></tbody></table></div></div>';
-	var url = '/api/users/';
-	var type = 'GET'
-	$.ajax({
-		timeout: TIMEOUT,
-		type: type,
-		url: encodeURI(url),
-		dataType: 'json',
-		success: function(data) {
-			if (data['status'] == 'success') {
-				logger(1, 'DEBUG: got UNetLab users.');
-				$('#main-body').html(html);
-
-				// Adding all data rows
-				$.each(data['data'], function(id, object) {
-					var username = object['username'];
-					var name = object['name'];
-					var email = object['email'];
-					var pod = object['pod'];
-					if (object['expiration'] <= 0) {
-						var expiration = 'never';
-					} else {
-						var d = new Date(object['expiration'] * 1000);
-						expiration = d.toLocaleDateString(); 
-					}
-					if (object['session'] <= 0) {
-						var session = 'never';
-					} else {
-						var d = new Date(object['session'] * 1000);
-						session = d.toLocaleDateString() + ' ' + d.toLocaleTimeString() + ' from ' + object['ip']; 
-					}
-					if (object['pexpiration'] <= 0) {
-						var pexpiration = 'never';
-					} else {
-						var d = new Date(object['pexpiration'] * 1000);
-						pexpiration = d.toLocaleDateString(); 
-					}
-					$('#main-body .table tbody').append('<tr class="user" data-path="' + username + '"><td>' + username + '</td><td>' + name + '</td><td>' + email + '</td><td>' + expiration + '</td><td>' + session + '</td><td>' + pod + '</td><td>' + pexpiration + '</td></tr>');
-					$('#actions-menu').html('<li><a class="user-add" href="#"><i class="glyphicon glyphicon-plus"></i> Add a new user</a></li><li><a class="user-add" href="#"><i class="glyphicon glyphicon-trash"></i> Delete selected users</a></li>');
-				});
-			} else {
-				// Application error
-				logger(1, 'DEBUG: internal error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-			}
-		},
-		error: function(data) {
-			// Server error
-			var message = getJsonMessage(data['responseText']);
-			logger(1, 'DEBUG: Ajax error (' + data['status'] + ') on ' + type + ' ' + url + '.');
-			logger(1, 'DEBUG: ' + message);
-			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-		}
-	});
+	printPageUserManagement();
 });
+
+// Add a user
+$(document).on('click', 'a.user-add', function(e) {
+	$.when(getRoles()).done(function(roles) {
+		// Got data
+		var html = '<form id="form-user-add" class="form-horizontal form-user-edit"><div class="form-group"><label class="col-md-3 control-label">Username</label><div class="col-md-5"><input class="form-control autofocus" name="user[username]" value="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Name</label><div class="col-md-5"><input class="form-control" name="user[name]" value="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Email</label><div class="col-md-5"><input class="form-control" name="user[email]" value="" type="text"/></div></div>';
+		html += '<div class="form-group"><label class="col-md-3 control-label">Password</label><div class="col-md-5"><input class="form-control" name="user[password]" value="" type="password"/></div></div>';
+		html += '<div class="form-group"><label class="col-md-3 control-label">Role</label><div class="col-md-5"><select class="selectpicker show-tick form-control" name="user[role]" data-live-search="true">';
+		$.each(roles, function(r, d) {
+			html += '<option value="' + r + '">' + d + '</option>';
+		});
+		html += '</select></div></div>';
+		html += '<div class="form-group"><label class="col-md-3 control-label">Expiration</label><div class="col-md-5"><input class="form-control" name="user[expiration]" value="" type="text"/></div></div>';
+		html += '<h4>Assigned POD</h4>';
+		html += '<div class="form-group"><label class="col-md-3 control-label">POD</label><div class="col-md-5"><input class="form-control" name="user[pod]" value="" type="text"/></div></div>';
+		html += '<div class="form-group"><label class="col-md-3 control-label">Expiration</label><div class="col-md-5"><input class="form-control" name="user[pexpiration]" value="" type="text"/></div></div>';
+
+
+
+
+		html += '<div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">Save</button> <button type="button" class="btn btn-grey" data-dismiss="modal">Cancel</button></div></div></form>';
+		addModal('Add a new user', html, '');
+		validateUser()
+	});
+});	
+
 
 // Open folder
 $(document).on('dblclick', 'a.folder', function(e) {
@@ -410,12 +383,84 @@ $(document).on('dblclick', 'a.lab', function(e) {
 
 // Edit a user
 $(document).on('dblclick', 'tr.user', function(e) {
-	alert("TODO");
-});
+	var username = $(this).attr('data-path');
+	var url = '/api/users/' + $(this).attr('data-path');
+	var type = 'GET'
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: got UNetLab user.');
+				if (data['data']['expiration'] == -1) {
+					var expiration = '';
+				} else {
+					var expiration = $.datepicker.formatDate('yy-mm-dd', new Date(data['data']['expiration'] * 1000));
+				}
+				if (data['data']['pod'] == -1) {
+					var pod = '';
+				} else {
+					var pod = data['data']['pod'];
+				}
+				if (data['data']['pexpiration'] == -1) {
+					var pexpiration = '';
+				} else {
+					var pexpiration = $.datepicker.formatDate('yy-mm-dd', new Date(data['data']['pexpiration'] * 1000));
+				}
+				$.when(getRoles()).done(function(roles) {
+					// Got data
+					var html = '<form data-path="' + username + '" id="form-user-edit" class="form-horizontal form-user-edit"><div class="form-group"><label class="col-md-3 control-label">Name</label><div class="col-md-5"><input class="form-control autofocus" name="user[name]" value="' + data['data']['name'] + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Email</label><div class="col-md-5"><input class="form-control" name="user[email]" value="' + data['data']['email'] + '" type="text"/></div></div>';
+					html += '<div class="form-group"><label class="col-md-3 control-label">Password</label><div class="col-md-5"><input class="form-control" name="user[password]" value="" type="password"/></div></div>';
+					html += '<div class="form-group"><label class="col-md-3 control-label">Role</label><div class="col-md-5"><select class="selectpicker show-tick form-control" name="user[role]" data-live-search="true">';
+					$.each(roles, function(r, d) {
+						var role_selected = '';
+						if (data['data']['role'] == r) {
+							role_selected = ' selected';
+						}
+						html += '<option' + role_selected + ' value="' + r + '">' + d + '</option>';
+					});
+					html += '</select></div></div>';
+					html += '<div class="form-group"><label class="col-md-3 control-label">Expiration</label><div class="col-md-5"><input class="form-control" name="user[expiration]" value="' + expiration + '" type="text"/></div></div>';
+					html += '<h4>Assigned POD</h4>';
+					html += '<div class="form-group"><label class="col-md-3 control-label">POD</label><div class="col-md-5"><input class="form-control" name="user[pod]" value="' + pod + '" type="text"/></div></div>';
+					html += '<div class="form-group"><label class="col-md-3 control-label">Expiration</label><div class="col-md-5"><input class="form-control" name="user[pexpiration]" value="' + pexpiration + '" type="text"/></div></div>';
 
+
+
+				
+					html += '<div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">Save</button> <button type="button" class="btn btn-grey" data-dismiss="modal">Cancel</button></div></div></form>';
+					addModal('Edit user "' + data['data']['username'] + '"', html, '');
+					validateUser()
+				}).fail(function(error) {
+					// Failed to get data
+					addModal('ERROR', '<p>' + error + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+				});
+			} else {
+				// Application error
+				logger(1, 'DEBUG: internal error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: Ajax error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+		}
+	});
+});	
+	
 // Remove modal on close
 $(document).on('hide.bs.modal', '.modal', function () {
     $(this).remove();
+});
+
+// Set autofocus on show modal
+$(document).on('shown.bs.modal', '.modal', function () {
+    $('.autofocus').focus();
 });
 
 // Submit login form
@@ -564,6 +609,111 @@ $(document).on('submit', '#form-lab-add', function(e) {
 				$(e.target).parents('.modal').modal('hide');
 				// Reload the lab list
 				printPageLabList(form_data['path']);
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+		}
+	});
+	return false;  // Stop to avoid POST
+});
+
+// Submit user-edit form
+$(document).on('submit', '#form-user-edit', function(e) {
+	e.preventDefault();  // Prevent default behaviour
+	var form_data = form2Array('user');
+	// Converting data
+	if (form_data['expiration'] == '') {
+		form_data['expiration'] = -1;
+	} else {
+		form_data['expiration'] = Math.floor($.datepicker.formatDate('@', new Date(form_data['expiration'])) / 1000);
+	}
+	if (form_data['pexpiration'] == '') {
+		form_data['pexpiration'] = -1;
+	} else {
+		form_data['pexpiration'] = Math.floor($.datepicker.formatDate('@', new Date(form_data['pexpiration'])) / 1000);
+	}
+	if (form_data['pod'] == '') {
+		form_data['pod'] = -1;
+	}
+	var edit_username = $(this).attr('data-path')
+	var url = '/api/users/' + edit_username;
+	var type = 'PUT';
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		data: JSON.stringify(form_data),
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: user "' + edit_username + '" saved.');
+				// Close the modal
+				$(e.target).parents('.modal').modal('hide');
+				if (edit_username == USERNAME) {
+					// Editing self
+					// TODO -> should logout and login
+				}
+				// Reload the user list
+				printPageUserManagement();
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+		}
+	});
+	return false;  // Stop to avoid POST
+});
+
+// Submit user-add form
+$(document).on('submit', '#form-user-add', function(e) {
+	e.preventDefault();  // Prevent default behaviour
+	var form_data = form2Array('user');
+	// Converting data
+	if (form_data['expiration'] == '') {
+		form_data['expiration'] = -1;
+	} else {
+		form_data['expiration'] = Math.floor($.datepicker.formatDate('@', new Date(form_data['expiration'])) / 1000);
+	}
+	if (form_data['pexpiration'] == '') {
+		form_data['pexpiration'] = -1;
+	} else {
+		form_data['pexpiration'] = Math.floor($.datepicker.formatDate('@', new Date(form_data['pexpiration'])) / 1000);
+	}
+	if (form_data['pod'] == '') {
+		form_data['pod'] = -1;
+	}
+	var url = '/api/users';
+	var type = 'POST';
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		data: JSON.stringify(form_data),
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: user "' + form_data['username'] + '" added.');
+				// Close the modal
+				$(e.target).parents('.modal').modal('hide');
+				// Reload the user list
+				printPageUserManagement();
 			} else {
 				// Application error
 				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');

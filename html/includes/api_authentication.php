@@ -106,8 +106,8 @@ function apiLogin($db, $p, $cookie) {
 		$output['message'] = $GLOBALS['messages'][90013];
 	} else if ($result['rows'] == 0) {
 		// User/Password does not match
-		$output['code'] = 401;
-		$output['status'] = 'unauthorized';
+		$output['code'] = 400;
+		$output['status'] = 'fail';
 		$output['message'] = $GLOBALS['messages'][90014];
 	} else {
 		// Invalid result
