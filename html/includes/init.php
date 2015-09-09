@@ -38,7 +38,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150824
+ * @version 20150831
  */
 
 // Include custom configuration
@@ -59,7 +59,7 @@ if (!isset($node_templates)) {
 		'clearpass'		=>	'Aruba ClearPass',
 		'timos'			=>	'Alcatel 7750 SR',
 		'veos'			=>	'Arista vEOS',
-		'brocadevadx'	=>	'Brocade vADX',
+		'brocadevadx'    	=>	'Brocade vADX',
 		'cpsg'			=>	'CheckPoint Security Gateway VE',
 		'acs'			=>	'Cisco ACS',
 		'asa'			=>	'Cisco ASA',
@@ -73,7 +73,8 @@ if (!isset($node_templates)) {
 		'c7200'			=>	'Cisco IOS 7206VXR (Dynamips)',
 		'iol'			=>	'Cisco IOL',
 		'titanium'		=>	'Cisco NX-OSv (Titanium)',
-		'sourcefire'	=>	'Cisco Sourcefire',
+		'ucspe'	                =>      'Cisco UCS-PE',
+		'sourcefire'    	=>	'Cisco Sourcefire',
 		'vios'			=>	'Cisco vIOS',
 		'viosl2'		=>	'Cisco vIOS L2',
 		'vnam'			=>	'Cisco vNAM',
