@@ -5,7 +5,6 @@
 #include <signal.h>
 #include <errno.h>
 
-//#include "iol_functions.h"
 #include "include/ts.h"
 #include "include/log.h"
 #include "include/tap.h"
@@ -25,7 +24,7 @@ int  bytes_processed  = 0;
 int ts_port = 32777;
 int *tapHandles;
 char xchangeBuffer[16000];
-char *defaultTapPrefix = "vnet";
+char *defaultTapPrefix = "vunl";
 
 void usage(char * bin) {
   printf("Usage: %s <standard options>\n", bin);
