@@ -143,6 +143,7 @@ function apiCloneLab($p, $tenant) {
 	}
 	
 	$rc = $lab -> edit($p);
+	$lab -> setId();
 	if ($rc !== 0) {
 		$output['code'] = 400;
 		$output['status'] = 'fail';

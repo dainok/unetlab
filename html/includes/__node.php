@@ -1508,7 +1508,11 @@ class Node {
 								// Previous interface found, copy from old one
 								$this -> ethernets[$i] = $old_ethernets[$i];
 							} else {
-								$n = 'port'.($i + 1);       // Interface name
+								if ($i == 0) {
+									$n = 'Mgmt';            // Interface name
+								} else {
+									$n = 'port'.$i;          // Interface name
+								}
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {

@@ -1023,6 +1023,16 @@ class Lab {
 	}
 
 	/**
+	 * Method to set a new lab_id
+	 *
+	 * @return	void
+	 */
+	public function setId() {
+		$this -> id = genUuid();
+		$this -> save();
+	}
+
+	/**
 	 * Method to set attached node count for each network
 	 *
 	 * @return	void

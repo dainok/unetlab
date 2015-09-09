@@ -265,7 +265,7 @@ function printPageUserManagement() {
 						pexpiration = d.toLocaleDateString(); 
 					}
 					$('#main-body .table tbody').append('<tr class="user" data-path="' + username + '"><td>' + username + '</td><td>' + name + '</td><td>' + email + '</td><td>' + role + '</td><td>' + expiration + '</td><td>' + session + '</td><td>' + pod + '</td><td>' + pexpiration + '</td></tr>');
-					$('#actions-menu').html('<li><a class="user-add" href="#"><i class="glyphicon glyphicon-plus"></i> Add a new user</a></li><li><a class="user-add" href="#"><i class="glyphicon glyphicon-trash"></i> Delete selected users</a></li>');
+					$('#actions-menu').html('<li><a class="user-add" href="#"><i class="glyphicon glyphicon-plus"></i> Add a new user</a></li><li><a class="selected-delete" href="#"><i class="glyphicon glyphicon-trash"></i> Delete selected users</a></li>');
 				});
 			} else {
 				// Application error

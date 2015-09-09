@@ -114,6 +114,44 @@ function apiGetUUsers($db) {
 }
 
 /**
+ * Function to delete a UNetLab user.
+ *
+ * @param	PDO		$db					PDO object for database connection
+ * @param	string	$user				UNetLab user
+ * @return  Array                       Return code (JSend data)
+ */
+function apiDeleteUUser($db, $user) {
+	// TODO missing try/catch
+	// TODO need to check all parameters
+	if (empty($user)) {
+		// User not found
+		$output['code'] = 404;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][60039];
+		return $output;
+	}
+
+	// Free used previously used pod
+	$query = 'DELETE FROM pods WHERE username = :username;';
+	$statement = $db -> prepare($query);
+	$statement -> bindParam(':username', $user, PDO::PARAM_STR);
+	$statement -> execute();
+	$result = $statement -> fetch();
+
+	// Delete user
+	$query = 'DELETE FROM users WHERE username = :username;';
+	$statement = $db -> prepare($query);
+	$statement -> bindParam(':username', $user, PDO::PARAM_STR);
+	$statement -> execute();
+	$result = $statement -> fetch();
+
+	$output['code'] = 201;
+	$output['status'] = 'success';
+	$output['message'] = $GLOBALS['messages'][60042];
+	return $output;
+}
+
+/**
  * Function to edit UNetLab user.
  *
  * @param	PDO		$db					PDO object for database connection
@@ -248,34 +286,21 @@ function apiAddUUser($db, $p) {
 	$statement -> execute();
 
 	// Update PODs
-	/*
-	if (isset($p['pod']) && $p['pod'] !== '') {
-		// Free used previously used pod
-		$query = 'DELETE FROM pods WHERE username = :username;';
-		$statement = $db -> prepare($query);
-		$statement -> bindParam(':username', $user, PDO::PARAM_STR);
-		$statement -> execute();
+	if (isset($p['pod']) && $p['pod'] !== '-1') {
 		$result = $statement -> fetch();
 		if (!isset($p['pexpiration'])) {
-			$p['pexpiration'] = '';
+			$p['pexpiration'] = '-1';
 		}
 		$query = 'INSERT OR REPLACE INTO pods (id, expiration, username) VALUES(:id, :expiration, :username);';
 		$statement = $db -> prepare($query);
 		$statement -> bindParam(':id', $p['pod'], PDO::PARAM_INT);
 		$statement -> bindParam(':expiration', $p['pexpiration'], PDO::PARAM_STR);
-		$statement -> bindParam(':username', $user, PDO::PARAM_STR);
-		$statement -> execute();
-		$result = $statement -> fetch();
-	} else if (isset($p['pod'])) {
-		$query = 'DELETE FROM pods WHERE username = :username;';
-		$statement = $db -> prepare($query);
-		$statement -> bindParam(':username', $user, PDO::PARAM_STR);
+		$statement -> bindParam(':username', $p['username'], PDO::PARAM_STR);
 		$statement -> execute();
 		$result = $statement -> fetch();
 	}
-	 */
 
-	$output['code'] = 200;
+	$output['code'] = 201;
 	$output['status'] = 'success';
 	$output['message'] = $GLOBALS['messages'][60042];
 	return $output;

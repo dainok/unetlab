@@ -724,6 +724,20 @@ $app -> post('/api/users', function($uuser = False) use ($app, $db) {
 	$app -> response -> setBody(json_encode($output));
 });
 
+// Delete a user
+$app -> delete('/api/users/(:uuser)', function($uuser = False) use ($app, $db) {
+	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($user === False) {
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+
+	$output = apiDeleteUUser($db, $uuser);
+	$app -> response -> setStatus($output['code']);
+	$app -> response -> setBody(json_encode($output));
+});
+
 /***************************************************************************
  * Export/Import
  **************************************************************************/

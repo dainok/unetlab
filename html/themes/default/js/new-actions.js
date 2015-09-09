@@ -153,13 +153,22 @@ $(document).on('click', '.selected-clone', function(e) {
 $(document).on('click', '.selected-delete', function(e) {
 	var type = 'DELETE'
 	$('.selected').each(function(id, object) {
-		var path = $(this).attr('data-path');
+		var name = $(this).attr('data-path');
 		if ($(this).hasClass('folder')) {
 			var object = 'folder';
-		} else {
+			var path = 'folders/' + $(this).attr('data-path');
+		} else if ($(this).hasClass('lab')) {
 			var object = 'lab';
+			var path = 'labs/' + $(this).attr('data-path');
+		} else if ($(this).hasClass('user')) {
+			var object = 'user';
+			var path = 'users/' + $(this).attr('data-path');
+		} else {
+			logger(1, 'DEBUG: cannot delete, invalid object.');
+			return;
 		}
-		var url = '/api/' + object + 's' + path;
+		var url = '/api/' + path;
+		console.log(url);
 
 		$.ajax({
 			timeout: TIMEOUT,
@@ -168,9 +177,9 @@ $(document).on('click', '.selected-delete', function(e) {
 			dataType: 'json',
 			success: function(data) {
 				if (data['status'] == 'success') {
-					logger(1, 'DEBUG: ' + object + ' "' + path + '" deleted.');
+					logger(1, 'DEBUG: ' + object + ' "' + name + '" deleted.');
 					// Remove object
-					$('.' + object + '[data-path="' + path + '"]').fadeOut(300, function() { $(this).remove(); })
+					$('.' + object + '[data-path="' + name + '"]').fadeOut(300, function() { $(this).remove(); })
 				} else {
 					// Application error
 					logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
