@@ -1418,6 +1418,26 @@ class Node {
 							$this -> flags_eth .= ' -netdev tap,id=net'.$i.',ifname=vunl'.$this -> tenant.'_'.$this -> id.'_'.$i.',script=no';
 						}
 						break;
+					case 'cda':
+						for ($i = 0; $i < $this -> ethernet; $i++) {
+							if (isset($old_ethernets[$i])) {
+								// Previous interface found, copy from old one
+								$this -> ethernets[$i] = $old_ethernets[$i];
+							} else {
+								$n = 'g'.$i;              // Interface name
+								try {
+									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
+								} catch (Exception $e) {
+									error_log('ERROR: '.$GLOBALS['messages'][40020]);
+									error_log((string) $e);
+									return 40020;
+								}
+							}
+							// Setting CMD flags (virtual device and map to TAP device)
+							$this -> flags_eth .= ' -device %NICDRIVER%,netdev=net'.$i.',mac=50:'.sprintf('%02x', $this -> tenant).':'.sprintf('%02x', $this -> id / 512).':'.sprintf('%02x', $this -> id % 512).':00:'.sprintf('%02x', $i);
+							$this -> flags_eth .= ' -netdev tap,id=net'.$i.',ifname=vunl'.$this -> tenant.'_'.$this -> id.'_'.$i.',script=no';
+						}
+						break;
 					case 'cips':
 						for ($i = 0; $i < $this -> ethernet; $i++) {
 							if (isset($old_ethernets[$i])) {
@@ -1753,6 +1773,26 @@ class Node {
 								$this -> ethernets[$i] = $old_ethernets[$i];
 							} else {
 								$n = 'ge-0/0/'.$i;          // Interface name
+								try {
+									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
+								} catch (Exception $e) {
+									error_log('ERROR: '.$GLOBALS['messages'][40020]);
+									error_log((string) $e);
+									return 40020;
+								}
+							}
+							// Setting CMD flags (virtual device and map to TAP device)
+							$this -> flags_eth .= ' -device %NICDRIVER%,netdev=net'.$i.',mac=50:'.sprintf('%02x', $this -> tenant).':'.sprintf('%02x', $this -> id / 512).':'.sprintf('%02x', $this -> id % 512).':00:'.sprintf('%02x', $i);
+							$this -> flags_eth .= ' -netdev tap,id=net'.$i.',ifname=vunl'.$this -> tenant.'_'.$this -> id.'_'.$i.',script=no';
+						}
+						break;
+					case 'vwaas':
+						for ($i = 0; $i < $this -> ethernet; $i++) {
+							if (isset($old_ethernets[$i])) {
+								// Previous interface found, copy from old one
+								$this -> ethernets[$i] = $old_ethernets[$i];
+							} else {
+								$n = 'v'.$i.'/0';			// Interface name
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {

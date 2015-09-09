@@ -331,4 +331,5 @@ $messages[90028] = 'Created "sessions" table (90028).';
 $messages[90029] = 'Failed to create "sessions" table (90029).';
 $messages[90030] = 'Failed to update database to latest version (90030).';
 $messages[90031] = 'Database updated (90031).';
+$messages[90032] = 'User does not have sufficient privileges (90032).';
 ?>

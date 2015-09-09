@@ -270,8 +270,6 @@ function apiAddUUser($db, $p) {
 	if (!isset($p['email'])) $p['email'] = '';
 	if (!isset($p['expiration']) || $p['expiration'] == '') {
 		$p['expiration'] = -1;
-	} else {
-		$p['expiration'] = strtotime($p['expiration']);
 	}
 	if (!isset($p['name'])) $p['name'] = '';
 
@@ -280,7 +278,7 @@ function apiAddUUser($db, $p) {
 	$statement -> bindParam(':username', $p['username'], PDO::PARAM_STR);
 	$statement -> bindParam(':email', $p['email'], PDO::PARAM_STR);
 	$statement -> bindParam(':name', $p['name'], PDO::PARAM_STR);
-	$statement -> bindParam(':password', $p['password'], PDO::PARAM_STR);
+	$statement -> bindParam(':password',  $hash = hash('sha256', $p['password']), PDO::PARAM_STR);
 	$statement -> bindParam(':expiration', $p['expiration'], PDO::PARAM_STR);
 	$statement -> bindParam(':role', $p['role'], PDO::PARAM_STR);
 	$statement -> execute();

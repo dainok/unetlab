@@ -74,6 +74,7 @@ if (!isset($node_templates)) {
 		'iol'			=>	'Cisco IOL',
 		'titanium'		=>	'Cisco NX-OSv (Titanium)',
 		'sourcefire'	=>	'Cisco Sourcefire',
+		'ucspe'			=>	'Cisco UCS-PE',
 		'vios'			=>	'Cisco vIOS',
 		'viosl2'		=>	'Cisco vIOS L2',
 		'vnam'			=>	'Cisco vNAM',

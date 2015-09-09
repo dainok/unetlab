@@ -103,6 +103,13 @@ if (updateDatabase($db) == False) {
 	$app -> run();
 }
 
+// Define output for unprivileged requests
+$forbidden = Array(
+	'code' => 401,
+	'status' => 'forbidden',
+	'message' => $GLOBALS['messages']['90032']
+);
+
 /***************************************************************************
  * Authentication
  **************************************************************************/
@@ -178,6 +185,7 @@ $app -> get('/api/status', function() use ($app, $db) {
 		$output['data']['iol'],
 		$output['data']['dynamips'],
 		$output['data']['qemu']
+		// TODO: docker sf
 	) = apiGetRunningWrappers();
 
 	$app -> response -> setStatus($output['code']);
@@ -281,6 +289,11 @@ $app -> post('/api/folders', function() use ($app, $db) {
 		$app -> response -> setBody(json_encode($output));
 		return;
 	}
+	if (!in_array($user['role'], Array('admin', 'editor'))) {
+		$app -> response -> setStatus($GLOBALS['forbidden']['code']);
+		$app -> response -> setBody(json_encode($GLOBALS['forbidden']));
+		return;
+	}
 
 	// TODO must check before using p name and p path
 
@@ -298,6 +311,11 @@ $app -> delete('/api/folders/(:path+)', function($path = array()) use ($app, $db
 	if ($user === False) {
 		$app -> response -> setStatus($output['code']);
 		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+	if (!in_array($user['role'], Array('admin', 'editor'))) {
+		$app -> response -> setStatus($GLOBALS['forbidden']['code']);
+		$app -> response -> setBody(json_encode($GLOBALS['forbidden']));
 		return;
 	}
 
@@ -428,6 +446,11 @@ $app -> put('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 		$app -> response -> setBody(json_encode($output));
 		return;
 	}
+	if (!in_array($user['role'], Array('admin', 'editor'))) {
+		$app -> response -> setStatus($GLOBALS['forbidden']['code']);
+		$app -> response -> setBody(json_encode($GLOBALS['forbidden']));
+		return;
+	}
 
 	$event = json_decode($app -> request() -> getBody());
 	$p = json_decode(json_encode($event), True);	// Reading options from POST/PUT
@@ -500,6 +523,11 @@ $app -> post('/api/labs', function() use ($app, $db) {
 		$app -> response -> setBody(json_encode($output));
 		return;
 	}
+	if (!in_array($user['role'], Array('admin', 'editor'))) {
+		$app -> response -> setStatus($GLOBALS['forbidden']['code']);
+		$app -> response -> setBody(json_encode($GLOBALS['forbidden']));
+		return;
+	}
 	
 	$event = json_decode($app -> request() -> getBody());
 	$p = json_decode(json_encode($event), True);;
@@ -520,6 +548,11 @@ $app -> post('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 	if ($user === False) {
 		$app -> response -> setStatus($output['code']);
 		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+	if (!in_array($user['role'], Array('admin', 'editor'))) {
+		$app -> response -> setStatus($GLOBALS['forbidden']['code']);
+		$app -> response -> setBody(json_encode($GLOBALS['forbidden']));
 		return;
 	}
 
@@ -604,6 +637,11 @@ $app -> delete('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 		$app -> response -> setBody(json_encode($output));
 		return;
 	}
+	if (!in_array($user['role'], Array('admin', 'editor'))) {
+		$app -> response -> setStatus($GLOBALS['forbidden']['code']);
+		$app -> response -> setBody(json_encode($GLOBALS['forbidden']));
+		return;
+	}
 
 	$event = json_decode($app -> request() -> getBody());
 	$s = '/'.implode('/', $path);
@@ -680,6 +718,11 @@ $app -> get('/api/users/(:uuser)', function($uuser = False) use ($app, $db) {
 		$app -> response -> setBody(json_encode($output));
 		return;
 	}
+	if (!in_array($user['role'], Array('admin'))) {
+		$app -> response -> setStatus($GLOBALS['forbidden']['code']);
+		$app -> response -> setBody(json_encode($GLOBALS['forbidden']));
+		return;
+	}
 
 	if (empty($uuser)) {
 		$output = apiGetUUsers($db);
@@ -696,6 +739,11 @@ $app -> put('/api/users/(:uuser)', function($uuser = False) use ($app, $db) {
 	if ($user === False) {
 		$app -> response -> setStatus($output['code']);
 		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+	if (!in_array($user['role'], Array('admin'))) {
+		$app -> response -> setStatus($GLOBALS['forbidden']['code']);
+		$app -> response -> setBody(json_encode($GLOBALS['forbidden']));
 		return;
 	}
 
@@ -715,6 +763,11 @@ $app -> post('/api/users', function($uuser = False) use ($app, $db) {
 		$app -> response -> setBody(json_encode($output));
 		return;
 	}
+	if (!in_array($user['role'], Array('admin'))) {
+		$app -> response -> setStatus($GLOBALS['forbidden']['code']);
+		$app -> response -> setBody(json_encode($GLOBALS['forbidden']));
+		return;
+	}
 
 	$event = json_decode($app -> request() -> getBody());
 	$p = json_decode(json_encode($event), True);	// Reading options from POST/PUT
@@ -730,6 +783,11 @@ $app -> delete('/api/users/(:uuser)', function($uuser = False) use ($app, $db) {
 	if ($user === False) {
 		$app -> response -> setStatus($output['code']);
 		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+	if (!in_array($user['role'], Array('admin'))) {
+		$app -> response -> setStatus($GLOBALS['forbidden']['code']);
+		$app -> response -> setBody(json_encode($GLOBALS['forbidden']));
 		return;
 	}
 
@@ -749,6 +807,11 @@ $app -> post('/api/export', function() use ($app, $db) {
 		$app -> response -> setBody(json_encode($output));
 		return;
 	}
+	if (!in_array($user['role'], Array('admin', 'editor'))) {
+		$app -> response -> setStatus($GLOBALS['forbidden']['code']);
+		$app -> response -> setBody(json_encode($GLOBALS['forbidden']));
+		return;
+	}
 	
 	$event = json_decode($app -> request() -> getBody());
 	$p = json_decode(json_encode($event), True);;
@@ -760,6 +823,18 @@ $app -> post('/api/export', function() use ($app, $db) {
 
 // Import labs
  $app -> post('/api/import', function() use ($app, $db) {
+	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($user === False) {
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+	if (!in_array($user['role'], Array('admin', 'editor'))) {
+		$app -> response -> setStatus($GLOBALS['forbidden']['code']);
+		$app -> response -> setBody(json_encode($GLOBALS['forbidden']));
+		return;
+	}
+
 	// Cannot use $app -> request() -> getBody()
 	$p = $_POST;
 	if (!empty($_FILES)) {
