@@ -689,6 +689,26 @@ function prepareNode($n, $id, $t, $nets) {
 					}
 				}
 				break;
+			case 'docker':
+				if (!is_file('/usr/bin/docker')) {
+					// docker.io is not installed
+					error_log('ERROR: '.$GLOBALS['messages'][80082]);
+					return 80082;
+				}
+
+				$cmd = 'docker inspect --format="{{ .State.Running }}" '.$n -> getUuid();
+				exec($cmd, $o, $rc);
+				if ($rc != 0) {
+					// Must create docker.io container
+					$cmd = 'docker create -ti --net=none --name='.$n -> getUuid().' -h '.$n -> getName().' '.$n -> getImage();
+					exec($cmd, $o, $rc);
+					if ($rc != 0) {
+						// Failed to create container
+						error_log('ERROR: '.$GLOBALS['messages'][80083]);
+						return 80083;
+					}
+				}
+				break;
 			case 'dynamips':
 				if ($n -> getConfig() == 'Saved') {
 					// Node should use saved startup-config
@@ -792,9 +812,14 @@ function start($n, $id, $t, $nets) {
 					$cmd .= ' -l '.$interface_id.':localhost:'.$interface -> getRemoteId().':'.$interface -> getRemoteIf();
 				}
 			}
+			$cmd .= ' -- '.$flags.' > '.$n -> getRunningPath().'/wrapper.txt 2>&1 &';
+			break;
+		case 'docker':
+			$cmd = 'docker start -ai '.$n -> getUuid();
 			break;
 		case 'dynamips':
 			$cmd = '/opt/unetlab/wrappers/dynamips_wrapper -T '.$t.' -D '.$id.' -t "'.$n -> getName().'" -F /opt/unetlab/addons/dynamips/'.$n -> getImage().' -d '.$n -> getDelay();
+			$cmd .= ' -- '.$flags.' > '.$n -> getRunningPath().'/wrapper.txt 2>&1 &';
 			break;
 		case 'qemu':
 			$cmd = '/opt/unetlab/wrappers/qemu_wrapper -T '.$t.' -D '.$id.' -t "'.$n -> getName().'" -F '.$bin.' -d '.$n -> getDelay();
@@ -802,10 +827,10 @@ function start($n, $id, $t, $nets) {
 				// Disable telnet (wrapper) console
 				$cmd .= ' -x';
 			}
+			$cmd .= ' -- '.$flags.' > '.$n -> getRunningPath().'/wrapper.txt 2>&1 &';
 			break;
 	}
 
-	$cmd .= ' -- '.$flags.' > '.$n -> getRunningPath().'/wrapper.txt 2>&1 &';
 	exec($cmd, $o, $rc);
 	error_log('INFO: CWD is '.getcwd());
 	error_log('INFO: starting '.$cmd);
@@ -821,9 +846,13 @@ function start($n, $id, $t, $nets) {
  */
 function stop($n) {
 	if ($n -> getStatus() == 1) {
-		$cmd = 'fuser -n tcp -k -TERM '.$n -> getPort().' > /dev/null 2>&1';
-		exec($cmd, $o, $rc);
+		if ($n -> getNType() == 'docker') {
+			$cmd = 'docker stop '.$n -> getUuid();
+		} else {
+			$cmd = 'fuser -n tcp -k -TERM '.$n -> getPort().' > /dev/null 2>&1';
+		}
 		error_log('INFO: stopping '.$cmd);
+		exec($cmd, $o, $rc);
 		sleep(1);  // Need to wait a few
 		if ($n -> getStatus() == 0) {
 			return 0;

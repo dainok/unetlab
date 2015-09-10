@@ -3,16 +3,10 @@ $(document).ready(function() {
 		// User is authenticated
 	}).fail(function() {
 		// User is not authenticated, or error on API
-		window.location = '/themes/default/lab_list.php';
+		window.location = '/';
 	});
 
-    if ($(location).attr('pathname') == '/lab_list.php') {
-        // Page: lab_list
-        path = getParameter('path');
-
-        // Display folder content
-        displayFolder(path);
-    } else if ($(location).attr('pathname') == '/lab_open.php') {
+    if ($(location).attr('pathname') == '/lab_open.php') {
         // Page: lab_open
         lab_file = getParameter('filename');
 

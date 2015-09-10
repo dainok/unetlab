@@ -211,7 +211,6 @@ function apiGetLabNode($lab, $id) {
 			'icon' => $node -> getIcon(),
 			'image' => $node -> getImage(),
 			'name' => $node -> getName(),
-			'ram' => $node -> getRam(),
 			'status' => $node -> getStatus(),
 			'template' => $node -> getTemplate(),
 			'type' => $node -> getNType(),
@@ -222,12 +221,14 @@ function apiGetLabNode($lab, $id) {
 		if ($node -> getNType() == 'iol') {
 			$output['data']['ethernet'] = $node -> getEthernetCount();
 			$output['data']['nvram'] = $node -> getNvram();
+			$output['data']['ram'] = $node -> getRam();
 			$output['data']['serial'] = $node -> getSerialCount();
 		}
 
 		if ($node -> getNType() == 'dynamips') {
 			$output['data']['idlepc'] = $node -> getIdlePc();
 			$output['data']['nvram'] = $node -> getNvram();
+			$output['data']['ram'] = $node -> getRam();
 			foreach ($node -> getSlot() as $slot_id => $module) {
 				$output['data']['slot'.$slot_id] = $module;
 			}
@@ -236,7 +237,13 @@ function apiGetLabNode($lab, $id) {
 		if ($node -> getNType() == 'qemu') {
 			$output['data']['cpu'] = $node -> getCpu();
 			$output['data']['ethernet'] = $node -> getEthernetCount();
+			$output['data']['ram'] = $node -> getRam();
 			$output['data']['uuid'] = $node -> getUuid();
+		}
+
+		if ($node -> getNType() == 'docker') {
+			$output['data']['ethernet'] = $node -> getEthernetCount();
+			$output['data']['ram'] = $node -> getRam();
 		}
 	} else {
 		// Node not found
@@ -283,12 +290,14 @@ function apiGetLabNodes($lab) {
 			if ($node -> getNType() == 'iol') {
 				$output['data'][$node_id]['ethernet'] = $node -> getEthernetCount();
 				$output['data'][$node_id]['nvram'] = $node -> getNvram();
+				$output['data'][$node_id]['ram'] = $node -> getRam();
 				$output['data'][$node_id]['serial'] = $node -> getSerialCount();
 			}
 
 			if ($node -> getNType() == 'dynamips') {
 				$output['data'][$node_id]['idlepc'] = $node -> getIdlePc();
 				$output['data'][$node_id]['nvram'] = $node -> getNvram();
+				$output['data'][$node_id]['ram'] = $node -> getRam();
 				foreach ($node -> getSlot() as $slot_id => $module) {
 					$output['data'][$node_id]['slot'.$slot_id] = $module;
 				}
@@ -297,7 +306,13 @@ function apiGetLabNodes($lab) {
 			if ($node -> getNType() == 'qemu') {
 				$output['data'][$node_id]['cpu'] = $node -> getCpu();
 				$output['data'][$node_id]['ethernet'] = $node -> getEthernetCount();
+				$output['data'][$node_id]['ram'] = $node -> getRam();
 				$output['data'][$node_id]['uuid'] = $node -> getUuid();
+			}
+
+			if ($node -> getNType() == 'docker') {
+				$output['data'][$node_id]['ethernet'] = $node -> getEthernetCount();
+				$output['data'][$node_id]['ram'] = $node -> getRam();
 			}
 		}
 	}
@@ -437,14 +452,14 @@ function apiGetLabNodeTemplate($p) {
 	);
 
 	// NVRAM
-	if ($p['type'] == 'dynamips') $output['data']['options']['nvram'] = Array(
+	if (in_array($p['type'], Array('dynamips', 'iol'))) $output['data']['options']['nvram'] = Array(
 		'name' => $GLOBALS['messages'][70010],
 		'type' => 'input',
 		'value' => $p['nvram']
 	);
 
 	// RAM
-	$output['data']['options']['ram'] = Array(
+	if (in_array($p['type'], Array('dynamips', 'iol', 'qemu', 'docker'))) $output['data']['options']['ram'] = Array(
 		'name' => $GLOBALS['messages'][70011],
 		'type' => 'input',
 		'value' => $p['ram']
@@ -467,7 +482,7 @@ function apiGetLabNodeTemplate($p) {
 	}
 
 	// Ethernet
-	if ($p['type'] == 'qemu') $output['data']['options']['ethernet'] = Array(
+	if (in_array($p['type'], Array('qemu', 'docker'))) $output['data']['options']['ethernet'] = Array(
 		'name' => $GLOBALS['messages'][70012],
 		'type' => 'input',
 		'value' => $p['ethernet']
@@ -611,7 +626,7 @@ function apiStopLabNode($lab, $id, $tenant) {
 		$output['status'] = 'success';
 		$output['message'] = $GLOBALS['messages'][80051];
 	} else {
-		// Failed to start
+		// Failed to stop
 		$output['code'] = 400;
 		$output['status'] = 'fail';
 		$output['message'] = $GLOBALS['messages'][$rc];

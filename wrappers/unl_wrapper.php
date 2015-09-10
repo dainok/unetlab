@@ -291,6 +291,10 @@ switch ($action) {
 		if (isset($node_id)) {
 			// Node ID is set, stop and wipe the node
 			stop($lab -> getNodes()[$node_id]);
+			if ($lab -> getNodes()[$node_id] -> getNType() == 'docker') {
+				$cmd = 'docker rm '.$lab -> getNodes()[$node_id] -> getUuid();
+				exec($cmd, $o, $rc);
+			}
 			$cmd = 'rm -rf "/opt/unetlab/tmp/'.$tenant.'/'.$lab -> getId().'/'.$node_id.'/"';
 			exec($cmd, $o, $rc);
 			if ($rc !== 0) {
@@ -302,6 +306,10 @@ switch ($action) {
 			// Node ID is not set, stop and wipe all nodes
 			foreach ($lab -> getNodes() as $node_id => $node) {
 				stop($node);
+				if ($node -> getNType() == 'docker') {
+					$cmd = 'docker rm '.$node -> getUuid();
+					exec($cmd, $o, $rc);
+				}
 			}
 			$cmd = 'rm -rf "/opt/unetlab/tmp/'.$tenant.'/'.$lab -> getId().'/"';
 			exec($cmd, $o, $rc);

@@ -885,6 +885,11 @@ class Lab {
 								$s -> addAttribute('module', $module);
 							}
 							break;
+						case 'docker':
+							// Docker specific parameters
+							$d -> addAttribute('ethernet', $node -> getEthernetCount());
+							$d -> addAttribute('ram', $node -> getRam());
+							break;
 						case 'qemu':
 							// QEMU specific parameters
 							$d -> addAttribute('console', $node -> getConsole());

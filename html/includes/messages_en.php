@@ -298,6 +298,8 @@ $messages[80078] = 'Import file must be a Zip file (80078).';
 $messages[80079] = 'Cannot import file (80079).';
 $messages[80080] = 'File imported (80080).';
 $messages[80081] = 'Failed to upload file, check file size (80081).';
+$messages[80082] = 'Cannot find docker.io installation (80082).';
+$messages[80083] = 'Cannot create docket container (80083).';
 
 // Authentication (90000-99999)
 $messages[90001] = 'User is not authenticated (90001).';
@@ -331,5 +333,5 @@ $messages[90028] = 'Created "sessions" table (90028).';
 $messages[90029] = 'Failed to create "sessions" table (90029).';
 $messages[90030] = 'Failed to update database to latest version (90030).';
 $messages[90031] = 'Database updated (90031).';
-$messages[90032] = 'User does not have sufficient privileges (90032).';
+$messages[90032] = 'User are not allowed to take this action (90032).';
 ?>

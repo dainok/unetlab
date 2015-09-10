@@ -178,12 +178,6 @@ class Node {
 			error_log('WARNING: '.$GLOBALS['messages'][40008]);
 		}
 
-		if (isset($p['ram']) && (int) $p['ram'] <= 0) {
-			// RAM is invalid, ignored
-			unset($p['ram']);
-			error_log('WARNING: '.$GLOBALS['messages'][40009]);
-		}
-
 		if (isset($p['top']) && !checkPosition($p['top'])) {
 			// Top is invalid, ignored
 			unset($p['top']);
@@ -204,6 +198,12 @@ class Node {
 				error_log('WARNING: '.$GLOBALS['messages'][40011]);
 			}
 
+			if (isset($p['ram']) && (int) $p['ram'] <= 0) {
+				// RAM is invalid, ignored
+				unset($p['ram']);
+				error_log('WARNING: '.$GLOBALS['messages'][40009]);
+			}
+
 			if (isset($p['serial']) && (int) $p['serial'] < 0) {
 				// Serial interfaces is invalid, default to 4
 				$p['serial'] = 2;
@@ -222,6 +222,12 @@ class Node {
 				// NVRAM is invalid, ignored
 				unset($p['nvram']);
 				error_log('WARNING: '.$GLOBALS['messages'][40011]);
+			}
+
+			if (isset($p['ram']) && (int) $p['ram'] <= 0) {
+				// RAM is invalid, ignored
+				unset($p['ram']);
+				error_log('WARNING: '.$GLOBALS['messages'][40009]);
 			}
 		}
 
@@ -244,10 +250,30 @@ class Node {
 				error_log('WARNING: '.$GLOBALS['messages'][40012]);
 			}
 
+			if (isset($p['ram']) && (int) $p['ram'] <= 0) {
+				// RAM is invalid, ignored
+				unset($p['ram']);
+				error_log('WARNING: '.$GLOBALS['messages'][40009]);
+			}
+
 			if (isset($p['uuid']) && !checkUuid($p['uuid'])) {
 				// Configured UUID is invalid, ignored
 				unset($p['uuid']);
 				error_log('WARNING: '.$GLOBALS['messages'][40026]);
+			}
+		}
+
+		if ($p['type'] == 'docker') {
+			if (isset($p['ethernet']) && (int) $p['ethernet'] <= 0) {
+				// Ethernet interfaces is invalid, default to 1
+				$p['ethernet'] = 1;
+				error_log('WARNING: '.$GLOBALS['messages'][40012]);
+			}
+
+			if (isset($p['ram']) && (int) $p['ram'] <= 0) {
+				// RAM is invalid, ignored
+				unset($p['ram']);
+				error_log('WARNING: '.$GLOBALS['messages'][40009]);
 			}
 		}
 
@@ -274,13 +300,13 @@ class Node {
 		if (isset($p['icon'])) $this -> icon = $p['icon'];
 		if (isset($p['left'])) $this -> left = $p['left'];
 		if (isset($p['name'])) $this -> name = $p['name'];
-		if (isset($p['ram'])) $this -> ram = (int) $p['ram'];
 		if (isset($p['top'])) $this -> top = $p['top'];
 
 		// Building iol node
 		if ($p['type'] == 'iol') {
 			if (isset($p['nvram'])) $this -> nvram = (int) $p['nvram'];
 			if (isset($p['ethernet'])) $this -> ethernet = (int) $p['ethernet'];
+			if (isset($p['ram'])) $this -> ram = (int) $p['ram'];
 			if (isset($p['serial'])) $this -> serial = (int) $p['serial'];
 		}
 
@@ -288,6 +314,7 @@ class Node {
 		if ($p['type'] == 'dynamips') {
 			if (isset($p['idlepc'])) $this -> idlepc = $p['idlepc'];
 			if (isset($p['nvram'])) $this -> nvram = (int) $p['nvram'];
+			if (isset($p['ram'])) $this -> ram = (int) $p['ram'];
 			foreach ($p as $key => $module) {
 				if (preg_match('/^slot[0-9]+$/', $key)) {
 					// Found a slot
@@ -303,6 +330,13 @@ class Node {
 			if (isset($p['cpu'])) $this -> cpu = (int) $p['cpu'];
 			if (isset($p['ethernet'])) $this -> ethernet = (int) $p['ethernet'];
 			if (isset($p['uuid'])) $this -> uuid = $p['uuid'];
+			if (isset($p['ram'])) $this -> ram = (int) $p['ram'];
+		}
+
+		// Building docker node
+		if ($p['type'] == 'docker') {
+			if (isset($p['ram'])) $this -> ram = (int) $p['ram'];
+			if (isset($p['ethernet'])) $this -> ethernet = (int) $p['ethernet'];
 		}
 
 		// Set interface name
@@ -415,18 +449,6 @@ class Node {
 			$modified = True;
 		}
 
-		if (isset($p['ram']) && $p['ram'] === '') {
-			// RAM is empty, unset the current one
-			unset($p['ram']);
-			$modified = True;
-		} else if (isset($p['ram']) && (int) $p['ram'] <= 0) {
-			// RAM is invalid, ignored
-			error_log('WARNING: '.$GLOBALS['messages'][40009]);
-		} else if (isset($p['ram'])) {
-			$this -> ram = (int) $p['ram'];
-		}
-
-
 		// Specific parameters
 		if ($this -> type == 'iol') {
 			if (isset($p['ethernet']) && $p['ethernet'] === '') {
@@ -451,6 +473,17 @@ class Node {
 				error_log('WARNING: '.$GLOBALS['messages'][40011]);
 			} else if (isset($p['nvram'])) {
 				$this -> nvram = (int) $p['nvram'];
+			}
+
+			if (isset($p['ram']) && $p['ram'] === '') {
+				// RAM is empty, unset the current one
+				unset($p['ram']);
+				$modified = True;
+			} else if (isset($p['ram']) && (int) $p['ram'] <= 0) {
+				// RAM is invalid, ignored
+				error_log('WARNING: '.$GLOBALS['messages'][40009]);
+			} else if (isset($p['ram'])) {
+				$this -> ram = (int) $p['ram'];
 			}
 
 			if (isset($p['serial']) && $p['serial'] === '') {
@@ -488,6 +521,17 @@ class Node {
 				error_log('WARNING: '.$GLOBALS['messages'][40011]);
 			} else if (isset($p['nvram'])) {
 				$this -> nvram = (int) $p['nvram'];
+			}
+
+			if (isset($p['ram']) && $p['ram'] === '') {
+				// RAM is empty, unset the current one
+				unset($p['ram']);
+				$modified = True;
+			} else if (isset($p['ram']) && (int) $p['ram'] <= 0) {
+				// RAM is invalid, ignored
+				error_log('WARNING: '.$GLOBALS['messages'][40009]);
+			} else if (isset($p['ram'])) {
+				$this -> ram = (int) $p['ram'];
 			}
 
 			// Loading slots
@@ -530,6 +574,17 @@ class Node {
 				$this -> cpu = (int) $p['cpu'];
 			}
 
+			if (isset($p['ram']) && $p['ram'] === '') {
+				// RAM is empty, unset the current one
+				unset($p['ram']);
+				$modified = True;
+			} else if (isset($p['ram']) && (int) $p['ram'] <= 0) {
+				// RAM is invalid, ignored
+				error_log('WARNING: '.$GLOBALS['messages'][40009]);
+			} else if (isset($p['ram'])) {
+				$this -> ram = (int) $p['ram'];
+			}
+
 			if (isset($p['ethernet']) && $p['ethernet'] === '') {
 				// Ethernet interfaces is empty, unset the current one
 				unset($p['ethernet']);
@@ -552,6 +607,32 @@ class Node {
 				error_log('WARNING: '.$GLOBALS['messages'][40026]);
 			} else if (isset($p['uuid'])) {
 				$this -> uuid = $p['uuid'];
+				$modified = True;
+			}
+		}
+
+		if ($this -> type == 'docker') {
+			if (isset($p['ram']) && $p['ram'] === '') {
+				// RAM is empty, unset the current one
+				unset($p['ram']);
+				$modified = True;
+			} else if (isset($p['ram']) && (int) $p['ram'] <= 0) {
+				// RAM is invalid, ignored
+				error_log('WARNING: '.$GLOBALS['messages'][40009]);
+			} else if (isset($p['ram'])) {
+				$this -> ram = (int) $p['ram'];
+			}
+
+			if (isset($p['ethernet']) && $p['ethernet'] === '') {
+				// Ethernet interfaces is empty, unset the current one
+				unset($p['ethernet']);
+				$modified = True;
+			} else if (isset($p['ethernet']) && (int) $p['ethernet'] <= 0) {
+				// Ethernet interfaces is invalid, ignored
+				error_log('WARNING: '.$GLOBALS['messages'][40012]);
+			} else if (isset($p['ethernet']) && $this -> ethernet != (int) $p['ethernet']) {
+				// New Ethernet value
+				$this -> ethernet = (int) $p['ethernet'];
 				$modified = True;
 			}
 		}
@@ -736,6 +817,24 @@ class Node {
 			}
 		}
 
+		if ($this -> type == 'docker') {
+			// Docker.io node
+			$bin .= '/usr/bin/docker';
+			$flags .= 'run -dti --net=none --rm=false -n INSTANCENAME -h HOSTNAME';
+			$flags .= ' -m '.$this -> getRam();		// Maximum RAM
+			$flags .= ' '.$this -> getImage();		// Docker image
+			// docker run -dti --net=none --rm=false --name=ae89c614-dc96-4019-b713-22b251ab4704 -h docker -m 64MB wataru/quagga:latest
+			// TODO
+			// --dns=[]                        Set custom DNS servers
+			// --dns-search=[]                 Set custom DNS search domains
+			// -e, --env=[]                    Set environment variables
+			// --env-file=[]                   Read in a file of environment variables
+			// -h, --hostname=                 Container host name
+			// --lxc-conf=[]                   Add custom lxc options
+			// --add-host=[]                   Add a custom host-to-IP mapping (host:ip)
+			//
+		}
+
 		return Array($bin, $flags);
 	}
 
@@ -838,7 +937,7 @@ class Node {
 	 * @return	int                         Total configured Ethernet interfaces/portgroups
 	 */
 	public function getEthernetCount() {
-		if (in_Array($this -> type, Array('iol', 'qemu'))) {
+		if (in_Array($this -> type, Array('iol', 'qemu', 'docker'))) {
 			return $this -> ethernet;
 		} else {
 			return 0;
@@ -1015,22 +1114,37 @@ class Node {
 	 * @return	int                         0 is stopped, 1 is running, 2 is building
 	 */
 	public function getStatus() {
-		if (!is_dir(BASE_TMP.'/'.$this -> tenant.'/'.$this -> lab_id.'/'.$this -> id)) {
-			// TMP folder does not exists, nodes are stopped
-			return 0;
-		} else if (is_file(BASE_TMP.'/'.$this -> tenant.'/'.$this -> lab_id.'/'.$this -> id.'/.lock')) {
-			// Lock file is present, node is building
-			return 1;
-		} else {
-			// Need to check if node port is used (netstat + grep doesn't require root privileges)
-			$cmd = 'netstat -a -t -n | grep LISTEN | grep :'.$this -> port.' 2>&1';
+		if ($this -> type == 'docker') {
+			$cmd = 'docker inspect --format="{{ .State.Running }}" '.$this -> getUuid();
 			exec($cmd, $o, $rc);
 			if ($rc == 0) {
-				// Console available -> node is running
+				if ($o[0] == 'true') {
+					return 1;
+				} else {
+					return 0;
+				}
+			} else {
+				// Instance does not exist
+				return 0;
+			}
+		} else {
+			if (!is_dir(BASE_TMP.'/'.$this -> tenant.'/'.$this -> lab_id.'/'.$this -> id)) {
+				// TMP folder does not exists, nodes are stopped
+				return 0;
+			} else if (is_file(BASE_TMP.'/'.$this -> tenant.'/'.$this -> lab_id.'/'.$this -> id.'/.lock')) {
+				// Lock file is present, node is building
 				return 1;
 			} else {
-				// No console available -> node is stopped
-				return 0;
+				// Need to check if node port is used (netstat + grep doesn't require root privileges)
+				$cmd = 'netstat -a -t -n | grep LISTEN | grep :'.$this -> port.' 2>&1';
+				exec($cmd, $o, $rc);
+				if ($rc == 0) {
+					// Console available -> node is running
+					return 1;
+				} else {
+					// No console available -> node is stopped
+					return 0;
+				}
 			}
 		}
 	}
@@ -1064,7 +1178,9 @@ class Node {
 	* @return  string                      UUID
 	*/
 	public function getUuid() {
-		if (isset($this -> uuid)) {
+		if ($this -> type == 'docker') {
+			return $this -> lab_id.'-'.$this -> tenant.'-'.$this -> id;
+		} else if (isset($this -> uuid)) {
 			return $this -> uuid;
 		} else {
 			// By default return a random UUID
@@ -1164,6 +1280,26 @@ class Node {
 				}
 				// Setting CMD flags
 				$this -> flags_eth = '-e '.$this -> ethernet;  // Number of Ethernet interfaces
+				break;
+			case 'docker':
+				for ($i = 0; $i < $this -> ethernet; $i++) {
+					if (isset($old_ethernets[$i])) {
+						// Previous interface found, copy from old one
+						$this -> ethernets[$i] = $old_ethernets[$i];
+					} else {
+						$n = 'eth'.$i;		// Interface name
+						try {
+							$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
+						} catch (Exception $e) {
+							error_log('ERROR: '.$GLOBALS['messages'][40020]);
+							error_log((string) $e);
+							return 40020;
+						}
+					}
+					// Setting CMD flags (virtual device and map to TAP device)
+					$this -> flags_eth .= ' -device %NICDRIVER%,netdev=net'.$i.',mac=50:'.sprintf('%02x', $this -> tenant).':'.sprintf('%02x', $this -> id / 512).':'.sprintf('%02x', $this -> id % 512).':00:'.sprintf('%02x', $i);
+					$this -> flags_eth .= ' -netdev tap,id=net'.$i.',ifname=vunl'.$this -> tenant.'_'.$this -> id.'_'.$i.',script=no';
+				}
 				break;
 			case 'dynamips':
 				switch ($this -> getTemplate()) {

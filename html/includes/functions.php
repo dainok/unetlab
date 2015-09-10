@@ -630,6 +630,16 @@ function listNodeImages($t, $p) {
 				}
 			}
 			break;
+		case 'docker':
+			$cmd = '/usr/bin/docker images | sed \'s/^\([^[:space:]]\+\)[[:space:]]\+\([^[:space:]]\+\).\+/\1:\2/g\'';
+			exec($cmd, $o, $rc);
+			if (!empty($o) && sizeof($o) > 1) {
+				unset($o[0]);	// Removing header
+				foreach ($o as $image) {
+					$results[$image] = $image;
+				}
+			}
+			break;
 	}
 	return $results;
 }
@@ -640,8 +650,7 @@ function listNodeImages($t, $p) {
  * @return  Array                       The list of node types
  */
 function listNodeTypes() {
-
-	return Array('iol', 'dynamips', 'qemu');
+	return Array('iol', 'dynamips', 'docker', 'qemu');
 }
 
 /**

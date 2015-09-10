@@ -185,7 +185,6 @@ $app -> get('/api/status', function() use ($app, $db) {
 		$output['data']['iol'],
 		$output['data']['dynamips'],
 		$output['data']['qemu']
-		// TODO: docker sf
 	) = apiGetRunningWrappers();
 
 	$app -> response -> setStatus($output['code']);
