@@ -166,8 +166,8 @@ switch ($action) {
 		$cmd = '/bin/chmod 755 /opt/unetlab/addons/iol/bin/*.bin > /dev/null 2>&1';
 		exec($cmd, $o, $rc);
 
-		// Wrappers
-		$cmd = '/bin/chmod 755 /opt/unetlab/wrappers/*_wrapper* > /dev/null 2>&1';
+		// Wrappers and helpers
+		$cmd = '/bin/chmod 755 /opt/unetlab/wrappers/*_wrapper* /opt/unetlab/wrappers/nsenter > /dev/null 2>&1';
 		exec($cmd, $o, $rc);
 
 		// OVS database

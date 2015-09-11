@@ -25,16 +25,14 @@ all:
 	chmod 755 $(DST)/dynamips_wrapper
 	chown root:root $(DST)/dynamips_wrapper
 
-	cp -a unl_wrapper.php $(DST)/unl_wrapper
-	chmod 755 $(DST)/unl_wrapper
-	chown root:root $(DST)/unl_wrapper
-
-	cp -a vnc_wrapper.sh $(DST)/vnc_wrapper
-	chmod 755 $(DST)/vnc_wrapper
-	chown root:root $(DST)/vnc_wrapper
+	cp -a nsenter $(DST)/nsenter
+	chmod 755 $(DST)/nsenter
+	chown root:root $(DST)/nsenter
 
 uninstall:
+	rm -f $(DST)/simple_forwarder
 	rm -f $(DST)/iol_wrapper
-	rm -f $(DST)/vios_wrapper
-	rm -f $(DST)/vios_ifup
+	rm -f $(DST)/qemu_wrapper
+	rm -f $(DST)/dynamips_wrapper
 	rm -f $(DST)/unl_wrapper
+	rm -f $(DST)/nsenter

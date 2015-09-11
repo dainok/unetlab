@@ -831,9 +831,39 @@ function start($n, $id, $t, $nets) {
 			break;
 	}
 
-	exec($cmd, $o, $rc);
 	error_log('INFO: CWD is '.getcwd());
 	error_log('INFO: starting '.$cmd);
+	exec($cmd, $o, $rc);
+
+	if ($rc == 0 && $n -> getNType() == 'docker') {
+		// Need to configure each interface
+		foreach ($n -> getEthernets() as $interface_id => $interface) {
+			// TODO must check each step against errors
+			// ip link add docker3_4_5 type veth peer name vnet3_4_5
+			$cmd = 'ip link add docker'.$t.'_'.$id.'_'.$interface_id.' type veth peer name vnet'.$t.'_'.$id.'_'.$interface_id;
+			error_log('INFO: starting '.$cmd);
+			exec($cmd, $o, $rc);
+			// ip link set dev vnet3_4_5 up
+			$cmd = 'ip link set dev vnet'.$t.'_'.$id.'_'.$interface_id.' up';
+			error_log('INFO: starting '.$cmd);
+			exec($cmd, $o, $rc);
+			// brctl addif vnet0_1 vnet3_4_5
+			$cmd = 'brctl addif vnet'.$t.'_'.$interface -> getNetworkId().'  vnet'.$t.'_'.$id.'_'.$interface_id;
+			error_log('INFO: starting '.$cmd);
+			exec($cmd, $o, $rc);
+			// PID=$(docker inspect --format '{{ .State.Pid }}' docker3_4) # Must be greater than 0
+			$cmd = 'docker inspect --format "{{ .State.Pid }}" '.$n -> getUuid();
+			error_log('INFO: starting '.$cmd);
+			exec($cmd, $o, $rc);
+			// ip link set netns ${PID} docker3_4_5 name eth0 address 22:ce:e0:99:04:05 up
+			$cmd = 'ip link set netns '.$o[0].' docker'.$t.'_'.$id.'_'.$interface_id.' name eth0 address '.'50:'.sprintf('%02x', $t).':'.sprintf('%02x', $id / 512).':'.sprintf('%02x', $id % 512).':00:'.sprintf('%02x', $interface_id).' up';
+			error_log('INFO: starting '.$cmd);
+			exec($cmd, $o, $rc);
+			// /opt/unetlab/wrappers/nsenter -t ${PID} -n ip addr add 1.1.1.1/24 dev eth0
+			// /opt/unetlab/wrappers/nsenter -t ${PID} -n ip route add default via 1.1.1.254
+
+		}
+	}
 
 	return 0;
 }
