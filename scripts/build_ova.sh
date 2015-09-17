@@ -166,7 +166,7 @@ fi
 echo -e "DONE"
 
 echo -e "Installing required packages under $TEMP/target..."
-apt-get -y -o RootDir=$TEMP/target install ubuntu-minimal
+chroot $TEMP/target apt-get -y install ubuntu-minimal
 if [ $? -ne 0 ]; then
 	echo -e "FAILED"
 	umount $TEMP/target/boot
@@ -176,6 +176,11 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 echo -e "DONE"
+
+
+
+
+chroot $TEMP/target dpkg-reconfigure locales
 
 
 
