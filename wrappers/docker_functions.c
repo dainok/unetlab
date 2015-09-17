@@ -1,7 +1,9 @@
+// vim: syntax=c tabstop=4 softtabstop=0 noexpandtab laststatus=1 ruler
+
 /**
- * wrappers/includes/serial2udp.h
+ * wrappers/docker_functions.c
  *
- * Serial to UDP converter for wrappers.
+ * Functions for docker_wrapper.
  *
  * LICENSE:
  *
@@ -27,13 +29,17 @@
  * @version 20150730
  */
 
-#include <sys/types.h>
-
-// Serial to UDP Converter: listen
-int serial2udp_listen(int port, int *server_socket);
-
-// Serial to UDP Converter: add end-point
-int serial2udp_add(int *remote_socket, int *remote_id, int *remote_if, char *serial2udp_map);
-
-// Serial to UDP Converter: receive
-int serial2udp_receive(void *c, int server_socket, int bytesToRead);
+// Print usage
+void usage(const char *bin) {
+    printf("Usage: %s <standard options> <specific options>\n", bin);
+    printf("Standard Options:\n");
+    printf("-T <n>    *Tenant ID\n");
+    printf("-D <n>    *Device ID\n");
+    printf("-d <n>     Delayed start in seconds (default 0)\n");
+    printf("-t <desc>  Window (xterm) title\n");
+    printf("Specific Options:\n");
+    printf("-I <n>    *Docker ID\n");
+    printf("* Mandatory option\n");
+    printf("WARNING: use the above parameter order!\n");
+    exit(1);
+}

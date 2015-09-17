@@ -12,5 +12,7 @@ chown root:utmp /var/log/wtmp
 rm -f /etc/apt/apt.conf.d/00proxy
 rm -f /opt/ovf/.configured
 rm -f /etc/issue
+rm -rf /root/.cache /root/.Xauthority /root/.bash_history
+rm -rf /tmp/vmware-root
 
 history -c; dd if=/dev/zero of=file bs=1M; rm -f file; poweroff

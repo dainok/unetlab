@@ -1,9 +1,9 @@
 // vim: syntax=c tabstop=4 softtabstop=0 noexpandtab laststatus=1 ruler
 
 /**
- * wrappers/qemu_wrapper.c
+ * wrappers/docker_wrapper.c
  *
- * Wrapper for QEMU.
+ * Wrapper for Docker.
  *
  * LICENSE:
  *
@@ -31,7 +31,7 @@
 
 /*
  * Example:
- *  /opt/unetlab/wrappers/qemu_wrapper -T 3 -D 0 -t "vIOS" -d 0 -F /usr/bin/qemu-system-i386 -- -machine type=pc-1.0,accel=kvm:tcg -serial mon:stdio -nographic -nodefconfig -nodefaults -rtc base=utc -no-shutdown -boot order=c -smp 1 -m 384 -device e1000,netdev=net0,mac=52:54:00:03:00:00 -netdev tap,id=net0,ifname=vunl3_0_0,script=no -device e1000,netdev=net1,mac=52:54:00:03:00:01 -netdev tap,id=net1,ifname=vunl3_0_1,script=no -device e1000,netdev=net2,mac=52:54:00:03:00:02 -netdev tap,id=net2,ifname=vunl3_0_2,script=no -device e1000,netdev=net3,mac=52:54:00:03:00:03 -netdev tap,id=net3,ifname=vunl3_0_3,script=no
+ *  /opt/unetlab/wrappers/docker_wrapper -T 3 -D 0 -t "Docker1" -I "ae89c614-dc96-4019-b713-22b251ab4704-1"
  */
 
 #include <errno.h>
@@ -47,7 +47,7 @@
 #include "include/functions.h"
 #include "include/ts.h"
 #include "include/log.h"
-#include "qemu_functions.h"
+#include "docker_functions.h"
 
 #include "include/params.h"
 
@@ -63,8 +63,6 @@ int main (int argc, char *argv[]) {
     cmd = (char *) calloc(m, sizeof(char));
 
     // Child's parameters
-    int *child_delay = mmap(NULL, sizeof(int), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
-    *child_delay = 0;                       // Delay before starting (shared between parent and child)
     char *child_file = NULL;                // Binary file
     int child_pid = -1;                     // PID after the fork()
     int child_status = -1;                  // Used during waitpid()
@@ -73,7 +71,7 @@ int main (int argc, char *argv[]) {
     int ts_socket = -1;                     // Telnet server socket
     int ts_port = -1;                       // TCP (console) and UDP (serial converter) port
     char child_output = '\0';               // Store single char from child
-    unsigned char client_input = '\0';               // Store single char from client
+    unsigned char client_input = '\0';		// Store single char from client
     char *xtitle = "Terminal Server";       // Title for telnet clients
 
     // Select parameters
@@ -89,11 +87,10 @@ int main (int argc, char *argv[]) {
     int j = -1;                             // Counter
     int opt = NULL;                         // Store CMD options
     int rc = -1;                            // Generic return code
-    int vnc = 0;                            // If 1, enable VNC console
     struct sigaction sa;                    // Manage signals (SIGHUP, SIGTERM...)
 
     // Parsing options
-    while ((opt = getopt(argc, argv, ":vT:D:d:t:F:x")) != -1) {
+    while ((opt = getopt(argc, argv, ":vT:D:t:I:")) != -1) {
         switch (opt) {
             default:
                 usage(argv[0]);
@@ -120,29 +117,17 @@ int main (int argc, char *argv[]) {
                 }
                 UNLLog(LLINFO, "Device_id = %i\n", device_id);
                 break;
-            case 'F':
-                // Mandatory: subprocess executable
+            case 'I':
+                // Mandatory: Docker ID
                 child_file = optarg;
                 if (is_file(child_file) != 0) {
                     UNLLog(LLERROR,"File '%s' does not exist.\n", child_file);
                     exit(1);
                 }
                 break;
-            case 'd':
-                // Optional: child's startup delay (default 0)
-                *child_delay = atoi(optarg);
-                if (*child_delay < 0) {
-                    UNLLog(LLERROR,"Delay must be integer.\n");
-                    exit(1);
-                }
-                break;
             case 't':
                 // Optional: telnet window title (default "Terminal Server")
                 xtitle = optarg;
-                break;
-            case 'x':
-                // Optiona: disable STD output (serial console) and enable VNC console
-                vnc = 1;
                 break;
         }
     }
@@ -189,14 +174,12 @@ int main (int argc, char *argv[]) {
     }
 
     // Telnet listen
-    if (vnc != 1) {
-        ts_port = 32768 + 128 * tenant_id + device_id;
-        tsclients_socket[0] = 0;
-        if ((rc = ts_listen(ts_port, &ts_socket)) != 0) {
-            UNLLog(LLERROR, "Failed to open TCP socket (%i).\n", rc);
-            exit(1);
-        }
-    }
+	ts_port = 32768 + 128 * tenant_id + device_id;
+	tsclients_socket[0] = 0;
+	if ((rc = ts_listen(ts_port, &ts_socket)) != 0) {
+		UNLLog(LLERROR, "Failed to open TCP socket (%i).\n", rc);
+		exit(1);
+	}
 
     // Forking
     if ((rc = fork()) == 0) {
