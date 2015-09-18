@@ -1,9 +1,9 @@
 // vim: syntax=c tabstop=4 softtabstop=0 noexpandtab laststatus=1 ruler
 
 /**
- * wrappers/docker_functions.c
+ * wrappers/docker_functions.h
  *
- * Functions for docker_wrapper.
+ * Functions for dcoker_wrapper.
  *
  * LICENSE:
  *
@@ -26,20 +26,10 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150730
+ * @version 20150715
  */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <sys/types.h>
 
 // Print usage
-void usage(const char *bin) {
-    printf("Usage: %s <standard options> -- attach <Docker ID>\n", bin);
-    printf("Standard Options:\n");
-    printf("-T <n>    *Tenant ID\n");
-    printf("-D <n>    *Device ID\n");
-    printf("-t <desc>  Window (xterm) title\n");
-    printf("-F <n>    *Docker executable\n");
-    printf("* Mandatory option\n");
-    exit(1);
-}
+void usage(char *bin);

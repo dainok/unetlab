@@ -25,6 +25,10 @@ all:
 	chmod 755 $(DST)/dynamips_wrapper
 	chown root:root $(DST)/dynamips_wrapper
 
+	$(CC) $(CFLAGS) -o $(DST)/docker_wrapper $(INC) docker_wrapper.c docker_functions.c
+	chmod 755 $(DST)/docker_wrapper
+	chown root:root $(DST)/docker_wrapper
+
 	cp -a nsenter $(DST)/nsenter
 	chmod 755 $(DST)/nsenter
 	chown root:root $(DST)/nsenter
@@ -34,5 +38,6 @@ uninstall:
 	rm -f $(DST)/iol_wrapper
 	rm -f $(DST)/qemu_wrapper
 	rm -f $(DST)/dynamips_wrapper
+	rm -f $(DST)/docker_wrapper
 	rm -f $(DST)/unl_wrapper
 	rm -f $(DST)/nsenter

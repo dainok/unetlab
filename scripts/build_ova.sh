@@ -11,6 +11,8 @@ VMDK="Unified_Networking_Lab-disk1.vmdk"
 QCOW="Unified_Networking_Lab-disk1.qcow2"
 OVF="Unified Networking Lab.ovf"
 
+export DEBIAN_FRONTEND="noninteractive"
+
 echo -ne "Creating a VMDK disk under $TEMP... "
 /opt/qemu/bin/qemu-img create -f vmdk $TEMP/unetlab-disk1.vmdk 20G > /dev/null 2>&1
 if [ $? -ne 0 ]; then
@@ -166,7 +168,7 @@ fi
 echo -e "DONE"
 
 echo -e "Installing required packages under $TEMP/target..."
-chroot $TEMP/target apt-get -y install ubuntu-minimal
+chroot $TEMP/target apt-get -o Dpkg::Options::="--force-confold" --force-yes -fuy install ubuntu-minimal apparmor cron curl dmsetup grub-common grub-pc init-system-helpers kbd keyboard-configuration lvm2 mime-support nano ncurses-term openssh-server openssh-sftp-server pciutils sharutils telnet ucf vlan xkb-data 
 if [ $? -ne 0 ]; then
 	echo -e "FAILED"
 	umount $TEMP/target/boot
@@ -177,10 +179,86 @@ if [ $? -ne 0 ]; then
 fi
 echo -e "DONE"
 
+echo -ne "Installing RR Labs key under $TEMP/target..."
+curl -s http://www.unetlab.com/rrlabs.key | chroot $TEMP/target apt-key add - > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+	echo -e "FAILED"
+	umount $TEMP/target/boot
+	umount $TEMP/target
+	/opt/qemu/bin/qemu-nbd -d /dev/nbd0
+	rm -rf $TEMP
+	exit 1
+fi
+echo -e "DONE"
 
+cat > $TEMP/target/etc/apt/sources.list << EOF
+# See http://help.ubuntu.com/community/UpgradeNotes for how to upgrade to
+# newer versions of the distribution.
+deb http://us.archive.ubuntu.com/ubuntu/ trusty main restricted
+deb-src http://us.archive.ubuntu.com/ubuntu/ trusty main restricted
 
+## Major bug fix updates produced after the final release of the
+## distribution.
+deb http://us.archive.ubuntu.com/ubuntu/ trusty-updates main restricted
+deb-src http://us.archive.ubuntu.com/ubuntu/ trusty-updates main restricted
 
-chroot $TEMP/target dpkg-reconfigure locales
+## N.B. software from this repository is ENTIRELY UNSUPPORTED by the Ubuntu
+## team. Also, please note that software in universe WILL NOT receive any
+## review or updates from the Ubuntu security team.
+deb http://us.archive.ubuntu.com/ubuntu/ trusty universe
+deb-src http://us.archive.ubuntu.com/ubuntu/ trusty universe
+deb http://us.archive.ubuntu.com/ubuntu/ trusty-updates universe
+deb-src http://us.archive.ubuntu.com/ubuntu/ trusty-updates universe
+
+deb http://security.ubuntu.com/ubuntu trusty-security main
+deb-src http://security.ubuntu.com/ubuntu trusty-security main
+deb http://security.ubuntu.com/ubuntu trusty-security universe
+deb-src http://security.ubuntu.com/ubuntu trusty-security universe
+deb http://security.ubuntu.com/ubuntu trusty-security multiverse
+deb-src http://security.ubuntu.com/ubuntu trusty-security multiverse
+
+## Uncomment the following two lines to add software from Canonical's
+## 'partner' repository.
+## This software is not part of Ubuntu, but is offered by Canonical and the
+## respective vendors as a service to Ubuntu users.
+# deb http://archive.canonical.com/ubuntu trusty partner
+# deb-src http://archive.canonical.com/ubuntu trusty partner
+
+## Uncomment the following two lines to add software from Ubuntu's
+## 'extras' repository.
+## This software is not part of Ubuntu, but is offered by third-party
+## developers who want to ship their latest software.
+# deb http://extras.ubuntu.com/ubuntu trusty main
+# deb-src http://extras.ubuntu.com/ubuntu trusty main
+EOF
+
+cat > $TEMP/target/etc/apt/sources.list.d/unetlab.list << EOF
+deb http://public.routereflector.com/apt trusty rrlabs
+EOF
+
+echo -e "Updating APT repos..."
+apt-get -y -o RootDir=$TEMP/target update
+if [ $? -ne 0 ]; then
+	echo -e "FAILED"
+	umount $TEMP/target/boot
+	umount $TEMP/target
+	/opt/qemu/bin/qemu-nbd -d /dev/nbd0
+	rm -rf $TEMP
+	exit 1
+fi
+echo -e "DONE"
+
+echo -e "Installing UNetLab under $TEMP/target..."
+chroot $TEMP/target apt-get -o Dpkg::Options::="--force-confold" --force-yes -fuy install unetlab
+if [ $? -ne 0 ]; then
+	echo -e "FAILED"
+	umount $TEMP/target/boot
+	umount $TEMP/target
+	/opt/qemu/bin/qemu-nbd -d /dev/nbd0
+	rm -rf $TEMP
+	exit 1
+fi
+echo -e "DONE"
 
 
 

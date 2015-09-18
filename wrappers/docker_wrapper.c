@@ -31,7 +31,7 @@
 
 /*
  * Example:
- *  /opt/unetlab/wrappers/docker_wrapper -T 3 -D 0 -t "Docker1" -I "ae89c614-dc96-4019-b713-22b251ab4704-1"
+ *  /opt/unetlab/wrappers/docker_wrapper -T 11 -D 1 -t "Docker1" -F /usr/bin/docker -- attach ae89c614-dc96-4019-b713-22b251ab4704-11-1
  */
 
 #include <errno.h>
@@ -90,7 +90,7 @@ int main (int argc, char *argv[]) {
     struct sigaction sa;                    // Manage signals (SIGHUP, SIGTERM...)
 
     // Parsing options
-    while ((opt = getopt(argc, argv, ":vT:D:t:I:")) != -1) {
+    while ((opt = getopt(argc, argv, ":vT:D:t:F:")) != -1) {
         switch (opt) {
             default:
                 usage(argv[0]);
@@ -117,8 +117,8 @@ int main (int argc, char *argv[]) {
                 }
                 UNLLog(LLINFO, "Device_id = %i\n", device_id);
                 break;
-            case 'I':
-                // Mandatory: Docker ID
+            case 'F':
+                // Mandatory: subprocess executable
                 child_file = optarg;
                 if (is_file(child_file) != 0) {
                     UNLLog(LLERROR,"File '%s' does not exist.\n", child_file);
@@ -185,15 +185,6 @@ int main (int argc, char *argv[]) {
     if ((rc = fork()) == 0) {
         // Child: stating subprocess
         UNLLog(LLINFO, "Starting child (%s).\n", cmd);
-        if (*child_delay > 0) {
-            // Delay is set, waiting
-            for (; *child_delay > 0;) {
-                rc = write(outfd[1], ".", 1);
-                *child_delay = *child_delay - 1;
-                sleep(1);
-            }
-            rc = write(outfd[1], "\n", 1);
-        }
         close(STDIN_FILENO);            // Closing child's stdin
         close(STDOUT_FILENO);           // Closing child's stdout
         dup2(infd[0], STDIN_FILENO);    // Linking stdin to PIPE
@@ -204,7 +195,10 @@ int main (int argc, char *argv[]) {
         close(outfd[0]);
         close(outfd[1]);
         // Start process
-        rc = cmd_start(cmd);
+		while (rc == -1 || rc == 0) {
+			// Start console until it fail
+			rc = cmd_start(cmd);
+		}
         // Subprocess terminated, killing the parent
         UNLLog(LLERROR, "Child terminated (%i).\n", rc);
     } else if (rc > 0) {
@@ -234,56 +228,50 @@ int main (int argc, char *argv[]) {
         }
 
         // Preparing select()
-        if (vnc != 1) {
-            FD_ZERO(&active_fd_set);
-            FD_ZERO(&read_fd_set);
-            FD_SET(outfd[0], &active_fd_set);         // Adding subprocess stdout
-            FD_SET(ts_socket, &active_fd_set);        // Adding telnet socket
+		FD_ZERO(&active_fd_set);
+		FD_ZERO(&read_fd_set);
+		FD_SET(outfd[0], &active_fd_set);         // Adding subprocess stdout
+		FD_SET(ts_socket, &active_fd_set);        // Adding telnet socket
 
-            // While subprocess is running, check IO from subprocess, telnet clients, socket and network
-            while (waitpid(child_pid, &child_status, WNOHANG|WUNTRACED) == 0) {
-                // Check if select() is valid
-                read_fd_set = active_fd_set;
-                if (select(FD_SETSIZE, &read_fd_set, NULL, NULL, NULL) <= 0) {
-                    UNLLog(LLERROR, "Failed to select().\n");
-                    kill(0, SIGTERM);
-                    break;
-                }
+		// While subprocess is running, check IO from subprocess, telnet clients, socket and network
+		while (waitpid(child_pid, &child_status, WNOHANG|WUNTRACED) == 0) {
+			// Check if select() is valid
+			read_fd_set = active_fd_set;
+			if (select(FD_SETSIZE, &read_fd_set, NULL, NULL, NULL) <= 0) {
+				UNLLog(LLERROR, "Failed to select().\n");
+				kill(0, SIGTERM);
+				break;
+			}
 
-                // Check if output from child
-                if (FD_ISSET(outfd[0], &read_fd_set)) {
-                    if (read(outfd[0], &child_output, 1) <= 0) {
-                        UNLLog(LLERROR, "Error while reading data from the subprocess, killing it.\n");
-                        kill(0, SIGTERM);
-                        break;
-                    }
-                    // Writing to all telnet clients
-                    ts_broadcast(child_output, &active_fd_set, tsclients_socket);
-                }
+			// Check if output from child
+			if (FD_ISSET(outfd[0], &read_fd_set)) {
+				if (read(outfd[0], &child_output, 1) <= 0) {
+					UNLLog(LLERROR, "Error while reading data from the subprocess, killing it.\n");
+					kill(0, SIGTERM);
+					break;
+				}
+				// Writing to all telnet clients
+				ts_broadcast(child_output, &active_fd_set, tsclients_socket);
+			}
 
-                // Check if new client is coming
-                if (FD_ISSET(ts_socket, &read_fd_set)) {
-                    if ((rc = ts_accept(&active_fd_set, ts_socket, xtitle, tsclients_socket,1)) != 0) {
-                        UNLLog(LLERROR, "Failed to accept a new client (%i).\n", rc);
-                    }
-                }
+			// Check if new client is coming
+			if (FD_ISSET(ts_socket, &read_fd_set)) {
+				if ((rc = ts_accept(&active_fd_set, ts_socket, xtitle, tsclients_socket,1)) != 0) {
+					UNLLog(LLERROR, "Failed to accept a new client (%i).\n", rc);
+				}
+			}
 
-                // Check for output from all telnet clients
-                if (ts_receive(&client_input, &read_fd_set, &active_fd_set, tsclients_socket) == 0) {
-                    // Write to child
-                    rc = write(infd[1], &client_input, 1);
-                    if (rc < 0) {
-                        UNLLog(LLERROR, "Error writing to the subprocess, closing.\n");
-                        kill(0, SIGTERM);
-                        break;
-                    }
-                }
-            }
-        } else {
-            waitpid(child_pid, &child_status, 0);
-            // Child is no more running
-            UNLLog(LLERROR, "Child is no more running.\n");
-        }
+			// Check for output from all telnet clients
+			if (ts_receive(&client_input, &read_fd_set, &active_fd_set, tsclients_socket) == 0) {
+				// Write to child
+				rc = write(infd[1], &client_input, 1);
+				if (rc < 0) {
+					UNLLog(LLERROR, "Error writing to the subprocess, closing.\n");
+					kill(0, SIGTERM);
+					break;
+				}
+			}
+		}
     } else {
         UNLLog(LLERROR, "Failed to fork.\n" );
         exit(1);
