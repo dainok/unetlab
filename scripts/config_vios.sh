@@ -12,6 +12,7 @@ export() {
 	# Set of script to export config from IMAGE to FILE
 	IMAGE=$1
 	FILE=$2
+	modprobe nbd max_part=32 > /dev/null 2>&1
 	mkdir -p ${IMAGE}/vdisk > /dev/null 2>&1
 	if [ $? -ne 0 ]; then
 		echo "ERROR: cannot create vdisk directory."
@@ -43,6 +44,7 @@ import() {
 	# Set of script to IMPORT config from FILE to IMAGE
 	IMAGE=$1
 	FILE=$2
+	modprobe nbd max_part=32 > /dev/null 2>&1
 	mkdir -p ${IMAGE}/vdisk > /dev/null 2>&1
 	if [ $? -ne 0 ]; then
 		echo "ERROR: cannot create vdisk directory."
