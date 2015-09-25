@@ -468,6 +468,7 @@ function export($node_id, $n, $lab) {
 			}
 			$cmd = '/opt/unetlab/scripts/iou_export '.$nvram.' '.$tmp;
 			exec($cmd, $o, $rc);
+			usleep(1);
 			error_log('INFO: exporting '.$cmd);
 			if ($rc != 0) {
 				error_log('ERROR: '.$GLOBALS['messages'][80060]);

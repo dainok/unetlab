@@ -208,9 +208,9 @@ def main():
         sys.exit(1)
     if action == 'put':
         try:
-            fh = open(filename, 'r')
-            config = fh.read()
-            fh.close()
+            fd = open(filename, 'r')
+            config = fd.read()
+            fd.close()
         except:
             usage()
             print('ERROR: cannot read from file.')
@@ -247,9 +247,9 @@ def main():
                 sys.exit(4)
 
             try:
-                fh = open(filename, 'a')
-                fh.write(config)
-                fh.close()
+                fd = open(filename, 'a')
+                fd.write(config)
+                fd.close()
             except:
                 print('ERROR: cannot write config to file.')
 
