@@ -2,9 +2,9 @@
 # vim: syntax=php tabstop=4 softtabstop=0 noexpandtab laststatus=1 ruler
 
 /**
- * html/templates/vmx.php
+ * html/templates/vsrxng.php
  *
- * vmx template for UNetLab.
+ * vsrx-ng template for UNetLab.
  *
  * LICENSE:
  *
@@ -31,12 +31,13 @@
  */
 
 $p['type'] = 'qemu';
-$p['name'] = 'vMX';
+$p['name'] = 'vSRX-NG';
 $p['icon'] = 'Router.png';
-$p['cpu'] = 1;
-$p['ram'] = 2048;
-$p['ethernet'] = 6;
-$p['console'] = 'telnet';
+$p['cpu'] = 2;
+$p['ram'] = 4096;
+$p['ethernet'] = 4;
+$p['console'] = 'vnc';
+$p['qemu_nic'] = 'virtio-net-pci';
 $p['qemu_arch'] = 'x86_64';
-$p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -serial mon:stdio -nographic';
+$p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -vga std -nodefconfig -nodefaults -rtc base=utc -no-shutdown -boot order=c';
 ?>

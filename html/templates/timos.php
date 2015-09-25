@@ -33,7 +33,11 @@
 $p['type'] = 'qemu';
 $p['name'] = '7750SR';
 $p['icon'] = 'Router.png';
-$p['cpu'] = 2;
+if (function_exists('isVirtual') && isVirtual()) {
+	$p['cpu'] = 1;
+} else {
+	$p['cpu'] = 2;
+}
 $p['ram'] = 2048; 
 $p['ethernet'] = 6; 
 $p['console'] = 'telnet'; 

@@ -475,6 +475,19 @@ function export($node_id, $n, $lab) {
 				return 80060;
 			}
 			break;
+		case 'qemu':
+			switch ($n -> getTemplate()) {
+				case 'vios':
+					$cmd = '/usr/src/unetlab/scripts/config_vios.py -a get -p '.$n -> getPort().' -f '.$tmp.' -t 15';
+					exec($cmd, $o, $rc);
+					error_log('INFO: exporting '.$cmd);
+					if ($rc != 0) {
+						error_log('ERROR: '.$GLOBALS['messages'][80060]);
+						error_log((string) $o);
+						return 80060;
+					}
+					break;
+			}
 	}
 
 	if (!is_file($tmp)) {

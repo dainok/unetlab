@@ -92,6 +92,7 @@ if (!isset($node_templates)) {
 		'olive'			=>	'Juniper Olive',
 		'vmx'			=>	'Juniper vMX',
 		'vsrx'			=>	'Juniper vSRX',
+		'vsrxng'		=>	'Juniper vSRX NextGen',
 		'linux'			=>	'Linux',
 		'mikrotik'		=>	'MikroTik RouterOS',
 		'ostinato'		=>	'Ostinato',
