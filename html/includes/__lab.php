@@ -27,7 +27,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150807
+ * @version 20150910
  * @property type $author Author name of the lab. It's optional.
  * @property type $description Description of the lab. It's optional
  * @property type $filename The filename of the lab (without path). It's mandatory and automatically set.

@@ -27,7 +27,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150828
+ * @version 20150925
  */
 
 /**
@@ -392,7 +392,7 @@ function delTap($s) {
  *
  * @param   string  $config_data        The startup-config
  * @param   string  $file_path          File with full path where config is stored
- * @return  bool                        true if configured
+ * @return  bool                        true if config dumped
  */
 function dumpConfig($config_data, $file_path) {
 	$fp = fopen($file_path, 'w');
@@ -478,7 +478,7 @@ function export($node_id, $n, $lab) {
 		case 'qemu':
 			switch ($n -> getTemplate()) {
 				case 'vios':
-					$cmd = '/usr/src/unetlab/scripts/config_vios.py -a get -p '.$n -> getPort().' -f '.$tmp.' -t 15';
+					$cmd = '/opt/unetlab/scripts/config_vios.py -a get -p '.$n -> getPort().' -f '.$tmp.' -t 15';
 					exec($cmd, $o, $rc);
 					error_log('INFO: exporting '.$cmd);
 					if ($rc != 0) {
@@ -667,12 +667,20 @@ function prepareNode($n, $id, $t, $nets) {
 		return 80036;
 	}
 
-	if (!is_file($n -> getRunningPath().'/.configured') && !is_file($n -> getRunningPath().'/.lock')) {
-		// Node is not configured/locked
+	if (!is_file($n -> getRunningPath().'/.prepared') && !is_file($n -> getRunningPath().'/.lock')) {
+		// Node is not prepared/locked
 		if (!is_dir($n -> getRunningPath()) && !mkdir($n -> getRunningPath(), 0775, True)) {
 			// Cannot create running directory
 			error_log('ERROR: '.$GLOBALS['messages'][80037]);
 			return 80037;
+		}
+
+		if ($n -> getConfig() == 'Saved') {
+			// Node should use saved startup-config
+			if (!dumpConfig($n -> getConfigData(), $n -> getRunningPath().'/startup-config')) {
+				// Cannot dump config to startup-config file
+				error_log('WARNING: '.$GLOBALS['messages'][80067]);
+			}
 		}
 
 		switch ($n -> getNType()) {
@@ -694,13 +702,6 @@ function prepareNode($n, $id, $t, $nets) {
 					return 80040;
 				}
 
-				if ($n -> getConfig() == 'Saved') {
-					// Node should use saved startup-config
-					if (!dumpConfig($n -> getConfigData(), $n -> getRunningPath().'/startup-config')) {
-						// Cannot dump config to startup-config file
-						error_log('WARNING: '.$GLOBALS['messages'][80067]);
-					}
-				}
 				break;
 			case 'docker':
 				if (!is_file('/usr/bin/docker')) {
@@ -723,13 +724,7 @@ function prepareNode($n, $id, $t, $nets) {
 				}
 				break;
 			case 'dynamips':
-				if ($n -> getConfig() == 'Saved') {
-					// Node should use saved startup-config
-					if (!dumpConfig($n -> getConfigData(), $n -> getRunningPath().'/startup-config')) {
-						// Cannot dump config to startup-config file
-						error_log('WARNING: '.$GLOBALS['messages'][80067]);
-					}
-				}
+				// Nothing to do
 				break;
 			case 'qemu':
 				$image = '/opt/unetlab/addons/qemu/'.$n -> getImage();
@@ -764,8 +759,8 @@ function prepareNode($n, $id, $t, $nets) {
 				break;
 		}
 
-		// Mark the node as configured
-		if (!touch($n -> getRunningPath().'/.configured')) {
+		// Mark the node as prepared
+		if (!touch($n -> getRunningPath().'/.prepared')) {
 			// Cannot write on directory
 			error_log('ERROR: '.$GLOBALS['messages'][80044]);
 			return 80044;
@@ -848,6 +843,15 @@ function start($n, $id, $t, $nets) {
 	error_log('INFO: starting '.$cmd);
 	exec($cmd, $o, $rc);
 
+	if ($rc == 0 && $n -> getNType() == 'qemu' && is_file($n -> getRunningPath().'/startup-config') && !is_file(is_file($n -> getRunningPath().'/.configured'))) {
+		// Start configuration process
+		touch($n -> getRunningPath().'/.lock');
+		$cmd = 'nohup /opt/unetlab/scripts/config_vios.py -a put -p '.$n -> getPort().' -f '.$n -> getRunningPath().'/startup-config -t '.($n -> getDelay() + 300).' &';
+		exec($cmd, $o, $rc);
+		error_log('INFO: importing '.$cmd);
+	}
+
+
 	if ($rc == 0 && $n -> getNType() == 'docker') {
 		// Need to configure each interface
 		foreach ($n -> getEthernets() as $interface_id => $interface) {
@@ -874,7 +878,6 @@ function start($n, $id, $t, $nets) {
 			exec($cmd, $o, $rc);
 			// /opt/unetlab/wrappers/nsenter -t ${PID} -n ip addr add 1.1.1.1/24 dev eth0
 			// /opt/unetlab/wrappers/nsenter -t ${PID} -n ip route add default via 1.1.1.254
-
 		}
 	}
 
@@ -888,7 +891,7 @@ function start($n, $id, $t, $nets) {
  * @return  int                         0 means ok
  */
 function stop($n) {
-	if ($n -> getStatus() == 1) {
+	if ($n -> getStatus() != 0) {
 		if ($n -> getNType() == 'docker') {
 			$cmd = 'docker stop '.$n -> getUuid();
 		} else {

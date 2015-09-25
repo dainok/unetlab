@@ -34,19 +34,20 @@ password = 'cisco'
 secret = 'cisco'
 
 def node_login(handler, end_before):
-    # Send an empty line
-    handler.sendline('\r\n')
-    i = handler.expect([
-        'Press RETURN to get started',
-        'Username:',
-        '\(config',
-        '>',
-        '#'], timeout = end_before - now())
+    # Send an empty line, and wait for the login prompt
+    i = -1
+    while (i == -1 or now() > end_before):
+        try:
+            handler.sendline('\r\n')
+            i = handler.expect([
+                'Username:',
+                '\(config',
+                '>',
+                '#'], timeout = 1)
+        except:
+            i = -1
+
     if i == 0:
-        # Need to send an additional EOL and start node_login() again
-        handler.sendline('\r\n')
-        return node_login(handler)
-    elif i == 1:
         # Need to send username and password
         handler.sendline(username)
         handler.expect('Password:', timeout = end_before - now())
@@ -54,7 +55,7 @@ def node_login(handler, end_before):
         j = handler.expect(['>', '#'], timeout = end_before - now())
         if j == 0:
             # Secret password required
-            return node_login(handler)
+            return node_login(handler, end_before)
         elif j == 1:
             # Nothing to do
             return True
@@ -62,12 +63,12 @@ def node_login(handler, end_before):
             # Unexpected output
             node_quit(handler)
             return False
-    elif i == 2:
+    elif i == 1:
         # Config mode detected, need to exit
         handler.sendline('end')
         handler.expect('#', timeout = end_before - now())
         return True
-    elif i == 3:
+    elif i == 2:
         # Need higher privilege
         handler.sendline('enable')
         j = handler.expect(['Password:', '#'], timeout = end_before - now())
@@ -83,7 +84,7 @@ def node_login(handler, end_before):
             # Unexpected output
             node_quit(handler)
             return False
-    elif i == 4:
+    elif i == 3:
         # Nothing to do
         return True
     else:
@@ -258,6 +259,17 @@ def main():
                 print('ERROR: failed to push config.')
                 node_quit(handler)
                 sys.exit(4)
+
+            # Remove lock file
+            lock = '%s/.lock' %(os.path.dirname(filename))
+
+            if os.path.exists(lock):
+                os.remove(lock)
+
+            # Mark as configured
+            configured = '%s/.configured' %(os.path.dirname(filename))
+            if not os.path.exists(configured):
+                open(configured, 'a').close()
 
         node_quit(handler)
 

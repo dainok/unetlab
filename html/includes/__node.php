@@ -27,7 +27,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150826
+ * @version 20150925
  * @property type $flags_eth CMD flags related to Ethernet interfaces. It's mandatory and automatically set.
  * @property type $flags_ser CMD flags related to Serial interfaces. It's mandatory and automatically set.
  * @property type $console protocol. It's optional.
@@ -1133,7 +1133,7 @@ class Node {
 				return 0;
 			} else if (is_file(BASE_TMP.'/'.$this -> tenant.'/'.$this -> lab_id.'/'.$this -> id.'/.lock')) {
 				// Lock file is present, node is building
-				return 1;
+				return 2;
 			} else {
 				// Need to check if node port is used (netstat + grep doesn't require root privileges)
 				$cmd = 'netstat -a -t -n | grep LISTEN | grep :'.$this -> port.' 2>&1';

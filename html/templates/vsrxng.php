@@ -2,9 +2,9 @@
 # vim: syntax=php tabstop=4 softtabstop=0 noexpandtab laststatus=1 ruler
 
 /**
- * html/templates/vsrxng.php
+ * html/templates/vsrx.php
  *
- * vsrx-ng template for UNetLab.
+ * vsrx template for UNetLab.
  *
  * LICENSE:
  *
@@ -27,7 +27,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150826
+ * @version 20150918
  */
 
 $p['type'] = 'qemu';

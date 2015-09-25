@@ -5,7 +5,7 @@
 /**
  * scripts/set_uuid.php
  *
- * Scripts to create lab UUID and rename tmp folder for UNetLab.
+ * Script to create lab UUID and rename tmp folder for UNetLab.
  *
  * LICENSE:
  *

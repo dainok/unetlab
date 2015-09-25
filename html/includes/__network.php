@@ -27,7 +27,7 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150715
+ * @version 20150904
  * @property type $count Total of connected nodes to this network. If not set, it's automatically set to 0.
  * @property type $id Network ID. Mandatory and set during construction phase.
  * @property type $left Left margin for visual position. It's optional.
