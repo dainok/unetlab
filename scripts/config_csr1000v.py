@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-# scripts/config_viosl2.py
+# scripts/config_csr1000v.py
 #
-# Import/Export script for vIOS L2.
+# Import/Export script for CSR 1000v.
 #
 # LICENSE:
 #
@@ -31,7 +31,7 @@ import getopt, os, pexpect, re, sys, time
 
 username = 'cisco'
 password = 'cisco'
-secret = 'cisco'
+secret = ''
 
 def node_login(handler, end_before):
     # Send an empty line, and wait for the login prompt

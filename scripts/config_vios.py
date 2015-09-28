@@ -109,14 +109,14 @@ def config_get(handler, end_before):
     handler.expect('#', timeout = end_before - now())
 
     # Getting the config
-    handler.sendline('show startup-config')
+    handler.sendline('more system:running-config')
     handler.expect('#', timeout = end_before - now())
     config = handler.before.decode()
-    print(config)
 
     # Manipulating the config
     config = re.sub('\r', '', config, flags=re.DOTALL)                                      # Unix style
     config = re.sub('.*Using [0-9]+ out of [0-9]+ bytes\n', '', config, flags=re.DOTALL)    # Header
+    config = re.sub('.*more system:running-config\n', '', config, flags=re.DOTALL)          # Header
     config = re.sub('!\nend.*', '!\nend', config, flags=re.DOTALL)                          # Footer
 
     return config

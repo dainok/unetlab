@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-# scripts/config_viosl2.py
+# scripts/config_titanium.py
 #
-# Import/Export script for vIOS L2.
+# Import/Export script for Titanium / NX-OS.
 #
 # LICENSE:
 #
@@ -29,9 +29,8 @@
 
 import getopt, os, pexpect, re, sys, time
 
-username = 'cisco'
-password = 'cisco'
-secret = 'cisco'
+username = 'admin'
+password = 'admin'
 
 def node_login(handler, end_before):
     # Send an empty line, and wait for the login prompt
@@ -42,7 +41,6 @@ def node_login(handler, end_before):
             i = handler.expect([
                 'Username:',
                 '\(config',
-                '>',
                 '#'], timeout = 1)
         except:
             i = -1
@@ -52,11 +50,8 @@ def node_login(handler, end_before):
         handler.sendline(username)
         handler.expect('Password:', timeout = end_before - now())
         handler.sendline(password)
-        j = handler.expect(['>', '#'], timeout = end_before - now())
+        j = handler.expect(['#'], timeout = end_before - now())
         if j == 0:
-            # Secret password required
-            return node_login(handler, end_before)
-        elif j == 1:
             # Nothing to do
             return True
         else:
@@ -69,22 +64,6 @@ def node_login(handler, end_before):
         handler.expect('#', timeout = end_before - now())
         return True
     elif i == 2:
-        # Need higher privilege
-        handler.sendline('enable')
-        j = handler.expect(['Password:', '#'], timeout = end_before - now())
-        if j == 0:
-            # Need do provide secret
-            handler.sendline(secret)
-            handler.expect('#', timeout = end_before - now())
-            return True
-        elif j == 1:
-            # Nothing to do
-            return True
-        else:
-            # Unexpected output
-            node_quit(handler)
-            return False
-    elif i == 3:
         # Nothing to do
         return True
     else:
@@ -93,7 +72,7 @@ def node_login(handler, end_before):
         return False
 
 def node_quit(handler):
-    handler.sendline('quit\n')
+    handler.sendline('exit\n')
     handler.close()
 
 def config_get(handler, end_before):
@@ -109,15 +88,14 @@ def config_get(handler, end_before):
     handler.expect('#', timeout = end_before - now())
 
     # Getting the config
-    handler.sendline('more system:running-config')
+    handler.sendline('show startup-config')
     handler.expect('#', timeout = end_before - now())
     config = handler.before.decode()
 
     # Manipulating the config
-    config = re.sub('\r', '', config, flags=re.DOTALL)                                      # Unix style
-    config = re.sub('.*Using [0-9]+ out of [0-9]+ bytes\n', '', config, flags=re.DOTALL)    # Header
-    config = re.sub('.*more system:running-config\n', '', config, flags=re.DOTALL)          # Header
-    config = re.sub('!\nend.*', '!\nend', config, flags=re.DOTALL)                          # Footer
+    config = re.sub('\r', '', config, flags=re.DOTALL)                      # Unix style
+    config = re.sub('.*\n!Command', '!Command', config, flags=re.DOTALL)    # Header
+    config = re.sub('\n[^\n]*\Z', '', config, flags=re.DOTALL)              # Footer
 
     return config
 
@@ -137,8 +115,6 @@ def config_put(handler, end_before, config):
 
     # Save
     handler.sendline('copy running-config startup-config')
-    handler.expect('Destination filename', timeout = end_before - now())
-    handler.sendline('\r\n')
     handler.expect('#', timeout = end_before - now())
 
     return True

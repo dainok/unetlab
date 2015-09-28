@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-# scripts/config_viosl2.py
+# scripts/config_vios.py
 #
-# Import/Export script for vIOS L2.
+# Import/Export script for vIOS.
 #
 # LICENSE:
 #
@@ -31,7 +31,7 @@ import getopt, os, pexpect, re, sys, time
 
 username = 'cisco'
 password = 'cisco'
-secret = 'cisco'
+secret = ''
 
 def node_login(handler, end_before):
     # Send an empty line, and wait for the login prompt
@@ -105,7 +105,7 @@ def config_get(handler, end_before):
             break
 
     # Disable paging
-    handler.sendline('terminal length 0')
+    handler.sendline('terminal pager 0')
     handler.expect('#', timeout = end_before - now())
 
     # Getting the config
@@ -114,10 +114,9 @@ def config_get(handler, end_before):
     config = handler.before.decode()
 
     # Manipulating the config
-    config = re.sub('\r', '', config, flags=re.DOTALL)                                      # Unix style
-    config = re.sub('.*Using [0-9]+ out of [0-9]+ bytes\n', '', config, flags=re.DOTALL)    # Header
-    config = re.sub('.*more system:running-config\n', '', config, flags=re.DOTALL)          # Header
-    config = re.sub('!\nend.*', '!\nend', config, flags=re.DOTALL)                          # Footer
+    config = re.sub('\r', '', config, flags=re.DOTALL)              # Unix style
+    config = re.sub('.*: Saved\n', '', config, flags=re.DOTALL)     # Header
+    config = re.sub(': end.*', ': end', config, flags=re.DOTALL)    # Footer
 
     return config
 

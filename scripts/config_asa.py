@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-# scripts/config_viosl2.py
+# scripts/config_vios.py
 #
-# Import/Export script for vIOS L2.
+# Import/Export script for vIOS.
 #
 # LICENSE:
 #
@@ -31,7 +31,7 @@ import getopt, os, pexpect, re, sys, time
 
 username = 'cisco'
 password = 'cisco'
-secret = 'cisco'
+secret = ''
 
 def node_login(handler, end_before):
     # Send an empty line, and wait for the login prompt
@@ -40,6 +40,7 @@ def node_login(handler, end_before):
         try:
             handler.sendline('\r\n')
             i = handler.expect([
+                'Management IP address:',
                 'Username:',
                 '\(config',
                 '>',
@@ -48,6 +49,22 @@ def node_login(handler, end_before):
             i = -1
 
     if i == 0:
+        # Entered the interactive configuration
+        handler.sendline('10.0.0.10')
+        handler.expect('Management network mask:', timeout = end_before - now())
+        handler.sendline('255.255.255.0')
+        handler.expect('Host name:', timeout = end_before - now())
+        handler.sendline('ciscoasa')
+        handler.expect('Domain name:', timeout = end_before - now())
+        handler.sendline('example.com')
+        handler.expect('IP address of host running Device Manager:', timeout = end_before - now())
+        handler.sendline('10.0.0.1')
+        handler.expect('>', timeout = end_before - now())
+        handler.sendline('enable')
+        handler.expect('Password:', timeout = end_before - now())
+        handler.sendline('')
+        return True
+    elif i == 1:
         # Need to send username and password
         handler.sendline(username)
         handler.expect('Password:', timeout = end_before - now())
@@ -63,12 +80,12 @@ def node_login(handler, end_before):
             # Unexpected output
             node_quit(handler)
             return False
-    elif i == 1:
+    elif i == 2:
         # Config mode detected, need to exit
         handler.sendline('end')
         handler.expect('#', timeout = end_before - now())
         return True
-    elif i == 2:
+    elif i == 3:
         # Need higher privilege
         handler.sendline('enable')
         j = handler.expect(['Password:', '#'], timeout = end_before - now())
@@ -84,7 +101,7 @@ def node_login(handler, end_before):
             # Unexpected output
             node_quit(handler)
             return False
-    elif i == 3:
+    elif i == 4:
         # Nothing to do
         return True
     else:
@@ -105,7 +122,7 @@ def config_get(handler, end_before):
             break
 
     # Disable paging
-    handler.sendline('terminal length 0')
+    handler.sendline('terminal pager 0')
     handler.expect('#', timeout = end_before - now())
 
     # Getting the config
@@ -114,17 +131,20 @@ def config_get(handler, end_before):
     config = handler.before.decode()
 
     # Manipulating the config
-    config = re.sub('\r', '', config, flags=re.DOTALL)                                      # Unix style
-    config = re.sub('.*Using [0-9]+ out of [0-9]+ bytes\n', '', config, flags=re.DOTALL)    # Header
-    config = re.sub('.*more system:running-config\n', '', config, flags=re.DOTALL)          # Header
-    config = re.sub('!\nend.*', '!\nend', config, flags=re.DOTALL)                          # Footer
+    config = re.sub('\r', '', config, flags=re.DOTALL)              # Unix style
+    config = re.sub('.*: Saved\n', '', config, flags=re.DOTALL)     # Header
+    config = re.sub(': end.*', ': end', config, flags=re.DOTALL)    # Footer
 
     return config
 
 def config_put(handler, end_before, config):
     # Got to configure mode
     handler.sendline('configure terminal')
-    handler.expect('\(config', timeout = end_before - now())
+    i = handler.expect(['\(config', 'sk later:'], timeout = end_before - now())
+    if i == 1:
+        handler.sendline('N');
+        handler.expect('\(config', timeout = end_before - now())
+
 
     # Pushing the config
     for line in config.splitlines():
