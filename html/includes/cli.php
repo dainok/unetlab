@@ -676,7 +676,7 @@ function prepareNode($n, $id, $t, $nets) {
 			return 80037;
 		}
 
-		if ($n -> getConfig() == 'Saved') {
+		if ($n -> getConfig() == 'Saved' && $n -> getConfigData() != '') {
 			// Node should use saved startup-config
 			if (!dumpConfig($n -> getConfigData(), $n -> getRunningPath().'/startup-config')) {
 				// Cannot dump config to startup-config file
@@ -851,7 +851,6 @@ function start($n, $id, $t, $nets) {
 		exec($cmd, $o, $rc);
 		error_log('INFO: importing '.$cmd);
 	}
-
 
 	if ($rc == 0 && $n -> getNType() == 'docker') {
 		// Need to configure each interface

@@ -1111,7 +1111,7 @@ class Node {
 	/**
 	 * Method to get node status.
 	 * 
-	 * @return	int                         0 is stopped, 1 is running, 2 is building
+	 * @return	int                         0 is stopped, 1 is running, 2 is building and started, 3 is building and stopped
 	 */
 	public function getStatus() {
 		if ($this -> type == 'docker') {
@@ -1128,21 +1128,23 @@ class Node {
 				return 0;
 			}
 		} else {
-			if (!is_dir(BASE_TMP.'/'.$this -> tenant.'/'.$this -> lab_id.'/'.$this -> id)) {
-				// TMP folder does not exists, nodes are stopped
-				return 0;
-			} else if (is_file(BASE_TMP.'/'.$this -> tenant.'/'.$this -> lab_id.'/'.$this -> id.'/.lock')) {
-				// Lock file is present, node is building
-				return 2;
-			} else {
-				// Need to check if node port is used (netstat + grep doesn't require root privileges)
-				$cmd = 'netstat -a -t -n | grep LISTEN | grep :'.$this -> port.' 2>&1';
-				exec($cmd, $o, $rc);
-				if ($rc == 0) {
-					// Console available -> node is running
-					return 1;
+			// Need to check if node port is used (netstat + grep doesn't require root privileges)
+			$cmd = 'netstat -a -t -n | grep LISTEN | grep :'.$this -> port.' 2>&1';
+			exec($cmd, $o, $rc);
+			if ($rc == 0) {
+				// Console available -> node is running
+				if (is_file(BASE_TMP.'/'.$this -> tenant.'/'.$this -> lab_id.'/'.$this -> id.'/.lock')) {
+					// Node is running and locked
+					return 3;
 				} else {
-					// No console available -> node is stopped
+					return 1;
+				}
+			} else {
+				// No console available -> node is stopped
+				if (is_file(BASE_TMP.'/'.$this -> tenant.'/'.$this -> lab_id.'/'.$this -> id.'/.lock')) {
+					// Node is running and locked
+					return 2;
+				} else {
 					return 0;
 				}
 			}

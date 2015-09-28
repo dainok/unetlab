@@ -97,6 +97,13 @@ def node_quit(handler):
     handler.close()
 
 def config_get(handler, end_before):
+    # Clearing all "expect" buffer
+    while True:
+        try:
+            handler.expect('#', timeout = 0.1)
+        except:
+            break
+
     # Disable paging
     handler.sendline('terminal length 0')
     handler.expect('#', timeout = end_before - now())
@@ -105,6 +112,7 @@ def config_get(handler, end_before):
     handler.sendline('show startup-config')
     handler.expect('#', timeout = end_before - now())
     config = handler.before.decode()
+    print(config)
 
     # Manipulating the config
     config = re.sub('\r', '', config, flags=re.DOTALL)                                      # Unix style
