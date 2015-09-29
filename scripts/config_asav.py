@@ -116,7 +116,7 @@ def config_get(handler, end_before):
     # Manipulating the config
     config = re.sub('\r', '', config, flags=re.DOTALL)              # Unix style
     config = re.sub('.*: Saved\n', '', config, flags=re.DOTALL)     # Header
-    config = re.sub(': end.*', ': end', config, flags=re.DOTALL)    # Footer
+    config = re.sub(': end.*', ': end\n', config, flags=re.DOTALL)  # Footer
 
     return config
 

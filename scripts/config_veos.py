@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-# scripts/config_viosl2.py
+# scripts/config_vios.py
 #
-# Import/Export script for vIOS L2.
+# Import/Export script for vIOS.
 #
 # LICENSE:
 #
@@ -29,9 +29,9 @@
 
 import getopt, os, pexpect, re, sys, time
 
-username = 'cisco'
-password = 'cisco'
-secret = 'cisco'
+username = 'admin'
+password = 'password'
+secret = 'secret'
 
 def node_login(handler, end_before):
     # Send an empty line, and wait for the login prompt
@@ -39,53 +39,27 @@ def node_login(handler, end_before):
     while (i == -1 or now() > end_before):
         try:
             handler.sendline('\r\n')
-            i = handler.expect([
-                'Username:',
-                '\(config',
-                '>',
-                '#'], timeout = 1)
+            i = handler.expect(['login:'], timeout = 1)
         except:
             i = -1
 
-    if i == 0:
-        # Need to send username and password
-        handler.sendline(username)
-        handler.expect('Password:', timeout = end_before - now())
+    # Need to send username
+    handler.sendline(username)
+    j = handler.expect(['Password:', '>'], timeout = end_before - now())
+    if j == 0:
+        # Need to send the password
         handler.sendline(password)
-        j = handler.expect(['>', '#'], timeout = end_before - now())
-        if j == 0:
-            # Secret password required
-            return node_login(handler, end_before)
-        elif j == 1:
-            # Nothing to do
-            return True
-        else:
-            # Unexpected output
-            node_quit(handler)
-            return False
-    elif i == 1:
-        # Config mode detected, need to exit
-        handler.sendline('end')
+        handler.expect('>', timeout = end_before - now())
+
+    # Need higher privilege
+    handler.sendline('enable')
+    j = handler.expect(['Password:', '#'], timeout = end_before - now())
+    if j == 0:
+        # Secret password required
+        handler.sendline(secret)
         handler.expect('#', timeout = end_before - now())
         return True
-    elif i == 2:
-        # Need higher privilege
-        handler.sendline('enable')
-        j = handler.expect(['Password:', '#'], timeout = end_before - now())
-        if j == 0:
-            # Need do provide secret
-            handler.sendline(secret)
-            handler.expect('#', timeout = end_before - now())
-            return True
-        elif j == 1:
-            # Nothing to do
-            return True
-        else:
-            # Unexpected output
-            node_quit(handler)
-            return False
-    elif i == 3:
-        # Nothing to do
+    elif j == 1:
         return True
     else:
         # Unexpected output
@@ -115,9 +89,8 @@ def config_get(handler, end_before):
 
     # Manipulating the config
     config = re.sub('\r', '', config, flags=re.DOTALL)                                      # Unix style
-    config = re.sub('.*Using [0-9]+ out of [0-9]+ bytes\n', '', config, flags=re.DOTALL)    # Header
     config = re.sub('.*more system:running-config\n', '', config, flags=re.DOTALL)          # Header
-    config = re.sub('!\nend.*', '!\nend\n', config, flags=re.DOTALL)                        # Footer
+    config = re.sub('\nend.*', '\nend\n', config, flags=re.DOTALL)                          # Footer
 
     return config
 
@@ -137,8 +110,6 @@ def config_put(handler, end_before, config):
 
     # Save
     handler.sendline('copy running-config startup-config')
-    handler.expect('Destination filename', timeout = end_before - now())
-    handler.sendline('\r\n')
     handler.expect('#', timeout = end_before - now())
 
     return True
