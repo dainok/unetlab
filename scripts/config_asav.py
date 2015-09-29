@@ -136,7 +136,7 @@ def config_put(handler, end_before, config):
 
     # Save
     handler.sendline('copy running-config startup-config')
-    handler.expect('Destination filename', timeout = end_before - now())
+    handler.expect('Source filename', timeout = end_before - now())
     handler.sendline('\r\n')
     handler.expect('#', timeout = end_before - now())
 

@@ -88,7 +88,7 @@ def config_get(handler, end_before):
     handler.expect('#', timeout = end_before - now())
 
     # Getting the config
-    handler.sendline('show startup-config')
+    handler.sendline('show running-config')
     handler.expect('#', timeout = end_before - now())
     config = handler.before.decode()
 

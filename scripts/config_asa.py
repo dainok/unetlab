@@ -62,7 +62,7 @@ def node_login(handler, end_before):
         handler.expect('>', timeout = end_before - now())
         handler.sendline('enable')
         handler.expect('Password:', timeout = end_before - now())
-        handler.sendline('')
+        handler.sendline(secret)
         return True
     elif i == 1:
         # Need to send username and password
@@ -157,7 +157,7 @@ def config_put(handler, end_before, config):
 
     # Save
     handler.sendline('copy running-config startup-config')
-    handler.expect('Destination filename', timeout = end_before - now())
+    handler.expect('Source filename', timeout = end_before - now())
     handler.sendline('\r\n')
     handler.expect('#', timeout = end_before - now())
 
