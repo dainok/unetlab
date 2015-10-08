@@ -845,7 +845,7 @@ function start($n, $id, $t, $nets) {
 	if ($rc == 0 && $n -> getNType() == 'qemu' && is_file($n -> getRunningPath().'/startup-config') && !is_file(is_file($n -> getRunningPath().'/.configured'))) {
 		// Start configuration process
 		touch($n -> getRunningPath().'/.lock');
-		$cmd = 'nohup /opt/unetlab/scripts/config_vios.py -a put -p '.$n -> getPort().' -f '.$n -> getRunningPath().'/startup-config -t '.($n -> getDelay() + 300).' &';
+		$cmd = 'nohup /opt/unetlab/scripts/config_'.$n -> getTemplate().'.py -a put -p '.$n -> getPort().' -f '.$n -> getRunningPath().'/startup-config -t '.($n -> getDelay() + 300).' &';
 		exec($cmd, $o, $rc);
 		error_log('INFO: importing '.$cmd);
 	}

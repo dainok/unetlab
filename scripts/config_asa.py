@@ -138,7 +138,7 @@ def config_get(handler, end_before):
     return config
 
 def config_put(handler, end_before, config):
-    # Got to configure mode
+    # enable and ot to configure mode
     handler.sendline('configure terminal')
     i = handler.expect(['\(config', 'sk later:'], timeout = end_before - now())
     if i == 1:
