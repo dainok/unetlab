@@ -29,6 +29,7 @@
  * @link http://www.unetlab.com/
  * @version 20150910
  * @property type $author Author name of the lab. It's optional.
+ * @property type $body Long text for lab usage. It's optional.
  * @property type $description Description of the lab. It's optional
  * @property type $filename The filename of the lab (without path). It's mandatory and automatically set.
  * @property type $id UUID of the lab. It's mandatory and automatically set.
@@ -43,6 +44,7 @@
 
 class Lab {
 	private $author;
+	private $body;
 	private $description;
 	private $filename;
 	private $id;
@@ -72,13 +74,13 @@ class Lab {
 
 			if (!checkLabFilename($this -> filename)) {
 				// Invalid filename
-				error_log('ERROR: '.$f.' '.$GLOBALS['messages'][20001]);
+				error_log(date('M d H:i:s ').'ERROR: '.$f.' '.$GLOBALS['messages'][20001]);
 				throw new Exception('20001');
 			}
 
 			if (!checkLabPath($this -> path)) {
 				// Invalid path
-				error_log('ERROR: '.$f.' '.$GLOBALS['messages'][20002]);
+				error_log(date('M d H:i:s ').'ERROR: '.$f.' '.$GLOBALS['messages'][20002]);
 				throw new Exception('20002');
 			}
 
@@ -93,13 +95,13 @@ class Lab {
 
 			if (!checkLabFilename($this -> filename)) {
 				// Invalid filename
-				error_log('ERROR: '.$f.' '.$GLOBALS['messages'][20001]);
+				error_log(date('M d H:i:s ').'ERROR: '.$f.' '.$GLOBALS['messages'][20001]);
 				throw new Exception('20001');
 			}
 
 			if (!checkLabPath($this -> path)) {
 				// Invalid path
-				error_log('ERROR: '.$f.' '.$GLOBALS['messages'][20002]);
+				error_log(date('M d H:i:s ').'ERROR: '.$f.' '.$GLOBALS['messages'][20002]);
 				throw new Exception('20002');
 			}
 
@@ -107,7 +109,7 @@ class Lab {
 			$xml = simplexml_load_file($f);
 			if (!$xml) {
 				// Invalid XML document
-				error_log('ERROR: '.$f.' '.$GLOBALS['messages'][20003]);
+				error_log(date('M d H:i:s ').'ERROR: '.$f.' '.$GLOBALS['messages'][20003]);
 				throw new Exception('20003');
 			}
 
@@ -115,12 +117,12 @@ class Lab {
 			$result = $xml -> xpath('//lab/@name');
 			if (empty($result)) {
 				// Invalid UNetLab file (attribute is missing)
-				error_log('ERROR: '.$f.' '.$GLOBALS['messages'][20004]);
+				error_log(date('M d H:i:s ').'ERROR: '.$f.' '.$GLOBALS['messages'][20004]);
 				throw new Exception('20004');
 				return;
 			} else if (!checkLabName($result[0])) {
 				// Attribute not valid
-				error_log('ERROR: '.$f.' '.$GLOBALS['messages'][20005]);
+				error_log(date('M d H:i:s ').'ERROR: '.$f.' '.$GLOBALS['messages'][20005]);
 				throw new Exception('20005');
 				return;
 			} else {
@@ -132,12 +134,12 @@ class Lab {
 			if (empty($result)) {
 				// Lab ID not set, create a new one
 				$this -> id = genUuid();
-				error_log('WARNING: '.$f.' '.$GLOBALS['messages'][20011]);
+				error_log(date('M d H:i:s ').'WARNING: '.$f.' '.$GLOBALS['messages'][20011]);
 				$modified = True;
 			} else if (!checkUuid($result[0])) {
 				// Attribute not valid
 				$this -> id = genUuid();
-				error_log('WARNING: '.$f.' '.$GLOBALS['messages'][20012]);
+				error_log(date('M d H:i:s ').'WARNING: '.$f.' '.$GLOBALS['messages'][20012]);
 				$modified = True;
 			} else {
 				$this -> id = (string) $result[0];
@@ -148,7 +150,15 @@ class Lab {
 			if (strlen($result) !== 0) {
 				$this -> description = htmlspecialchars($result, ENT_DISALLOWED, 'UTF-8', TRUE);
 			} else if (strlen($result) !== 0) {
-				error_log('WARNING: '.$f.' '.$GLOBALS['messages'][20006]);
+				error_log(date('M d H:i:s ').'WARNING: '.$f.' '.$GLOBALS['messages'][20006]);
+			}
+
+			// Lab body
+			$result = (string) array_pop($xml -> xpath('//lab/body'));
+			if (strlen($result) !== 0) {
+				$this -> body = htmlspecialchars($result, ENT_DISALLOWED, 'UTF-8', TRUE);
+			} else if (strlen($result) !== 0) {
+				error_log(date('M d H:i:s ').'WARNING: '.$f.' '.$GLOBALS['messages'][20006]);
 			}
 
 			// Lab author
@@ -156,7 +166,7 @@ class Lab {
 			if (strlen($result) !== 0) {
 				$this -> author = htmlspecialchars($result, ENT_DISALLOWED, 'UTF-8', TRUE);
 			} else if (strlen($result) !== 0) {
-				error_log('WARNING: '.$f.' '.$GLOBALS['messages'][20007]);
+				error_log(date('M d H:i:s ').'WARNING: '.$f.' '.$GLOBALS['messages'][20007]);
 			}
 
 			// Lab version
@@ -164,7 +174,7 @@ class Lab {
 			if (strlen($result) !== 0 && (int) $result >= 0) {
 				$this -> version = $result;
 			} else if (strlen($result) !== 0) {
-				error_log('WARNING: '.$f.' '.$GLOBALS['messages'][20008]);
+				error_log(date('M d H:i:s ').'WARNING: '.$f.' '.$GLOBALS['messages'][20008]);
 			}
 
 			// Lab networks
@@ -180,8 +190,8 @@ class Lab {
 					$this -> networks[$w['id']] = new Network($w, $w['id'], $this -> tenant);
 				} catch (Exception $e) {
 					// Invalid network
-					error_log('WARNING: '.$f.':net'.$w['id'].' '.$GLOBALS['messages'][20009]);
-					error_log((string) $e);
+					error_log(date('M d H:i:s ').'WARNING: '.$f.':net'.$w['id'].' '.$GLOBALS['messages'][20009]);
+					error_log(date('M d H:i:s ').(string) $e);
 					continue;
 				}
 			}
@@ -212,8 +222,8 @@ class Lab {
 					$this -> nodes[$n['id']] = new Node($n, $n['id'], $this -> tenant, $this -> id);
 				} catch (Exception $e) {
 					// Invalid node
-					error_log('WARNING: '.$f.':node'.$n['id'].' '.$GLOBALS['messages'][20010]);
-					error_log((string) $e);
+					error_log(date('M d H:i:s ').'WARNING: '.$f.':node'.$n['id'].' '.$GLOBALS['messages'][20010]);
+					error_log(date('M d H:i:s ').(string) $e);
 					continue;
 				}
 
@@ -224,7 +234,7 @@ class Lab {
 					if (isset($slot -> attributes() -> id)) $s['id'] = (string) $slot -> attributes() -> id;
 					if (isset($slot -> attributes() -> module)) $s['module'] = (string) $slot -> attributes() -> module;
 					if ($this -> nodes[$n['id']] -> setSlot($s['id'], $s['module']) !== 0) {
-						error_log('WARNING: '.$f.':node'.$n['id'].':slot'.$s['id'].' '.$GLOBALS['messages'][20013]);
+						error_log(date('M d H:i:s ').'WARNING: '.$f.':node'.$n['id'].':slot'.$s['id'].' '.$GLOBALS['messages'][20013]);
 					}
 				}
 
@@ -239,17 +249,17 @@ class Lab {
 					if (isset($interface -> attributes() -> type)) $i['type'] = (string) $interface -> attributes() -> type;
 					switch ($i['type']) {
 						default:
-							error_log('WARNING: '.$f.':node'.$n['id'].':inv'.$s['id'].' '.$GLOBALS['messages'][20016]);
+							error_log(date('M d H:i:s ').'WARNING: '.$f.':node'.$n['id'].':inv'.$s['id'].' '.$GLOBALS['messages'][20016]);
 							break;
 						case 'ethernet':
 							if ($this -> nodes[$n['id']] -> linkInterface($i) !== 0) {
-								error_log('WARNING: '.$f.':node'.$n['id'].':eth'.$i['id'].' '.$GLOBALS['messages'][20014]);
+								error_log(date('M d H:i:s ').'WARNING: '.$f.':node'.$n['id'].':eth'.$i['id'].' '.$GLOBALS['messages'][20014]);
 							}
 							break;
 						case 'serial':
 							// Serial
 							if ($this -> nodes[$n['id']] -> linkInterface($i) !== 0) {
-								error_log('WARNING: '.$f.':node'.$n['id'].':ser'.$i['id'].' '.$GLOBALS['messages'][20015]);
+								error_log(date('M d H:i:s ').'WARNING: '.$f.':node'.$n['id'].':ser'.$i['id'].' '.$GLOBALS['messages'][20015]);
 							}
 							break;
 					}
@@ -266,7 +276,7 @@ class Lab {
 
 				$rc = $this -> nodes[$node_id] -> setConfigData($config_data);
 				if ($rc != 0) {
-					error_log('WARNING: '.$f.':cfg'.$node_id.' '.$GLOBALS['messages'][20037]);
+					error_log(date('M d H:i:s ').'WARNING: '.$f.':cfg'.$node_id.' '.$GLOBALS['messages'][20037]);
 					continue;
 				}
 			}
@@ -286,8 +296,8 @@ class Lab {
 					$this -> pictures[$p['id']] = new Picture($p, $p['id']);
 				} catch (Exception $e) {
 					// Invalid picture
-					error_log('WARNING: '.$f.':pic'.$p['id'].' '.$GLOBALS['messages'][20020]);
-					error_log((string) $e);
+					error_log(date('M d H:i:s ').'WARNING: '.$f.':pic'.$p['id'].' '.$GLOBALS['messages'][20020]);
+					error_log(date('M d H:i:s ').(string) $e);
 					continue;
 				}
 			}
@@ -323,8 +333,8 @@ class Lab {
 			return $this -> save();
 		} catch (Exception $e) {
 			// Failed to create the network
-			error_log('ERROR: '.$this -> path .'/'.$this -> filename.'?net='.$p['id'].' '.$GLOBALS['messages'][20021]);
-			error_log((string) $e);
+			error_log(date('M d H:i:s ').'ERROR: '.$this -> path .'/'.$this -> filename.'?net='.$p['id'].' '.$GLOBALS['messages'][20021]);
+			error_log(date('M d H:i:s ').(string) $e);
 			return 20021;
 		}
 		return 0;
@@ -345,8 +355,8 @@ class Lab {
 			return $this -> save();
 		} catch (Exception $e) {
 			// Failed to create the node
-			error_log('ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$p['id'].' '.$GLOBALS['messages'][20022]);
-			error_log((string) $e);
+			error_log(date('M d H:i:s ').'ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$p['id'].' '.$GLOBALS['messages'][20022]);
+			error_log(date('M d H:i:s ').(string) $e);
 			return 20022;
 		}
 	}
@@ -375,8 +385,8 @@ class Lab {
 			return $this -> save();
 		} catch (Exception $e) {
 			// Failed to create the picture
-			error_log('ERROR: '.$this -> path .'/'.$this -> filename.'?pic='.$p['id'].' '.$GLOBALS['messages'][20017]);
-			error_log((string) $e);
+			error_log(date('M d H:i:s ').'ERROR: '.$this -> path .'/'.$this -> filename.'?pic='.$p['id'].' '.$GLOBALS['messages'][20017]);
+			error_log(date('M d H:i:s ').(string) $e);
 			return 20017;
 		}
 	}
@@ -399,7 +409,7 @@ class Lab {
 			}
 			unset($this -> networks[$i]);
 		} else {
-			error_log('WARNING: '.$this -> path .'/'.$this -> filename.'?net='.$i.' '.$GLOBALS['messages'][20023]);
+			error_log(date('M d H:i:s ').'WARNING: '.$this -> path .'/'.$this -> filename.'?net='.$i.' '.$GLOBALS['messages'][20023]);
 		}
 		return $this -> save();
 	}
@@ -420,7 +430,7 @@ class Lab {
 						// Serial interface is configured, unlink remote node
 						$rc = $this -> nodes[$interface -> getRemoteId()] -> unlinkInterface($interface -> getRemoteIf());
 						if ($rc !== 0) {
-							error_log('WARNING: '.$this -> path .'/'.$this -> filename.'?node='.$interface -> getRemoteId().' '.$GLOBALS['messages'][20035]);
+							error_log(date('M d H:i:s ').'WARNING: '.$this -> path .'/'.$this -> filename.'?node='.$interface -> getRemoteId().' '.$GLOBALS['messages'][20035]);
 						}
 					}
 				}
@@ -429,7 +439,7 @@ class Lab {
 			// Delete the node
 			unset($this -> nodes[$i]);
 		} else {
-			error_log('WARNING: '.$this -> path .'/'.$this -> filename.'?node='.$i.' '.$GLOBALS['messages'][20024]);
+			error_log(date('M d H:i:s ').'WARNING: '.$this -> path .'/'.$this -> filename.'?node='.$i.' '.$GLOBALS['messages'][20024]);
 		}
 		return $this -> save();
 	}
@@ -444,7 +454,7 @@ class Lab {
 		if (isset($this -> pictures[$i])) {
 			unset($this -> pictures[$i]);
 		} else {
-			error_log('WARNING: '.$this -> path .'/'.$this -> filename.'?pic='.$i.' '.$GLOBALS['messages'][20018]);
+			error_log(date('M d H:i:s ').'WARNING: '.$this -> path .'/'.$this -> filename.'?pic='.$i.' '.$GLOBALS['messages'][20018]);
 		}
 		return $this -> save();
 	}
@@ -467,7 +477,7 @@ class Lab {
 
 		if (!isset($p['name']) && !checkLabFilename($p['name'].'.unl')) {
 			// Name is not valid, ignored
-			error_log('WARNING: '.$GLOBALS['messages'][20038]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][20038]);
 		} else if (isset($p['name'])) {
 			$this -> name = $p['name'];
 			$modified = True;
@@ -479,6 +489,15 @@ class Lab {
 			$modified = True;
 		} else if (isset($p['author'])) {
 			$this -> author = htmlspecialchars($p['author'], ENT_DISALLOWED, 'UTF-8', TRUE);
+			$modified = True;
+		}
+
+		if (isset($p['body']) && $p['body'] === '') {
+			// Body is empty, unset the current one
+			unset($this -> body);
+			$modified = True;
+		} else if (isset($p['body'])) {
+			$this -> body = htmlspecialchars($p['body'], ENT_DISALLOWED, 'UTF-8', TRUE);
 			$modified = True;
 		}
 
@@ -497,7 +516,7 @@ class Lab {
 			$modified = True;
 		} else if (isset($p['version']) && (int) $p['version'] < 0) {
 			// Version is not valid, ignored
-			error_log('WARNING: '.$GLOBALS['messages'][30008]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][30008]);
 		} else if (isset($p['version'])) {
 			$this -> version = (int) $p['version'];
 			$modified = True;
@@ -508,7 +527,7 @@ class Lab {
 			return $this -> save();
 		} else {
 			// No attribute has been changed
-			error_log('ERROR: '.$GLOBALS['messages'][20030]);
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][20030]);
 			return 20030;
 		}
 	}
@@ -522,12 +541,12 @@ class Lab {
 	public function editNetwork($p) {
 		if (!isset($this -> networks[$p['id']])) {
 			// Network not found
-			error_log('ERROR: '.$this -> path .'/'.$this -> filename.'?net='.$p['id'].' '.$GLOBALS['messages'][20023]);
+			error_log(date('M d H:i:s ').'ERROR: '.$this -> path .'/'.$this -> filename.'?net='.$p['id'].' '.$GLOBALS['messages'][20023]);
 			return 20023;
 		} else if ($this -> networks[$p['id']] -> edit($p) === 0) {
 			return $this -> save();
 		} else {
-			error_log('ERROR: '.$this -> path .'/'.$this -> filename.'?net='.$p['id'].' '.$GLOBALS['messages'][20025]);
+			error_log(date('M d H:i:s ').'ERROR: '.$this -> path .'/'.$this -> filename.'?net='.$p['id'].' '.$GLOBALS['messages'][20025]);
 			return False;
 		}
 	}
@@ -541,12 +560,12 @@ class Lab {
 	public function editNode($p) {
 		if (!isset($this -> nodes[$p['id']])) {
 			// Node not found
-			error_log('ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$p['id'].' '.$GLOBALS['messages'][20024]);
+			error_log(date('M d H:i:s ').'ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$p['id'].' '.$GLOBALS['messages'][20024]);
 			return 20024;
 		} else if ($this -> nodes[$p['id']] -> edit($p) === 0) {
 			return $this -> save();
 		} else {
-			error_log('ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$p['id'].' '.$GLOBALS['messages'][20026]);
+			error_log(date('M d H:i:s ').'ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$p['id'].' '.$GLOBALS['messages'][20026]);
 			return 20026;
 		}
 	}
@@ -560,12 +579,12 @@ class Lab {
 	public function editPicture($p) {
 		if (!isset($this -> pictures[$p['id']])) {
 			// Picture not found
-			error_log('ERROR: '.$this -> path .'/'.$this -> filename.'?pic='.$p['id'].' '.$GLOBALS['messages'][20018]);
+			error_log(date('M d H:i:s ').'ERROR: '.$this -> path .'/'.$this -> filename.'?pic='.$p['id'].' '.$GLOBALS['messages'][20018]);
 			return 20018;
 		} else if ($this -> pictures[$p['id']] -> edit($p) === 0) {
 			return $this -> save();
 		} else {
-			error_log('ERROR: '.$this -> path .'/'.$this -> filename.'?pic='.$p['id'].' '.$GLOBALS['messages'][20019]);
+			error_log(date('M d H:i:s ').'ERROR: '.$this -> path .'/'.$this -> filename.'?pic='.$p['id'].' '.$GLOBALS['messages'][20019]);
 			return False;
 		}
 	}
@@ -578,6 +597,20 @@ class Lab {
 	public function getAuthor() {
 		if (isset($this -> author)) {
 			return $this -> author;
+		} else {
+			// By default return an empty string
+			return '';
+		}
+	}
+
+	/**
+	 * Method to get lab body.
+	 *
+	 * @return  string                      Lab body or False if not set
+	 */
+	public function getBody() {
+		if (isset($this -> body)) {
+			return $this -> body;
 		} else {
 			// By default return an empty string
 			return '';
@@ -743,7 +776,7 @@ class Lab {
 	public function connectNode($n, $p) {
 		if (!isset($this -> nodes[$n])) {
 			// Node not found
-			error_log('ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$n.' '.$GLOBALS['messages'][20032]);
+			error_log(date('M d H:i:s ').'ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$n.' '.$GLOBALS['messages'][20032]);
 			return 20032;
 		}
 
@@ -761,11 +794,11 @@ class Lab {
 
 						// Link the interface
 						if ($this -> nodes[$n] -> linkInterface($i) !== 0) {
-							error_log('ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$n.' '.$GLOBALS['messages'][20034]);
+							error_log(date('M d H:i:s ').'ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$n.' '.$GLOBALS['messages'][20034]);
 							return 20034;
 						}
 					} else {
-						error_log('ERROR: '.$this -> path .'/'.$this -> filename.'?net='.$interface_link.' '.$GLOBALS['messages'][20033]);
+						error_log(date('M d H:i:s ').'ERROR: '.$this -> path .'/'.$this -> filename.'?net='.$interface_link.' '.$GLOBALS['messages'][20033]);
 						return 20033;
 					}
 				} else {
@@ -779,7 +812,7 @@ class Lab {
 						// Serial interfaces was previously connected, need to unlink remote node
 						$rc = $this -> nodes[$node -> getSerials()[$interface_id] -> getRemoteId()] -> unlinkInterface($node -> getSerials()[$interface_id] -> getRemoteIf());
 						if ($rc !== 0) {
-							error_log('WARNING: '.$this -> path .'/'.$this -> filename.'?node='.$node_id.' '.$GLOBALS['messages'][20035]);
+							error_log(date('M d H:i:s ').'WARNING: '.$this -> path .'/'.$this -> filename.'?node='.$node_id.' '.$GLOBALS['messages'][20035]);
 						}
 					}
 					$node = $this -> nodes[$remote_id];  // Destination node
@@ -787,7 +820,7 @@ class Lab {
 						// Serial interfaces was previously connected, need to unlink remote node
 						$rc = $this -> nodes[$node -> getSerials()[$remote_if] -> getRemoteId()] -> unlinkInterface($node -> getSerials()[$remote_if] -> getRemoteIf());
 						if ($rc !== 0) {
-							error_log('WARNING: '.$this -> path .'/'.$this -> filename.'?node='.$node_id.' '.$GLOBALS['messages'][20035]);
+							error_log(date('M d H:i:s ').'WARNING: '.$this -> path .'/'.$this -> filename.'?node='.$node_id.' '.$GLOBALS['messages'][20035]);
 						}
 					}
 
@@ -798,7 +831,7 @@ class Lab {
 
 					// Link the interface
 					if ($this -> nodes[$n] -> linkInterface($i) !== 0) {
-						error_log('ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$n.' '.$GLOBALS['messages'][20034]);
+						error_log(date('M d H:i:s ').'ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$n.' '.$GLOBALS['messages'][20034]);
 						return 20034;
 					}
 
@@ -810,7 +843,7 @@ class Lab {
 
 					// Link the interface
 					if ($this -> nodes[$remote_id] -> linkInterface($i) !== 0) {
-						error_log('ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$remote_id.' '.$GLOBALS['messages'][20034]);
+						error_log(date('M d H:i:s ').'ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$remote_id.' '.$GLOBALS['messages'][20034]);
 						return 20034;
 					}
 				}
@@ -821,13 +854,13 @@ class Lab {
 					// Serial interfaces was previously connected, need to unlink remote node
 					$rc = $this -> nodes[$node -> getSerials()[$interface_id] -> getRemoteId()] -> unlinkInterface($node -> getSerials()[$interface_id] -> getRemoteIf());
 					if ($rc !== 0) {
-						error_log('WARNING: '.$this -> path .'/'.$this -> filename.'?node='.$node -> getSerials()[$interface_id] -> getRemoteId().' '.$GLOBALS['messages'][20035]);
+						error_log(date('M d H:i:s ').'WARNING: '.$this -> path .'/'.$this -> filename.'?node='.$node -> getSerials()[$interface_id] -> getRemoteId().' '.$GLOBALS['messages'][20035]);
 					}
 				}
 
 				// Now deconfigure local interface
 				if ($this -> nodes[$n] -> unlinkInterface($interface_id) !== 0) {
-					error_log('ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$n.' '.$GLOBALS['messages'][20035]);
+					error_log(date('M d H:i:s ').'ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$n.' '.$GLOBALS['messages'][20035]);
 					return 20035;
 				}
 			}
@@ -1002,25 +1035,25 @@ class Lab {
 			// Failed to write
 			fclose($fp);
 			unlink($tmp);
-			error_log('ERROR: '.$GLOBALS['messages'][20027]);
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][20027]);
 			return 20027;
 		} else {
 			// Write OK
 			fclose($fp);
 			if ($old != $dst && is_file($dst)) {
 				// Should rename the lab, but destination file already exists
-				error_log('ERROR: '.$GLOBALS['messages'][20039]);
+				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][20039]);
 				return 20039;
 			}
 			if (is_file($old) && !unlink($old)) {
 				// Cannot delete original lab
 				unlink($tmp);
-				error_log('ERROR: '.$GLOBALS['messages'][20028]);
+				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][20028]);
 				return 20028;
 			}
 			if (!rename($tmp, $dst)) {
 				// Cannot move $tmp to $dst
-				error_log('ERROR: '.$GLOBALS['messages'][20029]);
+				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][20029]);
 				return 20029;
 			}
 		}
@@ -1067,13 +1100,13 @@ class Lab {
 	public function setNodeConfigData($node_id, $config_data) {
 		if (!isset($this -> nodes[$node_id])) {
 			// Node not found
-			error_log('ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$node_id.' '.$GLOBALS['messages'][20024]);
+			error_log(date('M d H:i:s ').'ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$node_id.' '.$GLOBALS['messages'][20024]);
 			return 20024;
 		} else if ($this -> nodes[$node_id] -> setConfigData($config_data) === 0) {
 			$this -> nodes[$node_id] -> edit(Array('config' => 'Saved'));
 			return $this -> save();
 		} else {
-			error_log('ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$node_id.' '.$GLOBALS['messages'][20036]);
+			error_log(date('M d H:i:s ').'ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$node_id.' '.$GLOBALS['messages'][20036]);
 			return False;
 		}
 

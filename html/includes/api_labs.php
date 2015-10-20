@@ -126,7 +126,7 @@ function apiCloneLab($p, $tenant) {
 		$output['code'] = 400;
 		$output['status'] = 'fail';
 		$output['message'] = $GLOBALS['messages'][60037];
-		error_log('ERROR: '.$GLOBALS['messages'][60037]);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][60037]);
 		return $output;
 	}
 	
@@ -308,6 +308,7 @@ function apiGetLab($lab) {
 	$output['data'] = Array(
 		'author' => $lab -> getAuthor(),
 		'description' => $lab -> getDescription(),
+		'body' => $lab -> getBody(),
 		'id' => $lab -> getId(),
 		'name' => $lab -> getName(),
 		'version' => $lab -> getVersion(),
@@ -450,7 +451,7 @@ function apiMoveLab($lab, $path) {
 		$output['code'] = 400;
 		$output['status'] = 'fail';
 		$output['message'] = $GLOBALS['messages'][60034];
-		error_log('ERROR: '.$GLOBALS['messages'][60034]);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][60034]);
 	}
 	return $output;
 }

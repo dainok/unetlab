@@ -122,21 +122,21 @@ class Node {
 		// Mandatory parameters
 		if (!isset($p['type']) || !isset($p['template'])) {
 			// Missing mandatory parameters
-			error_log('ERROR: '.$GLOBALS['messages'][40000]);
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40000]);
 			throw new Exception('40000');
 			return 40000;
 		}
 
 		if (!checkNodeType($p['type'])) {
 			// Type is not valid
-			error_log('ERROR: '.$GLOBALS['messages'][40001]);
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40001]);
 			throw new Exception('40001');
 			return 40001;
 		}
 
 		if (!isset($GLOBALS['node_templates'][$p['template']])) {
 			// Template is not valid or not available
-			error_log('ERROR: '.$GLOBALS['messages'][40002]);
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40002]);
 			throw new Exception('40002');
 			return 40002;
 		}
@@ -145,43 +145,43 @@ class Node {
 		if (isset($p['config']) && !checkNodeConfig($p['config'])) {
 			// Config is invalid, ignored
 			unset($p['config']);
-			error_log('WARNING: '.$GLOBALS['messages'][40003]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40003]);
 		}
 
 		if (isset($p['delay']) && (int) $p['delay'] < 0) {
 			// Delay is invalid, ignored
 			unset($p['delay']);
-			error_log('WARNING: '.$GLOBALS['messages'][40004]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40004]);
 		}
 
 		if (isset($p['icon']) && !checkNodeIcon($p['icon'])) {
 			// Icon is invalid, ignored
 			unset($p['icon']);
-			error_log('WARNING: '.$GLOBALS['messages'][40005]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40005]);
 		}
 
 		if (isset($p['image']) && !checkNodeImage($p['image'], $p['type'], $p['template'])) {
 			// Image is invalid, ignored
 			unset($p['image']);
-			error_log('WARNING: '.$GLOBALS['messages'][40006]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40006]);
 		}
 
 		if (isset($p['left']) && !checkPosition($p['left'])) {
 			// Left is invalid, ignored
 			unset($p['left']);
-			error_log('WARNING: '.$GLOBALS['messages'][40007]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40007]);
 		}
 
 		if (isset($p['name']) && !checkNodeName($p['name'])) {
 			// Name is invalid, ignored
 			unset($p['name']);
-			error_log('WARNING: '.$GLOBALS['messages'][40008]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40008]);
 		}
 
 		if (isset($p['top']) && !checkPosition($p['top'])) {
 			// Top is invalid, ignored
 			unset($p['top']);
-			error_log('WARNING: '.$GLOBALS['messages'][40010]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40010]);
 		}
 
 		// Specific parameters
@@ -189,25 +189,25 @@ class Node {
 			if (isset($p['ethernet']) && (int) $p['ethernet'] < 0) {
 				// Ethernet interfaces is invalid, default to 4
 				$p['ethernet'] = 2;
-				error_log('WARNING: '.$GLOBALS['messages'][40012]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40012]);
 			}
 
 			if (isset($p['nvram']) && (int) $p['nvram'] <= 0) {
 				// NVRAM is invalid, ignored
 				unset($p['nvram']);
-				error_log('WARNING: '.$GLOBALS['messages'][40011]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40011]);
 			}
 
 			if (isset($p['ram']) && (int) $p['ram'] <= 0) {
 				// RAM is invalid, ignored
 				unset($p['ram']);
-				error_log('WARNING: '.$GLOBALS['messages'][40009]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40009]);
 			}
 
 			if (isset($p['serial']) && (int) $p['serial'] < 0) {
 				// Serial interfaces is invalid, default to 4
 				$p['serial'] = 2;
-				error_log('WARNING: '.$GLOBALS['messages'][40013]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40013]);
 			}
 		}
 
@@ -215,19 +215,19 @@ class Node {
 			if (isset($p['idlepc']) && !checkNodeIdlepc($p['idlepc'])) {
 				// Idle PC is invalid, ignored
 				unset($p['idlepc']);
-				error_log('WARNING: '.$GLOBALS['messages'][40014]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40014]);
 			}
 
 			if (isset($p['nvram']) && (int) $p['nvram'] <= 0) {
 				// NVRAM is invalid, ignored
 				unset($p['nvram']);
-				error_log('WARNING: '.$GLOBALS['messages'][40011]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40011]);
 			}
 
 			if (isset($p['ram']) && (int) $p['ram'] <= 0) {
 				// RAM is invalid, ignored
 				unset($p['ram']);
-				error_log('WARNING: '.$GLOBALS['messages'][40009]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40009]);
 			}
 		}
 
@@ -235,31 +235,31 @@ class Node {
 			if (isset($p['console']) && !checkNodeConsole($p['console'])) {
 				// Configured console is invalid, ignored
 				unset($p['console']);
-				error_log('WARNING: '.$GLOBALS['messages'][40027]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40027]);
 			}
 
 			if (isset($p['cpu']) && (int) $p['cpu'] <= 0) {
 				// Configured CPUs is invalid, ignored
 				unset($p['cpu']);
-				error_log('WARNING: '.$GLOBALS['messages'][40015]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40015]);
 			}
 
 			if (isset($p['ethernet']) && (int) $p['ethernet'] <= 0) {
 				// Ethernet interfaces is invalid, default to 4
 				$p['ethernet'] = 4;
-				error_log('WARNING: '.$GLOBALS['messages'][40012]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40012]);
 			}
 
 			if (isset($p['ram']) && (int) $p['ram'] <= 0) {
 				// RAM is invalid, ignored
 				unset($p['ram']);
-				error_log('WARNING: '.$GLOBALS['messages'][40009]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40009]);
 			}
 
 			if (isset($p['uuid']) && !checkUuid($p['uuid'])) {
 				// Configured UUID is invalid, ignored
 				unset($p['uuid']);
-				error_log('WARNING: '.$GLOBALS['messages'][40026]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40026]);
 			}
 		}
 
@@ -267,20 +267,20 @@ class Node {
 			if (isset($p['ethernet']) && (int) $p['ethernet'] <= 0) {
 				// Ethernet interfaces is invalid, default to 1
 				$p['ethernet'] = 1;
-				error_log('WARNING: '.$GLOBALS['messages'][40012]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40012]);
 			}
 
 			if (isset($p['ram']) && (int) $p['ram'] <= 0) {
 				// RAM is invalid, ignored
 				unset($p['ram']);
-				error_log('WARNING: '.$GLOBALS['messages'][40009]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40009]);
 			}
 		}
 
 		// If image is not set, choose the latest one available
 		if (!isset($p['image'])) {
 			if (empty(listNodeImages($p['type'], $p['template']))) {
-				error_log('WARNING: '.$GLOBALS['messages'][40025]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40025]);
 				$p['image'] = '';
 			} else {
 				$p['image'] = end(listNodeImages($p['type'], $p['template']));
@@ -377,7 +377,7 @@ class Node {
 			$modified = True;
 		} else if (isset($p['config']) && !checkNodeConfig($p['config'])) {
 			// Config is invalid, ingored
-			error_log('WARNING: '.$GLOBALS['messages'][40003]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40003]);
 		} else if (isset($p['config'])) {
 			$this -> config = $p['config'];
 			$modified = True;
@@ -389,7 +389,7 @@ class Node {
 			$modified = True;
 		} else if (isset($p['delay']) && (int) $p['delay'] < 0) {
 			// Delay is invalid, ignored
-			error_log('WARNING: '.$GLOBALS['messages'][40004]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40004]);
 		} else if (isset($p['delay'])) {
 			$this -> delay = (int) $p['delay'];
 		}
@@ -400,14 +400,14 @@ class Node {
 			$modified = True;
 		} else if (isset($p['icon']) && !checkNodeIcon($p['icon'])) {
 			// Icon is invalid, ignored
-			error_log('WARNING: '.$GLOBALS['messages'][40005]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40005]);
 		} else if (isset($p['icon'])) {
 			$this -> icon = $p['icon'];
 		}
 
 		if (isset($p['image']) && ($p['image'] === '' || !checkNodeImage($p['image'], $p['type'], $p['template']))) {
 			// Image is not valid, ignored
-			error_log('WARNING: '.$GLOBALS['messages'][40006]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40006]);
 		} else if (isset($p['image'])) {
 			$this -> image = $p['image'];
 			$modified = True;
@@ -419,7 +419,7 @@ class Node {
 			$modified = True;
 		} else if (isset($p['left']) && !checkPosition($p['left'])) {
 			// Left is not valid, ignored
-			error_log('WARNING: '.$GLOBALS['messages'][40007]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40007]);
 		} else if (isset($p['left'])) {
 			$this -> left = $p['left'];
 			$modified = True;
@@ -431,7 +431,7 @@ class Node {
 			$modified = True;
 		} else if (isset($p['name']) && !checkNodeName($p['name'])) {
 			// Name is not valid, ignored
-			error_log('WARNING: '.$GLOBALS['messages'][40008]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40008]);
 		} else if (isset($p['name'])) {
 			$this -> name = $p['name'];
 			$modified = True;
@@ -443,7 +443,7 @@ class Node {
 			$modified = True;
 		} else if (isset($p['top']) && !checkPosition($p['top'])) {
 			// Top is not valid, ignored
-			error_log('WARNING: '.$GLOBALS['messages'][40010]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40010]);
 		} else if (isset($p['top'])) {
 			$this -> top = $p['top'];
 			$modified = True;
@@ -457,7 +457,7 @@ class Node {
 				$modified = True;
 			} else if (isset($p['ethernet']) && (int) $p['ethernet'] <  0) {
 				// Ethernet interfaces is invalid, ignored
-				error_log('WARNING: '.$GLOBALS['messages'][40012]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40012]);
 			} else if (isset($p['ethernet']) && $this -> ethernet != (int) $p['ethernet']) {
 				// New Ethernet value
 				$this -> ethernet = (int) $p['ethernet'];
@@ -470,7 +470,7 @@ class Node {
 				$modified = True;
 			} else if (isset($p['nvram']) && (int) $p['nvram'] <= 0) {
 				// NVRAM is invalid, ignored
-				error_log('WARNING: '.$GLOBALS['messages'][40011]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40011]);
 			} else if (isset($p['nvram'])) {
 				$this -> nvram = (int) $p['nvram'];
 			}
@@ -481,7 +481,7 @@ class Node {
 				$modified = True;
 			} else if (isset($p['ram']) && (int) $p['ram'] <= 0) {
 				// RAM is invalid, ignored
-				error_log('WARNING: '.$GLOBALS['messages'][40009]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40009]);
 			} else if (isset($p['ram'])) {
 				$this -> ram = (int) $p['ram'];
 			}
@@ -492,7 +492,7 @@ class Node {
 				$modified = True;
 			} else if (isset($p['serial']) && (int) $p['serial'] < 0) {
 				// Serial interfaces is invalid, ignored
-				error_log('WARNING: '.$GLOBALS['messages'][40013]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40013]);
 			} else if (isset($p['serial']) && $this -> serial != (int) $p['serial']) {
 				// New Serial value
 				$this -> serial = (int) $p['serial'];
@@ -507,7 +507,7 @@ class Node {
 				$modified = True;
 			} else if (isset($p['idlepc']) && !checkNodeIdlepc($p['idlepc'])) {
 				// Idle PC is invalid, ignored
-				error_log('WARNING: '.$GLOBALS['messages'][40014]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40014]);
 			} else if (isset($p['idlepc'])) {
 				$this -> idlepc = $p['idlepc'];
 			}
@@ -518,7 +518,7 @@ class Node {
 				$modified = True;
 			} else if (isset($p['nvram']) && (int) $p['nvram'] <= 0) {
 				// NVRAM is invalid, ignored
-				error_log('WARNING: '.$GLOBALS['messages'][40011]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40011]);
 			} else if (isset($p['nvram'])) {
 				$this -> nvram = (int) $p['nvram'];
 			}
@@ -529,7 +529,7 @@ class Node {
 				$modified = True;
 			} else if (isset($p['ram']) && (int) $p['ram'] <= 0) {
 				// RAM is invalid, ignored
-				error_log('WARNING: '.$GLOBALS['messages'][40009]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40009]);
 			} else if (isset($p['ram'])) {
 				$this -> ram = (int) $p['ram'];
 			}
@@ -569,7 +569,7 @@ class Node {
 				$modified = True;
 			} else if (isset($p['cpu']) && (int) $p['cpu'] <= 0) {
 				// Configured CPUs is invalid, ignored
-				error_log('WARNING: '.$GLOBALS['messages'][40011]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40011]);
 			} else if (isset($p['cpu'])) {
 				$this -> cpu = (int) $p['cpu'];
 			}
@@ -580,7 +580,7 @@ class Node {
 				$modified = True;
 			} else if (isset($p['ram']) && (int) $p['ram'] <= 0) {
 				// RAM is invalid, ignored
-				error_log('WARNING: '.$GLOBALS['messages'][40009]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40009]);
 			} else if (isset($p['ram'])) {
 				$this -> ram = (int) $p['ram'];
 			}
@@ -591,7 +591,7 @@ class Node {
 				$modified = True;
 			} else if (isset($p['ethernet']) && (int) $p['ethernet'] <= 0) {
 				// Ethernet interfaces is invalid, ignored
-				error_log('WARNING: '.$GLOBALS['messages'][40012]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40012]);
 			} else if (isset($p['ethernet']) && $this -> ethernet != (int) $p['ethernet']) {
 				// New Ethernet value
 				$this -> ethernet = (int) $p['ethernet'];
@@ -604,7 +604,7 @@ class Node {
 				$modified = True;
 			} else if (isset($p['uuid']) && !checkUuid($p['uuid'])) {
 				// UUID is not valid, ignored
-				error_log('WARNING: '.$GLOBALS['messages'][40026]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40026]);
 			} else if (isset($p['uuid'])) {
 				$this -> uuid = $p['uuid'];
 				$modified = True;
@@ -618,7 +618,7 @@ class Node {
 				$modified = True;
 			} else if (isset($p['ram']) && (int) $p['ram'] <= 0) {
 				// RAM is invalid, ignored
-				error_log('WARNING: '.$GLOBALS['messages'][40009]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40009]);
 			} else if (isset($p['ram'])) {
 				$this -> ram = (int) $p['ram'];
 			}
@@ -629,7 +629,7 @@ class Node {
 				$modified = True;
 			} else if (isset($p['ethernet']) && (int) $p['ethernet'] <= 0) {
 				// Ethernet interfaces is invalid, ignored
-				error_log('WARNING: '.$GLOBALS['messages'][40012]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40012]);
 			} else if (isset($p['ethernet']) && $this -> ethernet != (int) $p['ethernet']) {
 				// New Ethernet value
 				$this -> ethernet = (int) $p['ethernet'];
@@ -645,7 +645,7 @@ class Node {
 			return 0;
 		} else {
 			// No attribute has been changed
-			error_log('ERROR: '.$GLOBALS['messages'][40016]);
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40016]);
 			return 40016;
 		}
 	}
@@ -661,7 +661,7 @@ class Node {
 
 		if ($this -> getImage() === '') {
 			// No image found
-			error_log('ERROR: '.$GLOBALS['messages'][80014]);
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80014]);
 			return Array(False, False);
 		}
 
@@ -686,7 +686,7 @@ class Node {
 
 			if (!is_file($bin)) {
 				// Dynamips not found
-				error_log('ERROR: '.$GLOBALS['messages'][80054]);
+				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80054]);
 				return Array(False, False);
 			}
 
@@ -712,7 +712,7 @@ class Node {
 
 			if (!isset($p['qemu_arch'])) {
 				// Arch not found
-				error_log('ERROR: '.$GLOBALS['messages'][80015]);
+				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80015]);
 				return Array(False, False);
 			}
 
@@ -724,7 +724,7 @@ class Node {
 
 			if (!is_file($bin)) {
 				// QEMU not found
-				error_log('ERROR: '.$GLOBALS['messages'][80016]);
+				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80016]);
 				return Array(False, False);
 			}
 
@@ -733,7 +733,7 @@ class Node {
 				$flags .= str_replace('%NICDRIVER%', $p['qemu_nic'], $this -> flags_eth);
 			} else if (isset($p['qemu_nic'])) {
 				// Invalid NIC driver
-				error_log('ERROR: '.$GLOBALS['messages'][80017]);
+				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80017]);
 				return Array(False, False);
 			} else {
 				// Setting default NIC driver
@@ -812,7 +812,7 @@ class Node {
 				$flags .= ' '.$p['qemu_options'];
 			} else if (isset($p['qemu_options'])) {
 				// Invalid QEMU options
-				error_log('ERROR: '.$GLOBALS['messages'][80018]);
+				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80018]);
 				return Array(False, False);
 			}
 		}
@@ -1198,7 +1198,7 @@ class Node {
 	 */
 	public function linkInterface($p) {
 		if (!isset($p['id']) || (int) $p['id'] < 0) {
-			error_log('ERROR: '.$GLOBALS['messages'][40017]);
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40017]);
 			return 40017;
 		}
 
@@ -1213,7 +1213,7 @@ class Node {
 		}
 
 		// Non existent interface
-		error_log('ERROR: '.$GLOBALS['messages'][40018]);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40018]);
 		return 40018;
 	}
 
@@ -1255,7 +1255,7 @@ class Node {
 		switch ($this -> type) {
 			default:
 				// Should not be here
-				error_log('ERROR: '.$GLOBALS['messages'][40019]);
+				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40019]);
 				return 40019;
 			case 'iol':
 				// IOL uses porgroups, 4 interfaces each portgroup
@@ -1273,8 +1273,8 @@ class Node {
 							try {
 								$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 							} catch (Exception $e) {
-								error_log('ERROR: '.$GLOBALS['messages'][40020]);
-								error_log((string) $e);
+								error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+								error_log(date('M d H:i:s ').(string) $e);
 								return 40020;
 							}
 						}
@@ -1293,8 +1293,8 @@ class Node {
 						try {
 							$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 						} catch (Exception $e) {
-							error_log('ERROR: '.$GLOBALS['messages'][40020]);
-							error_log((string) $e);
+							error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+							error_log(date('M d H:i:s ').(string) $e);
 							return 40020;
 						}
 					}
@@ -1307,7 +1307,7 @@ class Node {
 				switch ($this -> getTemplate()) {
 					default:
 						// Should not be here
-						error_log('ERROR: '.$GLOBALS['messages'][40021]);
+						error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40021]);
 						return 40021;
 					case 'c1710':
 						if (isset($old_ethernets[0])) {
@@ -1318,8 +1318,8 @@ class Node {
 							try {
 								$this -> ethernets[0] = new Interfc(Array('name' => 'e0', 'type' => 'ethernet'), 0);
 							} catch (Exception $e) {
-								error_log('ERROR: '.$GLOBALS['messages'][40020]);
-								error_log((string) $e);
+								error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+								error_log(date('M d H:i:s ').(string) $e);
 								return 40020;
 							}
 						}
@@ -1331,8 +1331,8 @@ class Node {
 							try {
 								$this -> ethernets[1] = new Interfc(Array('name' => 'fa0', 'type' => 'ethernet'), 1);
 							} catch (Exception $e) {
-								error_log('ERROR: '.$GLOBALS['messages'][40020]);
-								error_log((string) $e);
+								error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+								error_log(date('M d H:i:s ').(string) $e);
 								return 40020;
 							}
 						}
@@ -1349,8 +1349,8 @@ class Node {
 							try {
 								$this -> ethernets[0] = new Interfc(Array('name' => 'fa0/0', 'type' => 'ethernet'), 0);
 							} catch (Exception $e) {
-								error_log('ERROR: '.$GLOBALS['messages'][40020]);
-								error_log((string) $e);
+								error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+								error_log(date('M d H:i:s ').(string) $e);
 								return 40020;
 							}
 						}
@@ -1362,8 +1362,8 @@ class Node {
 							try {
 								$this -> ethernets[1] = new Interfc(Array('name' => 'fa0/1', 'type' => 'ethernet'), 1);
 							} catch (Exception $e) {
-								error_log('ERROR: '.$GLOBALS['messages'][40020]);
-								error_log((string) $e);
+								error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+								error_log(date('M d H:i:s ').(string) $e);
 								return 40020;
 							}
 						}
@@ -1380,8 +1380,8 @@ class Node {
 							try {
 								$this -> ethernets[0] = new Interfc(Array('name' => 'fa0/0', 'type' => 'ethernet'), 0);
 							} catch (Exception $e) {
-								error_log('ERROR: '.$GLOBALS['messages'][40020]);
-								error_log((string) $e);
+								error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+								error_log(date('M d H:i:s ').(string) $e);
 								return 40020;
 							}
 						}
@@ -1403,8 +1403,8 @@ class Node {
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -1428,8 +1428,8 @@ class Node {
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -1454,8 +1454,8 @@ class Node {
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -1474,8 +1474,8 @@ class Node {
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -1498,8 +1498,8 @@ class Node {
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -1522,8 +1522,8 @@ class Node {
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -1546,8 +1546,8 @@ class Node {
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -1566,8 +1566,8 @@ class Node {
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -1590,8 +1590,8 @@ class Node {
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -1610,8 +1610,8 @@ class Node {
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -1630,8 +1630,8 @@ class Node {
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -1650,8 +1650,8 @@ class Node {
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -1674,8 +1674,8 @@ class Node {
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -1694,8 +1694,8 @@ class Node {
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -1714,8 +1714,8 @@ class Node {
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -1734,8 +1734,8 @@ class Node {
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -1758,8 +1758,8 @@ class Node {
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -1782,8 +1782,8 @@ class Node {
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -1806,8 +1806,8 @@ class Node {
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -1830,8 +1830,8 @@ class Node {
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -1850,8 +1850,8 @@ class Node {
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -1870,8 +1870,8 @@ class Node {
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -1896,8 +1896,8 @@ class Node {
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -1916,8 +1916,8 @@ class Node {
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -1936,8 +1936,8 @@ class Node {
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -1956,8 +1956,8 @@ class Node {
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -1976,8 +1976,8 @@ class Node {
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -2000,8 +2000,8 @@ class Node {
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -2035,7 +2035,7 @@ class Node {
 		switch ($this -> type) {
 			default:
 				// Should not be here
-				error_log('ERROR: '.$GLOBALS['messages'][40019]);
+				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40019]);
 				return 40019;
 			case 'iol':
 				// IOL uses porgroups, 4 interfaces each portgroup
@@ -2053,8 +2053,8 @@ class Node {
 							try {
 								$this -> serials[$i] = new Interfc(Array('name' => $n, 'type' => 'serial'), $i);
 							} catch (Exception $e) {
-								error_log('ERROR: '.$GLOBALS['messages'][40022]);
-								error_log((string) $e);
+								error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40022]);
+								error_log(date('M d H:i:s ').(string) $e);
 								return 40022;
 							}
 						}
@@ -2075,7 +2075,7 @@ class Node {
 	 */
 	public function setSlot($i, $s) {
 		if ($this -> type != 'dynamips') {
-			error_log('ERROR: '.$GLOBALS['messages'][40023]);
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40023]);
 			return 40023;
 		}
 
@@ -2089,7 +2089,7 @@ class Node {
 		switch ($this -> getTemplate()) {
 			default:
 				// Should not be here
-				error_log('ERROR: '.$GLOBALS['messages'][40019]);
+				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40019]);
 				return 40019;
 			case 'c3725':
 				// c3725 has two slots
@@ -2097,7 +2097,7 @@ class Node {
 					switch ($s) {
 						default:
 							// Unsupported module
-							error_log('ERROR: '.$GLOBALS['messages'][40024]);
+							error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40024]);
 							return 40024;
 						case 'NM-1FE-TX':
 							$this -> slots[$i] = $s;
@@ -2109,8 +2109,8 @@ class Node {
 								try {
 									$this -> ethernets[16 * $i] = new Interfc(Array('name' => 'fa'.$i.'/0', 'type' => 'ethernet'), 16 * $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -2130,8 +2130,8 @@ class Node {
 									try {
 										$this -> ethernets[16 * $i + $p] = new Interfc(Array('name' => 'fa'.$i.'/'.$p, 'type' => 'ethernet'), 16 * $i + $p);
 									} catch (Exception $e) {
-										error_log('ERROR: '.$GLOBALS['messages'][40020]);
-										error_log((string) $e);
+										error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+										error_log(date('M d H:i:s ').(string) $e);
 										return 40020;
 									}
 								}
@@ -2150,7 +2150,7 @@ class Node {
 				if (in_Array($i, Array(1, 2, 3, 4, 5, 6))) {
 					switch ($s) {
 						default:
-							error_log('ERROR: '.$GLOBALS['messages'][40024]);
+							error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40024]);
 							return 40024;
 						case 'PA-FE-TX':
 							$this -> slots[$i] = $s;
@@ -2162,8 +2162,8 @@ class Node {
 								try {
 									$this -> ethernets[16 * $i] = new Interfc(Array('name' => 'fa'.$i.'/0', 'type' => 'ethernet'), 16 * $i);
 								} catch (Exception $e) {
-									error_log('ERROR: '.$GLOBALS['messages'][40020]);
-									error_log((string) $e);
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
 									return 40020;
 								}
 							}
@@ -2183,8 +2183,8 @@ class Node {
 									try {
 										$this -> ethernets[16 * $i + $p] = new Interfc(Array('name' => 'e'.$i.'/'.$p, 'type' => 'ethernet'), 16 * $i + $p);
 									} catch (Exception $e) {
-										error_log('ERROR: '.$GLOBALS['messages'][40020]);
-										error_log((string) $e);
+										error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+										error_log(date('M d H:i:s ').(string) $e);
 										return 40020;
 									}
 								}
@@ -2204,8 +2204,8 @@ class Node {
 									try {
 										$this -> ethernets[16 * $i + $p] = new Interfc(Array('name' => 'e'.$i.'/'.$p, 'type' => 'ethernet'), 16 * $i + $p);
 									} catch (Exception $e) {
-										error_log('ERROR: '.$GLOBALS['messages'][40020]);
-										error_log((string) $e);
+										error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+										error_log(date('M d H:i:s ').(string) $e);
 										return 40020;
 									}
 								}
@@ -2231,7 +2231,7 @@ class Node {
 	 */
 	public function unlinkInterface($i) {
 		if (!isset($i) || (int) $i < 0) {
-			error_log('WARNING: '.$GLOBALS['messages'][40017]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40017]);
 			return 40017;
 		}
 
@@ -2246,7 +2246,7 @@ class Node {
 		}
 
 		// Non existent interface
-		error_log('WARNING: '.$GLOBALS['messages'][40018]);
+		error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40018]);
 		return 40018;
 	}
 }

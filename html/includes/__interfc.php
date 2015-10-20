@@ -62,14 +62,14 @@ class Interfc {
 		// Mandatory parameters
 		if (!isset($p['type'])) {
 			// Missing mandatory parameters
-			error_log('ERROR: '.$GLOBALS['messages'][10000]);
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][10000]);
 			throw new Exception('10000');
 			return 10000;
 		}
 
 		if (!checkInterfcType($p['type'])) {
 			// Type is not valid
-			error_log('ERROR: '.$GLOBALS['messages'][10001]);
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][10001]);
 			throw new Exception('10001');
 			return 10001;
 		}
@@ -78,14 +78,14 @@ class Interfc {
 		if (isset($p['name']) && $p['name'] === '') {
 			// Name is empty, ignored
 			unset($p['name']);
-			error_log('WARNING: '.$GLOBALS['messages'][10002]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][10002]);
 		}
 
 		if ($p['type'] == 'ethernet') {
 			if (isset($p['network_id']) && (int) $p['network_id'] <= 0) {
 				// Network ID is not valid
 				unset($p['network_id']);
-				error_log('WARNING: '.$GLOBALS['messages'][10003]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][10003]);
 			}
 		}
 				
@@ -93,13 +93,13 @@ class Interfc {
 			if (isset($p['remote_id']) && (int) $p['remote_id'] <= 0) {
 				// Remote ID is not valid
 				unset($p['remote_id']);
-				error_log('WARNING: '.$GLOBALS['messages'][10006]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][10006]);
 			}
 
 			if (isset($p['remote_if']) && (int) $p['remote_if'] < 0) {
 				// Remote interface is not valid
 				unset($p['remote_if']);
-				error_log('WARNING: '.$GLOBALS['messages'][10007]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][10007]);
 			}
 		}
 
@@ -150,7 +150,7 @@ class Interfc {
 				// Unneeded attributes
 				unset($p['remote_id']);
 				unset($p['remote_if']);
-				error_log('WARNING: '.$GLOBALS['messages'][10004]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][10004]);
 			}
 
 			if (isset($p['network_id']) && $p['network_id'] === '') {
@@ -159,7 +159,7 @@ class Interfc {
 				$modified = True;
 			} else if (isset($p['network_id']) && (int) $p['network_id'] <= 0) {
 				// Network ID is not valid
-				error_log('WARNING: '.$GLOBALS['messages'][10003]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][10003]);
 			} else if (isset($p['network_id'])) {
 				$this -> network_id = (int) $p['network_id'];
 				$modified = True;
@@ -170,7 +170,7 @@ class Interfc {
 			if (isset($p['network_id'])) {
 				// Unneeded attributes
 				unset($p['network_id']);
-				error_log('WARNING: '.$GLOBALS['messages'][10005]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][10005]);
 			}
 
 			if (isset($p['remote_id']) && $p['remote_id'] === '') {
@@ -181,7 +181,7 @@ class Interfc {
 			} else {
 				if (isset($p['remote_id']) && (int) $p['remote_id'] <= 0) {
 					// Remote ID is not valid
-					error_log('WARNING: '.$GLOBALS['messages'][10006]);
+					error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][10006]);
 				} else if (isset($p['remote_id'])) {
 					$this -> remote_id = (int) $p['remote_id'];
 					$modified = True;
@@ -189,7 +189,7 @@ class Interfc {
 
 				if (isset($p['remote_if']) && (int) $p['remote_if'] < 0) {
 					// Remote IF is not valid
-					error_log('WARNING: '.$GLOBALS['messages'][10007]);
+					error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][10007]);
 				} else if (isset($p['remote_if'])) {
 					$this -> remote_if = (int) $p['remote_if'];
 					$modified = True;
@@ -202,7 +202,7 @@ class Interfc {
 			return 0;
 		} else {
 			// No attribute has been changed
-			error_log('ERROR: '.$GLOBALS['messages'][10008]);
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][10008]);
 			return 10008;
 		}
 	}

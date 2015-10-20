@@ -29,6 +29,55 @@
  * @version 20150909
  */
 
+// Get user info
+function getUserInfo() {
+	var deferred = $.Deferred();
+	var url = '/api/auth';
+	var type = 'GET'
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: user is authenticated.');
+				EMAIL = data['data']['email'];
+				FOLDER = data['data']['folder'];
+				LAB = data['data']['lab'];
+				LANG = data['data']['lang'];
+				NAME = data['data']['name'];
+				ROLE = data['data']['role'];
+				TENANT = data['data']['tenant'];
+				USERNAME = data['data']['username'];
+				deferred.resolve();
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject();
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject();
+		}
+	});
+	return deferred.promise();
+}
+
+
+
+
+
+
+
+
+
+
+ 
 // Add Modal
 function addModal(title, body, footer) {
 	var html = '<div aria-hidden="false" style="display: block;" class="modal fade in" tabindex="-1" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">' + title + '</h4></div><div class="modal-body">' + body + '</div><div class="modal-footer">' + footer + '</div></div></div></div>';
@@ -283,41 +332,7 @@ function printPageUserManagement() {
 	});
 }
 
-// Get user info
-function getUserInfo() {
-	var deferred = $.Deferred();
-	var url = '/api/auth';
-	var type = 'GET'
-	$.ajax({
-		timeout: TIMEOUT,
-		type: type,
-		url: encodeURI(url),
-		dataType: 'json',
-		success: function(data) {
-			if (data['status'] == 'success') {
-				logger(1, 'DEBUG: user is authenticated.');
-				USERNAME = data['data']['username'];
-				EMAIL = data['data']['email'];
-				ROLE = data['data']['role'];
-				TENANT = data['data']['tenant'];
-				NAME = data['data']['name'];
-				deferred.resolve();
-			} else {
-				// Application error
-				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-				deferred.reject();
-			}
-		},
-		error: function(data) {
-			// Server error
-			var message = getJsonMessage(data['responseText']);
-			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
-			logger(1, 'DEBUG: ' + message);
-			deferred.reject();
-		}
-	});
-	return deferred.promise();
-}
+
 
 // Logging
 function logger(severity, message) {

@@ -63,7 +63,7 @@ class Picture {
 		// Mandatory parameters
 		if (!isset($p['data']) || !isset($p['type'])) {
 			// Missing mandatory parameters
-			error_log('ERROR: '.$GLOBALS['messages'][50000]);
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][50000]);
 			throw new Exception('50000');
 			return 50000;
 		}
@@ -71,7 +71,7 @@ class Picture {
 		list($p['width'], $p['height']) = getimagesizefromstring($p['data']);
 		if (!$p['height'] > 0 || !$p['width'] > 0) {
 			// Picture is not valid
-			error_log('ERROR: '.$GLOBALS['messages'][50002]);
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][50002]);
 			throw new Exception(50002);
 			return 50002;
 		}
@@ -80,18 +80,18 @@ class Picture {
 		if (isset($p['map']) && !checkPictureMap($p['map'])) {
 			// Map is not valid, ignored
 			unset($p['map']);
-			error_log('WARNING: '.$GLOBALS['messages'][50005]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][50005]);
 		}
 
 		if (isset($p['name']) && $p['name'] === '') {
 			// Name is empty, ignored
 			unset($p['name']);
-			error_log('WARNING: '.$GLOBALS['messages'][50003]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][50003]);
 		}
 
 		if (!checkPictureType($p['type'])) {
 			// Type is not valid
-			error_log('ERROR: '.$GLOBALS['messages'][50004]);
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][50004]);
 			throw new Exception('50004');
 			return 50004;
 		}
@@ -127,7 +127,7 @@ class Picture {
 			$modified = True;
 		} else if (isset($p['map']) && !checkPictureMap($p['map'])) {
 			// Map is not valid, ignored
-			error_log('WARNING: '.$GLOBALS['messages'][50005]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][50005]);
 		} else {
 			$this -> map = $p['map'];
 			$modified = True;
@@ -147,7 +147,7 @@ class Picture {
 			return 0;
 		} else {
 			// No attribute has been changed
-			error_log('ERROR: '.$GLOBALS['messages'][50006]);
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][50006]);
 			return 50006;
 		}
 	}

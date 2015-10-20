@@ -68,7 +68,7 @@ $messages[20000] = 'Create a new lab, file does not exists (20000).';
 $messages[20001] = 'Cannot load lab, invalid filename (20001).';
 $messages[20002] = 'Cannot load lab, invalid folder (20002).';
 $messages[20003] = 'Cannot load lab, invalid XML document (20003).';
-$messages[20004] = 'Cannot load lab, invalid lab_name attribute (20004).';
+$messages[20004] = 'Cannot load lab, Invalid UNetLab file, attribute is missing (20004).';
 $messages[20005] = 'Cannot load lab, invalid lab_name attribute (20005).';
 $messages[20006] = 'Attribute ignored, invalid lab_description (20006).';
 $messages[20007] = 'Attribute ignored, invalid lab_author (20007).';
@@ -104,6 +104,7 @@ $messages[20036] = 'Cannot save startup-config in the selected lab (20036).';
 $messages[20037] = 'Config ignored, cannot load it (20037).';
 $messages[20038] = 'Attribute ignored, invalid lab_name (20038).';
 $messages[20039] = 'Lab already exists (20039).';
+$messages[20040] = 'Attribute ignored, invalid lab_body (20040).';
 
 // __network.php (30000-39999)
 $messages[30000] = 'Cannot create network, invalid or missing mandatory parameters (30000).';
@@ -334,4 +335,5 @@ $messages[90029] = 'Failed to create "sessions" table (90029).';
 $messages[90030] = 'Failed to update database to latest version (90030).';
 $messages[90031] = 'Database updated (90031).';
 $messages[90032] = 'User are not allowed to take this action (90032).';
+$messages[90033] = 'Cannot set last seen folder database, check also disk space (90033).';
 ?>

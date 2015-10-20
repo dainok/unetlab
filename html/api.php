@@ -144,6 +144,11 @@ $app -> get('/api/auth', function() use ($app, $db) {
 		return;
 	}
 
+	if (checkFolder($user['folder']) !== 0) {
+		// User has an invalid last viewed folder
+		$user['folder'] = '/';
+	}
+
 	$output['code'] = 200;
 	$output['status'] = 'success';
 	$output['message'] = $GLOBALS['messages']['90002'];
@@ -275,6 +280,17 @@ $app -> get('/api/folders/(:path+)', function($path = array()) use ($app, $db) {
 
 	$s = '/'.implode('/', $path);
 	$output = apiGetFolders($s);
+
+	if ($output['status'] === 'success') {
+		// Setting folder as last viewed
+		$rc = updateUserFolder($db, $app -> getCookie('unetlab_session'), $s);
+		if ($rc !== 0) {
+			// Cannot update user folder
+			$output['code'] = 500;
+			$output['status'] = 'error';
+			$output['message'] = $GLOBALS['messages'][$rc];
+		}
+	}
 
 	$app -> response -> setStatus($output['code']);
 	$app -> response -> setBody(json_encode($output));

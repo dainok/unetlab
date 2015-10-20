@@ -64,14 +64,14 @@ class Network {
 		// Mandatory parameters
 		if (!isset($p['type'])) {
 			// Missing mandatory parameters
-			error_log('ERROR: '.$GLOBALS['messages'][30000]);
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][30000]);
 			throw new Exception('30000');
 			return 30000;
 		}
 
 		if (!checkNetworkType($p['type'])) {
 			// Type is not valid
-			error_log('ERROR: '.$GLOBALS['messages'][30001]);
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][30001]);
 			throw new Exception('30001');
 			return 30001;
 		}
@@ -82,26 +82,26 @@ class Network {
 			$p['count'] = 0;
 		} else if ((int) $p['count'] < 0) {
 			// Count is invalid, ignored
-			error_log('WARNING: '.$GLOBALS['messages'][30007]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][30007]);
 			$p['count'] = 0;
 		}
 
 		if (isset($p['left']) && !checkPosition($p['left'])) {
 			// Left is invalid, ignored
 			unset($p['left']);
-			error_log('WARNING: '.$GLOBALS['messages'][30003]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][30003]);
 		}
 
 		if (isset($p['name']) && $p['name'] === '') {
 			// Name is empty, ignored
 			unset($p['name']);
-			error_log('WARNING: '.$GLOBALS['messages'][30002]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][30002]);
 		}
 
 		if (isset($p['top']) && !checkPosition($p['top'])) {
 			// Top is invalid, ignored
 			unset($p['top']);
-			error_log('WARNING: '.$GLOBALS['messages'][30004]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][30004]);
 		}
 
 		// Now building the network
@@ -137,7 +137,7 @@ class Network {
 			$modified = True;
 		} else if (isset($p['left']) && !checkPosition($p['left'])) {
 			// Left is not valid, ignored
-			error_log('WARNING: '.$GLOBALS['messages'][30003]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][30003]);
 		} else if (isset($p['left'])) {
 			$this -> left = $p['left'];
 			$modified = True;
@@ -158,7 +158,7 @@ class Network {
 			$modified = True;
 		} else if (isset($p['top']) && !checkPosition($p['top'])) {
 			// Top is not valid, ignored
-			error_log('WARNING: '.$GLOBALS['messages'][30004]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][30004]);
 		} else if (isset($p['top'])) {
 			$this -> top = $p['top'];
 			$modified = True;
@@ -166,7 +166,7 @@ class Network {
 
 		if (isset($p['type']) && !checkNetworkType($p['type'])) {
 			// Type is not valid, ignored
-			error_log('WARNING: '.$GLOBALS['messages'][30005]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][30005]);
 		} else if (isset($p['type'])) {
 			$this -> type = $p['type'];
 			$modified = True;
@@ -177,7 +177,7 @@ class Network {
 			return 0;
 		} else {
 			// No attribute has been changed
-			error_log('ERROR: '.$GLOBALS['messages'][30006]);
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][30006]);
 			return 30006;
 		}
 	}
@@ -266,7 +266,7 @@ class Network {
 			$this -> count = (int) $i;
 			return 0;
 		} else {
-			error_log('WARNING: '.$GLOBALS['messages'][30008]);
+			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][30008]);
 			return 30008;
 		}
 	}

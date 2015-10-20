@@ -41,8 +41,8 @@ function addBridge($s) {
 	exec($cmd, $o, $rc);
 	if ($rc != 0) {
 		// Failed to add the bridge
-		error_log('ERROR: '.$GLOBALS['messages'][80026]);
-		error_log(implode("\n", $o));
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80026]);
+		error_log(date('M d H:i:s ').implode("\n", $o));
 		return 80026;
 	}
 
@@ -50,8 +50,8 @@ function addBridge($s) {
 	exec($cmd, $o, $rc);
 	if ($rc != 0) {
 		// Failed to activate it
-		error_log('ERROR: '.$GLOBALS['messages'][80027]);
-		error_log(implode("\n", $o));
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80027]);
+		error_log(date('M d H:i:s ').implode("\n", $o));
 		return 80027;
 	}
 
@@ -61,8 +61,8 @@ function addBridge($s) {
 		exec($cmd, $o, $rc);
 		if ($rc != 0) {
 			// Failed to configure forward mask
-			error_log('ERROR: '.$GLOBALS['messages'][80028]);
-			error_log(implode("\n", $o));
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80028]);
+			error_log(date('M d H:i:s ').implode("\n", $o));
 			return 80028;
 		}
 
@@ -71,8 +71,8 @@ function addBridge($s) {
 		exec($cmd, $o, $rc);
 		if ($rc != 0) {
 			// Failed to configure multicast_snooping
-			error_log('ERROR: '.$GLOBALS['messages'][80071]);
-			error_log(implode("\n", $o));
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80071]);
+			error_log(date('M d H:i:s ').implode("\n", $o));
 			return 80071;
 		}
 	}
@@ -81,8 +81,8 @@ function addBridge($s) {
 	exec($cmd, $o, $rc);
 	if ($rc != 0) {
 		// Failed to set ageing on bridge (need for portmirroring)
-		error_log('ERROR: '.$GLOBALS['messages'][80055]);
-		error_log(implode("\n", $o));
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80055]);
+		error_log(date('M d H:i:s ').implode("\n", $o));
 		return 80055;
 	}
 	return 0;
@@ -97,7 +97,7 @@ function addBridge($s) {
 function addNetwork($p) {
 	if (!isset($p['name']) || !isset($p['type'])) {
 		// Missing mandatory parameters
-		error_log('ERROR: '.$GLOBALS['messages'][80021]);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80021]);
 		return 80021;
 	}
 
@@ -107,11 +107,11 @@ function addNetwork($p) {
 				// Cloud already exists
 			} else if (preg_match('/^pnet[0-9]+$/', $p['type'])) {
 				// Cloud does not exist
-				error_log('ERROR: '.$GLOBALS['messages'][80056]);
+				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80056]);
 				return 80056;
 			} else {
 				// Should not be here
-				error_log('ERROR: '.$GLOBALS['messages'][80020]);
+				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80020]);
 				return 80020;
 			}
 			break;
@@ -134,7 +134,7 @@ function addNetwork($p) {
 				}
 			} else {
 				// Non bridge/OVS interface exist -> cannot create
-				error_log('ERROR: '.$GLOBALS['messages'][80022]);
+				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80022]);
 				return 80022;
 			}
 			break;
@@ -157,7 +157,7 @@ function addNetwork($p) {
 				}
 			} else {
 				// Non bridge/OVS interface exist -> cannot create
-				error_log('ERROR: '.$GLOBALS['messages'][80022]);
+				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80022]);
 				return 80022;
 			}
 			break;
@@ -178,8 +178,8 @@ function addOvs($s) {
 		return 0;
 	} else {
 		// Failed to add the OVS
-		error_log('ERROR: '.$GLOBALS['messages'][80023]);
-		error_log(implode("\n", $o));
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80023]);
+		error_log(date('M d H:i:s ').implode("\n", $o));
 		return 80023;
 	}
 }
@@ -196,8 +196,8 @@ function addTap($s, $u) {
 	exec($cmd, $o, $rc);
 	if ($rc != 0) {
 		// Failed to add the TAP interface
-		error_log('ERROR: '.$GLOBALS['messages'][80032]);
-		error_log(implode("\n", $o));
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80032]);
+		error_log(date('M d H:i:s ').implode("\n", $o));
 		return 80032;
 	}
 
@@ -205,8 +205,8 @@ function addTap($s, $u) {
 	exec($cmd, $o, $rc); 
 	if ($rc != 0) {
 		// Failed to activate the TAP interface
-		error_log('ERROR: '.$GLOBALS['messages'][80033]);
-		error_log(implode("\n", $o));
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80033]);
+		error_log(date('M d H:i:s ').implode("\n", $o));
 		return 80033;
 	}
 
@@ -239,8 +239,8 @@ function checkUsername($i) {
 		exec($cmd, $o, $rc);
 		if ($rc != 0) {
 			// Failed to add the username
-			error_log('ERROR: '.$GLOBALS['messages'][80009]);
-			error_log(implode("\n", $o));
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80009]);
+			error_log(date('M d H:i:s ').implode("\n", $o));
 			return False;
 		}
 	}
@@ -248,7 +248,7 @@ function checkUsername($i) {
 	// Now check if the home directory exists
 	if (!is_dir($path) && !mkdir($path)) {
 		// Failed to create the home directory
-		error_log('ERROR: '.$GLOBALS['messages'][80010]);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80010]);
 		return False;
 	}
 
@@ -257,22 +257,22 @@ function checkUsername($i) {
 	exec($cmd, $o, $rc);
 	if ($rc != 0) {
 		// Failed to set the setgid bit
-		error_log('ERROR: '.$GLOBALS['messages'][80011]);
-		error_log(implode("\n", $o));
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80011]);
+		error_log(date('M d H:i:s ').implode("\n", $o));
 		return False;
 	}
 
 	// Set permissions
 	if (!chown($path, 'unl'.$i)) {
 		// Failed to set owner and/or group
-		error_log('ERROR: '.$GLOBALS['messages'][80012]);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80012]);
 		return False;
 	}
 
 	// Last, link the profile
 	if (!file_exists($path.'/.profile') && !symlink('/opt/unetlab/wrappers/unl_profile', $path.'/.profile')) {
 		// Failed to link the profile
-		error_log('ERROR: '.$GLOBALS['messages'][80013]);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80013]);
 		return False;
 	}
 
@@ -294,8 +294,8 @@ function connectInterface($n, $p) {
 			return 0;
 		} else {
 			// Failed to add interface to Bridge
-			error_log('ERROR: '.$GLOBALS['messages'][80030]);
-			error_log(implode("\n", $o));
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80030]);
+			error_log(date('M d H:i:s ').implode("\n", $o));
 			return 80030;
 		}
 	} else if (isOvs($n)) {
@@ -305,13 +305,13 @@ function connectInterface($n, $p) {
 			return 0;
 		} else {
 			// Failed to add interface to OVS
-			error_log('ERROR: '.$GLOBALS['messages'][80031]);
-			error_log(implode("\n", $o));
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80031]);
+			error_log(date('M d H:i:s ').implode("\n", $o));
 			return 80031;
 		}
 	} else {
 		// Network not found
-		error_log('ERROR: '.$GLOBALS['messages'][80029]);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80029]);
 		return 80029;
 	}
 }
@@ -333,8 +333,8 @@ function delBridge($s) {
 		return 0;
 	} else {
 		// Failed to delete the OVS
-		error_log('ERROR: '.$GLOBALS['messages'][80025]);
-		error_log(implode("\n", $o));
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80025]);
+		error_log(date('M d H:i:s ').implode("\n", $o));
 		return 80025;
 	}
 }
@@ -352,8 +352,8 @@ function delOvs($s) {
 		return 0;
 	} else {
 		// Failed to delete the OVS
-		error_log('ERROR: '.$GLOBALS['messages'][80024]);
-		error_log(implode("\n", $o));
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80024]);
+		error_log(date('M d H:i:s ').implode("\n", $o));
 		return 80024;
 	}
 }
@@ -375,8 +375,8 @@ function delTap($s) {
 		exec($cmd, $o, $rc);
 		if (isInterface($s)) {
 			// Failed to delete the TAP interface
-			error_log('ERROR: '.$GLOBALS['messages'][80034]);
-			error_log(implode("\n", $o));
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80034]);
+			error_log(date('M d H:i:s ').implode("\n", $o));
 			return 80034;
 		} else {
 			return 0;
@@ -398,13 +398,13 @@ function dumpConfig($config_data, $file_path) {
 	$fp = fopen($file_path, 'w');
 	if (!isset($fp)) {
 		// Cannot open file
-		error_log('ERROR: '.$GLOBALS['messages'][80068]);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80068]);
 		return False;
 	}
 
 	if (!fwrite($fp, $config_data)) {
 		// Cannot write file
-		error_log('ERROR: '.$GLOBALS['messages'][80069]);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80069]);
 		return False;
 	}
 
@@ -424,14 +424,14 @@ function export($node_id, $n, $lab) {
 
 	if (is_file($tmp) && !unlink($tmp)) {
 		// Cannot delete tmp file
-		error_log('ERROR: '.$GLOBALS['messages'][80059]);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80059]);
 		return 80059;
 	}
 
 	switch ($n -> getNType()) {
 		default:
 			// Unsupported
-			error_log('ERROR: '.$GLOBALS['messages'][80061]);
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80061]);
 			return 80061;
 			break;
 		case 'dynamips':
@@ -447,15 +447,15 @@ function export($node_id, $n, $lab) {
 
 			if (!isset($nvram) || !is_file($nvram)) {
 				// NVRAM file not found
-				error_log('ERROR: '.$GLOBALS['messages'][80066]);
+				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80066]);
 				return 80066;
 			}
 			$cmd = '/usr/bin/nvram_export '.$nvram.' '.$tmp;
 			exec($cmd, $o, $rc);
-			error_log('INFO: exporting '.$cmd);
+			error_log(date('M d H:i:s ').'INFO: exporting '.$cmd);
 			if ($rc != 0) {
-				error_log('ERROR: '.$GLOBALS['messages'][80060]);
-				error_log((string) $o);
+				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80060]);
+				error_log(date('M d H:i:s ').(string) $o);
 				return 80060;
 			}
 			break;
@@ -463,16 +463,16 @@ function export($node_id, $n, $lab) {
 			$nvram = $n -> getRunningPath().'/nvram_'.sprintf('%05u', $node_id);
 			if (!is_file($nvram)) {
 				// NVRAM file not found
-				error_log('ERROR: '.$GLOBALS['messages'][80066]);
+				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80066]);
 				return 80066;
 			}
 			$cmd = '/opt/unetlab/scripts/iou_export '.$nvram.' '.$tmp;
 			exec($cmd, $o, $rc);
 			usleep(1);
-			error_log('INFO: exporting '.$cmd);
+			error_log(date('M d H:i:s ').'INFO: exporting '.$cmd);
 			if ($rc != 0) {
-				error_log('ERROR: '.$GLOBALS['messages'][80060]);
-				error_log((string) $o);
+				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80060]);
+				error_log(date('M d H:i:s ').(string) $o);
 				return 80060;
 			}
 			break;
@@ -480,10 +480,10 @@ function export($node_id, $n, $lab) {
 			if (is_file('/opt/unetlab/scripts/config_'.$n -> getTemplate().'.py')) {
 				$cmd = '/opt/unetlab/scripts/config_'.$n -> getTemplate().'.py -a get -p '.$n -> getPort().' -f '.$tmp.' -t 15';
 				exec($cmd, $o, $rc);
-				error_log('INFO: exporting '.$cmd);
+				error_log(date('M d H:i:s ').'INFO: exporting '.$cmd);
 				if ($rc != 0) {
-					error_log('ERROR: '.$GLOBALS['messages'][80060]);
-					error_log((string) $o);
+					error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80060]);
+					error_log(date('M d H:i:s ').(string) $o);
 					return 80060;
 				}
 			}
@@ -491,7 +491,7 @@ function export($node_id, $n, $lab) {
 
 	if (!is_file($tmp)) {
 		// File not found
-		error_log('ERROR: '.$GLOBALS['messages'][80062]);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80062]);
 		return 80062;
 	}
 
@@ -499,25 +499,25 @@ function export($node_id, $n, $lab) {
 	$fp = fopen($tmp, 'r');
 	if (!isset($fp)) {
 		// Cannot open file
-		error_log('ERROR: '.$GLOBALS['messages'][80064]);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80064]);
 		return 80064;
 	}
 	$config_data = fread($fp ,filesize($tmp));
 	if ($config_data === False || $config_data === ''){
 		// Cannot read file
-		error_log('ERROR: '.$GLOBALS['messages'][80065]);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80065]);
 		return 80065;
 	}
 	
 	if ($lab -> setNodeConfigData($node_id, $config_data) !== 0) {
 		// Failed to save startup-config
-		error_log('ERROR: '.$GLOBALS['messages'][80063]);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80063]);
 		return 80063;
 	}
 
 	if(!unlink($tmp)) {
 		// Failed to remove tmp file
-		error_log('WARNING: '.$GLOBALS['messages'][80070]);
+		error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][80070]);
 	}
 
 	return 0;
@@ -662,7 +662,7 @@ function prepareNode($n, $id, $t, $nets) {
 	posix_setsid();
 	posix_setgid(32768);
 	if ($n -> getNType() == 'iol' && !posix_setuid($uid)) {
-		error_log('ERROR: '.$GLOBALS['messages'][80036]);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80036]);
 		return 80036;
 	}
 
@@ -670,7 +670,7 @@ function prepareNode($n, $id, $t, $nets) {
 		// Node is not prepared/locked
 		if (!is_dir($n -> getRunningPath()) && !mkdir($n -> getRunningPath(), 0775, True)) {
 			// Cannot create running directory
-			error_log('ERROR: '.$GLOBALS['messages'][80037]);
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80037]);
 			return 80037;
 		}
 
@@ -678,26 +678,26 @@ function prepareNode($n, $id, $t, $nets) {
 			// Node should use saved startup-config
 			if (!dumpConfig($n -> getConfigData(), $n -> getRunningPath().'/startup-config')) {
 				// Cannot dump config to startup-config file
-				error_log('WARNING: '.$GLOBALS['messages'][80067]);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][80067]);
 			}
 		}
 
 		switch ($n -> getNType()) {
 			default:
 				// Invalid node_type
-				error_log('ERROR: '.$GLOBALS['messages'][80038]);
+				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80038]);
 				return 80038;
 			case 'iol':
 				// Check license
 				if (!is_file('/opt/unetlab/addons/iol/bin/iourc')) {
 					// IOL license not found
-					error_log('ERROR: '.$GLOBALS['messages'][80039]);
+					error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80039]);
 					return 80039;
 				}
 
 				if (!file_exists($n -> getRunningPath().'/iourc') && !symlink('/opt/unetlab/addons/iol/bin/iourc', $n -> getRunningPath().'/iourc')) {
 					// Cannot link IOL license
-					error_log('ERROR: '.$GLOBALS['messages'][80040]);
+					error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80040]);
 					return 80040;
 				}
 
@@ -705,7 +705,7 @@ function prepareNode($n, $id, $t, $nets) {
 			case 'docker':
 				if (!is_file('/usr/bin/docker')) {
 					// docker.io is not installed
-					error_log('ERROR: '.$GLOBALS['messages'][80082]);
+					error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80082]);
 					return 80082;
 				}
 
@@ -717,7 +717,7 @@ function prepareNode($n, $id, $t, $nets) {
 					exec($cmd, $o, $rc);
 					if ($rc != 0) {
 						// Failed to create container
-						error_log('ERROR: '.$GLOBALS['messages'][80083]);
+						error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80083]);
 						return 80083;
 					}
 				}
@@ -730,7 +730,7 @@ function prepareNode($n, $id, $t, $nets) {
 
 				if (!touch($n -> getRunningPath().'/.lock')) {
 					// Cannot lock directory
-					error_log('ERROR: '.$GLOBALS['messages'][80041]);
+					error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80041]);
 					return 80041;
 				}
 
@@ -742,8 +742,8 @@ function prepareNode($n, $id, $t, $nets) {
 						exec($cmd, $o, $rc);
 						if ($rc !== 0) {
 							// Cannot make linked clone
-							error_log('ERROR: '.$GLOBALS['messages'][80045]);
-							error_log(implode("\n", $o));
+							error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80045]);
+							error_log(date('M d H:i:s ').implode("\n", $o));
 							return 80045;
 						}
 					}
@@ -752,7 +752,7 @@ function prepareNode($n, $id, $t, $nets) {
 
 				if (!unlink($n -> getRunningPath().'/.lock')) {
 					// Cannot unlock directory
-					error_log('ERROR: '.$GLOBALS['messages'][80042]);
+					error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80042]);
 					return 80042;
 				}
 				break;
@@ -761,7 +761,7 @@ function prepareNode($n, $id, $t, $nets) {
 		// Mark the node as prepared
 		if (!touch($n -> getRunningPath().'/.prepared')) {
 			// Cannot write on directory
-			error_log('ERROR: '.$GLOBALS['messages'][80044]);
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80044]);
 			return 80044;
 		}
 
@@ -795,13 +795,13 @@ function start($n, $id, $t, $nets) {
 
 	if ($bin == False || $flags == False) {
 		// Invalid CMD line
-		error_log('ERROR: '.$GLOBALS['messages'][80046]);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80046]);
 		return 80046;
 	}
 
 	if(!chdir($n -> getRunningPath())) {
 		// Failed to change directory
-		error_log('ERROR: '.$GLOBALS['messages'][80047]);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80047]);
 		return 80047;
 	}
 
@@ -809,7 +809,7 @@ function start($n, $id, $t, $nets) {
 	switch ($n -> getNType()) {
 		default:
 			// Invalid node_type
-			error_log('ERROR: '.$GLOBALS['messages'][80038]);
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80038]);
 			return 80028;
 		case 'iol':
 			$cmd = '/opt/unetlab/wrappers/iol_wrapper -T '.$t.' -D '.$id.' -t "'.$n -> getName().'" -F /opt/unetlab/addons/iol/bin/'.$n -> getImage().' -d '.$n -> getDelay().' -e '.$n -> getEthernetCount().' -s '.$n -> getSerialCount();
@@ -838,8 +838,8 @@ function start($n, $id, $t, $nets) {
 			break;
 	}
 
-	error_log('INFO: CWD is '.getcwd());
-	error_log('INFO: starting '.$cmd);
+	error_log(date('M d H:i:s ').'INFO: CWD is '.getcwd());
+	error_log(date('M d H:i:s ').'INFO: starting '.$cmd);
 	exec($cmd, $o, $rc);
 
 	if ($rc == 0 && $n -> getNType() == 'qemu' && is_file($n -> getRunningPath().'/startup-config') && !is_file(is_file($n -> getRunningPath().'/.configured'))) {
@@ -847,7 +847,7 @@ function start($n, $id, $t, $nets) {
 		touch($n -> getRunningPath().'/.lock');
 		$cmd = 'nohup /opt/unetlab/scripts/config_'.$n -> getTemplate().'.py -a put -p '.$n -> getPort().' -f '.$n -> getRunningPath().'/startup-config -t '.($n -> getDelay() + 300).' &';
 		exec($cmd, $o, $rc);
-		error_log('INFO: importing '.$cmd);
+		error_log(date('M d H:i:s ').'INFO: importing '.$cmd);
 	}
 
 	if ($rc == 0 && $n -> getNType() == 'docker') {
@@ -856,23 +856,23 @@ function start($n, $id, $t, $nets) {
 			// TODO must check each step against errors
 			// ip link add docker3_4_5 type veth peer name vnet3_4_5
 			$cmd = 'ip link add docker'.$t.'_'.$id.'_'.$interface_id.' type veth peer name vnet'.$t.'_'.$id.'_'.$interface_id;
-			error_log('INFO: starting '.$cmd);
+			error_log(date('M d H:i:s ').'INFO: starting '.$cmd);
 			exec($cmd, $o, $rc);
 			// ip link set dev vnet3_4_5 up
 			$cmd = 'ip link set dev vnet'.$t.'_'.$id.'_'.$interface_id.' up';
-			error_log('INFO: starting '.$cmd);
+			error_log(date('M d H:i:s ').'INFO: starting '.$cmd);
 			exec($cmd, $o, $rc);
 			// brctl addif vnet0_1 vnet3_4_5
 			$cmd = 'brctl addif vnet'.$t.'_'.$interface -> getNetworkId().'  vnet'.$t.'_'.$id.'_'.$interface_id;
-			error_log('INFO: starting '.$cmd);
+			error_log(date('M d H:i:s ').'INFO: starting '.$cmd);
 			exec($cmd, $o, $rc);
 			// PID=$(docker inspect --format '{{ .State.Pid }}' docker3_4) # Must be greater than 0
 			$cmd = 'docker inspect --format "{{ .State.Pid }}" '.$n -> getUuid();
-			error_log('INFO: starting '.$cmd);
+			error_log(date('M d H:i:s ').'INFO: starting '.$cmd);
 			exec($cmd, $o, $rc);
 			// ip link set netns ${PID} docker3_4_5 name eth0 address 22:ce:e0:99:04:05 up
 			$cmd = 'ip link set netns '.$o[0].' docker'.$t.'_'.$id.'_'.$interface_id.' name eth0 address '.'50:'.sprintf('%02x', $t).':'.sprintf('%02x', $id / 512).':'.sprintf('%02x', $id % 512).':00:'.sprintf('%02x', $interface_id).' up';
-			error_log('INFO: starting '.$cmd);
+			error_log(date('M d H:i:s ').'INFO: starting '.$cmd);
 			exec($cmd, $o, $rc);
 			// /opt/unetlab/wrappers/nsenter -t ${PID} -n ip addr add 1.1.1.1/24 dev eth0
 			// /opt/unetlab/wrappers/nsenter -t ${PID} -n ip route add default via 1.1.1.254
@@ -895,15 +895,15 @@ function stop($n) {
 		} else {
 			$cmd = 'fuser -n tcp -k -TERM '.$n -> getPort().' > /dev/null 2>&1';
 		}
-		error_log('INFO: stopping '.$cmd);
+		error_log(date('M d H:i:s ').'INFO: stopping '.$cmd);
 		exec($cmd, $o, $rc);
 		sleep(1);  // Need to wait a few
 		if ($n -> getStatus() == 0) {
 			return 0;
 		} else {
 			// Node is still running
-			error_log('ERROR: '.$GLOBALS['messages'][80035]);
-			error_log(implode("\n", $o));
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80035]);
+			error_log(date('M d H:i:s ').implode("\n", $o));
 			return 80035;
 		}
 	} else {

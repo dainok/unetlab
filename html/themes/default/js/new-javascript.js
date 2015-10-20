@@ -35,6 +35,9 @@ var TIMEOUT = 30000;
 
 // Global vars, defined on getUserInfo()
 var EMAIL;
+var FOLDER;
+var LAB;
+var LANG;
 var NAME;
 var ROLE;
 var TENANT;
@@ -42,14 +45,15 @@ var USERNAME;
 
 $(document).ready(function() {
 	if ($.cookie('privacy') != 'true') {
+		// Cookie is not set, show a modal with privacy policy
 		logger(1, 'DEBUG: need to accept privacy.');
-		var message = '<p>We use cookies on this site for our own business purposes including collecting aggregated statistics to analyze how our site is used, integrating social networks and forums and to show you ads tailored to your interests. Find out our <a href="http://www.unetlab.com/about/privacy.html" title="Privacy Policy">privacy policy</a> for more information.</p><p>By continuing to browse the site, you are agreeing to our use of cookies.</p>';
-		addModal('Privacy Policy', message, '<button id="privacy" type="button" class="btn btn-aqua" data-dismiss="modal">Accept</button>');
+		addModal(MESSAGES[0], MESSAGES[1], '<button id="privacy" type="button" class="btn btn-aqua" data-dismiss="modal">' + MESSAGES[2] + '</button>');
 	} else {
+		// Privacy policy already been accepted, check if user is already authenticated
 		$.when(getUserInfo()).done(function() {
 			// User is authenticated
 			logger(1, 'DEBUG: loading home page.');
-			printPageLabList('/');
+			printPageLabList(FOLDER);
 		}).fail(function() {
 			// User is not authenticated, or error on API
 			logger(1, 'DEBUG: loading authentication page.');

@@ -427,12 +427,12 @@ The resized picture is generated with original aspect-ratio using given values a
 
 ### Create a new lab
 
-\`curl -s -c $COOKIE -b $COOKIE -X POST -d '{"path":"/Andrea/Folder 3","name":"New Lab","version":"1","author":"Andrea Dainese","description":"A new demo lab"}' -H "Content-type: application/json" http://127.0.0.1/api/labs\`
+\`curl -s -c $COOKIE -b $COOKIE -X POST -d '{"path":"/Andrea/Folder 3","name":"New Lab","version":"1","author":"Andrea Dainese","description":"A new demo lab","body":"Lab usage and guide"}' -H "Content-type: application/json" http://127.0.0.1/api/labs\`
 
 An authenticated user can create a new lab:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X POST -d '{"path":"/Andrea/Folder 3","name":"New Lab","version":"1","author":"Andrea Dainese","description":"A new demo lab"}' -H "Content-type: application/json" http://127.0.0.1/api/labs | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X POST -d '{"path":"/Andrea/Folder 3","name":"New Lab","version":"1","author":"Andrea Dainese","description":"A new demo lab","body":"Lab usage and guide"}}' -H "Content-type: application/json" http://127.0.0.1/api/labs | python -m json.tool`
 ~~~
 
 ### Move an existing lab to a different folder

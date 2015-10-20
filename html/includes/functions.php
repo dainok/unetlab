@@ -42,8 +42,8 @@ function checkDatabase() {
 		$db -> setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		return $db;
 	} catch (Exception $e) {
-		error_log('ERROR: '.$GLOBALS['messages'][90003]);
-		error_log((string) $e);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][90003]);
+		error_log(date('M d H:i:s ').(string) $e);
 		return False;
 	}
 }
@@ -297,8 +297,8 @@ function checkUserExpiration($db, $username) {
 			return False;
 		}
 	} catch (Exception $e) {
-		error_log('ERROR: '.$GLOBALS['messages'][90024]);
-		error_log((string) $e);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][90024]);
+		error_log(date('M d H:i:s ').(string) $e);
 		return False;
 	}
 }
@@ -334,15 +334,15 @@ function configureUserPod($db, $username) {
 		$result = $statement -> fetch();
 		if ($result['rows'] > 1) {
 			// We expect one or none rows
-			error_log('ERROR: '.$GLOBALS['messages'][90015]);
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][90015]);
 			return 90015;
 		} else if ($result['rows'] == 1) {
 			// POD already assigned
 			return 0;
 		}
 	} catch (Exception $e) {
-		error_log('ERROR: '.$GLOBALS['messages'][90027]);
-		error_log((string) $e);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][90027]);
+		error_log(date('M d H:i:s ').(string) $e);
 		return 90027;
 	}
 			
@@ -353,8 +353,8 @@ function configureUserPod($db, $username) {
 		$statement -> execute();
 		$result = $statement -> fetchAll(PDO::FETCH_KEY_PAIR|PDO::FETCH_GROUP);
 	} catch (Exception $e) {
-		error_log('ERROR: '.$GLOBALS['messages'][90025]);
-		error_log((string) $e);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][90025]);
+		error_log(date('M d H:i:s ').(string) $e);
 		return 90025;
 	}
 
@@ -369,7 +369,7 @@ function configureUserPod($db, $username) {
 
 	if ($pod >= 256) {
 		// No free POD available
-		error_log('ERROR: '.$GLOBALS['messages'][90022]);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][90022]);
 		return 90022;
 	} else {
 		// Assign the POD
@@ -380,8 +380,8 @@ function configureUserPod($db, $username) {
 			$statement -> bindParam(':username', $username, PDO::PARAM_STR);
 			$statement -> execute();
 		} catch (Exception $e) {
-			error_log('ERROR: '.$GLOBALS['messages'][90023]);
-			error_log((string) $e);
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][90023]);
+			error_log(date('M d H:i:s ').(string) $e);
 			return 90023;
 		}
 	}
@@ -407,8 +407,8 @@ function deleteSessions($db) {
 		// TODO should delete each POD
 		// foreach $result... delete $result['tenant_id']
 	} catch (Exception $e) {
-		error_log('ERROR: '.$GLOBALS['messages'][90020]);
-		error_log((string) $e);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][90020]);
+		error_log(date('M d H:i:s ').(string) $e);
 		return 90020;
 	}
 
@@ -420,8 +420,8 @@ function deleteSessions($db) {
 		$statement -> execute();
 		$result = $statement -> fetch();
 	} catch (Exception $e) {
-		error_log('ERROR: '.$GLOBALS['messages'][90021]);
-		error_log((string) $e);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][90021]);
+		error_log(date('M d H:i:s ').(string) $e);
 		return 90021;
 	}
 
@@ -438,7 +438,7 @@ function deleteSessions($db) {
 function getUserByCookie($db, $cookie) {
 	$now = time();
 	try {
-		$query = 'SELECT users.role AS role, users.email AS email, users.name AS name, pods.id AS pod, users.username AS username FROM users LEFT JOIN pods ON users.username = pods.username WHERE cookie = :cookie AND users.session >= :session AND (users.expiration < 0 OR users.expiration >= :user_expiration) AND (pods.expiration < 0 OR pods.expiration > :pod_expiration);';
+		$query = 'SELECT users.role AS role, users.email AS email, users.name AS name, pods.id AS pod, users.username AS username, users.folder AS folder, pods.lab_id AS lab FROM users LEFT JOIN pods ON users.username = pods.username WHERE cookie = :cookie AND users.session >= :session AND (users.expiration < 0 OR users.expiration >= :user_expiration) AND (pods.expiration < 0 OR pods.expiration > :pod_expiration);';
 		$statement = $db -> prepare($query);
 		$statement -> bindParam(':cookie', $cookie, PDO::PARAM_STR);
 		$statement -> bindParam(':session', $now, PDO::PARAM_INT);
@@ -447,20 +447,24 @@ function getUserByCookie($db, $cookie) {
 		$statement -> execute();
 		$result = $statement -> fetch();
 		// TODO should check number of rows == 1, if not database corrupted
+
 		if (isset($result['username'])) {
 			return Array(
 				'email' => $result['email'],
+				'folder' => $result['folder'],
+				'lab' => $result['lab'],
+				'lang' => 'en',	// TODO: must deal with multiple lang
 				'name' => $result['name'],
 				'role' => $result['role'],
-				'username' => $result['username'],
-				'tenant' => $result['pod']
+				'tenant' => $result['pod'],
+				'username' => $result['username']
 			);
 		} else {
 			return Array();
 		}
 	} catch (Exception $e) {
-		error_log('ERROR: '.$GLOBALS['messages'][90026]);
-		error_log((string) $e);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][90026]);
+		error_log(date('M d H:i:s ').(string) $e);
 		return Array();;
 	}
 }
@@ -722,11 +726,11 @@ function updateDatabase($db) {
 			$statement -> execute();
 			$db -> commit();
 
-			error_log('INFO: '.$GLOBALS['messages'][90004]);
+			error_log(date('M d H:i:s ').'INFO: '.$GLOBALS['messages'][90004]);
 		}
 	} catch (Exception $e) {
-		error_log('ERROR: '.$GLOBALS['messages'][90005]);
-		error_log((string) $e);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][90005]);
+		error_log(date('M d H:i:s ').(string) $e);
 		return False;
 	}
 
@@ -750,11 +754,11 @@ function updateDatabase($db) {
 			$statement -> execute();
 			$db -> commit();
 
-			error_log('ERROR: '.$GLOBALS['messages'][90007]);
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][90007]);
 		}
 	} catch (Exception $e) {
-		error_log('ERROR: '.$GLOBALS['messages'][90008]);
-		error_log((string) $e);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][90008]);
+		error_log(date('M d H:i:s ').(string) $e);
 		return False;
 	}
 	 */
@@ -781,11 +785,11 @@ function updateDatabase($db) {
 			$statement -> execute();
 			$db -> commit();
 
-			error_log('INFO: '.$GLOBALS['messages'][90009]);
+			error_log(date('M d H:i:s ').'INFO: '.$GLOBALS['messages'][90009]);
 		}
 	} catch (Exception $e) {
-		error_log('ERROR: '.$GLOBALS['messages'][90010]);
-		error_log((string) $e);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][90010]);
+		error_log(date('M d H:i:s ').(string) $e);
 		return False;
 	}
 	
@@ -808,14 +812,22 @@ function updateDatabase($db) {
 				$statement = $db -> prepare($query);
 				$statement -> execute();
 
+			case 1:
+				// From version 1 to version 2, need to add folder column to users table
+				$db -> beginTransaction();
+				$query = 'ALTER TABLE users ADD COLUMN folder TEXT;';
+				$statement = $db -> prepare($query);
+				$statement -> execute();
+				$db -> commit();
+
 				// Latest database version
-				error_log('INFO: '.$GLOBALS['messages'][90031]);
-				$query = 'PRAGMA user_version = 1;';
+				error_log(date('M d H:i:s ').'INFO: '.$GLOBALS['messages'][90031]);
+				$query = 'PRAGMA user_version = 2;';
 				$version = $db -> query($query);
 		}
 	} catch (Exception $e) {
-		error_log('ERROR: '.$GLOBALS['messages'][90030]);
-		error_log((string) $e);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][90030]);
+		error_log(date('M d H:i:s ').(string) $e);
 		return False;
 	}
 
@@ -843,9 +855,32 @@ function updateUserCookie($db, $username, $cookie) {
 		$statement -> execute();
 		return 0;
 	} catch (Exception $e) {
-		error_log('ERROR: '.$GLOBALS['messages'][90017]);
-		error_log((string) $e);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][90017]);
+		error_log(date('M d H:i:s ').(string) $e);
 		return 90017;
+	}
+}
+
+/**
+ * Function to update user folder.
+ *
+ * @param   PDO     $db                 PDO object for database connection
+ * @param   string  $cookie             Session cookie
+ * @param   string  $folder             Last seen folder
+ * @return  0                           0 means ok
+ */
+function updateUserFolder($db, $cookie, $folder) {
+	try {
+		$query = 'UPDATE users SET folder = :folder WHERE cookie = :cookie;';
+		$statement = $db -> prepare($query);
+		$statement -> bindParam(':cookie', $cookie, PDO::PARAM_STR);
+		$statement -> bindParam(':folder', $folder, PDO::PARAM_STR);
+		$statement -> execute();
+		return 0;
+	} catch (Exception $e) {
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][90017]);
+		error_log(date('M d H:i:s ').(string) $e);
+		return 90033;
 	}
 }
 ?>
