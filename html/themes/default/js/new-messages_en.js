@@ -28,9 +28,20 @@
  * @link http://www.unetlab.com/
  * @version 20150907
  */
-
- var MESSAGES = [];
- MESSAGES[0] = 'Privacy Policy';
- MESSAGES[1] = '<p>We use cookies on this site for our own business purposes including collecting aggregated statistics to analyze how our site is used, integrating social networks and forums and to show you ads tailored to your interests. Find out our <a href="http://www.unetlab.com/about/privacy.html" title="Privacy Policy">privacy policy</a> for more information.</p><p>By continuing to browse the site, you are agreeing to our use of cookies.</p>';
- MESSAGES[2] = 'Accept';
-
+ 
+var MESSAGES = [];
+MESSAGES[0]  = 'Folders in';
+MESSAGES[1]  = 'Labs';
+MESSAGES[2]  = 'File';
+MESSAGES[3]  = 'none';
+MESSAGES[4]  = 'Add a new folder';
+MESSAGES[5]  = 'Add a new lab';
+MESSAGES[6]  = 'Clone selected labs';
+MESSAGES[7]  = 'Delete selected objects';
+MESSAGES[8]  = 'Export selected objects';
+MESSAGES[9]  = 'Import external objects';
+MESSAGES[10] = 'Rename current folder';
+MESSAGES[11] = 'Home';
+MESSAGES[12] = 'Users';
+MESSAGES[13] = 'Status';
+MESSAGES[14] = 'Logout';

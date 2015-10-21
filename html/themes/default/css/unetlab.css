@@ -1,0 +1,554 @@
+#body {
+	overflow-y: scroll;
+}
+
+#list-title-folders {
+	background: #58585a;
+	color: #ffffff;
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+	font-size: 1em;
+	margin-left: 0px;
+	margin-right: 0px;
+	padding-left: 25px;
+	padding-right: 5px;
+	text-overflow: ellipsis;
+	text-transform: uppercase;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+#list-folders {
+	background-color: #e2edef;
+	margin-left: 0px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+#list-folders ul {
+	line-height: 3em;
+	list-style-type: none;
+	margin-left: -30px;
+	margin-right: -15px;
+	margin-top: 35px;
+}
+
+#list-title-labs {
+	background-color: #46a6b6;
+	color: #ffffff;
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+	font-size: 1em;
+	overflow: hidden;
+	padding-left: 40px;
+	text-overflow: ellipsis;
+	text-transform: uppercase;
+}
+
+#list-labs {
+	background-color: #babbbd;
+	margin-left: 15px;
+	margin-right: -15px;
+	padding-right: -15px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+#list-title-info {
+	background-color: #46a6b6;
+	color: #ffffff;
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+	font-size: 1em;
+	padding-left: 20px;
+}
+
+
+
+#list-labs ul {
+	line-height: 3em;
+	list-style-type: none;
+	margin-left: -30px;
+	margin-right: -55px;
+	margin-top: 35px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#list-body ul {
+	line-height: 3em;
+	list-style-type: none;
+	margin-left: -30px;
+	margin-right: -15px;
+	margin-top: 3vw;	/* must reflect #list-title top attribute */
+}
+
+
+
+#list-title-folders span {
+	text-transform: none;
+}
+
+
+
+
+
+
+
+#list-labs ul {
+	margin-left: -55px;		/* must reflect a.lab padding-left attribute */
+}
+
+#list-title-info {
+	margin-right: -20px;	/* previous column get a 20px margin */
+	padding-left: 20px;
+	padding-right: 20px;	/* reduce available space of 20px */
+}
+
+#list-info {
+	margin-right: -20px;	/* previous column get a 20px margin */
+	padding-right: 20px;	/* reduce available space of 20px */
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.full-height {
+	height: 100%;
+}
+
+body, html {
+	height: 100%;
+	overflow: hidden;
+	width: 100%;
+}
+
+img, input[type='image'] {
+	display: block;
+	height: auto;
+	max-width: 100%;
+}
+
+input[name='login[username]'], input[name='login[password]']{
+	background-color: #96c5cf;
+	border: 0px;
+	color: #58585a;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-size: 1.8vmin;
+	height: 5vmin;
+	text-align: center;
+	width: 100%;
+}
+
+#small {
+	background-color: #46a6b6;
+	height: 100%;
+	width: 100%;
+}
+
+#small .jumbotron {
+	background-color: #ffffff;
+	box-shadow: 0 0 30px black;
+}
+
+#small h1 {
+	color: #46a6b6;
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+	font-size: 8vmin;
+}
+
+#small p {
+	color: #58585a;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-size: 4vmin;
+}
+
+#body {
+	height: 100%;
+	padding: 0;
+	width: 100%;
+}
+
+#auth-left {
+	background: url('/themes/default/images/shade-home.png') #46a6b6 100% repeat-y;
+	background-size: 3% 100%;
+	color: #ffffff;
+	display: table;
+	font-family: 'Ubuntu Light', Helvetica, Arial, sans-serif;
+	font-size: 2.8vmin;
+	table-layout: fixed;
+}
+
+#auth-left .row {
+	margin: 15px 0px 15px 0px;
+	margin: 2vmin 0px 2vmin 0px;
+}
+
+#auth-right {
+	background-color: #ffffff;
+	height: 100%;
+}
+
+#auth-right #logo-angular {
+	bottom: 0px;
+	max-height: 90%;
+	position: absolute;
+	right: 0px;
+	width: 90%;
+}
+
+#auth-right #logo-ad {
+	bottom: 10%;
+	position: absolute;
+	right: 3%;
+	max-width: 25%;
+	max-width: 30vmin;
+}
+
+#auth-right #logo-text {
+	bottom: 16%;
+	bottom: 15vmin;
+	position: absolute;
+	right: 24%;
+	right: 20vmin;
+	width: 58%;
+}
+
+#auth-right #logo-text h1 {
+	color: #46a6b6;
+	font-family: 'Ubuntu Light', Helvetica, Arial, sans-serif;
+	font-size: 3.5vmin;
+	line-height: 200%;
+}
+
+#auth-right #logo-text p {
+	color: #58585a;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-size: 1.8vmin;
+	line-height: 180%;
+}
+
+#main-navbar {
+	padding: 5px;
+	margin: 0px;
+}
+
+#main-navbar  .container-fluid {
+	padding: 0px;
+}
+
+#main-navbar  .navbar-header {
+	background-color: #46a6b6;
+	padding: 1vw 2vw 1vw 2vw;
+}
+
+#main-navbar .navbar-nav {
+	border-bottom: 1px dotted #8B8C90;
+	margin-top: 3vw;
+}
+
+#main-navbar .navbar-item {
+	background-color: transparent;
+	margin-right: 5px;
+	margin-top: 2.3vw;
+	width: 12vw;	/* Divide 72 by the number of items */
+}
+
+#main-navbar a.item {
+	background-color: transparent;
+	color: #89888c;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-size: 1em;
+	font-weight: bold;
+	text-align: left;
+	text-transform: uppercase;
+}
+
+#main-navbar a.item:link, #main-navbar a.item:visited {
+	border-bottom: 0.3vw solid transparent;
+}
+
+#main-navbar a.item:hover, #main-navbar a.item:active {
+	border-bottom: 0.3vw solid #3ba9ba;
+}
+
+#list-title {
+	background: rgba(60, 153, 171, 0.75);
+	color: #ffffff;
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+	font-size: 1.1em;
+	left: 0px;
+	line-height: 1.2em;
+	padding: 1px 5px 3px 5px;
+	position: absolute;
+	right: 0px;
+	top: 12.5vw;
+	z-index: 100;
+}
+
+#list-body {
+	padding: 5px;
+	padding-bottom: 210px;	/* don't know why this exceed lower margin */
+}
+
+
+
+.btn-aqua {
+	/* http://charliepark.org/bootstrap_buttons/ */
+	-webkit-font-smoothing: antialiased;
+	background-color: hsl(189, 44%, 34%) !important;
+	background-repeat: repeat-x;
+	background-image: -khtml-gradient(linear, left top, left bottom, from(#7abfcb), to(#30717c));
+	background-image: -moz-linear-gradient(top, #7abfcb, #30717c);
+	background-image: -ms-linear-gradient(top, #7abfcb, #30717c);
+	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #7abfcb), color-stop(100%, #30717c));
+	background-image: -webkit-linear-gradient(top, #7abfcb, #30717c);
+	background-image: -o-linear-gradient(top, #7abfcb, #30717c);
+	background-image: linear-gradient(#7abfcb, #30717c);
+	border-color: #30717c #30717c hsl(189, 44%, 26.5%);
+	border-radius: 20px;
+	color: #fff !important;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#7abfcb", endColorstr="#30717c");
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+	font-size: 2.5vmin;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.49);
+	text-transform: uppercase;
+}
+
+.btn-file {
+	position: relative;
+	overflow: hidden;
+}
+
+.btn-file input[type=file] {
+	position: absolute;
+	top: 0;
+	right: 0;
+	min-width: 100%;
+	min-height: 100%;
+	font-size: 100px;
+	text-align: right;
+	filter: alpha(opacity=0);
+	opacity: 0;
+	outline: none;
+	background: white;
+	cursor: inherit;
+	display: block;
+}
+
+.btn-grey {
+	-webkit-font-smoothing: antialiased;
+	background-color: hsl(240, 0%, 20%) !important;
+	background-repeat: repeat-x;
+	background-image: -khtml-gradient(linear, left top, left bottom, from(#7f7f7f), to(#333333));
+	background-image: -moz-linear-gradient(top, #7f7f7f, #333333);
+	background-image: -ms-linear-gradient(top, #7f7f7f, #333333);
+	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #7f7f7f), color-stop(100%, #333333));
+	background-image: -webkit-linear-gradient(top, #7f7f7f, #333333);
+	background-image: -o-linear-gradient(top, #7f7f7f, #333333);
+	background-image: linear-gradient(#7f7f7f, #333333);
+	border-color: #333333 #333333 hsl(240, 0%, 12.5%);
+	border-radius: 20px;
+	color: #fff !important;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#7f7f7f", endColorstr="#333333");
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+	font-size: 2.5vmin;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.49);
+	text-transform: uppercase;
+}
+
+.folder, .folder:visited {
+	border-bottom: 1px dotted #46a6b6;
+	color: #58585a;
+	float: left;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-weight: bold;
+	padding-left: 5px;
+	text-decoration: none;
+	width: 100%;
+}
+
+.folder:active, .folder:hover {
+	border-bottom: 1px solid #46a6b6;
+	color: #46a6b6;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-weight: bold;
+	text-decoration: none;
+	width: 100%;
+}
+
+.lab, .lab:visited {
+	border-bottom: 1px dotted #ffffff;
+	color: #ffffff;
+	float: left;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-weight: bold;
+	padding-left: 30px;	/* must reflect #list-labs ul margin-left attribute */
+	text-decoration: none;
+	width: 100%;
+}
+
+.lab:active, .lab:hover, .lab-opened, .lab-opened:visited, .lab-opened:active, .lab-opened:hover, .lab.ui-draggable-dragging {
+	background-color: #ffffff;
+	border-bottom: 1px dotted #ffffff;
+	color: #46a6b6;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-weight: bold;
+	text-decoration: none;
+	width: 100%;
+}
+
+.lab.ui-draggable-dragging {
+	line-height: 3em;
+	width: 25%;
+}
+
+.version {
+	color: #46a6b6;
+	margin-top: 50px;
+	padding-left: 10vw;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-weight: bold;
+	font-size: 5vmin;
+	text-align: left;
+}
+
+.circle {
+	margin-top: 50px;
+	text-align: center;
+}
+
+.circle span {
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-size: 2vmin;
+	text-align: center;
+}
+
+.circle strong {
+	position: absolute;
+	top: 30px;
+	left: 0;
+	width: 100%;
+	text-align: center;
+	line-height: 40px;
+	font-size: 30px;
+}
+
+.count {
+	margin-top: 50px;
+	text-align: center;
+}
+
+.count span {
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-size: 2vmin;
+	text-align: center;
+}
+
+.count strong {
+	text-align: center;
+	line-height: 40px;
+	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	font-size: 30px;
+	line-height: 1.42857;
+	color: #333;
+}
+
+.selected, .selected:visited, .selected:active, .selected:hover {
+	background: rgba(60, 153, 171, 0.75);
+	text-decoration: underline;
+}
+
+.selected:hover {
+	color: red;
+}
+
+
+
+.middle {
+	/* parent must use: "display: table; table-layout: fixed;" */
+	display: table-cell;
+	height: 100%;
+	vertical-align: middle;
+}
+
+.modal-header, .modal-footer {
+	border: 0px;
+}
+
+.modal-body {
+	color: #58585a;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-size: 2.8vmin;
+}
+
+.modal-body h4 {
+	color: #46a6b6;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-size: 2.8vmin;
+	margin-top: 4vmin;
+}
+
+.modal-body .error {
+	color: #46a6b6;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-size: 2vmin;
+}
+
+.modal-title {
+	border-bottom: 2px solid #46a6b6;
+	color: #46a6b6;
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+	font-size: 2.8vmin;
+}
+
+#users {
+	padding: 5px;
+}
+
+#users thead {
+	background: rgba(60, 153, 171, 0.75);
+	color: #ffffff;
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+	font-size: 1.1em;
+	text-transform: uppercase;
+}
+
+#users tbody {
+	background-color: #babbbd;
+	color: #ffffff;
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+	font-size: 1em;
+}

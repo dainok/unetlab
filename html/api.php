@@ -144,7 +144,7 @@ $app -> get('/api/auth', function() use ($app, $db) {
 		return;
 	}
 
-	if (checkFolder($user['folder']) !== 0) {
+	if (checkFolder(BASE_LAB.$user['folder']) !== 0) {
 		// User has an invalid last viewed folder
 		$user['folder'] = '/';
 	}

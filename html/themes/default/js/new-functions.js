@@ -68,6 +68,111 @@ function getUserInfo() {
 	return deferred.promise();
 }
 
+// Print Lab List page
+function printPageLabList(folder) {
+	var html = '';
+	var url = '/api/folders' + folder;
+	var type = 'GET'
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: folder "' + folder + '" found.');
+				
+				// Navbar: top
+				html += '<div id="body"><nav id="navbar-top" class="hidden-xs hidden-sm navbar navbar-static-top"><div class="container col-md-12 col-lg-12"><div id="logo-main" class="col-md-3 col-lg-3"><img alt="Logo" class="img-responsive" src="/themes/default/images/logo_rr.png"/></div><div class="navbar-collapse collapse"><ul class="nav navbar-nav navbar-right"><li class="navbar-item-aqua"><a href="https://unetlab.freshdesk.com/support/tickets/new" target="_blank"">Help</a></li><li class="navbar-item-grey"><a href="http://www.unetlab.com/" target="_blank">About</a></li><li class="navbar-item-grey"><a href="http://forum.802101.com/forum39.html" target="_blank">Forum</a></li></ul></div></div></nav>';
+
+				// Navbar: main
+				html += '<nav id="navbar-main" class="navbar navbar-static-top"><div class="container col-md-12 col-lg-12"><div id="navbar-main-text" class="hidden-xs hidden-sm col-md-3 col-lg-3">by Andrea Dainese</div><div id="navbar-main-spacer" class="hidden-xs hidden-sm"></div><div class="navbar-collapse collapse"><ul class="col-md-9 col-lg-9 nav navbar-nav"><li class="item-first lab-list"><a class="action-lablist" href="#">' + MESSAGES[11] + '</a></li><li class="separator hidden-xs hidden-sm"><img alt="Spacer" src="/themes/default/images/vertical_dots.gif"/></li><li class="item dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Actions <span class="caret"></span></a><ul id="actions-menu" class="dropdown-menu"><li><a href="#">&lt;' + MESSAGES[3] + '&gt;</a></li></ul></li><li class="separator hidden-xs hidden-sm"><img alt="Spacer" src="/themes/default/images/vertical_dots.gif"/></li><li class="item usermgmt"><a class="action-usermgmt" href="#">' + MESSAGES[12] + '</a></li><li class="separator hidden-xs hidden-sm"><img alt="Spacer" src="/themes/default/images/vertical_dots.gif"/></li><li class="item sysstatus"><a class="action-sysstatus" href="#">' + MESSAGES[13] + '</a></li><li class="separator hidden-xs hidden-sm"><img alt="Spacer" src="/themes/default/images/vertical_dots.gif"/></li><li class="item"><a class="action-logout item" href="#">' + MESSAGES[14] + '</a></li></ul></div></div></nav>';
+
+				// Main: title
+				html += '<div id="main-title"><div class="container col-md-12 col-lg-12"><div class="row row-eq-height"><div id="list-title-folders" class="col-md-3 col-lg-3">' + MESSAGES[0] + ' ' + folder + '</div><div id="list-title-labs" class="col-md-3 col-lg-3">' + MESSAGES[1] + '</div><div id="list-title-info" class="col-md-6 col-lg-6"></div></div></div></div>';
+				
+				// Main
+				html += '<div id="main" class="fill-height"><div class="container col-md-12 col-lg-12 fill-height"><div class="fill-height row row-eq-height"><div id="list-folders" class="col-md-3 col-lg-3"  data-path="' + folder + '"><ul></ul></div><div id="list-labs" class="col-md-3 col-lg-3"><ul></ul></div><div id="list-info" class="col-md-6 col-lg-6"></div></div></div></div>';
+				
+				// Footer
+				html += '</div>';
+				
+				// Adding to the page
+				$('#body').html(html);
+				
+				// Adding all folders
+				$.each(data['data']['folders'], function(id, object) {
+					$('#list-folders > ul').append('<li><a class="folder" data-path="' + object['path'] + '" href="#" title="Double click to open, single click to select.">' + object['name'] + '</a></li>');
+				});
+
+				// Adding all labs
+				$.each(data['data']['labs'], function(id, object) {
+					$('#list-labs > ul').append('<li><a class="lab" data-path="' + object['path'] + '" href="#" title="Double click to open, single click to select.">' + object['file'] + '</a></li>');
+				});
+				
+				// Read privileges and set specific actions/elements
+				if (ROLE == 'admin' || ROLE == 'editor') {
+					// Adding actions
+					$('#actions-menu').empty();
+					$('#actions-menu').append('<li><a class="action-folderadd" href="#"><i class="glyphicon glyphicon-folder-close"></i> ' + MESSAGES[4] + '</a></li>');
+					$('#actions-menu').append('<li><a class="action-labadd" href="#"><i class="glyphicon glyphicon-file"></i> ' + MESSAGES[5] + '</a></li>');
+					$('#actions-menu').append('<li><a class="action-selectedclone" href="#"><i class="glyphicon glyphicon-copy"></i> ' + MESSAGES[6] + '</a></li>');
+					$('#actions-menu').append('<li><a class="action-selecteddelete" href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[7] + '</a></li>');
+					$('#actions-menu').append('<li><a class="action-selectedexport" href="#"><i class="glyphicon glyphicon-export"></i> ' + MESSAGES[8] + '</a></li>');
+					$('#actions-menu').append('<li><a class="action-import" href="#"><i class="glyphicon glyphicon-import"></i> ' + MESSAGES[9] + '</a></li>');
+					$('#actions-menu').append('<li><a class="action-folderrename" href="#"><i class="glyphicon glyphicon-pencil"></i> ' + MESSAGES[10] + '</a></li>');
+					
+					// Make labs draggable (to move inside folders)
+					$('.lab').draggable({
+						appendTo: '#body',
+						helper: 'clone',
+						revert: 'invalid',
+						scroll: false,
+						snap: '.folder',
+						stack: '.folder'
+					});
+					
+					// Make folders draggable (to receive labs)
+					$('.folder').droppable({
+						drop: function(e, o) {
+							var lab = o['draggable'].attr('data-path');
+							var path = $(this).attr('data-path');
+							logger(1, 'DEBUG: moving "' + lab + '" to "' + path + '".');
+							$.when(moveLab(lab, path)).done(function(data) {
+								logger(1, 'DEBUG: "' + lab + '" moved to "' + path + '".');
+								o['draggable'].fadeOut(300, function() { o['draggable'].remove(); })
+							}).fail(function(data) {
+								logger(1, 'DEBUG: failed to move "' + lab + '" into "' + path + '".');
+								addModal('ERROR', '<p>' + data + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+							});
+						}
+					});
+				}
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+		}
+	});
+}
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -155,72 +260,7 @@ function printPageAuthentication() {
 	$('#body').html(html);
 }
 
-// Print Lab List page
-function printPageLabList(folder) {
-	var html = '';
-	var url = '/api/folders' + folder;
-	var type = 'GET'
-	$.ajax({
-		timeout: TIMEOUT,
-		type: type,
-		url: encodeURI(url),
-		dataType: 'json',
-		success: function(data) {
-			if (data['status'] == 'success') {
-				logger(1, 'DEBUG: folder "' + folder + '" found.');
-				html += '<div id="main-navbar" class="navbar" role="navigation"><div class="container-fluid"><div class="col-md-3 col-lg-3 navbar-header"><img height=100" src="/themes/default/images/logo-rr.png"/></div><div class="collapse navbar-collapse navbar-menubuilder"><ul class="nav navbar-nav navbar-right"><li class="navbar-item"><a class="item lab-list" href="#">Home</a></li><li><img src="/themes/default/images/vertical_dots.gif"></li><li class="dropdown navbar-item"><a class="dropdown-toggle item" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Actions <span class="caret"></span></a><ul id="actions-menu" class="dropdown-menu"><li><a class="folder-add" href="#"><i class="glyphicon glyphicon-folder-close"></i> Add a new folder</a></li><li><a class="lab-add" href="#"><i class="glyphicon glyphicon-file"></i> Add a new lab</a></li><li><a class="selected-clone" href="#"><i class="glyphicon glyphicon-copy"></i> Clone selected labs</a></li><li><a class="selected-delete" href="#"><i class="glyphicon glyphicon-trash"></i> Delete selected objects</a></li><li><a class="selected-export" href="#"><i class="glyphicon glyphicon-export"></i> Export selected objects</a></li><li><a class="import" href="#"><i class="glyphicon glyphicon-import"></i> Import external objects</a></li><!--<li><a class="folder-rename" href="#"><i class="glyphicon glyphicon-pencil"></i> Rename current folder</a></li>--></ul></li><li><img src="/themes/default/images/vertical_dots.gif"></li><li class="navbar-item"><a class="sysstatus item" href="#">System&nbsp;Status</a></li><li><img src="/themes/default/images/vertical_dots.gif"></li><li class="navbar-item"><a class="usermgmt item" href="#">Users</a></li><li><img src="/themes/default/images/vertical_dots.gif"></li><li class="navbar-item"><a class="item" href="http://www.unetlab.com/" target="_blank">Help</a></li><li><img src="/themes/default/images/vertical_dots.gif"></li><li class="navbar-item"><a class="button-logout item" href="#">Logout</a></li></ul></div></div></div><div id="main-body" class="full-height"><div id="list-title"><div id="list-title-folders" class="col-md-3 col-lg-3">Folders in <span>' + folder + '</span></div><div id="list-title-labs" class="col-md-3 col-lg-3" style="margin-left: 10px; margin-right: 10px;">Labs</div><div id="list-title-info" class="col-md-6 col-lg-6" style="margin-right: -20px; padding-right: 20px;"></div></div><div id="list-body" class="full-height"><div class="col-md-3 col-lg-3 full-height" id="list-folders" data-path="' + folder + '"><ul>';
 
-				$.each(data['data']['folders'], function(id, object) {
-					// Adding all folders
-					html += '<li><a class="folder" data-path="' + object['path'] + '" href="#" title="Double click to open, single click to select.">' + object['name'] + '</a></li>';
-				});
-
-				html += '</ul></div><div class="col-md-3 col-lg-3 full-height" id="list-labs"><ul>';
-			
-				$.each(data['data']['labs'], function(id, object) {
-					// Adding all labs
-					html += '<li><a class="lab" data-path="' + object['path'] + '" href="#" title="Double click to open, single click to select.">' + object['file'] + '</a></li>';
-				});
-
-				html += '</ul></div><div class="col-md-6 col-lg-6 full-height" id="list-info"></div></div></div>';
-				$('#body').html(html);
-				$('.lab').draggable({
-					appendTo: '#body',
-					helper: 'clone',
-					revert: 'invalid',
-					scroll: false,
-					snap: '.folder',
-					stack: '.folder'
-				});
-				$('.folder').droppable({
-					drop: function(e, o) {
-						var lab = o['draggable'].attr('data-path');
-						var path = $(this).attr('data-path');
-						logger(1, 'DEBUG: moving "' + lab + '" to "' + path + '".');
-						$.when(moveLab(lab, path)).done(function(data) {
-							logger(1, 'DEBUG: "' + lab + '" moved to "' + path + '".');
-							o['draggable'].fadeOut(300, function() { o['draggable'].remove(); })
-						}).fail(function(data) {
-							logger(1, 'DEBUG: failed to move "' + lab + '" into "' + path + '".');
-							addModal('ERROR', '<p>' + data + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-						});
-					}
-				});
-			} else {
-				// Application error
-				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-			}
-		},
-		error: function(data) {
-			// Server error
-			var message = getJsonMessage(data['responseText']);
-			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
-			logger(1, 'DEBUG: ' + message);
-			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-		}
-	});
-}
 
 // Print Lab preview section
 function printPageLabPreview(lab) {
