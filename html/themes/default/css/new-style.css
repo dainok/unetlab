@@ -177,7 +177,7 @@ td {
 }
 
 #navbar-main-text {
-	font-family: 'Ubuntu Light', Helvetica, Arial, sans-serif;
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
 	font-size: 1.2em;
 	height: 50px;
 	padding: 10px 4vw 0px 0px;
@@ -256,6 +256,7 @@ td {
 	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
 	font-size: 0.8em;
 	text-align: left;
+	text-transform: none;
 	width: 100%;
 }
 
@@ -395,8 +396,8 @@ td {
 }
 
 .fill-height {
-	height: 100%;
-	min-height: 100%;
+	height: 100% !important;
+	min-height: 100% !important;
 }
 
 .modal-header, .modal-footer {

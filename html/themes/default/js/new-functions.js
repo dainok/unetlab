@@ -29,6 +29,38 @@
  * @version 20150909
  */
 
+// Get lab info
+function getLabInfo(lab_filename) {
+	var deferred = $.Deferred();
+	var url = '/api/labs' + lab_filename;
+	var type = 'GET'
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: lab "' + lab_filename + '" found.');
+				deferred.resolve(data['data']);
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject(data['message']);
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
+}
+
+ 
 // Get user info
 function getUserInfo() {
 	var deferred = $.Deferred();
@@ -50,11 +82,11 @@ function getUserInfo() {
 				ROLE = data['data']['role'];
 				TENANT = data['data']['tenant'];
 				USERNAME = data['data']['username'];
-				deferred.resolve();
+				deferred.resolve(data['data']);
 			} else {
 				// Application error
 				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-				deferred.reject();
+				deferred.reject(data['message']);
 			}
 		},
 		error: function(data) {
@@ -62,13 +94,82 @@ function getUserInfo() {
 			var message = getJsonMessage(data['responseText']);
 			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
 			logger(1, 'DEBUG: ' + message);
-			deferred.reject();
+			deferred.reject(message);
 		}
 	});
 	return deferred.promise();
 }
 
-// Print Lab List page
+// Logout user
+function logoutUser() {
+	var deferred = $.Deferred();
+	var url = '/api/auth/logout';
+	var type = 'GET'
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: user is logged off.');
+				deferred.resolve();
+			} else {
+				// Authentication error
+				logger(1, 'DEBUG: internal error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject(data['message']);
+			}
+		},
+		error: function(data) {
+			// Authentication error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: Ajax error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
+}
+
+/***************************************************************************
+ * Print forms and pages
+ **************************************************************************/
+// Folder add form
+function printFormFolderAdd(path) {
+	var html = '<form id="form-folder-add" class="form-horizontal form-folder-add"><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[20] + '</label><div class="col-md-5"><input class="form-control" name="folder[path]" value="' + path + '" disabled="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control autofocus" name="folder[name]" value="" type="text"/></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[17] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
+	logger(1, 'DEBUG: popping up the folder-add form.');
+	addModal(MESSAGES[4], html, '');
+}
+
+// Folder rename folder
+function printFormFolderRename(folder) {
+	var html = '<form id="form-folder-rename" class="form-horizontal form-folder-rename"><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[20] + '</label><div class="col-md-5"><input class="form-control" name="folder[path]" value="' + folder + '" disabled="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control autofocus" name="folder[name]" value="" type="text"/></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[21] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
+	logger(1, 'DEBUG: popping up the folder-rename form.');
+	addModal(MESSAGES[10], html, '');
+	validateFolder();
+}
+
+// Print lab preview section
+function printLabPreview(lab_filename) {
+	$.when(getLabInfo(lab_filename)).done(function(lab) {
+		var html = '<h1>' + lab['name'] + ' v' + lab['version'] + '</h1>';
+		if (lab['author'] != null) {
+			html += '<h2>by ' + lab['author'] + '</h2>';
+		}
+		html += '<p><code>' + lab['id'] + '</code></p>';
+		if (lab['description'] != null) {
+			html += '<p>' + lab['description'] + '</p>';
+		}
+		$('#list-title-info span').html(lab['filename'].replace(/\\/g,'/').replace(/.*\//, ''));
+		$('#list-info').html(html);
+	}).fail(function(message) {
+		addModalError(message);
+	});
+}
+
+
+
+// Print lab list page
 function printPageLabList(folder) {
 	var html = '';
 	var url = '/api/folders' + folder;
@@ -89,10 +190,10 @@ function printPageLabList(folder) {
 				html += '<nav id="navbar-main" class="navbar navbar-static-top"><div class="container col-md-12 col-lg-12"><div id="navbar-main-text" class="hidden-xs hidden-sm col-md-3 col-lg-3">by Andrea Dainese</div><div id="navbar-main-spacer" class="hidden-xs hidden-sm"></div><div class="navbar-collapse collapse"><ul class="col-md-9 col-lg-9 nav navbar-nav"><li class="item-first lab-list"><a class="action-lablist" href="#">' + MESSAGES[11] + '</a></li><li class="separator hidden-xs hidden-sm"><img alt="Spacer" src="/themes/default/images/vertical_dots.gif"/></li><li class="item dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Actions <span class="caret"></span></a><ul id="actions-menu" class="dropdown-menu"><li><a href="#">&lt;' + MESSAGES[3] + '&gt;</a></li></ul></li><li class="separator hidden-xs hidden-sm"><img alt="Spacer" src="/themes/default/images/vertical_dots.gif"/></li><li class="item usermgmt"><a class="action-usermgmt" href="#">' + MESSAGES[12] + '</a></li><li class="separator hidden-xs hidden-sm"><img alt="Spacer" src="/themes/default/images/vertical_dots.gif"/></li><li class="item sysstatus"><a class="action-sysstatus" href="#">' + MESSAGES[13] + '</a></li><li class="separator hidden-xs hidden-sm"><img alt="Spacer" src="/themes/default/images/vertical_dots.gif"/></li><li class="item"><a class="action-logout item" href="#">' + MESSAGES[14] + '</a></li></ul></div></div></nav>';
 
 				// Main: title
-				html += '<div id="main-title"><div class="container col-md-12 col-lg-12"><div class="row row-eq-height"><div id="list-title-folders" class="col-md-3 col-lg-3">' + MESSAGES[0] + ' ' + folder + '</div><div id="list-title-labs" class="col-md-3 col-lg-3">' + MESSAGES[1] + '</div><div id="list-title-info" class="col-md-6 col-lg-6"></div></div></div></div>';
+				html += '<div id="main-title" class="container col-md-12 col-lg-12"><div class="row row-eq-height"><div id="list-title-folders" class="col-md-3 col-lg-3"><span title="' + folder + '">' + MESSAGES[0] + '</span></div><div id="list-title-labs" class="col-md-3 col-lg-3"><span>' + MESSAGES[1] + '</span></div><div id="list-title-info" class="col-md-6 col-lg-6"><span></span></div></div></div>';
 				
 				// Main
-				html += '<div id="main" class="fill-height"><div class="container col-md-12 col-lg-12 fill-height"><div class="fill-height row row-eq-height"><div id="list-folders" class="col-md-3 col-lg-3"  data-path="' + folder + '"><ul></ul></div><div id="list-labs" class="col-md-3 col-lg-3"><ul></ul></div><div id="list-info" class="col-md-6 col-lg-6"></div></div></div></div>';
+				html += '<div id="main" class="container col-md-12 col-lg-12"><div class="fill-height row row-eq-height"><div id="list-folders" class="col-md-3 col-lg-3" data-path="' + folder + '"><ul></ul></div><div id="list-labs" class="col-md-3 col-lg-3"><ul></ul></div><div id="list-info" class="col-md-6 col-lg-6"></div></div></div>';
 				
 				// Footer
 				html += '</div>';
@@ -109,6 +210,13 @@ function printPageLabList(folder) {
 				$.each(data['data']['labs'], function(id, object) {
 					$('#list-labs > ul').append('<li><a class="lab" data-path="' + object['path'] + '" href="#" title="Double click to open, single click to select.">' + object['file'] + '</a></li>');
 				});
+				
+				// Extend height to the bottom if shorter
+				if ($('#main').height() < window.innerHeight - $('#main').offset().top) {
+					$('#main').height(function(index, height) {
+						return window.innerHeight - $(this).offset().top;
+					});
+				}
 				
 				// Read privileges and set specific actions/elements
 				if (ROLE == 'admin' || ROLE == 'editor') {
@@ -179,13 +287,17 @@ function printPageLabList(folder) {
 
 
 
-
-
-
  
 // Add Modal
 function addModal(title, body, footer) {
 	var html = '<div aria-hidden="false" style="display: block;" class="modal fade in" tabindex="-1" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">' + title + '</h4></div><div class="modal-body">' + body + '</div><div class="modal-footer">' + footer + '</div></div></div></div>';
+	$('body').append(html);
+	$('body > .modal').modal('show');
+}
+
+// Add Modal
+function addModalError(message) {
+	var html = '<div aria-hidden="false" style="display: block;" class="modal fade in" tabindex="-1" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">' + MESSAGES[15] + '</h4></div><div class="modal-body">' + message + '</div><div class="modal-footer"></div></div></div></div>';
 	$('body').append(html);
 	$('body > .modal').modal('show');
 }
@@ -262,52 +374,7 @@ function printPageAuthentication() {
 
 
 
-// Print Lab preview section
-function printPageLabPreview(lab) {
-	var html = '';
-	var url = '/api/labs' + lab;
-	var type = 'GET'
-	$.ajax({
-		timeout: TIMEOUT,
-		type: type,
-		url: encodeURI(url),
-		dataType: 'json',
-		success: function(data) {
-			if (data['status'] == 'success') {
-				logger(1, 'DEBUG: lab "' + lab + '" found.');
-// TODO
-html += '<ul>';
-html += '<li>Name: ' + data['data']['name'] + '</li>';
-html += '<li>ID: <code>' + data['data']['id'] + '</code></li>';
-html += '<li>Version: <code>' + data['data']['version'] + '</code></li>';
-html += '<li>Author: ' + data['data']['author'] + '</li>';
-html += '<li>Description:<br/>' + data['data']['description'] + '</li>';
-html += '<li><a href="/lab_open.php?filename=' + lab + '&tenant=' + TENANT + '">Load this lab</a></li>';
-html += '</ul>';
-	$('#list-title-info').html('FILE: ' + lab.replace(/\\/g,'/').replace(/.*\//, ''));
-	$('#list-info').html(html);
-	
-				
-				
-				
-				
-				
-				
-			} else {
-				// Application error
-				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-			}
-		},
-		error: function(data) {
-			// Server error
-			var message = getJsonMessage(data['responseText']);
-			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
-			logger(1, 'DEBUG: ' + message);
-			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-		}
-	});
-}
+
 
 // Print user management section
 function printPageUserManagement() {

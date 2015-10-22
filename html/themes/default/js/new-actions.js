@@ -29,35 +29,6 @@
  * @version 20150909
  */
 
-// Logout button
-$(document).on('click', '.button-logout', function(e) {
-	var url = '/api/auth/logout';
-	var type = 'GET'
-	$.ajax({
-		timeout: TIMEOUT,
-		type: type,
-		url: encodeURI(url),
-		dataType: 'json',
-		success: function(data) {
-			if (data['status'] == 'success') {
-				logger(1, 'DEBUG: user is logged off.');
-				printPageAuthentication();
-			} else {
-				// Authentication error
-				logger(1, 'DEBUG: internal error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-			}
-		},
-		error: function(data) {
-			// Authentication error
-			var message = getJsonMessage(data['responseText']);
-			logger(1, 'DEBUG: Ajax error (' + data['status'] + ') on ' + type + ' ' + url + '.');
-			logger(1, 'DEBUG: ' + message);
-			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-		}
-	});
-});
-
 // Accept privacy
 $(document).on('click', '#privacy', function () {
 	$.cookie('privacy', 'true', {
@@ -69,7 +40,7 @@ $(document).on('click', '#privacy', function () {
 	}
 });
 
-// Select user, folder or lab
+// Select folders, labs or users
 $(document).on('click', 'a.folder, a.lab, tr.user', function(e) {
 	logger(1, 'DEBUG: selected "' + $(this).attr('data-path') + '".');
 	if ($(this).hasClass('selected')) {
@@ -81,13 +52,100 @@ $(document).on('click', 'a.folder, a.lab, tr.user', function(e) {
 	}
 });
 
-// Display folder-add form
-$(document).on('click', 'a.folder-add', function(e) {
-	var html = '<form id="form-folder-add" class="form-horizontal form-folder-add"><div class="form-group"><label class="col-md-3 control-label">Path</label><div class="col-md-5"><input class="form-control" name="folder[path]" value="' + $('#list-folders').attr('data-path') + '" disabled="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Name</label><div class="col-md-5"><input class="form-control autofocus" name="folder[name]" value="" type="text"/></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">Add</button> <button type="button" class="btn btn-grey" data-dismiss="modal">Cancel</button></div></div></form>';
-	logger(1, 'DEBUG: popping up the folder-add form.');
-	addModal('Add a new folder', html, '');
-	validateFolder();
+// Preview lab
+$(document).on('dblclick', 'a.lab', function(e) {
+	logger(1, 'DEBUG: opening a preview of lab "' + $(this).attr('data-path') + '".');
+	$('.lab-opened').each(function() {
+		// Remove all previous selected lab
+		$(this).removeClass('lab-opened');
+	});
+	$(this).addClass('lab-opened');
+	printLabPreview($(this).attr('data-path'));
 });
+
+/***************************************************************************
+ * Actions links
+ **************************************************************************/
+// Add a new folder
+$(document).on('click', '.action-folderadd', function(e) {
+	logger(1, 'DEBUG: action = folderadd');
+	printFormFolderAdd($('#list-folders').attr('data-path'));
+});
+
+// Rename an existent folder
+$(document).on('click', '.action-folderrename', function(e) {
+	logger(1, 'DEBUG: action = folderrename');
+	printFormFolderRename($('#list-folders').attr('data-path'));
+});
+
+// Import labs
+$(document).on('click', '.action-import', function(e) {
+	logger(1, 'DEBUG: action = import');
+});
+
+// Add a new lab
+$(document).on('click', '.action-labadd', function(e) {
+	logger(1, 'DEBUG: action = labadd');
+});
+
+// List all labs
+$(document).on('click', '.action-lablist', function(e) {
+	logger(1, 'DEBUG: action = lablist');
+});
+
+// Logout
+$(document).on('click', '.action-logout', function(e) {
+	logger(1, 'DEBUG: action = logout');
+	$.when(logoutUser()).done(function() {
+		printPageAuthentication();
+	}).fail(function(message) {
+		addModalError(message);
+	});
+});
+
+// Clone selected labs
+$(document).on('click', '.action-selectedclone', function(e) {
+	logger(1, 'DEBUG: action = selectedclone');
+}); 
+ 
+// Delete selected folders and labs
+$(document).on('click', '.action-selecteddelete', function(e) {
+	logger(1, 'DEBUG: action = selecteddelete');
+}); 
+
+// Export selected folders and labs
+$(document).on('click', '.action-selectedexport', function(e) {
+	logger(1, 'DEBUG: action = selectedexport');
+}); 
+
+// Load user management page
+$(document).on('click', '.action-usermgmt', function(e) {
+	logger(1, 'DEBUG: action = usermgmt');
+}); 
+
+// Load system status page
+$(document).on('click', '.action-sysstatus', function(e) {
+	logger(1, 'DEBUG: action = sysstatus');
+}); 
+
+/***************************************************************************
+ * Submit
+ **************************************************************************/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Display folder-rename form
 $(document).on('click', 'a.folder-rename', function(e) {
@@ -380,6 +438,7 @@ $(document).on('dblclick', 'a.folder', function(e) {
 });
 
 // Preview lab
+/*
 $(document).on('dblclick', 'a.lab', function(e) {
 	logger(1, 'DEBUG: opening a preview of lab "' + $(this).attr('data-path') + '".');
 	$('.lab-opened').each(function() {
@@ -387,8 +446,9 @@ $(document).on('dblclick', 'a.lab', function(e) {
 		$(this).removeClass('lab-opened');
 	});
 	$(this).addClass('lab-opened');
-	printPageLabPreview($(this).attr('data-path'));
+	printLabPreview($(this).attr('data-path'));
 });
+*/
 
 // Edit a user
 $(document).on('dblclick', 'tr.user', function(e) {
@@ -492,7 +552,7 @@ $(document).on('submit', '#form-login', function(e) {
 				$.when(getUserInfo()).done(function() {
 					// User is authenticated
 					logger(1, 'DEBUG: loading home page.');
-					printPageLabList('/');
+					printPageLabList(FOLDER);
 				}).fail(function() {
 					// User is not authenticated, or error on API
 					logger(1, 'DEBUG: loading authentication page.');

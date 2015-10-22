@@ -3,25 +3,30 @@
 }
 
 #list-title-folders {
-	background: #58585a;
+	color: #ffffff;
+	background-color: #58585a;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+#list-title-folders span {
 	color: #ffffff;
 	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
 	font-size: 1em;
-	margin-left: 0px;
-	margin-right: 0px;
-	padding-left: 25px;
-	padding-right: 5px;
+	margin-left: 15px;
 	text-overflow: ellipsis;
 	text-transform: uppercase;
-	white-space: nowrap;
-	overflow: hidden;
 }
 
 #list-folders {
 	background-color: #e2edef;
 	margin-left: 0px;
+	margin-right: 0px;
 	overflow: hidden;
+	padding-bottom: 35px;
 	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 #list-folders ul {
@@ -35,10 +40,16 @@
 #list-title-labs {
 	background-color: #46a6b6;
 	color: #ffffff;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+#list-title-labs span {
+	color: #ffffff;
 	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
 	font-size: 1em;
-	overflow: hidden;
-	padding-left: 40px;
+	margin-left: 15px;
 	text-overflow: ellipsis;
 	text-transform: uppercase;
 }
@@ -47,56 +58,83 @@
 	background-color: #babbbd;
 	margin-left: 15px;
 	margin-right: -15px;
-	padding-right: -15px;
 	overflow: hidden;
+	padding-bottom: 35px;
 	text-overflow: ellipsis;
+	white-space: nowrap;
 }
-
-#list-title-info {
-	background-color: #46a6b6;
-	color: #ffffff;
-	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
-	font-size: 1em;
-	padding-left: 20px;
-}
-
-
 
 #list-labs ul {
 	line-height: 3em;
 	list-style-type: none;
-	margin-left: -30px;
-	margin-right: -55px;
 	margin-top: 35px;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#list-body ul {
-	line-height: 3em;
-	list-style-type: none;
-	margin-left: -30px;
 	margin-right: -15px;
-	margin-top: 3vw;	/* must reflect #list-title top attribute */
+	padding-left: 25px;
 }
 
+#list-title-info {
+	color: #ffffff;
+	background-color: #46a6b6;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
 
+#list-title-info span {
+	color: #ffffff;
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+	font-size: 1em;
+	margin-left: 10px;
+}
 
-#list-title-folders span {
+#list-info {
+	padding: 15px 30px 35px 30px;
+}
+
+#list-info  h1 {
+	color: #8b8c90;
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+	font-size: 1.5em;
+	margin: 0px 0px 5px 0px;
+	padding: 0px;
+}
+
+#list-info  h2 {
+	background-color: transparent;
+	color: #8b8c90;
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+	font-size: 1em;
+	margin: 5px 0px 5px 0px;
+	padding: 0px;
 	text-transform: none;
 }
+
+#list-info p {
+	margin: 5px 0px 5px 0px;
+	padding: 0px;
+}
+
+#list-info  code {
+	background-color: transparent;
+	color: #46a6b6;
+	font-size: 1em;
+	font-weight: bold;
+	margin: 0px;
+	padding: 0px;
+}
+
+.modal-title {
+	text-transform: uppercase;
+}
+
+
+
+
+
+
+
+
+
 
 
 

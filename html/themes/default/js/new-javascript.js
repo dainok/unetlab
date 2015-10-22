@@ -55,13 +55,12 @@ $(document).ready(function() {
 			logger(1, 'DEBUG: loading language.');
 			$.getScript('/themes/default/js/new-messages_' + LANG + '.js')
 				.done(function() {
-					logger(1, 'DEBUG: loading home page.');
+					logger(1, 'DEBUG: loading folder "' + FOLDER + '".');
 					printPageLabList(FOLDER);
 				})
 				.fail(function() {
 					logger(1, 'DEBUG: error loading language.');
 				});
-
 		}).fail(function() {
 			// User is not authenticated, or error on API
 			logger(1, 'DEBUG: loading authentication page.');

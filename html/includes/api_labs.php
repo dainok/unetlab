@@ -309,6 +309,7 @@ function apiGetLab($lab) {
 		'author' => $lab -> getAuthor(),
 		'description' => $lab -> getDescription(),
 		'body' => $lab -> getBody(),
+		'filename' => $lab -> getFilename(),
 		'id' => $lab -> getId(),
 		'name' => $lab -> getName(),
 		'version' => $lab -> getVersion(),

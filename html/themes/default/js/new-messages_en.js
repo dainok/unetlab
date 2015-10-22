@@ -30,9 +30,9 @@
  */
  
 var MESSAGES = [];
-MESSAGES[0]  = 'Folders in';
-MESSAGES[1]  = 'Labs';
-MESSAGES[2]  = 'File';
+MESSAGES[0]  = 'Folders';
+MESSAGES[1]  = 'Files';
+MESSAGES[2]  = '';
 MESSAGES[3]  = 'none';
 MESSAGES[4]  = 'Add a new folder';
 MESSAGES[5]  = 'Add a new lab';
@@ -45,3 +45,11 @@ MESSAGES[11] = 'Home';
 MESSAGES[12] = 'Users';
 MESSAGES[13] = 'Status';
 MESSAGES[14] = 'Logout';
+MESSAGES[15] = 'Error';
+MESSAGES[16] = 'Close';
+MESSAGES[17] = 'Add';
+MESSAGES[18] = 'Cancel';
+MESSAGES[19] = 'Name';
+MESSAGES[20] = 'Path';
+MESSAGES[21] = 'Rename';
+
