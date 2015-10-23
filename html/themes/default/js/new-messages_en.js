@@ -32,14 +32,14 @@
 var MESSAGES = [];
 MESSAGES[0]  = 'Folders';
 MESSAGES[1]  = 'Files';
-MESSAGES[2]  = '';
+MESSAGES[2]  = 'File';
 MESSAGES[3]  = 'none';
 MESSAGES[4]  = 'Add a new folder';
 MESSAGES[5]  = 'Add a new lab';
 MESSAGES[6]  = 'Clone selected labs';
 MESSAGES[7]  = 'Delete selected objects';
 MESSAGES[8]  = 'Export selected objects';
-MESSAGES[9]  = 'Import external objects';
+MESSAGES[9]  = 'Import external labs';
 MESSAGES[10] = 'Rename current folder';
 MESSAGES[11] = 'Home';
 MESSAGES[12] = 'Users';
@@ -52,4 +52,19 @@ MESSAGES[18] = 'Cancel';
 MESSAGES[19] = 'Name';
 MESSAGES[20] = 'Path';
 MESSAGES[21] = 'Rename';
+MESSAGES[22] = 'Open';
+MESSAGES[23] = 'Browse';
+MESSAGES[24] = 'Import';
+MESSAGES[25] = 'no file selected';
+MESSAGES[26] = 'Version';
+MESSAGES[27] = 'Description';
+MESSAGES[28] = 'Email';
+MESSAGES[29] = 'Role';
+MESSAGES[30] = 'Expiration';
+MESSAGES[31] = 'Last seen';
+MESSAGES[32] = 'POD';
+MESSAGES[33] = 'POD Expiration';
+MESSAGES[34] = 'Add a new user';
+MESSAGES[35] = 'Delete selected users';
+
 

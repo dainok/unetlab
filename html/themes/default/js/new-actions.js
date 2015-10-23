@@ -29,6 +29,17 @@
  * @version 20150909
  */
 
+// Attach files
+$('body').on('change', 'input[type=file]', function(e) {
+    ATTACHMENTS = e.target.files;
+});
+
+// Add the selectef filename to the proper input box
+$('body').on('change', 'input[name="import[file]"]', function(e) {
+	$('input[name="import[local]"]').val($(this).val());
+	console.log($(this).val())
+});
+
 // Accept privacy
 $(document).on('click', '#privacy', function () {
 	$.cookie('privacy', 'true', {
@@ -63,6 +74,16 @@ $(document).on('dblclick', 'a.lab', function(e) {
 	printLabPreview($(this).attr('data-path'));
 });
 
+// Remove modal on close
+$(document).on('hide.bs.modal', '.modal', function () {
+    $(this).remove();
+});
+
+// Set autofocus on show modal
+$(document).on('shown.bs.modal', '.modal', function () {
+    $('.autofocus').focus();
+});
+
 /***************************************************************************
  * Actions links
  **************************************************************************/
@@ -81,16 +102,24 @@ $(document).on('click', '.action-folderrename', function(e) {
 // Import labs
 $(document).on('click', '.action-import', function(e) {
 	logger(1, 'DEBUG: action = import');
+	printFormImport($('#list-folders').attr('data-path'));
 });
 
 // Add a new lab
 $(document).on('click', '.action-labadd', function(e) {
 	logger(1, 'DEBUG: action = labadd');
+	printFormLabAdd($('#list-folders').attr('data-path'));
 });
 
 // List all labs
 $(document).on('click', '.action-lablist', function(e) {
 	logger(1, 'DEBUG: action = lablist');
+	printPageLabList(FOLDER);
+});
+
+// Open a lab
+$(document).on('click', '.action-labopen', function(e) {
+	logger(1, 'DEBUG: action = labopen');
 });
 
 // Logout
@@ -121,6 +150,7 @@ $(document).on('click', '.action-selectedexport', function(e) {
 // Load user management page
 $(document).on('click', '.action-usermgmt', function(e) {
 	logger(1, 'DEBUG: action = usermgmt');
+	printUserManagement();
 }); 
 
 // Load system status page
@@ -137,39 +167,18 @@ $(document).on('click', '.action-sysstatus', function(e) {
 
 
 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
 
 
 
 
-
-
-
-
-
-
-// Display folder-rename form
-$(document).on('click', 'a.folder-rename', function(e) {
-	var html = '<form id="form-folder-rename" class="form-horizontal form-folder-rename"><div class="form-group"><label class="col-md-3 control-label">Path</label><div class="col-md-5"><input class="form-control" name="folder[path]" value="' + $('#list-folders').attr('data-path') + '" disabled="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Name</label><div class="col-md-5"><input class="form-control autofocus" name="folder[name]" value="" type="text"/></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">Rename</button> <button type="button" class="btn btn-grey" data-dismiss="modal">Cancel</button></div></div></form>';
-	logger(1, 'DEBUG: popping up the folder-rename form.');
-	addModal('Rename current folder', html, '');
-	validateFolder();
-});
-
-// Display import form
-$(document).on('click', 'a.import', function(e) {
-	var html = '<form id="form-import" class="form-horizontal form-import"><div class="form-group"><label class="col-md-3 control-label">Path</label><div class="col-md-7"><input class="form-control" name="import[path]" value="' + $('#list-folders').attr('data-path') + '" disabled="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">File</label><div class="col-md-7"><span class="btn btn-default btn-file btn-aqua">Browse <input class="form-control" name="import[file]" value="" type="file"></span></div></div><div class="form-group"><div class="col-md-7 col-md-offset-3"><button type="submit" class="btn btn-aqua">Import</button> <button type="button" class="btn btn-grey" data-dismiss="modal">Cancel</button></div></div></form>';
-	logger(1, 'DEBUG: popping up the import form.');
-	addModal('Import labs', html, '');
-	validateImport();
-});
-
-// Display lab-add form
-$(document).on('click', 'a.lab-add', function(e) {
-	var html = '<form id="form-lab-add" class="form-horizontal form-lab-add"><div class="form-group"><label class="col-md-3 control-label">Path</label><div class="col-md-5"><input class="form-control" name="lab[path]" value="' + $('#list-folders').attr('data-path') + '" disabled="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Name</label><div class="col-md-5"><input class="form-control autofocus" name="lab[name]" value="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Version</label><div class="col-md-5"><input class="form-control" name="lab[version]" value="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Author</label><div class="col-md-5"><input class="form-control" name="lab[author]" value="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Description</label><div class="col-md-5"><textarea class="form-control" name="lab[description]"></textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">Add</button> <button type="button" class="btn btn-grey" data-dismiss="modal">Cancel</button></div></div></form>';
-	logger(1, 'DEBUG: popping up the lab-add form.');
-	addModal('Add a new lab', html, '');
-	validateLabInfo();
-});
 
 // Clone selected labs
 $(document).on('click', '.selected-clone', function(e) {
@@ -293,10 +302,6 @@ $(document).on('click', '.selected-export', function(e) {
 	}
 });
 
-// Open lab-list page
-$(document).on('click', '.lab-list', function(e) {
-	printPageLabList('/');
-});
 
 // Open system status page
 $(document).on('click', '.sysstatus', function(e) {
@@ -400,10 +405,7 @@ $(document).on('click', '.sysstatus', function(e) {
 	});
 });
 
-// Open user management page
-$(document).on('click', '.usermgmt', function(e) {
-	printPageUserManagement();
-});
+
 
 // Add a user
 $(document).on('click', 'a.user-add', function(e) {
@@ -436,19 +438,6 @@ $(document).on('dblclick', 'a.folder', function(e) {
 	logger(1, 'DEBUG: opening folder "' + $(this).attr('data-path') + '".');
 	printPageLabList($(this).attr('data-path'));
 });
-
-// Preview lab
-/*
-$(document).on('dblclick', 'a.lab', function(e) {
-	logger(1, 'DEBUG: opening a preview of lab "' + $(this).attr('data-path') + '".');
-	$('.lab-opened').each(function() {
-		// Remove all previous selected lab
-		$(this).removeClass('lab-opened');
-	});
-	$(this).addClass('lab-opened');
-	printLabPreview($(this).attr('data-path'));
-});
-*/
 
 // Edit a user
 $(document).on('dblclick', 'tr.user', function(e) {
@@ -522,15 +511,7 @@ $(document).on('dblclick', 'tr.user', function(e) {
 	});
 });	
 	
-// Remove modal on close
-$(document).on('hide.bs.modal', '.modal', function () {
-    $(this).remove();
-});
 
-// Set autofocus on show modal
-$(document).on('shown.bs.modal', '.modal', function () {
-    $('.autofocus').focus();
-});
 
 // Submit login form
 $(document).on('submit', '#form-login', function(e) {

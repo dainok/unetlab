@@ -29,6 +29,52 @@
  * @version 20150909
  */
 
+// Add Modal
+function addModal(title, body, footer) {
+	var html = '<div aria-hidden="false" style="display: block;" class="modal fade in" tabindex="-1" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">' + title + '</h4></div><div class="modal-body">' + body + '</div><div class="modal-footer">' + footer + '</div></div></div></div>';
+	$('body').append(html);
+	$('body > .modal').modal('show');
+}
+
+// Add Modal
+function addModalError(message) {
+	var html = '<div aria-hidden="false" style="display: block;" class="modal fade in" tabindex="-1" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">' + MESSAGES[15] + '</h4></div><div class="modal-body">' + message + '</div><div class="modal-footer"></div></div></div></div>';
+	$('body').append(html);
+	$('body > .modal').modal('show');
+}
+
+// HTML Form to array
+function form2Array(form_name) {
+	var form_array = {};
+	$('form :input[name^="' + form_name + '["]').each(function(id, object) {
+		// INPUT name is in the form of "form_name[value]", get value only
+		form_array[$(this).attr('name').substr(form_name.length + 1, $(this).attr('name').length - form_name.length - 2)] = $(this).val();
+	});
+	return form_array;
+}
+
+// Get JSon message from HTTP response
+function getJsonMessage(response) {
+	console.log(response);
+	var message = '';
+	try {
+		message = JSON.parse(response)['message'];
+		code = JSON.parse(response)['code'];
+		if (code == 400) {
+			// if 400 should redirect (user timed out)
+			location.reload();
+			console.log(code);
+		}
+	} catch(e) {
+		if (response != '') {
+			message = response;
+		} else {
+			message = 'Undefined message, check if the UNetLab VM is powered on. If it is, see <a href="/Logs" target="_blank">logs</a>.';
+		}
+	}
+	return message;
+}
+
 // Get lab info
 function getLabInfo(lab_filename) {
 	var deferred = $.Deferred();
@@ -60,7 +106,39 @@ function getLabInfo(lab_filename) {
 	return deferred.promise();
 }
 
- 
+// Get roles
+function getRoles() {
+	var deferred = $.Deferred();
+	var form_data = {};
+	var url = '/api/list/roles';
+	var type = 'GET';
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		data: JSON.stringify(form_data),
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: got roles.');
+				deferred.resolve(data['data']);
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject(data['message']);
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
+}
+
 // Get user info
 function getUserInfo() {
 	var deferred = $.Deferred();
@@ -98,6 +176,44 @@ function getUserInfo() {
 		}
 	});
 	return deferred.promise();
+}
+
+// Get user info
+function getUsers() {
+	var deferred = $.Deferred();
+	var url = '/api/users/';
+	var type = 'GET'
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: got UNetLab users.');
+				deferred.resolve(data['data']);
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject(data['message']);
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
+}
+
+// Logging
+function logger(severity, message) {
+	if (DEBUG >= severity) {
+		console.log(message);
+	}
 }
 
 // Logout user
@@ -149,6 +265,22 @@ function printFormFolderRename(folder) {
 	validateFolder();
 }
 
+// Import external labs
+function printFormImport(path) {
+	var html = '<form id="form-import" class="form-horizontal form-import"><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[20] + '</label><div class="col-md-5"><input class="form-control" name="import[path]" value="' + path + '" disabled="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[2] + '</label><div class="col-md-5"><input class="form-control" name="import[local]" value="" disabled="" placeholder="' + MESSAGES[25] + '" "type="text"/></div></div><div class="form-group"><div class="col-md-7 col-md-offset-3"><span class="btn btn-default btn-file btn-aqua">' + MESSAGES[23] + ' <input class="form-control" name="import[file]" value="" type="file"></span> <button type="submit" class="btn btn-aqua">' + MESSAGES[24] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
+	logger(1, 'DEBUG: popping up the import form.');
+	addModal(MESSAGES[9], html, '');
+	validateImport();
+}
+
+// Add a new lab
+function printFormLabAdd(path) {
+	var html = '<form id="form-lab-add" class="form-horizontal form-lab-add"><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[20] + '</label><div class="col-md-5"><input class="form-control" name="lab[path]" value="' + path + '" disabled="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control autofocus" name="lab[name]" value="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[26] + '</label><div class="col-md-5"><input class="form-control" name="lab[version]" value="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Author</label><div class="col-md-5"><input class="form-control" name="lab[author]" value="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[27] + '</label><div class="col-md-5"><textarea class="form-control" name="lab[description]"></textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[17] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
+	logger(1, 'DEBUG: popping up the lab-add form.');
+	addModal(MESSAGES[5], html, '');
+	validateLabInfo();
+}
+
 // Print lab preview section
 function printLabPreview(lab_filename) {
 	$.when(getLabInfo(lab_filename)).done(function(lab) {
@@ -160,14 +292,13 @@ function printLabPreview(lab_filename) {
 		if (lab['description'] != null) {
 			html += '<p>' + lab['description'] + '</p>';
 		}
+		html += '<button class="action-labopen btn btn-aqua" type="button" data-path="' + $('#list-folders').attr('data-path') + '/' + lab['filename'] + '">' + MESSAGES[22] + '</button>';
 		$('#list-title-info span').html(lab['filename'].replace(/\\/g,'/').replace(/.*\//, ''));
 		$('#list-info').html(html);
 	}).fail(function(message) {
 		addModalError(message);
 	});
 }
-
-
 
 // Print lab list page
 function printPageLabList(folder) {
@@ -255,6 +386,9 @@ function printPageLabList(folder) {
 							});
 						}
 					});
+				} else {
+					$('#actions-menu').empty();
+					$('#actions-menu').append('<li><a href="#">&lt;' + MESSAGES[3] + '&gt;</a></li>');
 				}
 			} else {
 				// Application error
@@ -272,6 +406,62 @@ function printPageLabList(folder) {
 	});
 }
 
+// Print user management section
+function printUserManagement() {
+	$.when(getUsers()).done(function(data) {
+		var html = '<div id="users" class="col-md-12 col-lg-12"><div class="table-responsive"><table class="table"><thead><tr><th>Username</th><th>' + MESSAGES[19] + '</th><th>' + MESSAGES[28] + '</th><th>' + MESSAGES[29] + '</th><th>' + MESSAGES[30] + '</th><th>' + MESSAGES[31] + '</th><th>' + MESSAGES[32] + '</th><th>' + MESSAGES[33] + '</th></tr></thead><tbody></tbody></table></div></div>';
+		$('#main-title').remove();
+		$('#main').html(html);
+	
+		// Read privileges and set specific actions/elements
+		if (ROLE == 'admin') {
+			// Adding actions
+			$('#actions-menu').empty();
+			$('#actions-menu').append('<li><a class="user-add" href="#"><i class="glyphicon glyphicon-plus"></i> ' + MESSAGES[34] + '</a></li>');
+			$('#actions-menu').append('<li><a class="selected-delete" href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[35] + '</a></li>');
+		} else {
+			$('#actions-menu').empty();
+			$('#actions-menu').append('<li><a href="#">&lt;' + MESSAGES[3] + '&gt;</a></li>');
+		}
+	
+		// Adding all users
+		$.each(data, function(id, object) {
+			var username = object['username'];
+			var name = object['name'];
+			var email = object['email'];
+			var role = object['role'];
+			if (object['pod'] == -1) {
+				var pod = 'none';
+			} else {
+				var pod = object['pod'];
+			}
+			if (object['expiration'] <= 0) {
+				var expiration = 'never';
+			} else {
+				var d = new Date(object['expiration'] * 1000);
+				expiration = d.toLocaleDateString(); 
+			}
+			if (object['session'] <= 0) {
+				var session = 'never';
+			} else {
+				var d = new Date(object['session'] * 1000);
+				session = d.toLocaleDateString() + ' ' + d.toLocaleTimeString() + ' from ' + object['ip']; 
+			}
+			if (object['pexpiration'] <= 0) {
+				var pexpiration = 'never';
+			} else {
+				var d = new Date(object['pexpiration'] * 1000);
+				pexpiration = d.toLocaleDateString(); 
+			}
+			$('#users tbody').append('<tr class="user" data-path="' + username + '"><td class="username">' + username + '</td><td class="class="name">' + name + '</td><td class="email">' + email + '</td><td class="role">' + role + '</td><td class="expiration">' + expiration + '</td><td class="session">' + session + '</td><td class="pod">' + pod + '</td><td class="pexpiration">' + pexpiration + '</td></tr>');
+		});
+	}).fail(function(message) {
+		addModalError(message);
+	});
+}
+
+
+
 
 
 
@@ -288,87 +478,17 @@ function printPageLabList(folder) {
 
 
  
-// Add Modal
-function addModal(title, body, footer) {
-	var html = '<div aria-hidden="false" style="display: block;" class="modal fade in" tabindex="-1" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">' + title + '</h4></div><div class="modal-body">' + body + '</div><div class="modal-footer">' + footer + '</div></div></div></div>';
-	$('body').append(html);
-	$('body > .modal').modal('show');
-}
 
-// Add Modal
-function addModalError(message) {
-	var html = '<div aria-hidden="false" style="display: block;" class="modal fade in" tabindex="-1" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">' + MESSAGES[15] + '</h4></div><div class="modal-body">' + message + '</div><div class="modal-footer"></div></div></div></div>';
-	$('body').append(html);
-	$('body > .modal').modal('show');
-}
 
-// HTML Form to array
-function form2Array(form_name) {
-	var form_array = {};
-	$('form :input[name^="' + form_name + '["]').each(function(id, object) {
-		// INPUT name is in the form of "form_name[value]", get value only
-		form_array[$(this).attr('name').substr(form_name.length + 1, $(this).attr('name').length - form_name.length - 2)] = $(this).val();
-	});
-	return form_array;
-}
 
-// Get JSon message from HTTP response
-function getJsonMessage(response) {
-	console.log(response);
-	var message = '';
-	try {
-		message = JSON.parse(response)['message'];
-		code = JSON.parse(response)['code'];
-		if (code == 401) {
-			// User is no more authenticated
-			//location.reload();
-		}
-	} catch(e) {
-		if (response != '') {
-			message = response;
-		} else {
-			message = 'Undefined message, check if the UNetLab VM is powered on. If it is, see <a href="/Logs" target="_blank">logs</a>.';
-		}
-	}
-	return message;
-}
 
-// Get roles
-function getRoles() {
-	var deferred = $.Deferred();
-	var form_data = {};
-	var url = '/api/list/roles';
-	var type = 'GET';
-	$.ajax({
-		timeout: TIMEOUT,
-		type: type,
-		url: encodeURI(url),
-		dataType: 'json',
-		data: JSON.stringify(form_data),
-		success: function(data) {
-			if (data['status'] == 'success') {
-				logger(1, 'DEBUG: got roles.');
-				deferred.resolve(data['data']);
-			} else {
-				// Application error
-				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-				deferred.reject(data['message']);
-			}
-		},
-		error: function(data) {
-			// Server error
-			var message = getJsonMessage(data['responseText']);
-			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
-			logger(1, 'DEBUG: ' + message);
-			deferred.reject(message);
-		}
-	});
-	return deferred.promise();
-}
+
+
+
 
 // Print Authentication Page
 function printPageAuthentication() {
-	var html = '<div class="row full-height"><div class="col-md-5 col-lg-5 full-height" id="auth-left"><div class="middle"><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><img alt="Logo RR" src="/themes/default/images/logo-rr.png" /></div></div><!-- <div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><img alt="Signup Icon" src="/themes/default/images/button-signup.png"></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2">to access more features</div></div> --><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2">Existing user...</div></div><form id="form-login"><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input name="login[username]" placeholder="USERNAME" type="text" /></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input name="login[password]" placeholder="PASSWORD" type="password" /></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input alt="Login Icon" src="/themes/default/images/button-login.png" type="image" /></div></div></form></div></div><div class="col-md-7 col-lg-7" id="auth-right"><div id="logo-angular"><img alt="Logo Angular" src="/themes/default/images/logo-angular.png" /></div><div id="logo-ad"><img alt="Logo AD" src="/themes/default/images/logo-ad.png" /></div><div id="logo-text"><h1>Unified Networking Lab</h1><p>UNetLab can be considered the next major version of<br>iou-web, but the software has been rewritten from<br>scratch. The major advantage over GNS3 and<br>iou-web itself is about multi-hypervisor<br>support within a single entity. UNetLab<br>allows to design labs using IOU, Dy-<br>namips and QEMU nodes without<br>dealing with multi virtual ma-<br>chines: everything run in-<br>side a UNetLab host,<br>and a lab is a single<br>file including all<br>information<br>needed.</p></div></div></div>'
+	var html = '<div class="row full-height"><div class="col-md-5 col-lg-5 full-height" id="auth-left"><div class="middle"><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><img alt="Logo RR" src="/themes/default/images/logo-rr.png" /></div></div><!-- <div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><img alt="Signup Icon" src="/themes/default/images/button-signup.png"></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2">to access more features</div></div> --><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2 white">Existing user...</div></div><form id="form-login"><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input name="login[username]" placeholder="USERNAME" type="text" /></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input name="login[password]" placeholder="PASSWORD" type="password" /></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input alt="Login Icon" src="/themes/default/images/button-login.png" type="image" /></div></div></form></div></div><div class="col-md-7 col-lg-7" id="auth-right"><div id="logo-angular"><img alt="Logo Angular" src="/themes/default/images/logo-angular.png" /></div><div id="logo-ad"><img alt="Logo AD" src="/themes/default/images/logo-ad.png" /></div><div id="logo-text"><h1>Unified Networking Lab</h1><p>UNetLab can be considered the next major version of<br>iou-web, but the software has been rewritten from<br>scratch. The major advantage over GNS3 and<br>iou-web itself is about multi-hypervisor<br>support within a single entity. UNetLab<br>allows to design labs using IOU, Dy-<br>namips and QEMU nodes without<br>dealing with multi virtual ma-<br>chines: everything run in-<br>side a UNetLab host,<br>and a lab is a single<br>file including all<br>information<br>needed.</p></div></div></div>'
 	$('#body').html(html);
 }
 
@@ -376,77 +496,9 @@ function printPageAuthentication() {
 
 
 
-// Print user management section
-function printPageUserManagement() {
-	var html = '<div id="users" class="col-md-12 col-lg-12"><div class="table-responsive"><table class="table"><thead><tr><th>Username</th><th>Name</th><th>Email</th><th>Role</th><th>Expiration</th><th>Last seen</th><th>POD</th><th>POD Expiration</th></tr></thead><tbody></tbody></table></div></div>';
-	var url = '/api/users/';
-	var type = 'GET'
-	$.ajax({
-		timeout: TIMEOUT,
-		type: type,
-		url: encodeURI(url),
-		dataType: 'json',
-		success: function(data) {
-			if (data['status'] == 'success') {
-				logger(1, 'DEBUG: got UNetLab users.');
-				$('#main-body').html(html);
-
-				// Adding all data rows
-				$.each(data['data'], function(id, object) {
-					var username = object['username'];
-					var name = object['name'];
-					var email = object['email'];
-					var role = object['role'];
-					if (object['pod'] == -1) {
-						var pod = 'none';
-					} else {
-						var pod = object['pod'];
-					}
-					if (object['expiration'] <= 0) {
-						var expiration = 'never';
-					} else {
-						var d = new Date(object['expiration'] * 1000);
-						expiration = d.toLocaleDateString(); 
-					}
-					if (object['session'] <= 0) {
-						var session = 'never';
-					} else {
-						var d = new Date(object['session'] * 1000);
-						session = d.toLocaleDateString() + ' ' + d.toLocaleTimeString() + ' from ' + object['ip']; 
-					}
-					if (object['pexpiration'] <= 0) {
-						var pexpiration = 'never';
-					} else {
-						var d = new Date(object['pexpiration'] * 1000);
-						pexpiration = d.toLocaleDateString(); 
-					}
-					$('#main-body .table tbody').append('<tr class="user" data-path="' + username + '"><td>' + username + '</td><td>' + name + '</td><td>' + email + '</td><td>' + role + '</td><td>' + expiration + '</td><td>' + session + '</td><td>' + pod + '</td><td>' + pexpiration + '</td></tr>');
-					$('#actions-menu').html('<li><a class="user-add" href="#"><i class="glyphicon glyphicon-plus"></i> Add a new user</a></li><li><a class="selected-delete" href="#"><i class="glyphicon glyphicon-trash"></i> Delete selected users</a></li>');
-				});
-			} else {
-				// Application error
-				logger(1, 'DEBUG: internal error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-			}
-		},
-		error: function(data) {
-			// Server error
-			var message = getJsonMessage(data['responseText']);
-			logger(1, 'DEBUG: Ajax error (' + data['status'] + ') on ' + type + ' ' + url + '.');
-			logger(1, 'DEBUG: ' + message);
-			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-		}
-	});
-}
 
 
 
-// Logging
-function logger(severity, message) {
-	if (DEBUG >= severity) {
-		console.log(message);
-	}
-}
 
 // Move lab inside a folder
 function moveLab(lab, path) {

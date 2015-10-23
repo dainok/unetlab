@@ -5,6 +5,8 @@
 #list-title-folders {
 	color: #ffffff;
 	background-color: #58585a;
+	margin-left: 0px;
+	margin-right: 0px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -14,7 +16,7 @@
 	color: #ffffff;
 	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
 	font-size: 1em;
-	margin-left: 15px;
+	padding-left: 10px;
 	text-overflow: ellipsis;
 	text-transform: uppercase;
 }
@@ -49,7 +51,7 @@
 	color: #ffffff;
 	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
 	font-size: 1em;
-	margin-left: 15px;
+	padding-left: 15px;
 	text-overflow: ellipsis;
 	text-transform: uppercase;
 }
@@ -68,6 +70,7 @@
 	line-height: 3em;
 	list-style-type: none;
 	margin-top: 35px;
+	margin-left: -55px;
 	margin-right: -15px;
 	padding-left: 25px;
 }
@@ -84,11 +87,15 @@
 	color: #ffffff;
 	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
 	font-size: 1em;
-	margin-left: 10px;
+	padding-left: 15px;
 }
 
 #list-info {
 	padding: 15px 30px 35px 30px;
+	margin-right: -20px;	/* previous column get a 20px margin */
+	padding-bottom: 35px;
+	padding-right: 30px;	/* reduce available space of 20px */
+	padding-top: 45px;
 }
 
 #list-info  h1 {
@@ -110,7 +117,7 @@
 }
 
 #list-info p {
-	margin: 5px 0px 5px 0px;
+	margin: 5px 0px 10px 0px;
 	padding: 0px;
 }
 
@@ -123,41 +130,47 @@
 	padding: 0px;
 }
 
+#users  table {
+	margin: 0px;
+	padding: 0px;
+}
+
+#users thead {
+	background: #3ba9ba;
+}
+
+#users thead tr {
+	border: 0px;
+}
+
+#users thead th {
+	border: 0px;
+	color: #ffffff;
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+	font-size: 0.8em;
+	padding-bottom: 2px;
+	padding-top: 2px;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+
+#users tbody {
+	background-color: #babbbd;
+}
+
+#users tbody tr {
+	border: 1px solid #ffffff;
+}
+
+#users tbody td {
+	border: 0px;
+	color: #ffffff;
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+	font-size: 0.8em;
+}
+
 .modal-title {
 	text-transform: uppercase;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#list-labs ul {
-	margin-left: -55px;		/* must reflect a.lab padding-left attribute */
-}
-
-#list-title-info {
-	margin-right: -20px;	/* previous column get a 20px margin */
-	padding-left: 20px;
-	padding-right: 20px;	/* reduce available space of 20px */
-}
-
-#list-info {
-	margin-right: -20px;	/* previous column get a 20px margin */
-	padding-right: 20px;	/* reduce available space of 20px */
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	overflow: hidden;
 }
 
 
@@ -247,6 +260,10 @@ input[name='login[username]'], input[name='login[password]']{
 	font-family: 'Ubuntu Light', Helvetica, Arial, sans-serif;
 	font-size: 2.8vmin;
 	table-layout: fixed;
+}
+
+#auth-left  .white{
+	color: #ffffff;
 }
 
 #auth-left .row {
@@ -572,21 +589,4 @@ input[name='login[username]'], input[name='login[password]']{
 	font-size: 2.8vmin;
 }
 
-#users {
-	padding: 5px;
-}
 
-#users thead {
-	background: rgba(60, 153, 171, 0.75);
-	color: #ffffff;
-	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
-	font-size: 1.1em;
-	text-transform: uppercase;
-}
-
-#users tbody {
-	background-color: #babbbd;
-	color: #ffffff;
-	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
-	font-size: 1em;
-}

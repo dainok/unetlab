@@ -33,7 +33,7 @@
 var DEBUG = 5;
 var TIMEOUT = 30000;
 
-// Global vars, defined on getUserInfo()
+// Global vars
 var EMAIL;
 var FOLDER;
 var LAB;
@@ -42,6 +42,7 @@ var NAME;
 var ROLE;
 var TENANT;
 var USERNAME;
+var ATTACHMENTS;
 
 $(document).ready(function() {
 	if ($.cookie('privacy') != 'true') {
@@ -61,16 +62,10 @@ $(document).ready(function() {
 				.fail(function() {
 					logger(1, 'DEBUG: error loading language.');
 				});
-		}).fail(function() {
+		}).fail(function(data) {
 			// User is not authenticated, or error on API
 			logger(1, 'DEBUG: loading authentication page.');
 			printPageAuthentication();
 		});
 	}
-});
-
-// Attach files
-var ATTACHMENTS;
-$('body').on('change', 'input[type=file]', function(e) {
-    ATTACHMENTS = e.target.files;
 });

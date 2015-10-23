@@ -139,6 +139,8 @@ $app -> get('/api/auth/logout', function() use ($app, $db) {
 $app -> get('/api/auth', function() use ($app, $db) {
 	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
 	if ($user === False) {
+		// Set 401 for this page only -> used to refresh after a logout
+		$output['code'] = 401;
 		$app -> response -> setStatus($output['code']);
 		$app -> response -> setBody(json_encode($output));
 		return;
