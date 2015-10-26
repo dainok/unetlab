@@ -133,6 +133,7 @@
 #users  table {
 	margin: 0px;
 	padding: 0px;
+
 }
 
 #users thead {
@@ -173,13 +174,99 @@
 	text-transform: uppercase;
 }
 
+#stats-text {
+	background-color: #e2edef;
+	margin-left: 0px;
+	margin-right: 0px;
+	overflow: hidden;
+	padding-bottom: 35px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
 
+#stats-text ul {
+	line-height: 3em;
+	list-style-type: none;
+	margin-left: -30px;
+	margin-right: -15px;
+	margin-top: 35px;
+}
 
+#stats-text li {
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-weight: bold;
+	font-size: 1.2vw;
+	text-align: left;
+}
 
+#stats-text code {
+	background-color: transparent;
+	color: #46a6b6;
+	font-size: 1em;
+	font-weight: bold;
+	margin: 0px;
+	padding: 0px;
+}
 
+#stats-graph {
+	overflow: hidden;
+	padding-bottom: 35px;
+	padding-right: -50px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
 
+#stats-graph ul {
+	line-height: 3em;
+	list-style-type: none;
+	margin-left: -30px;
+	margin-right: -15px;
+	margin-top: 35px;
+}
 
+#stats-graph li {
+	margin-left: -30px;
+}
 
+#stats-graph  .circle {
+	margin-top: 20px;
+	text-align: center;
+}
+
+#stats-graph  .circle span {
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-size: 1.8vw;
+	text-align: center;
+}
+
+#stats-graph .circle strong {
+	font-size: 30px;
+	left: 0;
+	line-height: 40px;
+	position: absolute;
+	text-align: center;
+	top: 30px;
+	width: 100%;
+}
+
+#stats-graph .count {
+	margin-top: 70px;
+	text-align: center;
+}
+
+#stats-graph  .count span {
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-size: 1.8vw;
+	text-align: center;
+}
+
+#stats-graph  .count strong {
+	color: #333;
+	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	font-size: 30px;
+	line-height: 40px;
+	text-align: center;
+}
 
 
 
@@ -490,56 +577,7 @@ input[name='login[username]'], input[name='login[password]']{
 	width: 25%;
 }
 
-.version {
-	color: #46a6b6;
-	margin-top: 50px;
-	padding-left: 10vw;
-	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
-	font-weight: bold;
-	font-size: 5vmin;
-	text-align: left;
-}
 
-.circle {
-	margin-top: 50px;
-	text-align: center;
-}
-
-.circle span {
-	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
-	font-size: 2vmin;
-	text-align: center;
-}
-
-.circle strong {
-	position: absolute;
-	top: 30px;
-	left: 0;
-	width: 100%;
-	text-align: center;
-	line-height: 40px;
-	font-size: 30px;
-}
-
-.count {
-	margin-top: 50px;
-	text-align: center;
-}
-
-.count span {
-	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
-	font-size: 2vmin;
-	text-align: center;
-}
-
-.count strong {
-	text-align: center;
-	line-height: 40px;
-	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-	font-size: 30px;
-	line-height: 1.42857;
-	color: #333;
-}
 
 .selected, .selected:visited, .selected:active, .selected:hover {
 	background: rgba(60, 153, 171, 0.75);

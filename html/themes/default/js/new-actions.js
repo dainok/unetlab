@@ -63,6 +63,12 @@ $(document).on('click', 'a.folder, a.lab, tr.user', function(e) {
 	}
 });
 
+// Open folder
+$(document).on('dblclick', 'a.folder', function(e) {
+	logger(1, 'DEBUG: opening folder "' + $(this).attr('data-path') + '".');
+	printPageLabList($(this).attr('data-path'));
+});
+
 // Preview lab
 $(document).on('dblclick', 'a.lab', function(e) {
 	logger(1, 'DEBUG: opening a preview of lab "' + $(this).attr('data-path') + '".');
@@ -134,18 +140,88 @@ $(document).on('click', '.action-logout', function(e) {
 
 // Clone selected labs
 $(document).on('click', '.action-selectedclone', function(e) {
-	logger(1, 'DEBUG: action = selectedclone');
+	if ($('.selected').size() > 0) {
+		logger(1, 'DEBUG: action = selectedclone');
+		$('.selected').each(function(id, object) {
+			form_data = {};
+			form_data['name'] = 'Copy of ' + $(this).text().slice(0, -4);
+			form_data['source'] = $(this).attr('data-path');
+			$.when(cloneLab(form_data)).done(function() {
+				// Lab cloned -> reload the folder
+				printPageLabList($('#list-folders').attr('data-path'));
+			}).fail(function(message) {
+				// Error on clone
+				addModalError(message);
+			});
+		});
+	}
 }); 
  
 // Delete selected folders and labs
 $(document).on('click', '.action-selecteddelete', function(e) {
-	logger(1, 'DEBUG: action = selecteddelete');
-}); 
+	if ($('.selected').size() > 0) {
+		logger(1, 'DEBUG: action = selecteddelete');
+		$('.selected').each(function(id, object) {
+			var path = $(this).attr('data-path');
+			if ($(this).hasClass('folder')) {
+				$.when(deleteFolder(path)).done(function() {
+					// Folder deleted
+					$('.folder[data-path="' + path + '"]').fadeOut(300, function() {
+						$(this).remove();
+					});
+				}).fail(function(message) {
+					// Cannot delete folder
+					addModalError(message);
+				});
+			} else if ($(this).hasClass('lab')) {
+				$.when(deleteLab(path)).done(function() {
+					// Lab deleted
+					$('.lab[data-path="' + path + '"]').fadeOut(300, function() {
+						$(this).remove();
+					});
+				}).fail(function(message) {
+					// Cannot delete lab
+					addModalError(message);
+				});
+			} else if ($(this).hasClass('user')) {
+				$.when(deleteUser(path)).done(function() {
+					// User deleted
+					$('.user[data-path="' + path + '"]').fadeOut(300, function() {
+						$(this).remove();
+					});
+				}).fail(function(message) {
+					// Cannot delete user
+					addModalError(message);
+				});
+			} else {
+				// Invalid object
+				logger(1, 'DEBUG: cannot delete, invalid object.');
+				return;
+			}
+		});
+	}
+});
 
 // Export selected folders and labs
 $(document).on('click', '.action-selectedexport', function(e) {
-	logger(1, 'DEBUG: action = selectedexport');
-}); 
+	if ($('.selected').size() > 0) {
+		logger(1, 'DEBUG: action = selectedexport');
+		var form_data = {};
+		var i = 0;
+		form_data['path'] = $('#list-folders').attr('data-path')
+		$('.selected').each(function(id, object) {
+			form_data[i] = $(this).attr('data-path');
+			i++;
+		});
+		$.when(exportObjects(form_data)).done(function(url) {
+			// Export done
+			window.location = url;
+		}).fail(function(message) {
+			// Cannot export objects
+			addModalError(message);
+		});
+	}
+ });
 
 // Load user management page
 $(document).on('click', '.action-usermgmt', function(e) {
@@ -155,8 +231,8 @@ $(document).on('click', '.action-usermgmt', function(e) {
 
 // Load system status page
 $(document).on('click', '.action-sysstatus', function(e) {
-	logger(1, 'DEBUG: action = sysstatus');
-}); 
+	printSystemStats();
+});
 
 /***************************************************************************
  * Submit
@@ -167,8 +243,7 @@ $(document).on('click', '.action-sysstatus', function(e) {
 
 
 
- 
- 
+
  
  
  
@@ -176,235 +251,24 @@ $(document).on('click', '.action-sysstatus', function(e) {
  
  
 
+ 
+ 
+ 
+ 
+
+ 
+ 
+ 
 
 
-
-
-// Clone selected labs
-$(document).on('click', '.selected-clone', function(e) {
-	var type = 'POST'
-	var url = '/api/labs';
-	var path = {};
-	$('.selected').each(function(id, object) {
-		form_data = {};
-		form_data['name'] = 'Copy of ' + $(this).text().slice(0, -4);
-		form_data['source'] = $(this).attr('data-path');
-		$.ajax({
-			timeout: TIMEOUT,
-			type: type,
-			url: encodeURI(url),
-			dataType: 'json',
-			data: JSON.stringify(form_data),
-			success: function(data) {
-				if (data['status'] == 'success') {
-					logger(1, 'DEBUG: created lab "' + form_data['name'] + '" from "' + form_data['source'] + '".');
-				} else {
-					// Application error
-					logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-				}
-			},
-			error: function(data) {
-				// Server error
-				var message = getJsonMessage(data['responseText']);
-				logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
-				logger(1, 'DEBUG: ' + message);
-			}
-		});
-	});
-	if ($('.selected').size() > 0) {
-		printPageLabList($('#list-folders').attr('data-path'));
-	}
-});
-
-// Delete selected objects
-$(document).on('click', '.selected-delete', function(e) {
-	var type = 'DELETE'
-	$('.selected').each(function(id, object) {
-		var name = $(this).attr('data-path');
-		if ($(this).hasClass('folder')) {
-			var object = 'folder';
-			var path = 'folders/' + $(this).attr('data-path');
-		} else if ($(this).hasClass('lab')) {
-			var object = 'lab';
-			var path = 'labs/' + $(this).attr('data-path');
-		} else if ($(this).hasClass('user')) {
-			var object = 'user';
-			var path = 'users/' + $(this).attr('data-path');
-		} else {
-			logger(1, 'DEBUG: cannot delete, invalid object.');
-			return;
-		}
-		var url = '/api/' + path;
-		console.log(url);
-
-		$.ajax({
-			timeout: TIMEOUT,
-			type: type,
-			url: encodeURI(url),
-			dataType: 'json',
-			success: function(data) {
-				if (data['status'] == 'success') {
-					logger(1, 'DEBUG: ' + object + ' "' + name + '" deleted.');
-					// Remove object
-					$('.' + object + '[data-path="' + name + '"]').fadeOut(300, function() { $(this).remove(); })
-				} else {
-					// Application error
-					logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-				}
-			},
-			error: function(data) {
-				// Server error
-				var message = getJsonMessage(data['responseText']);
-				logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
-				logger(1, 'DEBUG: ' + message);
-			}
-		});
-	});
-});
-
-// Clone selected labs
-$(document).on('click', '.selected-export', function(e) {
-	var type = 'POST'
-	var url = '/api/export';
-	var form_data = {};
-	var i = 0;
-	form_data['path'] = $('#list-folders').attr('data-path')
-	$('.selected').each(function(id, object) {
-		form_data[i] = $(this).attr('data-path');
-		i++;
-	});
 	
-	if ($('.selected').size() > 0) {
-		$.ajax({
-			timeout: TIMEOUT,
-			type: type,
-			url: encodeURI(url),
-			dataType: 'json',
-			data: JSON.stringify(form_data),
-			success: function(data) {
-				if (data['status'] == 'success') {
-					logger(1, 'DEBUG: objects exported into "' + data['data'] + '".');
-					window.location = data['data'];
-				} else {
-					// Application error
-					logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-					addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-				}
-			},
-			error: function(data) {
-				// Server error
-				var message = getJsonMessage(data['responseText']);
-				logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
-				logger(1, 'DEBUG: ' + message);
-				addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-			}
-		});
-	}
-});
 
-
-// Open system status page
-$(document).on('click', '.sysstatus', function(e) {
-	var html = '<div class="row"><div class="version col-md-12 col-lg-12"></div></div><div class="row"><div class="circle circle-cpu col-md-3 col-lg-3"><strong></strong><br/><span>CPU usage</span></div><div class="circle circle-memory col-md-3 col-lg-3"><strong></strong><br/><span>Memory usage</span></div><div class="circle circle-swap col-md-3 col-lg-3"><strong></strong><br/><span>Swap usage</span></div><div class="circle circle-disk col-md-3 col-lg-3"><strong></strong><br/><span>Disk usage on /</span></div></div><div class="row"><div class="count count-iol col-md-4 col-lg-4"></div><div class="count count-dynamips col-md-4 col-lg-4"></div><div class="count count-qemu col-md-4 col-lg-4"></div>';
-	var url = '/api/status';
-	var type = 'GET'
-	$.ajax({
-		timeout: TIMEOUT,
-		type: type,
-		url: encodeURI(url),
-		dataType: 'json',
-		success: function(data) {
-			if (data['status'] == 'success') {
-				logger(1, 'DEBUG: got system status data.');
-                version = data['data']['version'];
-                cpu_percent = data['data']['cpu'] / 100;
-                disk_percent = data['data']['disk'] / 100;
-                mem_percent = data['data']['mem'] / 100;
-                cached_percent = data['data']['cached'] / 100;
-                swap_percent = data['data']['swap'] / 100;
-                qemu_count = data['data']['qemu'];
-                dynamips_count = data['data']['dynamips'];
-                iol_count = data['data']['iol'];
-
-				$('#main-body').html(html);
-				$('.version').html('Unified Networking Lab version is: <code>' + version + '</code>');
-				$('.circle-cpu').circleProgress({
-					arcCoef: 0.7,
-					value: cpu_percent,
-					thickness: 10,
-					startAngle: -Math.PI / 2,
-					fill: {	gradient: ['#46a6b6'] }
-				}).on('circle-animation-progress', function(event, progress) {
-					if (progress > cpu_percent) {
-						$(this).find('strong').html(parseInt(100 * cpu_percent) + '%');
-					} else {
-						$(this).find('strong').html(parseInt(100 * progress) + '%');
-					}
-				});
-				
-				$('.circle-memory').circleProgress({
-					arcCoef: 0.7,
-					value: mem_percent,
-					thickness: 10,
-					startAngle: -Math.PI / 2,
-					fill: {	gradient: ['#46a6b6'] }
-				}).on('circle-animation-progress', function(event, progress) {
-					if (progress > mem_percent) {
-						$(this).find('strong').html(parseInt(100 * mem_percent) + '%');
-					} else {
-						$(this).find('strong').html(parseInt(100 * progress) + '%');
-					}
-				});
-				
-				$('.circle-swap').circleProgress({
-					arcCoef: 0.7,
-					value: swap_percent,
-					thickness: 10,
-					startAngle: -Math.PI / 2,
-					fill: {	gradient: ['#46a6b6'] }
-				}).on('circle-animation-progress', function(event, progress) {
-					if (progress > swap_percent) {
-						$(this).find('strong').html(parseInt(100 * swap_percent) + '%');
-					} else {
-						$(this).find('strong').html(parseInt(100 * progress) + '%');
-					}
-				});
-				
-				$('.circle-disk').circleProgress({
-					arcCoef: 0.7,
-					value: disk_percent,
-					thickness: 10,
-					startAngle: -Math.PI / 2,
-					fill: {	gradient: ['#46a6b6'] }
-				}).on('circle-animation-progress', function(event, progress) {
-					if (progress > disk_percent) {
-						$(this).find('strong').html(parseInt(100 * disk_percent) + '%');
-					} else {
-						$(this).find('strong').html(parseInt(100 * progress) + '%');
-					}
-				});
-				
-				$('.count-iol').html('<strong>' + iol_count + '</strong><br/><span>running IOL nodes</span>');
-				$('.count-dynamips').html('<strong>' + dynamips_count + '</strong><br/><span>running Dynamips nodes</span>');
-				$('.count-qemu').html('<strong>' + qemu_count + '</strong><br/><span>running QEMU nodes</span>');
-				$('#actions-menu').html('<li><a class="sysstatus" href="#"><i class="glyphicon glyphicon-refresh"></i> Refresh</a></li>');
-
-			} else {
-				// Application error
-				logger(1, 'DEBUG: internal error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-			}
-		},
-		error: function(data) {
-			// Server error
-			var message = getJsonMessage(data['responseText']);
-			logger(1, 'DEBUG: Ajax error (' + data['status'] + ') on ' + type + ' ' + url + '.');
-			logger(1, 'DEBUG: ' + message);
-			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-		}
-	});
-});
-
+	
+	
+	
+	
+	
+	
 
 
 // Add a user
@@ -433,11 +297,7 @@ $(document).on('click', 'a.user-add', function(e) {
 });	
 
 
-// Open folder
-$(document).on('dblclick', 'a.folder', function(e) {
-	logger(1, 'DEBUG: opening folder "' + $(this).attr('data-path') + '".');
-	printPageLabList($(this).attr('data-path'));
-});
+
 
 // Edit a user
 $(document).on('dblclick', 'tr.user', function(e) {

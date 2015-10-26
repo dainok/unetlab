@@ -43,6 +43,163 @@ function addModalError(message) {
 	$('body > .modal').modal('show');
 }
 
+// Clone selected labs
+function cloneLab(form_data) {
+	var deferred = $.Deferred();
+	var type = 'POST'
+	var url = '/api/labs';
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		data: JSON.stringify(form_data),
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: created lab "' + form_data['name'] + '" from "' + form_data['source'] + '".');
+				deferred.resolve();
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject(data['message']);
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
+}
+
+// Delete folder
+function deleteFolder(path) {
+	var deferred = $.Deferred();
+	var type = 'DELETE'
+	var url = '/api/folders' + path;
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: folder "' + path + '" deleted.');
+				deferred.resolve();
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject(data['message']);
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
+}
+	
+// Delete lab
+function deleteLab(path) {
+	var deferred = $.Deferred();
+	var type = 'DELETE'
+	var url = '/api/labs' + path;
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: lab "' + path + '" deleted.');
+				deferred.resolve();
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject(data['message']);
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
+}
+
+// Delete user
+function deleteUser(path) {
+	var deferred = $.Deferred();
+	var type = 'DELETE'
+	var url = '/api/users' + path;
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: user "' + path + '" deleted.');
+				deferred.resolve();
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject(data['message']);
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
+}
+
+// Export selected folders and labs
+function exportObjects(form_data) {
+	var deferred = $.Deferred();
+	var type = 'POST'
+	var url = '/api/export';
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		data: JSON.stringify(form_data),
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: objects exported into "' + data['data'] + '".');
+				deferred.resolve(data['data']);
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject(data['message']);
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
+}
+
 // HTML Form to array
 function form2Array(form_name) {
 	var form_array = {};
@@ -122,6 +279,47 @@ function getRoles() {
 			if (data['status'] == 'success') {
 				logger(1, 'DEBUG: got roles.');
 				deferred.resolve(data['data']);
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject(data['message']);
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
+}
+
+// Get system stats
+function getSystemStats() {
+	var deferred = $.Deferred();
+	var url = '/api/status';
+	var type = 'GET'
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: system stats.');
+				var stats = {};
+				stats['version'] = data['data']['version'];
+                stats['cpu'] = data['data']['cpu'] / 100;
+                stats['disk'] = data['data']['disk'] / 100;
+                stats['mem'] = data['data']['mem'] / 100;
+                stats['cached'] = data['data']['cached'] / 100;
+                stats['swap'] = data['data']['swap'] / 100;
+                stats['qemu'] = data['data']['qemu'];
+                stats['dynamips'] = data['data']['dynamips'];
+                stats['iol'] = data['data']['iol'];
+				deferred.resolve(stats);
 			} else {
 				// Application error
 				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
@@ -410,7 +608,7 @@ function printPageLabList(folder) {
 function printUserManagement() {
 	$.when(getUsers()).done(function(data) {
 		var html = '<div id="users" class="col-md-12 col-lg-12"><div class="table-responsive"><table class="table"><thead><tr><th>Username</th><th>' + MESSAGES[19] + '</th><th>' + MESSAGES[28] + '</th><th>' + MESSAGES[29] + '</th><th>' + MESSAGES[30] + '</th><th>' + MESSAGES[31] + '</th><th>' + MESSAGES[32] + '</th><th>' + MESSAGES[33] + '</th></tr></thead><tbody></tbody></table></div></div>';
-		$('#main-title').remove();
+		$('#main-title').hide();
 		$('#main').html(html);
 	
 		// Read privileges and set specific actions/elements
@@ -460,6 +658,110 @@ function printUserManagement() {
 	});
 }
 
+// Print system stats
+function printSystemStats() {
+	$.when(getSystemStats()).done(function(data) {
+		// Main: title
+		var html_title = '<div class="row row-eq-height"><div id="list-title-folders" class="col-md-3 col-lg-3"><span title="' + MESSAGES[13] + '">' + MESSAGES[13] + '</span></div><div id="list-title-labs" class="col-md-3 col-lg-3"><span></span></div><div id="list-title-info" class="col-md-6 col-lg-6"><span></span></div></div>';
+		
+		// Main
+		var html = '<div id="main" class="container col-md-12 col-lg-12"><div class="fill-height row row-eq-height"><div id="stats-text" class="col-md-3 col-lg-3"><ul></ul></div><div id="stats-graph" class="col-md-9 col-lg-9"><ul></ul></div></div></div>';
+		
+		// Footer
+		html += '</div>';
+		
+		$('#main-title').html(html_title);
+		$('#main-title').show();
+		$('#main').html(html);
+		
+		// Read privileges and set specific actions/elements
+		$('#actions-menu').empty();
+		$('#actions-menu').append('<li><a class="action-sysstatus" href="#"><i class="glyphicon glyphicon-refresh"></i> ' + MESSAGES[40] + '</a></li>');
+		
+		// Adding all stats
+		
+		// Version
+		$('#stats-text ul').append('<li>' + MESSAGES[39] + ': <code>' + data['version'] + '</code></li>');
+		
+		// CPU usage
+		$('#stats-graph ul').append('<li><div class="circle circle-cpu col-md-3 col-lg-3"><strong></strong><br/><span>' + MESSAGES[36] + '</span></div></li>');
+		$('.circle-cpu').circleProgress({
+			arcCoef: 0.7,
+			value: data['cpu'],
+			thickness: 10,
+			startAngle: -Math.PI / 2,
+			fill: {	gradient: ['#46a6b6'] }
+		}).on('circle-animation-progress', function(event, progress) {
+			if (progress > data['cpu']) {
+				$(this).find('strong').html(parseInt(100 * data['cpu']) + '%');
+			} else {
+				$(this).find('strong').html(parseInt(100 * progress) + '%');
+			}
+		});
+		
+		// Memory usage
+		$('#stats-graph ul').append('<li><div class="circle circle-memory col-md-3 col-lg-3"><strong></strong><br/><span>' + MESSAGES[37] + '</span></div></li>');
+		$('.circle-memory').circleProgress({
+			arcCoef: 0.7,
+			value: data['mem'],
+			thickness: 10,
+			startAngle: -Math.PI / 2,
+			fill: {	gradient: ['#46a6b6'] }
+		}).on('circle-animation-progress', function(event, progress) {
+			if (progress > data['mem']) {
+				$(this).find('strong').html(parseInt(100 * data['mem']) + '%');
+			} else {
+				$(this).find('strong').html(parseInt(100 * progress) + '%');
+			}
+		});
+		
+		// Swap usage
+		$('#stats-graph ul').append('<li><div class="circle circle-swap col-md-3 col-lg-3"><strong></strong><br/><span>Swap usage</span></div></li>');
+		$('.circle-swap').circleProgress({
+			arcCoef: 0.7,
+			value: data['swap'],
+			thickness: 10,
+			startAngle: -Math.PI / 2,
+			fill: {	gradient: ['#46a6b6'] }
+		}).on('circle-animation-progress', function(event, progress) {
+			if (progress > data['swap']) {
+				$(this).find('strong').html(parseInt(100 * data['swap']) + '%');
+			} else {
+				$(this).find('strong').html(parseInt(100 * progress) + '%');
+			}
+		});
+
+		// Disk usage
+		$('#stats-graph ul').append('<li><div class="circle circle-disk col-md-3 col-lg-3"><strong></strong><br/><span>' + MESSAGES[38]+ '</span></div></li>');		
+		$('.circle-disk').circleProgress({
+			arcCoef: 0.7,
+			value: data['disk'],
+			thickness: 10,
+			startAngle: -Math.PI / 2,
+			fill: {	gradient: ['#46a6b6'] }
+		}).on('circle-animation-progress', function(event, progress) {
+			if (progress > data['disk']) {
+				$(this).find('strong').html(parseInt(100 * data['disk']) + '%');
+			} else {
+				$(this).find('strong').html(parseInt(100 * progress) + '%');
+			}
+		});
+		
+		// IOL running nodes
+		$('#stats-graph ul').append('<li><div class="count count-iol col-md-4 col-lg-4"></div>');
+		$('.count-iol').html('<strong>' + data['iol'] + '</strong><br/><span>' + MESSAGES[41] + '</span></li>');
+		
+		// Dynamips running nodes
+		$('#stats-graph ul').append('<li><div class="count count-dynamips col-md-4 col-lg-4"></div></li>');	
+		$('.count-dynamips').html('<strong>' + data['dynamips'] + '</strong><br/><span>' + MESSAGES[42] + '</span>');
+		
+		// QEMU running nodes
+		$('#stats-graph ul').append('<li><div class="count count-qemu col-md-4 col-lg-4"></div></li>');	
+		$('.count-qemu').html('<strong>' + data['qemu'] + '</strong><br/><span>' + MESSAGES[43] + '</span>');
+	}).fail(function(message) {
+		addModalError(message);
+	});
+}
 
 
 
@@ -477,7 +779,6 @@ function printUserManagement() {
 
 
 
- 
 
 
 

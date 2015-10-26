@@ -32,6 +32,7 @@ Code is the HTTP response code, message is a simple string explaining what is go
 Five status type are used:
 
 * success for 20x HTTP codes;
+* unauthorized for 400 HTTP code, meaning that the user session has timed out;
 * unauthorized for 401 HTTP code, meaning that user should login;
 * forbidden for 403 HTTP code, meaning that user does not have enough privileges;
 * fail for other 40x HTTP codes;
@@ -46,7 +47,7 @@ The following API requests are involved on login and logout process. All other A
 
 ### Login
 
-\`curl -s -b $COOKIE -c $COOKIE -X POST -d "{"username":"${USERNAME}","password":"${PASSWORD}"}" http://127.0.0.1/api/auth/login\`
+\`curl -s -b $COOKIE -c $COOKIE -X POST -d \'{"username":"${USERNAME}","password":"${PASSWORD}"}\' http://127.0.0.1/api/auth/login\`
 
 A successful login provides the following output:
 
@@ -56,72 +57,72 @@ A successful login provides the following output:
 
 ### User Info
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/auth\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/auth\`
 
 An authenticated user can get its own information:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/auth | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/auth | python -m json.tool`
 ~~~
 
 ### Logout
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/auth/logout\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/auth/logout\`
 
 All users can logout, this request cannot fail:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/auth/logout | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/auth/logout | python -m json.tool`
 ~~~
 `curl -s -b $COOKIE -c $COOKIE -X POST -d "{\"username\":\"${USERNAME}\",\"password\":\"${PASSWORD}\"}" http://127.0.0.1/api/auth/login > /dev/null`
 ## System status
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/status\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/status\`
 
 An authenticated user can get system statistics:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/status | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/status | python -m json.tool`
 ~~~
 
 ## List node templates
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/list/templates/\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/list/templates/\`
 
 An authenticated user can list all available node templates:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/list/templates/ | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/list/templates/ | python -m json.tool`
 ~~~
 
 A single template can be listed:
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/list/templates/iol\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/list/templates/iol\`
 
 All available images for the selected template will be included in the output:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/list/templates/iol | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/list/templates/iol | python -m json.tool`
 ~~~
 
 ## List network types
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/list/networks\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/list/networks\`
 
 An authenticated user can list all available network types:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/list/networks | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/list/networks | python -m json.tool`
 ~~~
 
 ## List user roles
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/list/roles\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/list/roles\`
 
 An authenticated user can list all user roles:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/list/roles | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/list/roles | python -m json.tool`
 ~~~
 
 ## Navigating between folders
@@ -130,34 +131,34 @@ The following API requests allow to manages folders and labs as files.
 
 ### List content inside a folder
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/folders/Andrea\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/folders/Andrea\`
 
 An authenticated user can list what is inside a folder:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/folders/Andrea | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/folders/Andrea | python -m json.tool`
 ~~~
 
 Folders and labs are listed using different arrays.
 
 ### Add a new folder
 
-\`curl -s -c $COOKIE -b $COOKIE -X POST -d '{"path":"/Andrea/Folder 3","name":"New Folder"}' -H "Content-type: application/json" http://127.0.0.1/api/folders\`
+\`curl -s -c $COOKIE -b $COOKIE -X POST -d '{"path":"/Andrea/Folder 3","name":"New Folder"}' -H 'Content-type: application/json' http://127.0.0.1/api/folders\`
 
 An authenticated user can add a folder inside a specific path:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X POST -d '{"path":"/Andrea/Folder 3","name":"New Folder"}' -H "Content-type: application/json" http://127.0.0.1/api/folders | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X POST -d '{"path":"/Andrea/Folder 3","name":"New Folder"}' -H 'Content-type: application/json' http://127.0.0.1/api/folders | python -m json.tool`
 ~~~
 
 ### Delete an existing folder
 
-\`curl -s -c $COOKIE -b $COOKIE -X DELETE -H "Content-type: application/json" http://127.0.0.1/api/folders/Andrea/Folder%203/New%20Folder\`
+\`curl -s -c $COOKIE -b $COOKIE -X DELETE -H 'Content-type: application/json' http://127.0.0.1/api/folders/Andrea/Folder%203/New%20Folder\`
 
 An authenticated user can delete an existing folder:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X DELETE -H "Content-type: application/json" http://127.0.0.1/api/folders/Andrea/Folder%203/New%20Folder | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X DELETE -H 'Content-type: application/json' http://127.0.0.1/api/folders/Andrea/Folder%203/New%20Folder | python -m json.tool`
 ~~~
 
 ## Managing users
@@ -166,32 +167,32 @@ The following API requests allow to manage UNetLab users and permissions.
 
 ### Get a user
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/users/\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/users/\`
 
 An authenticated user can get all UNetLab users:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/users/`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/users/`
 ~~~
 
 A single user can be retrieved:
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/users/admin\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/users/admin\`
 
 Here the output:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/users/admin | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/users/admin | python -m json.tool`
 ~~~
 
 ### Add a new user
 
-\`curl -s -c $COOKIE -b $COOKIE -X POST -d '{"username":"testuser","name":"Test User","email":"test@unetlab.com","password":"testpassword1","role":"user","expiration":"-1","pod":127,"pexpiration":"1451520000"}' -H "Content-type: application/json" http://127.0.0.1/api/users\`
+\`curl -s -c $COOKIE -b $COOKIE -X POST -d '{"username":"testuser","name":"Test User","email":"test@unetlab.com","password":"testpassword1","role":"user","expiration":"-1","pod":127,"pexpiration":"1451520000"}' -H 'Content-type: application/json' http://127.0.0.1/api/users\`
 
 An authenticated user can add a new UNetLab user:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X POST -d '{"username":"testuser","name":"Test User","email":"test@unetlab.com","password":"testpassword1","role":"user","expiration":"-1","pod":127,"pexpiration":"1451520000"}' -H "Content-type: application/json" http://127.0.0.1/api/users | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X POST -d '{"username":"testuser","name":"Test User","email":"test@unetlab.com","password":"testpassword1","role":"user","expiration":"-1","pod":127,"pexpiration":"1451520000"}' -H 'Content-type: application/json' http://127.0.0.1/api/users | python -m json.tool`
 ~~~
 
 Parameters:
@@ -205,12 +206,12 @@ Parameters:
 
 ### Edit an user
 
-\`curl -s -c $COOKIE -b $COOKIE -X PUT -d '{"name":"New Test User","email":"testuser@unetlab.com","password":"newpassword","role":"user","expiration":"1451520000","pod":127,"pexpiration":"-1"}' -H "Content-type: application/json" http://127.0.0.1/api/users/testuser\`
+\`curl -s -c $COOKIE -b $COOKIE -X PUT -d '{"name":"New Test User","email":"testuser@unetlab.com","password":"newpassword","role":"user","expiration":"1451520000","pod":127,"pexpiration":"-1"}' -H 'Content-type: application/json' http://127.0.0.1/api/users/testuser\`
 
 An authenticated user can edit an existent UNetLab user:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X PUT -d '{"name":"New Test User","email":"testuser@unetlab.com","password":"newpassword","role":"user","expiration":"1451520000","pod":127,"pexpiration":"-1"}' -H "Content-type: application/json" http://127.0.0.1/api/users/testuser | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X PUT -d '{"name":"New Test User","email":"testuser@unetlab.com","password":"newpassword","role":"user","expiration":"1451520000","pod":127,"pexpiration":"-1"}' -H 'Content-type: application/json' http://127.0.0.1/api/users/testuser | python -m json.tool`
 ~~~
 
 Parameters:
@@ -223,12 +224,12 @@ Parameters:
 
 ### Delete an user
 
-\`curl -s -c $COOKIE -b $COOKIE -X DELETE -H "Content-type: application/json" http://127.0.0.1/api/users/testuser\`
+\`curl -s -c $COOKIE -b $COOKIE -X DELETE -H 'Content-type: application/json' http://127.0.0.1/api/users/testuser\`
 
 An authenticated user can delete an existent UNetLab user:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X DELETE -H "Content-type: application/json" http://127.0.0.1/api/users/testuser | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X DELETE -H 'Content-type: application/json' http://127.0.0.1/api/users/testuser | python -m json.tool`
 ~~~
 
 ## Managing labs
@@ -237,232 +238,232 @@ The following API requests allow to manage labs and object inside a lab, like no
 
 ### Get a lab
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl\`
 
 An authenticated user can retrieve a lab:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl | python -m json.tool`
 ~~~
 
 ### Get one or all networks configured in a lab
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/networks\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/networks\`
 
 An authenticated user can retrieve all configured networks in a lab:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/networks | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/networks | python -m json.tool`
 ~~~
 
 A single network can be retrieved:
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/networks/1\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/networks/1\`
 
 Here the output:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/networks/1 | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/networks/1 | python -m json.tool`
 ~~~
 
 ### Get all remote endpoint for both ethernet and serial interfaces
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/links\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/links\`
 
 An authenticated user can retrieve all available endpoint in a lab:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/links | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/links | python -m json.tool`
 ~~~
 
 This API is useful when a user need to connect a node.
 
 ### Get one or all nodes configured in a lab
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes\`
 
 An authenticated user can retrieve all configured nodes in a lab:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes | python -m json.tool`
 ~~~
 
 A single node can be retrieved:
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/1\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/1\`
 
 Here the output:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/1 | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/1 | python -m json.tool`
 ~~~
 
 ### Start one or all nodes configured in a lab
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/start\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/start\`
 
 An authenticated user can start all configured nodes in a lab:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/start | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/start | python -m json.tool`
 ~~~
 
 A single node can be started:
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/1/start\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/1/start\`
 
 Here the output:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/1/start | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/1/start | python -m json.tool`
 ~~~
 
 ### Stop one or all nodes configured in a lab
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/stop\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/stop\`
 
 An authenticated user can stop all configured nodes in a lab:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/stop | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/stop | python -m json.tool`
 ~~~
 
 A single node can be stopped:
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/1/stop\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/1/stop\`
 
 Here the output:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/1/stop | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/1/stop | python -m json.tool`
 ~~~
 
 ### Wipe one or all nodes configured in a lab
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/wipe\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/wipe\`
 
 An authenticated user can wipe all configured nodes in a lab:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/wipe | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/wipe | python -m json.tool`
 ~~~
 
 Wiping means delete all user config, included startup-config, VLANs, and so on. Next start will rebuild node from selected image.
 A single node can be wiped:
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/1/wipe\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/1/wipe\`
 
 Here the output:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/1/wipe | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/1/wipe | python -m json.tool`
 ~~~
 
 ### Export one or all nodes configured in a lab
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/export\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/export\`
 
 An authenticated user can export all configured nodes in a lab:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/export | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/export | python -m json.tool`
 ~~~
 
 Exporting means save startup-config into the lab file. Starting a node after a wipe will load the previously exported startup-config.
 A single node can be wiped:
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/1/export\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/1/export\`
 
 Here the output:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/1/export | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/1/export | python -m json.tool`
 ~~~
 
 ### Get configured intefaces from a node
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/1/interfaces\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/1/interfaces\`
 
 An authenticated user can retrieve all configured interfaces from a node:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/1/interfaces | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/nodes/1/interfaces | python -m json.tool`
 ~~~
 
 ### Get the lab topology
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/topology\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/topology\`
 
 An authenticated user can get lab topology:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/topology | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/topology | python -m json.tool`
 ~~~
 
 ### Get one or all pictures configured in a lab
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/pictures\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/pictures\`
 
 An authenticated user can get all configured pictures in a lab:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/pictures | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/pictures | python -m json.tool`
 ~~~
 
 A single picture can be retrieved:
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/pictures/1\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/pictures/1\`
 
 Here the output:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/pictures/1 | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/pictures/1 | python -m json.tool`
 ~~~
 
 The data picture can be retrieved using a different request:
 
-\`curl -s -c $COOKIE -b $COOKIE -X GET -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Lab%201.unl/pictures/1/data/32/32\`
+\`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Lab%201.unl/pictures/1/data/32/32\`
 
 The resized picture is generated with original aspect-ratio using given values as maximum witdh/lenght.
 
 ### Create a new lab
 
-\`curl -s -c $COOKIE -b $COOKIE -X POST -d '{"path":"/Andrea/Folder 3","name":"New Lab","version":"1","author":"Andrea Dainese","description":"A new demo lab","body":"Lab usage and guide"}' -H "Content-type: application/json" http://127.0.0.1/api/labs\`
+\`curl -s -c $COOKIE -b $COOKIE -X POST -d '{"path":"/Andrea/Folder 3","name":"New Lab","version":"1","author":"Andrea Dainese","description":"A new demo lab","body":"Lab usage and guide"}' -H 'Content-type: application/json' http://127.0.0.1/api/labs\`
 
 An authenticated user can create a new lab:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X POST -d '{"path":"/Andrea/Folder 3","name":"New Lab","version":"1","author":"Andrea Dainese","description":"A new demo lab","body":"Lab usage and guide"}}' -H "Content-type: application/json" http://127.0.0.1/api/labs | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X POST -d '{"path":"/Andrea/Folder 3","name":"New Lab","version":"1","author":"Andrea Dainese","description":"A new demo lab","body":"Lab usage and guide"}}' -H 'Content-type: application/json' http://127.0.0.1/api/labs | python -m json.tool`
 ~~~
 
 ### Move an existing lab to a different folder
 
-\`curl -s -c $COOKIE -b $COOKIE -X PUT -d '{"path":"/Andrea/Folder 2"}' -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Folder%203/New%20Lab.unl\`
+\`curl -s -c $COOKIE -b $COOKIE -X PUT -d '{"path":"/Andrea/Folder 2"}' -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Folder%203/New%20Lab.unl\`
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X PUT -d '{"path":"/Andrea/Folder 2"}' -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Folder%203/New%20Lab.unl/move | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X PUT -d '{"path":"/Andrea/Folder 2"}' -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Folder%203/New%20Lab.unl/move | python -m json.tool`
 ~~~
 
 ### Edit an existing lab
 
-\`curl -s -c $COOKIE -b $COOKIE -X PUT -d '{"name":"Different Lab","version":"2","author":"AD","description":"A different demo lab"}' -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Folder%202/New%20Lab.unl\`
+\`curl -s -c $COOKIE -b $COOKIE -X PUT -d '{"name":"Different Lab","version":"2","author":"AD","description":"A different demo lab"}' -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Folder%202/New%20Lab.unl\`
 
 An authenticated user can edit an existing lab:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X PUT -d '{"name":"Different Lab","version":"2","author":"AD","description":"A different demo lab"}' -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Folder%202/New%20Lab.unl | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X PUT -d '{"name":"Different Lab","version":"2","author":"AD","description":"A different demo lab"}' -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Folder%202/New%20Lab.unl | python -m json.tool`
 ~~~
 
 The request can set only one single parameter. Optional paramiter can be reverted to the default setting an empty string "".
 
 ### Add a new network to a lab
 
-\`curl -s -c $COOKIE -b $COOKIE -X POST -d '{"type":"bridge","name":"Core Network","left":"35%","top":"25%"}' -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Folder%202/Different%20Lab.unl/networks\`
+\`curl -s -c $COOKIE -b $COOKIE -X POST -d '{"type":"bridge","name":"Core Network","left":"35%","top":"25%"}' -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Folder%202/Different%20Lab.unl/networks\`
 
 An authenticated user can add a network to an existing lab:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X POST -d '{"type":"bridge","name":"Core Network","left":"35%","top":"25%"}' -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Folder%202/Different%20Lab.unl/networks | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X POST -d '{"type":"bridge","name":"Core Network","left":"35%","top":"25%"}' -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Folder%202/Different%20Lab.unl/networks | python -m json.tool`
 ~~~
 
 Parameters:
@@ -474,12 +475,12 @@ Parameters:
 
 ### Add a new node to a lab
 
-\`curl -s -c $COOKIE -b $COOKIE -X POST -d '{"type":"qemu","template":"vios","config":"Unconfigured","delay":0,"icon":"Router.png","image":"vios-adventerprisek9-m-15.5.3M","name":"Core Router 1","left":"35%","top":"25%","ram":"1024","console":"telnet","cpu":1,"ethernet":2,"uuid":"641a4800-1b19-427c-ae87-4a8ee90b7790"}' -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Folder%202/Different%20Lab.unl/nodes\`
+\`curl -s -c $COOKIE -b $COOKIE -X POST -d '{"type":"qemu","template":"vios","config":"Unconfigured","delay":0,"icon":"Router.png","image":"vios-adventerprisek9-m-15.5.3M","name":"Core Router 1","left":"35%","top":"25%","ram":"1024","console":"telnet","cpu":1,"ethernet":2,"uuid":"641a4800-1b19-427c-ae87-4a8ee90b7790"}' -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Folder%202/Different%20Lab.unl/nodes\`
 
 An authenticated user can add a node to an existing lab:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X POST -d '{"type":"qemu","template":"vios","config":"Unconfigured","delay":0,"icon":"Router.png","image":"vios-adventerprisek9-m-15.5.3M","name":"Core Router 1","left":"35%","top":"25%","ram":"1024","console":"telnet","cpu":1,"ethernet":2,"uuid":"641a4800-1b19-427c-ae87-4a8ee90b7790"}' -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Folder%202/Different%20Lab.unl/nodes | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X POST -d '{"type":"qemu","template":"vios","config":"Unconfigured","delay":0,"icon":"Router.png","image":"vios-adventerprisek9-m-15.5.3M","name":"Core Router 1","left":"35%","top":"25%","ram":"1024","console":"telnet","cpu":1,"ethernet":2,"uuid":"641a4800-1b19-427c-ae87-4a8ee90b7790"}' -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Folder%202/Different%20Lab.unl/nodes | python -m json.tool`
 ~~~
 
 Parameters:
@@ -516,12 +517,12 @@ Parameters for QEMU nodes:
 
 ### Delete an existent lab
 
-\`curl -s -c $COOKIE -b $COOKIE -X DELETE -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Folder%202/Different%20Lab.unl\`
+\`curl -s -c $COOKIE -b $COOKIE -X DELETE -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Folder%202/Different%20Lab.unl\`
 
 An authenticated user can delete a lab:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X DELETE -H "Content-type: application/json" http://127.0.0.1/api/labs/Andrea/Folder%202/Different%20Lab.unl | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X DELETE -H 'Content-type: application/json' http://127.0.0.1/api/labs/Andrea/Folder%202/Different%20Lab.unl | python -m json.tool`
 ~~~
 
 EOF

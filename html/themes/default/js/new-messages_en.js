@@ -66,5 +66,13 @@ MESSAGES[32] = 'POD';
 MESSAGES[33] = 'POD Expiration';
 MESSAGES[34] = 'Add a new user';
 MESSAGES[35] = 'Delete selected users';
+MESSAGES[36] = 'CPU usage';
+MESSAGES[37] = 'Memory usage';
+MESSAGES[38] = 'Disk usage on /';
+MESSAGES[39] = 'UNetLab version';
+MESSAGES[40] = 'Refresh';
+MESSAGES[41] = 'running IOL nodes';
+MESSAGES[42] = 'running Dynamips nodes';
+MESSAGES[43] = 'running QEMU nodes';
 
 
