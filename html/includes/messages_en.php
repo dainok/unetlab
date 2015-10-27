@@ -204,6 +204,7 @@ $messages[60040] = 'Successfully listed users (60040).';
 $messages[60041] = 'Successfully listed user roles (60041).';
 $messages[60042] = 'User saved (60042).';
 $messages[60043] = 'Cannot create user, missing mandatory parameters (60043).';
+$messages[60044] = 'Cannot get QEMU version (60044).';
 
 // Text (70000-79999)
 $messages[70000] = 'Name/prefix';

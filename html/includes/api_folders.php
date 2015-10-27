@@ -64,15 +64,19 @@ function apiAddFolder($name, $path) {
 		$output['code'] = 304;
 		$output['status'] = 'success';
 		$output['message'] = $GLOBALS['messages'][60013];
-	} else if (mkdir(BASE_LAB.$path.'/'.$name)) {
-		// Adding the folder
-		$output['code'] = 200;
-		$output['status'] = 'success';
-		$output['message'] = $GLOBALS['messages'][60014];
 	} else {
-		$output['code'] = 400;
-		$output['status'] = 'fail';
-		$output['message'] = $GLOBALS['messages'][60015];
+		try {
+			mkdir(BASE_LAB.$path.'/'.$name);
+			$output['code'] = 200;
+			$output['status'] = 'success';
+			$output['message'] = $GLOBALS['messages'][60014];
+		} catch (Exception $e) {
+			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][60015]);
+			error_log(date('M d H:i:s ').(string) $e);
+			$output['code'] = 400;
+			$output['status'] = 'fail';
+			$output['message'] = $GLOBALS['messages'][60015];
+		}
 	}
 
 	return $output;

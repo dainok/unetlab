@@ -309,17 +309,44 @@ function getSystemStats() {
 		success: function(data) {
 			if (data['status'] == 'success') {
 				logger(1, 'DEBUG: system stats.');
-				var stats = {};
-				stats['version'] = data['data']['version'];
-                stats['cpu'] = data['data']['cpu'] / 100;
-                stats['disk'] = data['data']['disk'] / 100;
-                stats['mem'] = data['data']['mem'] / 100;
-                stats['cached'] = data['data']['cached'] / 100;
-                stats['swap'] = data['data']['swap'] / 100;
-                stats['qemu'] = data['data']['qemu'];
-                stats['dynamips'] = data['data']['dynamips'];
-                stats['iol'] = data['data']['iol'];
-				deferred.resolve(stats);
+                data['data']['cpu'] = data['data']['cpu'] / 100;
+                data['data']['disk'] = data['data']['disk'] / 100;
+                data['data']['mem'] = data['data']['mem'] / 100;
+                data['data']['cached'] = data['data']['cached'] / 100;
+                data['data']['swap'] = data['data']['swap'] / 100;
+				deferred.resolve(data['data']);
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject(data['message']);
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
+}
+
+// Get user
+function getUser(user) {
+	var deferred = $.Deferred();
+	var form_data = {};
+	var url = '/api/users/' + user;
+	var type = 'GET';
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: got user.');
+				deferred.resolve(data['data']);
 			} else {
 				// Application error
 				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
@@ -445,6 +472,40 @@ function logoutUser() {
 	return deferred.promise();
 }
 
+// Move lab inside a folder
+function moveLab(lab, path) {
+	var deferred = $.Deferred();
+	var type = 'PUT';
+	var url = '/api/labs' + lab + '/move';
+	var form_data = {};
+	form_data['path'] = path;
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		data: JSON.stringify(form_data),
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: lab is moved.');
+				deferred.resolve();
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject(data['message']);
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
+}
+
 /***************************************************************************
  * Print forms and pages
  **************************************************************************/
@@ -479,6 +540,34 @@ function printFormLabAdd(path) {
 	validateLabInfo();
 }
 
+// User form
+function printFormUser(action, values) {
+	$.when(getRoles()).done(function(roles) {
+		// Got data
+		var username = (values['username'] != null) ? values['username'] : '';
+		var name = (values['name'] != null) ? values['name'] : '';
+		var email = (values['email'] != null) ? values['email'] : '';
+		var role = (values['role'] != null) ? values['role'] : '';
+		var expiration = (values['expiration'] != null && values['expiration'] != -1) ? $.datepicker.formatDate('yy-mm-dd', new Date(values['expiration'] * 1000)) : '';
+		var pod = (values['pod'] != null && values['pod'] != -1) ? values['pod'] : '';
+		var pexpiration = (values['pexpiration'] != null && values['pexpiration'] != -1) ? $.datepicker.formatDate('yy-mm-dd', new Date(values['pexpiration'] * 1000)) : '';
+		var submit = (action == 'add') ? MESSAGES[17] : MESSAGES[47];
+		var title = (action == 'add') ? MESSAGES[34] : MESSAGES[48] + ' ' + username;
+		var user_disabled = (action == 'add') ? '' : 'disabled ';
+		var html = '<form id="form-user-' + action + '" class="form-horizontal form-user-' + action + '"><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[44] + '</label><div class="col-md-5"><input class="form-control autofocus" ' + user_disabled + 'name="user[username]" value="' + username + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control" name="user[name]" value="' + name + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[28] + '</label><div class="col-md-5"><input class="form-control" name="user[email]" value="' + email+ '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[45] + '</label><div class="col-md-5"><input class="form-control" name="user[password]" value="" type="password"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[29] + '</label><div class="col-md-5"><select class="selectpicker show-tick form-control" name="user[role]" data-live-search="true">';
+		$.each(roles, function(key, value) {
+			var role_selected = (role == key) ? 'selected ' : '';
+			html += '<option ' + role_selected + 'value="' + key + '">' + value + '</option>';
+		});
+		html += '</select></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[30] + '</label><div class="col-md-5"><input class="form-control" name="user[expiration]" value="' + expiration + '" type="text"/></div></div><h4>' + MESSAGES[46] + '</h4><div class="form-group"><label class="col-md-3 control-label">POD</label><div class="col-md-5"><input class="form-control" name="user[pod]" value="' + pod + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[30] + '</label><div class="col-md-5"><input class="form-control" name="user[pexpiration]" value="' + pexpiration + '" type="text"/></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + submit + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
+		addModal(title, html, '');
+		validateUser();
+	}).fail(function(message) {
+		// Cannot get data
+		addModalError(message);
+	});
+}
+
 // Print lab preview section
 function printLabPreview(lab_filename) {
 	$.when(getLabInfo(lab_filename)).done(function(lab) {
@@ -496,6 +585,12 @@ function printLabPreview(lab_filename) {
 	}).fail(function(message) {
 		addModalError(message);
 	});
+}
+
+// Print Authentication Page
+function printPageAuthentication() {
+	var html = '<div class="row full-height"><div class="col-md-5 col-lg-5 full-height" id="auth-left"><div class="middle"><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><img class="response" alt="Logo RR" src="/themes/default/images/logo-rr.png" /></div></div><!-- <div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><img class="response" alt="Signup Icon" src="/themes/default/images/button-signup.png"></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2">to access more features</div></div> --><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2 white">Existing user...</div></div><form id="form-login"><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input name="login[username]" placeholder="USERNAME" type="text" /></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input name="login[password]" placeholder="PASSWORD" type="password" /></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input alt="Login Icon" src="/themes/default/images/button-login.png" type="image" /></div></div></form></div></div><div class="col-md-7 col-lg-7" id="auth-right"><div id="logo-angular"><img class="response" alt="Logo Angular" src="/themes/default/images/logo-angular.png" /></div><div id="logo-ad"><img class="response" alt="Logo AD" src="/themes/default/images/logo-ad.png" /></div><div id="logo-text"><h1>Unified Networking Lab</h1><p>UNetLab can be considered the next major version of<br>iou-web, but the software has been rewritten from<br>scratch. The major advantage over GNS3 and<br>iou-web itself is about multi-hypervisor<br>support within a single entity. UNetLab<br>allows to design labs using IOU, Dy-<br>namips and QEMU nodes without<br>dealing with multi virtual ma-<br>chines: everything run in-<br>side a UNetLab host,<br>and a lab is a single<br>file including all<br>information<br>needed.</p></div></div></div>'
+	$('#body').html(html);
 }
 
 // Print lab list page
@@ -532,12 +627,12 @@ function printPageLabList(folder) {
 				
 				// Adding all folders
 				$.each(data['data']['folders'], function(id, object) {
-					$('#list-folders > ul').append('<li><a class="folder" data-path="' + object['path'] + '" href="#" title="Double click to open, single click to select.">' + object['name'] + '</a></li>');
+					$('#list-folders > ul').append('<li><a class="folder action-folderopen" data-path="' + object['path'] + '" href="#" title="Double click to open, single click to select.">' + object['name'] + '</a></li>');
 				});
 
 				// Adding all labs
 				$.each(data['data']['labs'], function(id, object) {
-					$('#list-labs > ul').append('<li><a class="lab" data-path="' + object['path'] + '" href="#" title="Double click to open, single click to select.">' + object['file'] + '</a></li>');
+					$('#list-labs > ul').append('<li><a class="lab action-labpreview" data-path="' + object['path'] + '" href="#" title="Double click to open, single click to select.">' + object['file'] + '</a></li>');
 				});
 				
 				// Extend height to the bottom if shorter
@@ -615,7 +710,7 @@ function printUserManagement() {
 		if (ROLE == 'admin') {
 			// Adding actions
 			$('#actions-menu').empty();
-			$('#actions-menu').append('<li><a class="user-add" href="#"><i class="glyphicon glyphicon-plus"></i> ' + MESSAGES[34] + '</a></li>');
+			$('#actions-menu').append('<li><a class="action-useradd" href="#"><i class="glyphicon glyphicon-plus"></i> ' + MESSAGES[34] + '</a></li>');
 			$('#actions-menu').append('<li><a class="selected-delete" href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[35] + '</a></li>');
 		} else {
 			$('#actions-menu').empty();
@@ -651,7 +746,7 @@ function printUserManagement() {
 				var d = new Date(object['pexpiration'] * 1000);
 				pexpiration = d.toLocaleDateString(); 
 			}
-			$('#users tbody').append('<tr class="user" data-path="' + username + '"><td class="username">' + username + '</td><td class="class="name">' + name + '</td><td class="email">' + email + '</td><td class="role">' + role + '</td><td class="expiration">' + expiration + '</td><td class="session">' + session + '</td><td class="pod">' + pod + '</td><td class="pexpiration">' + pexpiration + '</td></tr>');
+			$('#users tbody').append('<tr class="action-useredit user" data-path="' + username + '"><td class="username">' + username + '</td><td class="class="name">' + name + '</td><td class="email">' + email + '</td><td class="role">' + role + '</td><td class="expiration">' + expiration + '</td><td class="session">' + session + '</td><td class="pod">' + pod + '</td><td class="pexpiration">' + pexpiration + '</td></tr>');
 		});
 	}).fail(function(message) {
 		addModalError(message);
@@ -677,11 +772,13 @@ function printSystemStats() {
 		// Read privileges and set specific actions/elements
 		$('#actions-menu').empty();
 		$('#actions-menu').append('<li><a class="action-sysstatus" href="#"><i class="glyphicon glyphicon-refresh"></i> ' + MESSAGES[40] + '</a></li>');
+		$('#actions-menu').append('<li><a class="action-stopall" href="#"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[50] + '</a></li>');
 		
 		// Adding all stats
 		
 		// Version
 		$('#stats-text ul').append('<li>' + MESSAGES[39] + ': <code>' + data['version'] + '</code></li>');
+		$('#stats-text ul').append('<li>' + MESSAGES[49] + ': <code>' + data['qemu_version'] + '</code></li>');
 		
 		// CPU usage
 		$('#stats-graph ul').append('<li><div class="circle circle-cpu col-md-3 col-lg-3"><strong></strong><br/><span>' + MESSAGES[36] + '</span></div></li>');
@@ -761,76 +858,4 @@ function printSystemStats() {
 	}).fail(function(message) {
 		addModalError(message);
 	});
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Print Authentication Page
-function printPageAuthentication() {
-	var html = '<div class="row full-height"><div class="col-md-5 col-lg-5 full-height" id="auth-left"><div class="middle"><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><img alt="Logo RR" src="/themes/default/images/logo-rr.png" /></div></div><!-- <div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><img alt="Signup Icon" src="/themes/default/images/button-signup.png"></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2">to access more features</div></div> --><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2 white">Existing user...</div></div><form id="form-login"><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input name="login[username]" placeholder="USERNAME" type="text" /></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input name="login[password]" placeholder="PASSWORD" type="password" /></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input alt="Login Icon" src="/themes/default/images/button-login.png" type="image" /></div></div></form></div></div><div class="col-md-7 col-lg-7" id="auth-right"><div id="logo-angular"><img alt="Logo Angular" src="/themes/default/images/logo-angular.png" /></div><div id="logo-ad"><img alt="Logo AD" src="/themes/default/images/logo-ad.png" /></div><div id="logo-text"><h1>Unified Networking Lab</h1><p>UNetLab can be considered the next major version of<br>iou-web, but the software has been rewritten from<br>scratch. The major advantage over GNS3 and<br>iou-web itself is about multi-hypervisor<br>support within a single entity. UNetLab<br>allows to design labs using IOU, Dy-<br>namips and QEMU nodes without<br>dealing with multi virtual ma-<br>chines: everything run in-<br>side a UNetLab host,<br>and a lab is a single<br>file including all<br>information<br>needed.</p></div></div></div>'
-	$('#body').html(html);
-}
-
-
-
-
-
-
-
-
-
-// Move lab inside a folder
-function moveLab(lab, path) {
-	var deferred = $.Deferred();
-	var form_data = {};
-	form_data['path'] = path;
-	var url = '/api/labs' + lab + '/move';
-	var type = 'PUT';
-	$.ajax({
-		timeout: TIMEOUT,
-		type: type,
-		url: encodeURI(url),
-		dataType: 'json',
-		data: JSON.stringify(form_data),
-		success: function(data) {
-			if (data['status'] == 'success') {
-				logger(1, 'DEBUG: folder is moved.');
-				deferred.resolve();
-			} else {
-				// Application error
-				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-				deferred.reject(data['message']);
-			}
-		},
-		error: function(data) {
-			// Server error
-			var message = getJsonMessage(data['responseText']);
-			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
-			logger(1, 'DEBUG: ' + message);
-			deferred.reject(message);
-		}
-	});
-	return deferred.promise();
 }

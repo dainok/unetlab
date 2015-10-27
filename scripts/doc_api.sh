@@ -172,7 +172,7 @@ The following API requests allow to manage UNetLab users and permissions.
 An authenticated user can get all UNetLab users:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/users/`
+`curl -s -c $COOKIE -b $COOKIE -X GET -H 'Content-type: application/json' http://127.0.0.1/api/users/ | python -m json.tool`
 ~~~
 
 A single user can be retrieved:
@@ -198,7 +198,7 @@ An authenticated user can add a new UNetLab user:
 Parameters:
 
 * email: the email address of the user;
-* expiration: date until the user is valid (UNIX timestamp) or `-1` if never expires;
+* expiration: date until the user is valid (UNIX timestamp) or \`-1\` if never expires;
 * name: a description for the user, usually salutation;
 * password (mandatory): the user password used to login;
 * role: see "List user roles";
@@ -217,7 +217,7 @@ An authenticated user can edit an existent UNetLab user:
 Parameters:
 
 * email: the email address of the user;
-* expiration: date until the user is valid (UNIX timestamp) or `-1` if never expires;
+* expiration: date until the user is valid (UNIX timestamp) or \`-1\` if never expires;
 * name: a description for the user, usually salutation;
 * password: the user password used to login;
 * role: see "List user roles";
@@ -433,7 +433,7 @@ The resized picture is generated with original aspect-ratio using given values a
 An authenticated user can create a new lab:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X POST -d '{"path":"/Andrea/Folder 3","name":"New Lab","version":"1","author":"Andrea Dainese","description":"A new demo lab","body":"Lab usage and guide"}}' -H 'Content-type: application/json' http://127.0.0.1/api/labs | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X POST -d '{"path":"/Andrea/Folder 3","name":"New Lab","version":"1","author":"Andrea Dainese","description":"A new demo lab","body":"Lab usage and guide"}' -H 'Content-type: application/json' http://127.0.0.1/api/labs | python -m json.tool`
 ~~~
 
 ### Move an existing lab to a different folder

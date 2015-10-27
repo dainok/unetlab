@@ -74,5 +74,10 @@ MESSAGES[40] = 'Refresh';
 MESSAGES[41] = 'running IOL nodes';
 MESSAGES[42] = 'running Dynamips nodes';
 MESSAGES[43] = 'running QEMU nodes';
-
-
+MESSAGES[44] = 'Username';
+MESSAGES[45] = 'Password';
+MESSAGES[46] = 'Assigned POD';
+MESSAGES[47] = 'Save';
+MESSAGES[48] = 'Edit user';
+MESSAGES[49] = 'QEMU version';
+MESSAGES[50] = 'Stop all nodes';
