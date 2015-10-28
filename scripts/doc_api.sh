@@ -151,14 +151,24 @@ An authenticated user can add a folder inside a specific path:
 `curl -s -c $COOKIE -b $COOKIE -X POST -d '{"path":"/Andrea/Folder 3","name":"New Folder"}' -H 'Content-type: application/json' http://127.0.0.1/api/folders | python -m json.tool`
 ~~~
 
+### Move/rename an existent folder
+
+\`curl -s -c $COOKIE -b $COOKIE -X PUT -d '{"path":"/Andrea/Folder 3/Test Folder"}' -H 'Content-type: application/json' http://127.0.0.1/api/folders/Andrea/Folder%203/New%20Folder\`
+
+An authenticated user can add a folder inside a specific path:
+
+~~~
+`curl -s -c $COOKIE -b $COOKIE -X PUT -d '{"path":"/Andrea/Folder 3/Test Folder"}' -H 'Content-type: application/json' http://127.0.0.1/api/folders/Andrea/Folder%203/New%20Folder | python -m json.tool`
+~~~
+
 ### Delete an existing folder
 
-\`curl -s -c $COOKIE -b $COOKIE -X DELETE -H 'Content-type: application/json' http://127.0.0.1/api/folders/Andrea/Folder%203/New%20Folder\`
+\`curl -s -c $COOKIE -b $COOKIE -X DELETE -H 'Content-type: application/json' http://127.0.0.1/api/folders/Andrea/Folder%203/Test%20Folder\`
 
 An authenticated user can delete an existing folder:
 
 ~~~
-`curl -s -c $COOKIE -b $COOKIE -X DELETE -H 'Content-type: application/json' http://127.0.0.1/api/folders/Andrea/Folder%203/New%20Folder | python -m json.tool`
+`curl -s -c $COOKIE -b $COOKIE -X DELETE -H 'Content-type: application/json' http://127.0.0.1/api/folders/Andrea/Folder%203/Test%20Folder | python -m json.tool`
 ~~~
 
 ## Managing users

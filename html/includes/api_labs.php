@@ -60,8 +60,8 @@ function apiAddLab($p, $tenant) {
 	}
 
 	if (is_file(BASE_LAB.$lab_file)) {
-		$output['code'] = 304;
-		$output['status'] = 'success';
+		$output['code'] = 400;
+		$output['status'] = 'fail';
 		$output['message'] = $GLOBALS['messages'][60016];
 		return $output;
 	}

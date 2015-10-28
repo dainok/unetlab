@@ -37,7 +37,6 @@ $('body').on('change', 'input[type=file]', function(e) {
 // Add the selected filename to the proper input box
 $('body').on('change', 'input[name="import[file]"]', function(e) {
 	$('input[name="import[local]"]').val($(this).val());
-	console.log($(this).val())
 });
 
 // Accept privacy
@@ -79,7 +78,9 @@ $(document).on('shown.bs.modal', '.modal', function () {
 // Add a new folder
 $(document).on('click', '.action-folderadd', function(e) {
 	logger(1, 'DEBUG: action = folderadd');
-	printFormFolderAdd($('#list-folders').attr('data-path'));
+	var data = {};
+	data['path'] = $('#list-folders').attr('data-path');
+	printFormFolder('add', data);
 });
 
 // Open an existent folder
@@ -91,7 +92,10 @@ $(document).on('dblclick', '.action-folderopen', function(e) {
 // Rename an existent folder
 $(document).on('click', '.action-folderrename', function(e) {
 	logger(1, 'DEBUG: action = folderrename');
-	printFormFolderRename($('#list-folders').attr('data-path'));
+	var data = {};
+	data['path'] = dirname($('#list-folders').attr('data-path'));
+	data['name'] = basename($('#list-folders').attr('data-path'));
+	printFormFolder('rename', data);
 });
 
 // Import labs
@@ -255,6 +259,50 @@ $(document).on('click', '.action-sysstatus', function(e) {
  * Submit
  **************************************************************************/
 
+// Submit folder form
+$(document).on('submit', '#form-folder-add, #form-folder-rename', function(e) {
+	e.preventDefault();  // Prevent default behaviour
+	var form_data = form2Array('folder');
+	if ($(this).attr('id') == 'form-folder-add') {
+		logger(1, 'DEBUG: posting form-folder-add form.');
+		var url = '/api/folders';
+		var type = 'POST';
+	} else {
+		logger(1, 'DEBUG: posting form-folder-rename form.');
+		form_data['path'] = (form_data['path'] == '/') ? '/' + form_data['name'] : form_data['path'] + '/' + form_data['name'];
+		var url = '/api/folders' + form_data['original'];
+		var type = 'PUT';
+	}
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		data: JSON.stringify(form_data),
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: folder "' + form_data['name'] + '" added.');
+				// Close the modal
+				$(e.target).parents('.modal').modal('hide');
+				// Reload the folder list
+				printPageLabList(form_data['path']);
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+		}
+	});
+	return false;  // Stop to avoid POST
+});
+
 // Submit user form
  $(document).on('submit', '#form-user-add, #form-user-edit', function(e) {
 	e.preventDefault();  // Prevent default behaviour
@@ -349,18 +397,13 @@ $(document).on('click', '.action-sysstatus', function(e) {
 
 
 
-
-
 	
 	
 	
 		
 
 
-
-
-
-// Submit login form
+// Submit login form TODO
 $(document).on('submit', '#form-login', function(e) {
 	e.preventDefault();  // Prevent default behaviour
 	var form_data = form2Array('login');
@@ -403,43 +446,8 @@ $(document).on('submit', '#form-login', function(e) {
 	return false;  // Stop to avoid POST
 });
 
-// Submit folder-add form
-$(document).on('submit', '#form-folder-add', function(e) {
-	e.preventDefault();  // Prevent default behaviour
-	var form_data = form2Array('folder');
-	var url = '/api/folders';
-	var type = 'POST';
-	$.ajax({
-		timeout: TIMEOUT,
-		type: type,
-		url: encodeURI(url),
-		dataType: 'json',
-		data: JSON.stringify(form_data),
-		success: function(data) {
-			if (data['status'] == 'success') {
-				logger(1, 'DEBUG: folder "' + form_data['name'] + '" added.');
-				// Close the modal
-				$(e.target).parents('.modal').modal('hide');
-				// Reload the folder list
-				printPageLabList(form_data['path']);
-			} else {
-				// Application error
-				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-			}
-		},
-		error: function(data) {
-			// Server error
-			var message = getJsonMessage(data['responseText']);
-			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
-			logger(1, 'DEBUG: ' + message);
-			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-		}
-	});
-	return false;  // Stop to avoid POST
-});
 
-// Submit import form
+// Submit import form TODO
 $(document).on('submit', '#form-import', function(e) {
 	e.preventDefault();  // Prevent default behaviour
 	var form_data = new FormData();
@@ -487,7 +495,7 @@ $(document).on('submit', '#form-import', function(e) {
 	return false;  // Stop to avoid POST
 });
 
-// Submit lab-add form
+// Submit lab-add form TODO
 $(document).on('submit', '#form-lab-add', function(e) {
 	e.preventDefault();  // Prevent default behaviour
 	var form_data = form2Array('lab');

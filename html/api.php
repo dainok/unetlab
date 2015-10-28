@@ -306,6 +306,31 @@ $app -> get('/api/folders/(:path+)', function($path = array()) use ($app, $db) {
 	$app -> response -> setBody(json_encode($output));
 });
 
+// Edit (move and rename) a folder
+$app -> put('/api/folders/(:path+)', function($path = array()) use ($app, $db) {
+	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($user === False) {
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+	if (!in_array($user['role'], Array('admin', 'editor'))) {
+		$app -> response -> setStatus($GLOBALS['forbidden']['code']);
+		$app -> response -> setBody(json_encode($GLOBALS['forbidden']));
+		return;
+	}
+
+	// TODO must check before using p name and p path
+
+	$event = json_decode($app -> request() -> getBody());
+	$s = '/'.implode('/', $path);
+	$p = json_decode(json_encode($event), True);
+	$output = apiEditFolder($s, $p['path']);
+
+	$app -> response -> setStatus($output['code']);
+	$app -> response -> setBody(json_encode($output));
+});
+
 // Add a new folder
 $app -> post('/api/folders', function() use ($app, $db) {
 	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
@@ -319,6 +344,7 @@ $app -> post('/api/folders', function() use ($app, $db) {
 		$app -> response -> setBody(json_encode($GLOBALS['forbidden']));
 		return;
 	}
+
 
 	// TODO must check before using p name and p path
 
@@ -410,6 +436,11 @@ $app -> get('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/wipe$/', $s)) {
 		$output = apiWipeLabNodes($lab, $tenant);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/export$/', $s)) {
+		if (!in_array($user['role'], Array('admin', 'editor'))) {
+			$app -> response -> setStatus($GLOBALS['forbidden']['code']);
+			$app -> response -> setBody(json_encode($GLOBALS['forbidden']));
+			return;
+		}
 		$output = apiExportLabNodes($lab, $tenant);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/[0-9]+$/', $s)) {
 		$output = apiGetLabNode($lab, $id);
@@ -422,6 +453,11 @@ $app -> get('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/[0-9]+\/wipe$/', $s)) {
 		$output = apiWipeLabNode($lab, $id, $tenant);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/[0-9]+\/export$/', $s)) {
+		if (!in_array($user['role'], Array('admin', 'editor'))) {
+			$app -> response -> setStatus($GLOBALS['forbidden']['code']);
+			$app -> response -> setBody(json_encode($GLOBALS['forbidden']));
+			return;
+		}
 		$output = apiExportLabNode($lab, $id, $tenant);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/topology$/', $s)) {
 		$output = apiGetLabTopology($lab);

@@ -30,7 +30,7 @@
  */
  
 var MESSAGES = [];
-MESSAGES[0]  = 'Folders';
+MESSAGES[0]  = 'Folders in';
 MESSAGES[1]  = 'Files';
 MESSAGES[2]  = 'File';
 MESSAGES[3]  = 'none';
@@ -81,3 +81,4 @@ MESSAGES[47] = 'Save';
 MESSAGES[48] = 'Edit user';
 MESSAGES[49] = 'QEMU version';
 MESSAGES[50] = 'Stop all nodes';
+MESSAGES[51] = 'Cannot rename root folder.';

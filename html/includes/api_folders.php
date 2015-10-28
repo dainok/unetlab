@@ -61,8 +61,8 @@ function apiAddFolder($name, $path) {
 	// Check if exists
 	if (is_dir(BASE_LAB.$path.'/'.$name)) {
 		// Folder already exists
-		$output['code'] = 304;
-		$output['status'] = 'success';
+		$output['code'] = 400;
+		$output['status'] = 'fail';
 		$output['message'] = $GLOBALS['messages'][60013];
 	} else {
 		try {
@@ -129,6 +129,60 @@ function apiDeleteFolder($path) {
 		$output['status'] = 'fail';
 		$output['message'] = 'Cannot delete folder';
 		$output['message'] = $GLOBALS['messages'][60011];
+	}
+	return $output;
+}
+
+/**
+ * Function to edit a folder.
+ *
+ * @param   string     $s	            Full path of the source folder
+ * @param   string     $d				Full path of the destination folder
+ * @return  Array                       Return code (JSend data)
+ */
+function apiEditFolder($s, $d) {
+	$rc = checkFolder(BASE_LAB.$s);
+	if ($rc === 2) {
+		// Folder is not valid
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][60009];
+		return $output;
+	} else if ($rc === 1) {
+		// Folder does not exist
+		$output['code'] = 404;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][60008];
+		return $output;
+	}
+
+	$rc = checkFolder(BASE_LAB.$d);
+	if ($rc === 2) {
+		// Folder is not valid
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][60047];
+		return $output;
+	} else if ($rc === 0) {
+		// Folder already exists
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][60046];
+		return $output;
+	}
+
+	// Moving the folder
+	$cmd = 'mv "'.BASE_LAB.$s.'" "'.BASE_LAB.$d.'" 2>&1';
+	exec($cmd, $o, $rc);
+	if ($rc == 0) {
+		$output['code'] = 200;
+		$output['status'] = 'success';
+		$output['message'] = $GLOBALS['messages'][60049];
+	} else {
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = 'Cannot move folder';
+		$output['message'] = $GLOBALS['messages'][60048];
 	}
 	return $output;
 }

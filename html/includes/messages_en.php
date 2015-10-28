@@ -205,6 +205,11 @@ $messages[60041] = 'Successfully listed user roles (60041).';
 $messages[60042] = 'User saved (60042).';
 $messages[60043] = 'Cannot create user, missing mandatory parameters (60043).';
 $messages[60044] = 'Cannot get QEMU version (60044).';
+$messages[60045] = 'Cannot create user, check if already exists (60045).';
+$messages[60046] = 'Destination folder already exists (60046).';
+$messages[60047] = 'Destination folder is not valid (60047).';
+$messages[60048] = 'Cannot move folder (60048).';
+$messages[60049] = 'Folder moved (60049).';
 
 // Text (70000-79999)
 $messages[70000] = 'Name/prefix';
@@ -304,7 +309,7 @@ $messages[80082] = 'Cannot find docker.io installation (80082).';
 $messages[80083] = 'Cannot create docket container (80083).';
 
 // Authentication (90000-99999)
-$messages[90001] = 'User is not authenticated (90001).';
+$messages[90001] = 'User is not authenticated or session timed out (90001).';
 $messages[90002] = 'User has been loaded (90002).';
 $messages[90003] = 'Database error (90003).';
 $messages[90004] = 'Created "users" table (90004).';

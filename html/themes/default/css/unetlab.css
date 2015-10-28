@@ -1,7 +1,3 @@
-#body {
-	overflow-y: scroll;
-}
-
 #list-title-folders {
 	color: #ffffff;
 	background-color: #58585a;
@@ -268,30 +264,35 @@
 	text-align: center;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 .full-height {
 	height: 100%;
 }
 
-body, html {
-	height: 100%;
-	overflow: hidden;
-	width: 100%;
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* TODO */
 
 img, input[type='image'] {
 	display: block;
@@ -402,68 +403,6 @@ input[name='login[username]'], input[name='login[password]']{
 	line-height: 180%;
 }
 
-#main-navbar {
-	padding: 5px;
-	margin: 0px;
-}
-
-#main-navbar  .container-fluid {
-	padding: 0px;
-}
-
-#main-navbar  .navbar-header {
-	background-color: #46a6b6;
-	padding: 1vw 2vw 1vw 2vw;
-}
-
-#main-navbar .navbar-nav {
-	border-bottom: 1px dotted #8B8C90;
-	margin-top: 3vw;
-}
-
-#main-navbar .navbar-item {
-	background-color: transparent;
-	margin-right: 5px;
-	margin-top: 2.3vw;
-	width: 12vw;	/* Divide 72 by the number of items */
-}
-
-#main-navbar a.item {
-	background-color: transparent;
-	color: #89888c;
-	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
-	font-size: 1em;
-	font-weight: bold;
-	text-align: left;
-	text-transform: uppercase;
-}
-
-#main-navbar a.item:link, #main-navbar a.item:visited {
-	border-bottom: 0.3vw solid transparent;
-}
-
-#main-navbar a.item:hover, #main-navbar a.item:active {
-	border-bottom: 0.3vw solid #3ba9ba;
-}
-
-#list-title {
-	background: rgba(60, 153, 171, 0.75);
-	color: #ffffff;
-	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
-	font-size: 1.1em;
-	left: 0px;
-	line-height: 1.2em;
-	padding: 1px 5px 3px 5px;
-	position: absolute;
-	right: 0px;
-	top: 12.5vw;
-	z-index: 100;
-}
-
-#list-body {
-	padding: 5px;
-	padding-bottom: 210px;	/* don't know why this exceed lower margin */
-}
 
 
 
@@ -542,13 +481,18 @@ input[name='login[username]'], input[name='login[password]']{
 	width: 100%;
 }
 
-.folder:active, .folder:hover {
+.folder:active, .folder:hover, .folder.ui-draggable-dragging {
 	border-bottom: 1px solid #46a6b6;
 	color: #46a6b6;
 	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
 	font-weight: bold;
 	text-decoration: none;
 	width: 100%;
+}
+
+.folder.ui-draggable-dragging {
+	line-height: 3em;
+	width: 23%;
 }
 
 .lab, .lab:visited {
