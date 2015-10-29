@@ -193,6 +193,7 @@ $app -> get('/api/status', function() use ($app, $db) {
 	} else {
 		$output['data']['qemu_version'] = $o[0];
 	}
+	$output['data']['running_path'] = '/opt/unetlab/tmp/'.$tenant;
 	$output['data']['cpu'] = apiGetCPUUsage();
 	$output['data']['disk'] = apiGetDiskUsage();
 	list($output['data']['cached'], $output['data']['mem']) = apiGetMemUsage();

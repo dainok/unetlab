@@ -61,7 +61,7 @@ if (!isset($node_templates)) {
 		'veos'			=>	'Arista vEOS',
 		'brocadevadx'	=>	'Brocade vADX',
 		'cpsg'			=>	'CheckPoint Security Gateway VE',
-		'docker'		=>	'Docker.io',
+		//'docker'		=>	'Docker.io',
 		'acs'			=>	'Cisco ACS',
 		'asa'			=>	'Cisco ASA',
 		'asav'			=>	'Cisco ASAv',

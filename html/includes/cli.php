@@ -666,7 +666,11 @@ function prepareNode($n, $id, $t, $nets) {
 		return 80036;
 	}
 
+	// Transition fix: mark the node as prepared (TODO)
+	if (is_dir($n -> getRunningPath())) !touch($n -> getRunningPath().'/.prepared');
+
 	if (!is_file($n -> getRunningPath().'/.prepared') && !is_file($n -> getRunningPath().'/.lock')) {
+
 		// Node is not prepared/locked
 		if (!is_dir($n -> getRunningPath()) && !mkdir($n -> getRunningPath(), 0775, True)) {
 			// Cannot create running directory

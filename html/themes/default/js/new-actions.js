@@ -315,6 +315,141 @@ $(document).on('submit', '#form-folder-add, #form-folder-rename', function(e) {
 	return false;  // Stop to avoid POST
 });
 
+// Submit import form
+$(document).on('submit', '#form-import', function(e) {
+	e.preventDefault();  // Prevent default behaviour
+	var form_data = new FormData();
+	var form_name = 'import';
+	var url = '/api/import';
+	var type = 'POST';
+	// Setting options: cannot use form2Array() because not using JSON to send data
+	$('form :input[name^="' + form_name + '["]').each(function(id, object) {
+		// INPUT name is in the form of "form_name[value]", get value only
+		form_data.append($(this).attr('name').substr(form_name.length + 1, $(this).attr('name').length - form_name.length - 2), $(this).val());
+	});
+	// Add attachments
+    $.each(ATTACHMENTS, function(key, value) {
+        form_data.append(key, value);
+    });
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+        contentType: false, // Set content type to false as jQuery will tell the server its a query string request
+        processData: false, // Don't process the files
+		dataType: 'json',
+		data: form_data,
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: labs imported.');
+				// Close the modal
+				$(e.target).parents('.modal').modal('hide');
+				// Reload the folder list
+				printPageLabList($('#list-folders').attr('data-path'));
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+		}
+	});
+	return false;  // Stop to avoid POST
+});
+		
+// Submit lab form
+$(document).on('submit', '#form-lab-add, #form-lab-edit', function(e) {
+	e.preventDefault();  // Prevent default behaviour
+	var form_data = form2Array('lab');
+	if ($(this).attr('id') == 'form-lab-add') {
+		logger(1, 'DEBUG: posting form-lab-add form.');
+		var url = '/api/labs';
+		var type = 'POST';
+	} else {
+		logger(1, 'DEBUG: posting form-lab-edit form.');
+		//TODO
+		//var url = '/api/folders' + form_data['original'];
+		//var type = 'PUT';
+	}
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		data: JSON.stringify(form_data),
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: lab "' + form_data['name'] + '" saved.');
+				// Close the modal
+				$(e.target).parents('.modal').modal('hide');
+				// Reload the lab list
+				printPageLabList(form_data['path']);
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+		}
+	});
+	return false;  // Stop to avoid POST
+});
+
+// Submit login form
+$(document).on('submit', '#form-login', function(e) {
+	e.preventDefault();  // Prevent default behaviour
+	var form_data = form2Array('login');
+	var url = '/api/auth/login';
+	var type = 'POST';
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		data: JSON.stringify(form_data),
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: user is authenticated.');
+				// Close the modal
+				$(e.target).parents('.modal').modal('hide');
+				$.when(getUserInfo()).done(function() {
+					// User is authenticated
+					logger(1, 'DEBUG: loading home page.');
+					printPageLabList(FOLDER);
+				}).fail(function() {
+					// User is not authenticated, or error on API
+					logger(1, 'DEBUG: loading authentication page.');
+					printPageAuthentication();
+				});
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+		}
+	});
+	return false;  // Stop to avoid POST
+});
+
 // Submit user form
  $(document).on('submit', '#form-user-add, #form-user-edit', function(e) {
 	e.preventDefault();  // Prevent default behaviour
@@ -373,176 +508,3 @@ $(document).on('submit', '#form-folder-add, #form-folder-rename', function(e) {
 	});
 	return false;  // Stop to avoid POST
 });
-
- 
-
- 
- 
- 
- 
-
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
-
-
-
-
-	
-	
-	
-		
-
-
-// Submit login form TODO
-$(document).on('submit', '#form-login', function(e) {
-	e.preventDefault();  // Prevent default behaviour
-	var form_data = form2Array('login');
-	var url = '/api/auth/login';
-	var type = 'POST';
-	$.ajax({
-		timeout: TIMEOUT,
-		type: type,
-		url: encodeURI(url),
-		dataType: 'json',
-		data: JSON.stringify(form_data),
-		success: function(data) {
-			if (data['status'] == 'success') {
-				logger(1, 'DEBUG: user is authenticated.');
-				// Close the modal
-				$(e.target).parents('.modal').modal('hide');
-				$.when(getUserInfo()).done(function() {
-					// User is authenticated
-					logger(1, 'DEBUG: loading home page.');
-					printPageLabList(FOLDER);
-				}).fail(function() {
-					// User is not authenticated, or error on API
-					logger(1, 'DEBUG: loading authentication page.');
-					printPageAuthentication();
-				});
-			} else {
-				// Application error
-				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-			}
-		},
-		error: function(data) {
-			// Server error
-			var message = getJsonMessage(data['responseText']);
-			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
-			logger(1, 'DEBUG: ' + message);
-			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-		}
-	});
-	return false;  // Stop to avoid POST
-});
-
-
-// Submit import form TODO
-$(document).on('submit', '#form-import', function(e) {
-	e.preventDefault();  // Prevent default behaviour
-	var form_data = new FormData();
-	var form_name = 'import';
-	var url = '/api/import';
-	var type = 'POST';
-	// Setting options: cannot use form2Array() because not using JSON to send data
-	$('form :input[name^="' + form_name + '["]').each(function(id, object) {
-		// INPUT name is in the form of "form_name[value]", get value only
-		form_data.append($(this).attr('name').substr(form_name.length + 1, $(this).attr('name').length - form_name.length - 2), $(this).val());
-	});
-	// Add attachments
-    $.each(ATTACHMENTS, function(key, value) {
-        form_data.append(key, value);
-    });
-	$.ajax({
-		timeout: TIMEOUT,
-		type: type,
-		url: encodeURI(url),
-        contentType: false, // Set content type to false as jQuery will tell the server its a query string request
-        processData: false, // Don't process the files
-		dataType: 'json',
-		data: form_data,
-		success: function(data) {
-			if (data['status'] == 'success') {
-				logger(1, 'DEBUG: labs imported.');
-				// Close the modal
-				$(e.target).parents('.modal').modal('hide');
-				// Reload the folder list
-				printPageLabList($('#list-folders').attr('data-path'));
-			} else {
-				// Application error
-				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-			}
-		},
-		error: function(data) {
-			// Server error
-			var message = getJsonMessage(data['responseText']);
-			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
-			logger(1, 'DEBUG: ' + message);
-			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-		}
-	});
-	return false;  // Stop to avoid POST
-});
-
-// Submit lab-add form TODO
-$(document).on('submit', '#form-lab-add', function(e) {
-	e.preventDefault();  // Prevent default behaviour
-	var form_data = form2Array('lab');
-	var url = '/api/labs';
-	var type = 'POST';
-	$.ajax({
-		timeout: TIMEOUT,
-		type: type,
-		url: encodeURI(url),
-		dataType: 'json',
-		data: JSON.stringify(form_data),
-		success: function(data) {
-			if (data['status'] == 'success') {
-				logger(1, 'DEBUG: lab "' + form_data['name'] + '" added.');
-				// Close the modal
-				$(e.target).parents('.modal').modal('hide');
-				// Reload the lab list
-				printPageLabList(form_data['path']);
-			} else {
-				// Application error
-				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-			}
-		},
-		error: function(data) {
-			// Server error
-			var message = getJsonMessage(data['responseText']);
-			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
-			logger(1, 'DEBUG: ' + message);
-			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-		}
-	});
-	return false;  // Stop to avoid POST
-});
-
-
-
-

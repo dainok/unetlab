@@ -82,3 +82,4 @@ MESSAGES[48] = 'Edit user';
 MESSAGES[49] = 'QEMU version';
 MESSAGES[50] = 'Stop all nodes';
 MESSAGES[51] = 'Cannot rename root folder.';
+MESSAGES[52] = 'Path';
