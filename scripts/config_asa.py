@@ -29,8 +29,8 @@
 
 import getopt, os, pexpect, re, sys, time
 
-username = 'cisco'
-password = 'cisco'
+username = ''
+password = ''
 secret = ''
 
 def node_login(handler, end_before):
@@ -40,7 +40,7 @@ def node_login(handler, end_before):
         try:
             handler.sendline('\r\n')
             i = handler.expect([
-                'Management IP address:',
+                '[yes]?',
                 'Username:',
                 '\(config',
                 '>',
@@ -49,16 +49,8 @@ def node_login(handler, end_before):
             i = -1
 
     if i == 0:
-        # Entered the interactive configuration
-        handler.sendline('10.0.0.10')
-        handler.expect('Management network mask:', timeout = end_before - now())
-        handler.sendline('255.255.255.0')
-        handler.expect('Host name:', timeout = end_before - now())
-        handler.sendline('ciscoasa')
-        handler.expect('Domain name:', timeout = end_before - now())
-        handler.sendline('example.com')
-        handler.expect('IP address of host running Device Manager:', timeout = end_before - now())
-        handler.sendline('10.0.0.1')
+		#Exit the interactive configuration
+        handler.sendline('\x1A')
         handler.expect('>', timeout = end_before - now())
         handler.sendline('enable')
         handler.expect('Password:', timeout = end_before - now())

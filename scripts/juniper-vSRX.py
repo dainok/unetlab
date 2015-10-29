@@ -29,8 +29,8 @@
 
 import getopt, os, pexpect, re, sys, time
 
-username = 'cisco'
-password = 'cisco'
+username = 'root'
+password = ''
 
 def node_login(handler, end_before):
     #Send an empty line, and wait for the login prompt	
@@ -39,9 +39,8 @@ def node_login(handler, end_before):
         try:
             handler.sendline('\r\n')
             i = handler.expect([
-                'Username:',
-                '\(config',
-                '#'], timeout = 10)
+                'login:',
+                'root@%'], timeout = 10)
         except:
             i = -1
 
@@ -50,7 +49,7 @@ def node_login(handler, end_before):
         handler.sendline(username)
         handler.expect('Password:', timeout = end_before - now())
         handler.sendline(password)
-        j = handler.expect(['#'], timeout = end_before - now())
+        j = handler.expect(['root@%'], timeout = end_before - now())
         if j == 0:
             # Nothing to do
             return True
@@ -60,8 +59,8 @@ def node_login(handler, end_before):
             return False
     elif i == 1:
         # Config mode detected, need to exit
-        handler.sendline('end')
-        handler.expect('#', timeout = end_before - now())
+        #handler.sendline('end')
+        #handler.expect('root@%', timeout = end_before - now())
         return True
     elif i == 2:
         # Nothing to do
@@ -79,23 +78,30 @@ def config_get(handler, end_before):
     # Clearing all "expect" buffer
     while True:
         try:
-            handler.expect('#', timeout = 0.1)
+            handler.expect('%', timeout = 0.5)
         except:
             break
-
+    # CLI Mode
+    handler.sendline('cli')
+    handler.expect('root>', timeout = end_before - now())			
+			
     # Disable paging
-    handler.sendline('terminal length 0')
-    handler.expect('#', timeout = end_before - now())
+    handler.sendline('set cli screen-length 0')
+    handler.expect('Screen length set to 0', timeout = end_before - now())
 
     # Getting the config
-    handler.sendline('show running-config')
-    handler.expect('#', timeout = end_before - now())
+    handler.sendline('show version')
+    handler.expect('>', timeout = end_before - now())
     config = handler.before.decode()
 
-    # Manipulating the config
-    config = re.sub('\r', '', config, flags=re.DOTALL)                      # Unix style
-    config = re.sub('.*\n!Command', '!Command', config, flags=re.DOTALL)    # Header
-    config = re.sub('\n[^\n]*\Z', '', config, flags=re.DOTALL)              # Footer
+     #Manipulating the config
+    #config = re.sub('\r', '', config, flags=re.DOTALL)                      # Unix style
+    #config = re.sub('.*\n!Command', '!Command', config, flags=re.DOTALL)    # Header
+    #config = re.sub('\n[^\n]*\Z', '', config, flags=re.DOTALL)              # Footer
+	# Manipulating the config
+    config = re.sub('\r', '', config, flags=re.DOTALL)              # Unix style
+    config = re.sub('.*: Saved\n', '', config, flags=re.DOTALL)     # Header
+    config = re.sub(': end.*', ': end\n', config, flags=re.DOTALL)  # Footer
 
     return config
 

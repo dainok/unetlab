@@ -487,6 +487,42 @@ function logoutUser() {
 	return deferred.promise();
 }
 
+// Move folder inside a folder
+function moveFolder(folder, path) {
+	var deferred = $.Deferred();
+	var type = 'PUT';
+	var url = '/api/folders' + folder;
+	var form_data = {};
+	form_data['path'] = (path == '/') ? '/' + basename(folder) : path + '/' + basename(folder);
+	console.log('URL ' + url);
+	console.log(form_data);
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		data: JSON.stringify(form_data),
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: folder is moved.');
+				deferred.resolve();
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject(data['message']);
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
+}
+
 // Move lab inside a folder
 function moveLab(lab, path) {
 	var deferred = $.Deferred();
@@ -503,6 +539,37 @@ function moveLab(lab, path) {
 		success: function(data) {
 			if (data['status'] == 'success') {
 				logger(1, 'DEBUG: lab is moved.');
+				deferred.resolve();
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject(data['message']);
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
+}
+
+// Stop all nodes
+function stopAll() {
+	var deferred = $.Deferred();
+	var type = 'DELETE'
+	var url = '/api/status';
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: stopped all nodes.');
 				deferred.resolve();
 			} else {
 				// Application error
@@ -691,19 +758,33 @@ function printPageLabList(folder) {
 						stack: '.folder'
 					});
 					
-					// Make folders draggable (to receive labs)
+					// Make folders draggable (to receive labs and folders)
 					$('.folder').droppable({
 						drop: function(e, o) {
-							var lab = o['draggable'].attr('data-path');
+							var object = o['draggable'].attr('data-path');
 							var path = $(this).attr('data-path');
-							logger(1, 'DEBUG: moving "' + lab + '" to "' + path + '".');
-							$.when(moveLab(lab, path)).done(function(data) {
-								logger(1, 'DEBUG: "' + lab + '" moved to "' + path + '".');
-								o['draggable'].fadeOut(300, function() { o['draggable'].remove(); })
-							}).fail(function(data) {
-								logger(1, 'DEBUG: failed to move "' + lab + '" into "' + path + '".');
-								addModal('ERROR', '<p>' + data + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-							});
+							logger(1, 'DEBUG: moving "' + object + '" to "' + path + '".');
+							if (o['draggable'].hasClass('lab')) {
+								$.when(moveLab(object, path)).done(function(data) {
+									logger(1, 'DEBUG: "' + object + '" moved to "' + path + '".');
+									o['draggable'].fadeOut(300, function() { o['draggable'].remove(); })
+								}).fail(function(data) {
+									logger(1, 'DEBUG: failed to move "' + object + '" into "' + path + '".');
+									addModal('ERROR', '<p>' + data + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+								});
+							} else if (o['draggable'].hasClass('folder')) {
+								$.when(moveFolder(object, path)).done(function(data) {
+									logger(1, 'DEBUG: "' + object + '" moved to "' + path + '".');
+									o['draggable'].fadeOut(300, function() { o['draggable'].remove(); })
+								}).fail(function(data) {
+									logger(1, 'DEBUG: failed to move "' + object + '" into "' + path + '".');
+									addModal('ERROR', '<p>' + data + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+								});
+							} else {
+								// Should not be here
+								logger(1, 'DEBUG: cannot move unknown object.');
+							}
+
 						}
 					});
 				} else {

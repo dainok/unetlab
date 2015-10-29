@@ -210,6 +210,8 @@ $messages[60046] = 'Destination folder already exists (60046).';
 $messages[60047] = 'Destination folder is not valid (60047).';
 $messages[60048] = 'Cannot move folder (60048).';
 $messages[60049] = 'Folder moved (60049).';
+$messages[60050] = 'Failed to stop all nodes (60050).';
+$messages[60051] = 'All nodes has been stopped (60051).';
 
 // Text (70000-79999)
 $messages[70000] = 'Name/prefix';

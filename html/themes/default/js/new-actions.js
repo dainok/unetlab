@@ -228,6 +228,23 @@ $(document).on('click', '.action-selectedexport', function(e) {
 	}
  });
  
+// Stop all nodes
+$(document).on('click', '.action-stopall', function(e) {
+	logger(1, 'DEBUG: action = stopall');
+	$.when(stopAll()).done(function(url) {
+		// Stopped all nodes -> reload status page
+		printSystemStats();
+	}).fail(function(message) {
+		// Cannot stop all nodes
+		addModalError(message);
+	});
+});
+
+// Load system status page
+$(document).on('click', '.action-sysstatus', function(e) {
+	printSystemStats();
+});
+ 
 // Add a user
 $(document).on('click', '.action-useradd', function(e) {
 	printFormUser('add', {});
@@ -249,11 +266,6 @@ $(document).on('click', '.action-usermgmt', function(e) {
 	logger(1, 'DEBUG: action = usermgmt');
 	printUserManagement();
 }); 
-
-// Load system status page
-$(document).on('click', '.action-sysstatus', function(e) {
-	printSystemStats();
-});
 
 /***************************************************************************
  * Submit

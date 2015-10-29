@@ -171,6 +171,7 @@ $app -> put('/api/auth', function() use ($app, $db) {
 /***************************************************************************
  * Status
  **************************************************************************/
+// Get system stats
 $app -> get('/api/status', function() use ($app, $db) {
 	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
 	if ($user === False) {
@@ -201,6 +202,37 @@ $app -> get('/api/status', function() use ($app, $db) {
 		$output['data']['dynamips'],
 		$output['data']['qemu']
 	) = apiGetRunningWrappers();
+
+	$app -> response -> setStatus($output['code']);
+	$app -> response -> setBody(json_encode($output));
+});
+
+// Stop all nodes and clear the system
+$app -> delete('/api/status', function() use ($app, $db) {
+	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($user === False) {
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+	if (!in_array($user['role'], Array('admin'))) {
+		$app -> response -> setStatus($GLOBALS['forbidden']['code']);
+		$app -> response -> setBody(json_encode($GLOBALS['forbidden']));
+		return;
+	}
+
+	$cmd = 'sudo /opt/unetlab/wrappers/unl_wrapper -a stopall';
+	exec($cmd, $o, $rc);
+	if ($rc != 0) {
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][60044]);
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages']['60050'];
+	} else {
+		$output['code'] = 200;
+		$output['status'] = 'success';
+		$output['message'] = $GLOBALS['messages']['60051'];
+	}
 
 	$app -> response -> setStatus($output['code']);
 	$app -> response -> setBody(json_encode($output));
