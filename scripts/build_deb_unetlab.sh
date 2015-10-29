@@ -33,7 +33,7 @@ chmod 755 ${DATA_DIR}/opt/unetlab/scripts/*
 cd wrappers
 export CC="gcc"
 export CFLAGS="-Wall -O2"
-export INC="include/ts.c include/serial2udp.c include/afsocket.c include/tap.c include/cmd.c include/functions.c"
+export INC="include/ts.c include/serial2udp.c include/afsocket.c include/tap.c include/cmd.c include/functions.c include/log.c"
 export DST="${DATA_DIR}/opt/unetlab/wrappers"
 mkdir -p ${DATA_DIR}/opt/unetlab/wrappers ${DATA_DIR}/opt/unetlab/addons/iol/lib ${DATA_DIR}/opt/unetlab/addons/iol/bin ${DATA_DIR}/opt/unetlab/addons/dynamips ${DATA_DIR}/opt/unetlab/addons/qemu
 ${CC} ${CFLAGS} -o ${DST}/iol_wrapper ${INC} iol_wrapper.c iol_functions.c
