@@ -837,19 +837,19 @@ function printUserManagement() {
 				var pod = object['pod'];
 			}
 			if (object['expiration'] <= 0) {
-				var expiration = 'never';
+				var expiration = MESSAGES[54];
 			} else {
 				var d = new Date(object['expiration'] * 1000);
 				expiration = d.toLocaleDateString(); 
 			}
 			if (object['session'] <= 0) {
-				var session = 'never';
+				var session = MESSAGES[53];
 			} else {
 				var d = new Date(object['session'] * 1000);
 				session = d.toLocaleDateString() + ' ' + d.toLocaleTimeString() + ' from ' + object['ip']; 
 			}
 			if (object['pexpiration'] <= 0) {
-				var pexpiration = 'never';
+				var pexpiration = MESSAGES[54];
 			} else {
 				var d = new Date(object['pexpiration'] * 1000);
 				pexpiration = d.toLocaleDateString(); 
