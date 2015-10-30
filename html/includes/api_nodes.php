@@ -501,7 +501,7 @@ function apiGetLabNodeTemplate($p) {
 	);
 
 	// Startup configs
-	if (in_array($p['type'], Array('dynamips', 'iol'))) $output['data']['options']['config'] = Array(
+	if (in_array($p['type'], Array('dynamips', 'iol', 'qemu'))) $output['data']['options']['config'] = Array(
 		'name' => $GLOBALS['messages'][70013],
 		'type' => 'list',
 		'value' => 'Unconfigured',
