@@ -50,6 +50,11 @@ $.validator.addMethod('username', function(value) {
     return /^[A-Za-z0-9]+$/.test(value); 
 }, 'Must be alphanumeric ([A-Za-z0-9] chars).');
 
+// Validate a ISO date
+$.validator.addMethod('date', function(value) {
+    return /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(value); 
+}, 'Must be a ISO date (YYYY-MM-DD).');
+
 // Validate folder form
 function validateFolder() {
 	$('#form-folder-add').validate({
@@ -109,10 +114,10 @@ function validateUser() {
 				email: true
 			},
 			'user[expiration]': {
-				dateISO: true
+				date: true
 			},
 			'user[pexpiration]': {
-				dateISO: true
+				date: true
 			},
 			'user[pod]': {
 				required: false,
