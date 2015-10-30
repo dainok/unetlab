@@ -113,7 +113,7 @@ find /opt/unetlab/labs/ -name "*.swp" -exec rm -f {} \;
 # Mark official kernels as hold
 apt-mark hold  \$(dpkg -l | grep -e linux-image -e linux-headers -e linux-generic | grep -v unetlab | awk '{print \$2}') > /dev/null 2>&1
 # Additional fixes
-find /opt/unetlab/tmp/ -name "nvram_*" -exec /opt/unetlab/scripts/fix_iol_nvram.sh "{}" \;
+find /opt/unetlab/tmp/ -name "nvram_*" -exec /opt/unetlab/scripts/fix_iol_nvram.sh "{}" \; > /dev/null 2>&1
 EOF
 
 # Configuring APT
