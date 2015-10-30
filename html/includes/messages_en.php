@@ -342,6 +342,6 @@ $messages[90028] = 'Created "sessions" table (90028).';
 $messages[90029] = 'Failed to create "sessions" table (90029).';
 $messages[90030] = 'Failed to update database to latest version (90030).';
 $messages[90031] = 'Database updated (90031).';
-$messages[90032] = 'User are not allowed to take this action (90032).';
+$messages[90032] = 'Not enough access privileges for this operation (90032).';
 $messages[90033] = 'Cannot set last seen folder database, check also disk space (90033).';
 ?>

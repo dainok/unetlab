@@ -887,6 +887,8 @@ function printSystemStats() {
 		// Version
 		$('#stats-text ul').append('<li>' + MESSAGES[39] + ': <code>' + data['version'] + '</code></li>');
 		$('#stats-text ul').append('<li>' + MESSAGES[49] + ': <code>' + data['qemu_version'] + '</code></li>');
+		$('#stats-text ul').append('<li>' + MESSAGES[29] + ': <code>' + ROLE + '</code></li>');
+		$('#stats-text ul').append('<li>' + MESSAGES[32] + ': <code>' + TENANT + '</code></li>');
 		$('#stats-text ul').append('<li>' + MESSAGES[52] + ': <code>' + data['running_path'] + '</code></li>');
 		
 		// CPU usage
