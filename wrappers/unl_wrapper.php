@@ -28,20 +28,20 @@
  * @copyright 2014-2015 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150911
+ * @version 20150828
  */
 
 require_once('/opt/unetlab/html/includes/init.php');
 
 // Checking if called from CLI or Web
 if (php_sapi_name() != 'cli') {
-	error_log('ERROR: '.$GLOBALS['messages'][1]);
+	error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][1]);
 	exit(1);
 }
 
 // Checking privileges
 if (posix_getuid() != 0) {
-	error_log('ERROR: '.$GLOBALS['messages'][2]);
+	error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][2]);
 	exit(2);
 }
 
@@ -54,7 +54,7 @@ $options = getopt('oT:D:F:a:');
 // Checking -a (action)
 if (!isset($options['a'])) {
 	usage();
-	error_log('ERROR: '.$GLOBALS['messages'][3]);
+	error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][3]);
 	exit(3);
 }
 $action = $options['a'];
@@ -64,12 +64,12 @@ if (in_array($action, Array('delete', 'export', 'start', 'stop', 'wipe'))) {
 	if (!isset($options['T'])) {
 		// Tenant ID is missing
 		usage();
-		error_log('ERROR: '.$GLOBALS['messages'][4]);
+		error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][4]);
 		exit(4);
 	} else if ((int) $options['T'] < 0) {
 		// Tenant ID is not valid
 		usage();
-		error_log('ERROR: '.$GLOBALS['messages'][5]);
+		error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][5]);
 		exit(5);
 	} else {
 		$tenant = (int) $options['T'];
@@ -81,7 +81,7 @@ if (in_array($action, Array('delete', 'export', 'start', 'stop', 'wipe'))) {
 	if (!is_file($options['F'])) {
 		// File not found
 		usage();
-		error_log('ERROR: '.$GLOBALS['messages'][6]);
+		error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][6]);
 		exit(6);
 	}
 
@@ -89,8 +89,8 @@ if (in_array($action, Array('delete', 'export', 'start', 'stop', 'wipe'))) {
 		$lab = new Lab($options['F'], $tenant);
 	} catch(Exception $e) {
 		// Lab file is invalid
-		error_log('ERROR: '.$GLOBALS['messages'][$e -> getMessage()]);
-		error_log('ERROR: '.$GLOBALS['messages'][7]);
+		error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][$e -> getMessage()]);
+		error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][7]);
 		exit(7);
 	}
 }
@@ -102,7 +102,7 @@ if (isset($options['D'])) {
 	} else {
 		// Node ID must be numeric, greater than 0 and exists on lab
 		usage();
-		error_log('ERROR: '.$GLOBALS['messages'][8]);
+		error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][8]);
 		exit(8);
 	}
 }
@@ -111,7 +111,7 @@ switch ($action) {
 	default:
 		// Invalid action
 		usage();
-		error_log('ERROR: '.$GLOBALS['messages'][9]);
+		error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][9]);
 		exit(9);
 	case 'delete':
 		if (isset($node_id)) {
@@ -166,20 +166,29 @@ switch ($action) {
 		$cmd = '/bin/chmod 755 /opt/unetlab/addons/iol/bin/*.bin > /dev/null 2>&1';
 		exec($cmd, $o, $rc);
 
-		// Wrappers and helpers
-		$cmd = '/bin/chmod 755 /opt/unetlab/wrappers/*_wrapper* /opt/unetlab/wrappers/nsenter > /dev/null 2>&1';
-		exec($cmd, $o, $rc);
-
-		// OVS database
-		$cmd = '/bin/chmod 664 /var/run/openvswitch/db.sock > /dev/null 2>&1';
-		exec($cmd, $o, $rc);
-		$cmd = '/bin/chown root:unl /var/run/openvswitch/db.sock > /dev/null 2>&1';
+		// Wrappers
+		$cmd = '/bin/chmod 755 /opt/unetlab/wrappers/*_wrapper* > /dev/null 2>&1';
 		exec($cmd, $o, $rc);
 
 		// /tmp
 		$cmd = '/bin/chown root:root /tmp 2>&1';
 		exec($cmd, $o, $rc);
 		$cmd = '/bin/chmod u=rwx,g=rwx,o=rwxt /tmp > /dev/null 2>&1';
+		exec($cmd, $o, $rc);
+		break;
+	case 'stopall':
+		// Kill all nodes and clear the system
+		$cmd = 'pkill -TERM dynamips_wrapper > /dev/null 2>&1';
+		exec($cmd, $o, $rc);
+		$cmd = 'pkill -TERM iol_wrapper > /dev/null 2>&1';
+		exec($cmd, $o, $rc);
+		$cmd = 'pkill -TERM qemu_wrapper > /dev/null 2>&1';
+		exec($cmd, $o, $rc);
+		$cmd = 'brctl show | grep vnet | sed \'s/^\(vnet[0-9]\+_[0-9]\+\).*/\1/g\' | while read line; do ifconfig $line down; brctl delbr $line; done';
+		exec($cmd, $o, $rc);
+		$cmd = 'ovs-vsctl list-br | while read line; do ovs-vsctl del-br $line; done';
+		exec($cmd, $o, $rc);
+		$cmd = 'ifconfig | grep vunl | cut -d\' \' -f1 | while read line; do tunctl -d $line; done';
 		exec($cmd, $o, $rc);
 		break;
 	case 'platform':
@@ -191,7 +200,7 @@ switch ($action) {
 		// Starting node(s)
 		if (!checkUsername($lab -> getTenant())) {
 			// Cannot create username
-			error_log('ERROR: '.$GLOBALS['messages'][14]);
+			error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][14]);
 			exit(14);
 		}
 
@@ -201,7 +210,7 @@ switch ($action) {
 			foreach ($lab -> getNodes()[$node_id] -> getEthernets() as $interface) {
 				if ($interface -> getNetworkId() !== 0 && !isset($lab -> getNetworks()[$interface -> getNetworkId()])) {
 					// Interface is set but network does not exist
-					error_log('ERROR: '.$GLOBALS['messages'][10]);
+					error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][10]);
 					exit(10);
 				} else if ($interface -> getNetworkId() !== 0) {
 					// Create attached networks only
@@ -212,8 +221,8 @@ switch ($action) {
 					$rc = addNetwork($p);
 					if ($rc !== 0) {
 						// Failed to create network
-						error_log('ERROR: '.$GLOBALS['messages'][$rc]);
-						error_log('ERROR: '.$GLOBALS['messages'][11]);
+						error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][$rc]);
+						error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][11]);
 						exit(11);
 					}
 				}
@@ -223,8 +232,8 @@ switch ($action) {
 			$rc = start($lab -> getNodes()[$node_id], $node_id, $tenant, $lab -> getNetworks());
 			if ($rc !== 0) {
 				// Failed to start the node
-				error_log('ERROR: '.$GLOBALS['messages'][$rc]);
-				error_log('ERROR: '.$GLOBALS['messages'][12]);
+				error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][$rc]);
+				error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][12]);
 				exit(12);
 			}
 		} else {
@@ -239,8 +248,8 @@ switch ($action) {
 				$rc = addNetwork($p);
 				if ($rc !== 0) {
 					// Failed to create network
-					error_log('ERROR: '.$GLOBALS['messages'][$rc]);
-					error_log('ERROR: '.$GLOBALS['messages'][11]);
+					error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][$rc]);
+					error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][11]);
 					exit(11);
 				}
 			}
@@ -252,8 +261,8 @@ switch ($action) {
 					$rc = start($node, $node_id, $tenant, $lab -> getNetworks());
 					if ($rc !== 0) {
 						// Failed to start the node
-						error_log('ERROR: '.$GLOBALS['messages'][$rc]);
-						error_log('ERROR: '.$GLOBALS['messages'][12]);
+						error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][$rc]);
+						error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][12]);
 						exit(12);
 					}
 				}
@@ -266,8 +275,8 @@ switch ($action) {
 					$rc = start($node, $node_id, $tenant, $lab -> getNetworks());
 					if ($rc !== 0) {
 						// Failed to start the node
-						error_log('ERROR: '.$GLOBALS['messages'][$rc]);
-						error_log('ERROR: '.$GLOBALS['messages'][12]);
+						error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][$rc]);
+						error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][12]);
 						exit(12);
 					}
 				}
@@ -291,31 +300,23 @@ switch ($action) {
 		if (isset($node_id)) {
 			// Node ID is set, stop and wipe the node
 			stop($lab -> getNodes()[$node_id]);
-			if ($lab -> getNodes()[$node_id] -> getNType() == 'docker') {
-				$cmd = 'docker rm '.$lab -> getNodes()[$node_id] -> getUuid();
-				exec($cmd, $o, $rc);
-			}
 			$cmd = 'rm -rf "/opt/unetlab/tmp/'.$tenant.'/'.$lab -> getId().'/'.$node_id.'/"';
 			exec($cmd, $o, $rc);
 			if ($rc !== 0) {
-				error_log('ERROR: '.$GLOBALS['messages'][13]);
-				error_log(implode("\n", $o));
+				error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][13]);
+				error_log(date('M d H:i:s ').date('M d H:i:s ').implode("\n", $o));
 				exit(13);
 			}
 		} else {
 			// Node ID is not set, stop and wipe all nodes
 			foreach ($lab -> getNodes() as $node_id => $node) {
 				stop($node);
-				if ($node -> getNType() == 'docker') {
-					$cmd = 'docker rm '.$node -> getUuid();
-					exec($cmd, $o, $rc);
-				}
 			}
 			$cmd = 'rm -rf "/opt/unetlab/tmp/'.$tenant.'/'.$lab -> getId().'/"';
 			exec($cmd, $o, $rc);
 			if ($rc !== 0) {
-				error_log('ERROR: '.$GLOBALS['messages'][13]);
-				error_log(implode("\n", $o));
+				error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][13]);
+				error_log(date('M d H:i:s ').date('M d H:i:s ').implode("\n", $o));
 				exit(13);
 			}
 		}
