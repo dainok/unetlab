@@ -52,8 +52,8 @@ $.validator.addMethod('username', function(value) {
 
 // Validate a ISO date
 $.validator.addMethod('date', function(value) {
-    return /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(value); 
-}, 'Must be a ISO date (YYYY-MM-DD).');
+    return /(?:^$|^[0-9]{4}-[0-9]{2}-[0-9]{2}$)/.test(value); 
+}, 'Must be empty or an ISO date (YYYY-MM-DD).');
 
 // Validate folder form
 function validateFolder() {
@@ -111,12 +111,15 @@ function validateUser() {
 				username: true
 			},
 			'user[email]': {
+				required: true,
 				email: true
 			},
 			'user[expiration]': {
+				required: false,
 				date: true
 			},
 			'user[pexpiration]': {
+				required: false,
 				date: true
 			},
 			'user[pod]': {
