@@ -178,7 +178,7 @@ switch ($action) {
 		break;
 	case 'stopall':
 		// Kill all nodes and clear the system
-		$cmd = 'pkill -TERM dynamips_wrapper > /dev/null 2>&1';
+		$cmd = 'pkill -TERM dynamips > /dev/null 2>&1';
 		exec($cmd, $o, $rc);
 		$cmd = 'pkill -TERM iol_wrapper > /dev/null 2>&1';
 		exec($cmd, $o, $rc);

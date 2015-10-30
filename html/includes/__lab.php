@@ -114,20 +114,9 @@ class Lab {
 			}
 
 			// Lab name
-			$result = $xml -> xpath('//lab/@name');
-			if (empty($result)) {
-				// Invalid UNetLab file (attribute is missing)
-				error_log(date('M d H:i:s ').'ERROR: '.$f.' '.$GLOBALS['messages'][20004]);
-				throw new Exception('20004');
-				return;
-			} else if (!checkLabName($result[0])) {
-				// Attribute not valid
-				error_log(date('M d H:i:s ').'ERROR: '.$f.' '.$GLOBALS['messages'][20005]);
-				throw new Exception('20005');
-				return;
-			} else {
-				$this -> name = (string) $result[0];
-			}
+			$patterns[0] = '/\.unl$/';
+			$replacements[0] = '';
+			$this -> name = preg_replace($patterns, $replacements, basename($f));
 
 			// Lab ID
 			$result = $xml -> xpath('//lab/@id');

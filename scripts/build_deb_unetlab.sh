@@ -103,13 +103,16 @@ setcap cap_net_admin+ep /usr/bin/ovs-vsctl > /dev/null 2>&1
 fgrep -e vmx -e svm /proc/cpuinfo > /dev/null || echo "*** WARNING: neither Intel VT-x or AMD-V found"
 # Cleaning logs
 rm -f /opt/unetlab/data/Logs/*
+/usr/sbin/apache2ctl graceful > /dev/null 2>&1
 # Cleaning exports
 rm -f /opt/unetlab/data/Exports/*
-/usr/sbin/apache2ctl graceful > /dev/null 2>&1
+# Cleaning swp files
+find /opt/unetlab/labs/ -name "*.swp" -exec rm -f {} \;
+# Fixing permissions
+/opt/unetlab/wrappers/unl_wrapper -a fixpermissions > /dev/null 2>&1
 # Mark official kernels as hold
 apt-mark hold  \$(dpkg -l | grep -e linux-image -e linux-headers -e linux-generic | grep -v unetlab | awk '{print \$2}') > /dev/null 2>&1
-# Setting UUID on labs
-find /opt/unetlab/labs/ -name "*.unl" -printf 'Updating lab: %p\n' -exec /opt/unetlab/scripts/set_uuid.php "{}" \;
+# Additional fixes
 find /opt/unetlab/tmp/ -name "nvram_*" -exec /opt/unetlab/scripts/fix_iol_nvram.sh "{}" \;
 EOF
 
