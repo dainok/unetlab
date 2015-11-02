@@ -193,7 +193,6 @@ $app -> get('/api/status', function() use ($app, $db) {
 	} else {
 		$output['data']['qemu_version'] = $o[0];
 	}
-	$output['data']['running_path'] = '/opt/unetlab/tmp/'.$tenant;
 	$output['data']['cpu'] = apiGetCPUUsage();
 	$output['data']['disk'] = apiGetDiskUsage();
 	list($output['data']['cached'], $output['data']['mem']) = apiGetMemUsage();
@@ -463,15 +462,51 @@ $app -> get('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes$/', $s)) {
 		$output = apiGetLabNodes($lab);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/start$/', $s)) {
+		if ($tenant < 0) {
+			// User does not have an assigned tenant
+			$output['code'] = 400;
+			$output['status'] = 'fail';
+			$output['message'] = $GLOBALS['messages']['60052'];
+			$app -> response -> setStatus($output['code']);
+			$app -> response -> setBody(json_encode($output));
+			return;
+		}
 		$output = apiStartLabNodes($lab, $tenant);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/stop$/', $s)) {
+		if ($tenant < 0) {
+			// User does not have an assigned tenant
+			$output['code'] = 400;
+			$output['status'] = 'fail';
+			$output['message'] = $GLOBALS['messages']['60052'];
+			$app -> response -> setStatus($output['code']);
+			$app -> response -> setBody(json_encode($output));
+			return;
+		}
 		$output = apiStopLabNodes($lab, $tenant);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/wipe$/', $s)) {
+		if ($tenant < 0) {
+			// User does not have an assigned tenant
+			$output['code'] = 400;
+			$output['status'] = 'fail';
+			$output['message'] = $GLOBALS['messages']['60052'];
+			$app -> response -> setStatus($output['code']);
+			$app -> response -> setBody(json_encode($output));
+			return;
+		}
 		$output = apiWipeLabNodes($lab, $tenant);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/export$/', $s)) {
 		if (!in_array($user['role'], Array('admin', 'editor'))) {
 			$app -> response -> setStatus($GLOBALS['forbidden']['code']);
 			$app -> response -> setBody(json_encode($GLOBALS['forbidden']));
+			return;
+		}
+		if ($tenant < 0) {
+			// User does not have an assigned tenant
+			$output['code'] = 400;
+			$output['status'] = 'fail';
+			$output['message'] = $GLOBALS['messages']['60052'];
+			$app -> response -> setStatus($output['code']);
+			$app -> response -> setBody(json_encode($output));
 			return;
 		}
 		$output = apiExportLabNodes($lab, $tenant);
@@ -480,15 +515,51 @@ $app -> get('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/[0-9]+\/interfaces$/', $s)) {
 		$output = apiGetLabNodeInterfaces($lab, $id);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/[0-9]+\/start$/', $s)) {
+		if ($tenant < 0) {
+			// User does not have an assigned tenant
+			$output['code'] = 400;
+			$output['status'] = 'fail';
+			$output['message'] = $GLOBALS['messages']['60052'];
+			$app -> response -> setStatus($output['code']);
+			$app -> response -> setBody(json_encode($output));
+			return;
+		}
 		$output = apiStartLabNode($lab, $id, $tenant);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/[0-9]+\/stop$/', $s)) {
+		if ($tenant < 0) {
+			// User does not have an assigned tenant
+			$output['code'] = 400;
+			$output['status'] = 'fail';
+			$output['message'] = $GLOBALS['messages']['60052'];
+			$app -> response -> setStatus($output['code']);
+			$app -> response -> setBody(json_encode($output));
+			return;
+		}
 		$output = apiStopLabNode($lab, $id, $tenant);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/[0-9]+\/wipe$/', $s)) {
+		if ($tenant < 0) {
+			// User does not have an assigned tenant
+			$output['code'] = 400;
+			$output['status'] = 'fail';
+			$output['message'] = $GLOBALS['messages']['60052'];
+			$app -> response -> setStatus($output['code']);
+			$app -> response -> setBody(json_encode($output));
+			return;
+		}
 		$output = apiWipeLabNode($lab, $id, $tenant);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/[0-9]+\/export$/', $s)) {
 		if (!in_array($user['role'], Array('admin', 'editor'))) {
 			$app -> response -> setStatus($GLOBALS['forbidden']['code']);
 			$app -> response -> setBody(json_encode($GLOBALS['forbidden']));
+			return;
+		}
+		if ($tenant < 0) {
+			// User does not have an assigned tenant
+			$output['code'] = 400;
+			$output['status'] = 'fail';
+			$output['message'] = $GLOBALS['messages']['60052'];
+			$app -> response -> setStatus($output['code']);
+			$app -> response -> setBody(json_encode($output));
 			return;
 		}
 		$output = apiExportLabNode($lab, $id, $tenant);

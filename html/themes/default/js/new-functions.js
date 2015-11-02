@@ -884,12 +884,11 @@ function printSystemStats() {
 		
 		// Adding all stats
 		
-		// Version
+		// Text
 		$('#stats-text ul').append('<li>' + MESSAGES[39] + ': <code>' + data['version'] + '</code></li>');
 		$('#stats-text ul').append('<li>' + MESSAGES[49] + ': <code>' + data['qemu_version'] + '</code></li>');
 		$('#stats-text ul').append('<li>' + MESSAGES[29] + ': <code>' + ROLE + '</code></li>');
-		$('#stats-text ul').append('<li>' + MESSAGES[32] + ': <code>' + TENANT + '</code></li>');
-		$('#stats-text ul').append('<li>' + MESSAGES[52] + ': <code>' + data['running_path'] + '</code></li>');
+		$('#stats-text ul').append('<li>' + MESSAGES[32] + ': <code>' + ((TENANT == -1) ? 'none' : TENANT) + '</code></li>');
 		
 		// CPU usage
 		$('#stats-graph ul').append('<li><div class="circle circle-cpu col-md-3 col-lg-3"><strong></strong><br/><span>' + MESSAGES[36] + '</span></div></li>');

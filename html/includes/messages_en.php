@@ -212,6 +212,7 @@ $messages[60048] = 'Cannot move folder (60048).';
 $messages[60049] = 'Folder moved (60049).';
 $messages[60050] = 'Failed to stop all nodes (60050).';
 $messages[60051] = 'All nodes has been stopped (60051).';
+$messages[60052] = 'User does not have an assigned pod (60052).';
 
 // Text (70000-79999)
 $messages[70000] = 'Name/prefix';
