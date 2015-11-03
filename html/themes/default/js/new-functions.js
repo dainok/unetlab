@@ -663,7 +663,7 @@ function printLabPreview(lab_filename) {
 		if (lab['description'] != null) {
 			html += '<p>' + lab['description'] + '</p>';
 		}
-		html += '<button class="action-labopen btn btn-aqua" type="button" data-path="' + $('#list-folders').attr('data-path') + '/' + lab['filename'] + '">' + MESSAGES[22] + '</button>';
+		html += '<button class="action-labopen btn btn-aqua" type="button" data-path="' + lab_filename + '">' + MESSAGES[22] + '</button>';
 		$('#list-title-info span').html(lab['filename'].replace(/\\/g,'/').replace(/.*\//, ''));
 		$('#list-info').html(html);
 	}).fail(function(message) {
@@ -692,7 +692,7 @@ function printPageLabList(folder) {
 				logger(1, 'DEBUG: folder "' + folder + '" found.');
 				
 				// Navbar: top
-				html += '<div id="body"><nav id="navbar-top" class="hidden-xs hidden-sm navbar navbar-static-top"><div class="container col-md-12 col-lg-12"><div id="logo-main" class="col-md-3 col-lg-3"><img alt="Logo" class="img-responsive" src="/themes/default/images/logo_rr.png"/></div><div class="navbar-collapse collapse"><ul class="nav navbar-nav navbar-right"><li class="navbar-item-aqua"><a href="https://unetlab.freshdesk.com/support/tickets/new" target="_blank"">Help</a></li><li class="navbar-item-grey"><a href="http://www.unetlab.com/" target="_blank">About</a></li><li class="navbar-item-grey"><a href="http://forum.802101.com/forum39.html" target="_blank">Forum</a></li></ul></div></div></nav>';
+				html += '<nav id="navbar-top" class="hidden-xs hidden-sm navbar navbar-static-top"><div class="container col-md-12 col-lg-12"><div id="logo-main" class="col-md-3 col-lg-3"><img alt="Logo" class="img-responsive" src="/themes/default/images/logo_rr.png"/></div><div class="navbar-collapse collapse"><ul class="nav navbar-nav navbar-right"><li class="navbar-item-aqua"><a href="https://unetlab.freshdesk.com/support/tickets/new" target="_blank"">Help</a></li><li class="navbar-item-grey"><a href="http://www.unetlab.com/" target="_blank">About</a></li><li class="navbar-item-grey"><a href="http://forum.802101.com/forum39.html" target="_blank">Forum</a></li></ul></div></div></nav>';
 
 				// Navbar: main
 				html += '<nav id="navbar-main" class="navbar navbar-static-top"><div class="container col-md-12 col-lg-12"><div id="navbar-main-text" class="hidden-xs hidden-sm col-md-3 col-lg-3">by Andrea Dainese</div><div id="navbar-main-spacer" class="hidden-xs hidden-sm"></div><div class="navbar-collapse collapse"><ul class="col-md-9 col-lg-9 nav navbar-nav"><li class="item-first lab-list"><a class="action-lablist" href="#">' + MESSAGES[11] + '</a></li><li class="separator hidden-xs hidden-sm"><img alt="Spacer" src="/themes/default/images/vertical_dots.gif"/></li><li class="item dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Actions <span class="caret"></span></a><ul id="actions-menu" class="dropdown-menu"><li><a href="#">&lt;' + MESSAGES[3] + '&gt;</a></li></ul></li><li class="separator hidden-xs hidden-sm"><img alt="Spacer" src="/themes/default/images/vertical_dots.gif"/></li><li class="item usermgmt"><a class="action-usermgmt" href="#">' + MESSAGES[12] + '</a></li><li class="separator hidden-xs hidden-sm"><img alt="Spacer" src="/themes/default/images/vertical_dots.gif"/></li><li class="item sysstatus"><a class="action-sysstatus" href="#">' + MESSAGES[13] + '</a></li><li class="separator hidden-xs hidden-sm"><img alt="Spacer" src="/themes/default/images/vertical_dots.gif"/></li><li class="item"><a class="action-logout item" href="#"><i class="glyphicon glyphicon-log-out"></i> ' + MESSAGES[14] + '</a></li></ul></div></div></nav>';
@@ -704,7 +704,7 @@ function printPageLabList(folder) {
 				html += '<div id="main" class="container col-md-12 col-lg-12"><div class="fill-height row row-eq-height"><div id="list-folders" class="col-md-3 col-lg-3" data-path="' + folder + '"><ul></ul></div><div id="list-labs" class="col-md-3 col-lg-3"><ul></ul></div><div id="list-info" class="col-md-6 col-lg-6"></div></div></div>';
 				
 				// Footer
-				html += '</div>';
+				html += '';
 				
 				// Adding to the page
 				$('#body').html(html);
@@ -805,6 +805,20 @@ function printPageLabList(folder) {
 			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
 		}
 	});
+}
+
+// Print lab open page
+function printPageLabOpen(lab) {
+	var html = '';
+	
+	// Navbar: main
+	html += '<nav id="navbar-lab" class="navbar navbar-static-top"><div class="container col-md-12 col-lg-12"><div class="navbar-collapse collapse"><ul class="col-md-9 col-lg-9 nav navbar-nav"><li class="item dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Actions <span class="caret"></span></a><ul id="actions-menu" class="dropdown-menu"><li><a href="#">&lt;' + MESSAGES[3] + '&gt;</a></li></ul></li><li class="item sysstatus"><a class="action-labclose" href="#"><i class="glyphicon glyphicon-remove"></i> ' + MESSAGES[55] + '</a></li><li class="item"><a class="action-logout item" href="#"><i class="glyphicon glyphicon-log-out"></i> ' + MESSAGES[14] + '</a></li></ul></div></div></nav>';
+	
+	// Main
+	html += '<div id="lab-sidebar"><ul><li><a class="action-add item" href="#"><i class="glyphicon glyphicon-plus"></i></a></li></ul></div>';
+	html += '<div id="lab-viewport" data-path="' + lab + '">v i e w p o r t</div>';
+	
+	$('#body').html(html);
 }
 
 // Print user management section

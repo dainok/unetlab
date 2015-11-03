@@ -47,7 +47,7 @@ fun refresh_callback () {
 
 Plymouth.SetRefreshFunction (refresh_callback);
 
-#----------------------------------------- Progress Bar --------------------------------
+#--- Progress Bar ---------------------------------------------------------
 
 # Load the bar
 bar.image = Image("bar.png");
@@ -112,7 +112,7 @@ fun progress_callback (duration, progress) {
     # Currently we do nothing here
 Plymouth.SetBootProgressFunction(progress_callback);
 
-#----------------------------------------- Quit --------------------------------
+#--- Quit -----------------------------------------------------------------
 
 fun quit_callback () {
     if (Plymouth.GetMode() == "boot") {
@@ -151,7 +151,7 @@ fun quit_callback () {
 
 Plymouth.SetQuitFunction(quit_callback);
 
-#----------------------------------------- Message --------------------------------
+#--- Message --------------------------------------------------------------
 
 message_sprite = Sprite();
 message_sprite.SetPosition(10, 10, 10000);

@@ -85,3 +85,4 @@ MESSAGES[51] = 'Cannot rename root folder.';
 MESSAGES[52] = 'Path';
 MESSAGES[53] = 'not lgged in';
 MESSAGES[54] = 'never';
+MESSAGES[55] = 'Close';

@@ -1,3 +1,23 @@
+#lab-sidebar {
+	background-color: #3ba9ba;
+	bottom: 0px;
+	padding-top: 30px;
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	width: 30px;
+}
+
+#lab-viewport {
+	bottom: 0px;
+	position: absolute;
+	left: 30px;
+	overflow: scroll;
+	right: 0px;
+	top: 30px;
+	white-space: nowrap;
+}
+
 #list-title-folders {
 	color: #ffffff;
 	background-color: #58585a;
@@ -124,6 +144,69 @@
 	font-weight: bold;
 	margin: 0px;
 	padding: 0px;
+}
+
+#navbar-lab {
+	background-color: #3ba9ba;
+	height: 30px;
+	margin-bottom: -1px !important;
+	margin-top: -1px !important;
+	min-height: 30px;
+	max-height: 30px;
+}
+
+#navbar-lab, #navbar-lab > div {
+	margin: 0px;
+	padding: 0px;
+}
+
+#navbar-lab ul.navbar-nav {
+	float: right;
+	text-transform: uppercase;
+	width: 70vw;
+}
+
+#navbar-lab li {
+	margin: 0px;
+	padding: 0px;
+}
+
+#navbar-lab  .item i , #navbar-lab  span.caret{
+	color: #ffffff;
+}
+
+#navbar-lab .item a {
+	text-align: center;
+	width: 12vw;
+}
+
+#navbar-lab  .item > a, #navbar-lab  .item-first > a, #navbar-lab .item > a:link, #navbar-lab .item-first > a:link, #navbar-lab .item > a:visited, #navbar-lab .item-first > a:visited {
+	background-color: transparent;
+	border-bottom: 5px solid transparent;
+	color: #ffffff;
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+	font-size: 0.8em;
+	margin: 0px;
+	padding: 2px;
+}
+
+#navbar-lab .item > a:active, #navbar-lab .item-first > a:active, #navbar-lab .item > a:hover, #navbar-lab .item-first > a:hover {
+	background-color: transparent;
+	border-bottom: 5px solid #ffffff;
+}
+
+#navbar-lab .dropdown-menu a, #navbar-lab .dropdown-menu a:link, #navbar-lab .dropdown-menu a:visited {
+	color: #3ba9ba;
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+	font-size: 0.8em;
+	text-align: left;
+	text-transform: none;
+	width: 100%;
+}
+
+#navbar-lab .dropdown-menu a:active, #navbar-lab .dropdown-menu a:hover {
+	background-color: #f5f5f5;
+	color: #3ba9ba;
 }
 
 #users  table {

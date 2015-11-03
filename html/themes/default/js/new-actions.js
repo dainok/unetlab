@@ -119,7 +119,10 @@ $(document).on('click', '.action-lablist', function(e) {
 // Open a lab
 $(document).on('click', '.action-labopen', function(e) {
 	logger(1, 'DEBUG: action = labopen');
+	//TODO enable old lab_open page
 	window.location = '/lab_open.php?filename=' + $(this).attr('data-path') + '&tenant=' + TENANT;
+	//printPageLabOpen($(this).attr('data-path'));
+	
 });
 
 // Preview a lab
