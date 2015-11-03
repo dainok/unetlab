@@ -74,11 +74,6 @@ fun progress_callback (duration, progress) {
             # Boot scale can lead to large bar
             bar.width = bar_width * scale * progress * boot_scale;
         }
-        if (progress > 50) {
-            # Hide: need to manually hide logo and bar after 70%
-            bar.sprite.SetOpacity(0);
-            logo.sprite.SetOpacity(0);
-        }
     } else if (Plymouth.GetMode() == "shutdown") {
         if (1 - progress * shutdown_scale >= 0) {
             # Shutdown scale can lead to negative bar
@@ -120,38 +115,10 @@ Plymouth.SetBootProgressFunction(progress_callback);
 #--- Quit -----------------------------------------------------------------
 
 fun quit_callback () {
-    if (Plymouth.GetMode() == "boot") {
-        bar.width = bar_width * scale;
-    } else if (Plymouth.GetMode() == "shutdown") {
-        bar.width = 0;
-    } else {
-        # suspend and resume
-        bar.width = bar_width * scale;
-    }
-
-    if (checkpoint != progress) {
-        # Position the scaled bar
-        bar.scaled = bar.image.Scale(bar.width, bar.height);
-        bar.sprite = Sprite();
-        bar.sprite.SetImage(bar.scaled);
-        bar.sprite.SetX(bar.x);
-        bar.sprite.SetY(bar.y);
-        bar.sprite.SetZ(bar.z);
-        bar.sprite.SetOpacity(1);
-
-        # Position the scaled end bar
-        end.x = logo.x + logo.width * bar_x / logo.image.GetWidth() + bar.width - 1;   # Start at the end of the bar
-        end.width = end.image.GetWidth() * scale;
-        end.scaled = end.image.Scale(end.width, end.height);
-        end.sprite = Sprite();
-        end.sprite.SetImage(end.scaled);
-        end.sprite.SetX(end.x);
-        end.sprite.SetY(end.y);
-        end.sprite.SetZ(end.z);
-        end.sprite.SetOpacity(1);
-
-        checkpoint = progress;
-    }
+    Window.SetBackgroundTopColor(0.0, 0.0, 0.0);
+    Window.SetBackgroundBottomColor(0.0, 0.0, 0.0);
+    bar.sprite.SetOpacity(0);
+    logo.sprite.SetOpacity(0);
 }
 
 Plymouth.SetQuitFunction(quit_callback);
