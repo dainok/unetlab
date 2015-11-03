@@ -74,6 +74,11 @@ fun progress_callback (duration, progress) {
             # Boot scale can lead to large bar
             bar.width = bar_width * scale * progress * boot_scale;
         }
+		if (progress > 70) {
+			# Hide: need to manually hide logo and bar after 70%
+			bar.sprite.SetOpacity(0);
+			logo.sprite.SetOpacity(0);
+		}
     } else if (Plymouth.GetMode() == "shutdown") {
         if (1 - progress * shutdown_scale >= 0) {
             # Shutdown scale can lead to negative bar
