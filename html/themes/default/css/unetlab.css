@@ -8,6 +8,24 @@
 	width: 30px;
 }
 
+#lab-sidebar ul {
+	line-height: 2em;
+	list-style-type: none;
+	margin-left: -32px;
+	margin-right: -15px;
+	margin-top: 0px;
+}
+
+#lab-sidebar a i, #lab-sidebar a:link i, #lab-sidebar a:visited i {
+	color: #ffffff;
+	font-size: 1.2em;
+}
+
+#lab-sidebar a:active i, #lab-sidebar a:hover i {
+	color: red;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.49);
+}
+
 #lab-viewport {
 	bottom: 0px;
 	position: absolute;
@@ -16,6 +34,27 @@
 	right: 0px;
 	top: 30px;
 	white-space: nowrap;
+}
+
+#lab-viewport .network, #lab-viewport .node {
+	position: absolute;
+}
+
+#lab-viewport .network, #lab-viewport .node {
+	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	font-size: 0.8em;
+	font-weight: bold;
+	text-align: center;
+}
+
+#lab-viewport .node_interface {
+	background-color: #9fd3db;
+	border: 2px solid #46a6b6;
+	border-radius: 8px;
+    font-family: helvetica;
+    font-size: 0.8em;
+    font-weight: bold;
+    padding: 0px 2px 0px 2px;
 }
 
 #list-title-folders {

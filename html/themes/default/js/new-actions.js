@@ -72,6 +72,57 @@ $(document).on('shown.bs.modal', '.modal', function () {
     $('.autofocus').focus();
 });
 
+// After node/network move
+$(document).on('dragstop', '.node_frame, .network_frame', function(e) {
+	var lab_filename = $('#lab-viewport').attr('data-path');
+	var offset = $(this).offset();
+	var left = (100 * (offset.left / $(window).width())).toFixed(0) + '%';
+	var top = (100 * (offset.top / $(window).height())).toFixed(0) + '%';
+	var id = $(this).attr('data-path');
+
+	if ($(this).hasClass('node_frame')) {
+		logger(1, 'DEBUG: setting node' + id + ' position.');
+		$.when(setNodePosition(lab_filename, id, left, top)).done(function() {
+			// Position saved -> redraw topology
+			jsPlumb.repaintEverything();
+		}).fail(function(message) {
+			// Error on save
+			addModalError(message);
+		});
+	} else if ($(this).hasClass('network_frame')) {
+		logger(1, 'DEBUG: setting network' + id + ' position.');
+		$.when(setNetworkPosition(lab_filename, id, left, top)).done(function() {
+			// Position saved -> redraw topology
+			jsPlumb.repaintEverything();
+		}).fail(function(message) {
+			// Error on save
+			addModalError(message);
+		});
+	} else {
+		logger(1, 'DEBUG: unknown object.');
+	}
+});
+
+// Connect to a node
+$(document).on('click', '.node_frame', function(e) {
+	window.location = $(this).attr('data-url');
+});
+
+// Open a node
+$(document).on('contextmenu', '.node_frame', function(e) {
+	e.preventDefault();  // Prevent default behaviour
+	console.log("DBL");
+	//$('#hello').hide('slide', {direction: 'left'}, 1000); requires the jQuery-ui library. See http://www.jqueryui.com
+});
+
+// Window resize
+$(window).resize(function(){
+	if ($('#lab-viewport').length ) {
+        // Update topology on window resize
+        jsPlumb.repaintEverything();
+    }
+});
+
 /***************************************************************************
  * Actions links
  **************************************************************************/
@@ -120,8 +171,8 @@ $(document).on('click', '.action-lablist', function(e) {
 $(document).on('click', '.action-labopen', function(e) {
 	logger(1, 'DEBUG: action = labopen');
 	//TODO enable old lab_open page
-	window.location = '/lab_open.php?filename=' + $(this).attr('data-path') + '&tenant=' + TENANT;
-	//printPageLabOpen($(this).attr('data-path'));
+	//window.location = '/lab_open.php?filename=' + $(this).attr('data-path') + '&tenant=' + TENANT;
+	printPageLabOpen($(this).attr('data-path'));
 	
 });
 
@@ -134,6 +185,11 @@ $(document).on('dblclick', '.action-labpreview', function(e) {
 	});
 	$(this).addClass('lab-opened');
 	printLabPreview($(this).attr('data-path'));
+});
+
+// Redraw topology
+$(document).on('click', '.action-labtopologyrefresh', function(e) {
+	printLabTopology($('#lab-viewport').attr('data-path'))
 });
 
 // Logout
