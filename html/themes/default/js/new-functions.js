@@ -619,8 +619,6 @@ function moveFolder(folder, path) {
 	var url = '/api/folders' + folder;
 	var form_data = {};
 	form_data['path'] = (path == '/') ? '/' + basename(folder) : path + '/' + basename(folder);
-	console.log('URL ' + url);
-	console.log(form_data);
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,
