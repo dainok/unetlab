@@ -56,8 +56,7 @@ $(document).ready(function() {
 			logger(1, 'DEBUG: loading language.');
 			$.getScript('/themes/default/js/new-messages_' + LANG + '.js')
 				.done(function() {
-					logger(1, 'DEBUG: loading folder "' + FOLDER + '".');
-					printPageLabList(FOLDER);
+					postLogin();
 				})
 				.fail(function() {
 					logger(1, 'DEBUG: error loading language.');

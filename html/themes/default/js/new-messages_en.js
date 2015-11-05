@@ -93,3 +93,6 @@ MESSAGES[59] = 'Get pictures';
 MESSAGES[60] = 'Close lab';
 MESSAGES[61] = 'Get networks';
 MESSAGES[62] = 'Get nodes';
+MESSAGES[63] = 'Running lab';
+MESSAGES[64] = 'Lab details';
+

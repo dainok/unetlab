@@ -194,6 +194,11 @@
 	max-height: 30px;
 }
 
+#main.row {
+	margin: 0px;
+	padding: 0px;
+}
+
 #navbar-lab, #navbar-lab > div {
 	margin: 0px;
 	padding: 0px;
@@ -248,21 +253,26 @@
 	color: #3ba9ba;
 }
 
-#users  table {
+#pods, #users  {
+	margin: 0px 0px 15px 0px;
+	padding: 0px;
+}
+
+#pods table, #users  table {
 	margin: 0px;
 	padding: 0px;
 
 }
 
-#users thead {
+#pods thead, #users thead {
 	background: #3ba9ba;
 }
 
-#users thead tr {
+#pods thead tr, #users thead tr {
 	border: 0px;
 }
 
-#users thead th {
+#pods thead th, #users thead th {
 	border: 0px;
 	color: #ffffff;
 	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
@@ -273,23 +283,19 @@
 	white-space: nowrap;
 }
 
-#users tbody {
+#pods tbody, #users tbody {
 	background-color: #babbbd;
 }
 
-#users tbody tr {
+#pods tbody tr, #users tbody tr {
 	border: 1px solid #ffffff;
 }
 
-#users tbody td {
+#pods tbody td, #users tbody td {
 	border: 0px;
 	color: #ffffff;
 	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
 	font-size: 0.8em;
-}
-
-.modal-title {
-	text-transform: uppercase;
 }
 
 #stats-text {
@@ -390,7 +396,9 @@
 	height: 100%;
 }
 
-
+.modal-title {
+	text-transform: uppercase;
+}
 
 
 

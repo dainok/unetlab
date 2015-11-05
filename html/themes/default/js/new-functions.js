@@ -90,6 +90,38 @@ function cloneLab(form_data) {
 	return deferred.promise();
 }
 
+// Close lab
+function closeLab() {
+	var deferred = $.Deferred();
+	var url = '/api/labs/close';
+	var type = 'DELETE'
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: lab closed.');
+				LAB = null;
+				deferred.resolve();
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject(data['message']);
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
+}
+
 // Delete folder
 function deleteFolder(path) {
 	var deferred = $.Deferred();
@@ -650,6 +682,17 @@ function moveLab(lab, path) {
 	return deferred.promise();
 }
 
+// Post login
+function postLogin() {
+	if (LAB == null) {
+		logger(1, 'DEBUG: loading folder "' + FOLDER + '".');
+		printPageLabList(FOLDER);
+	} else {
+		logger(1, 'DEBUG: loading lab "' + LAB + '".');
+		printPageLabOpen(LAB);
+	}
+}
+
 // Set network position
 function setNetworkPosition(lab_filename, network_id, left, top) {
 	var deferred = $.Deferred();
@@ -844,10 +887,10 @@ function printLabTopology(lab_filename) {
 			} else {
 				var icon = 'cloud.png';
 			}
-			$('#lab-viewport').append('<div id="network' + value['id'] + '" class="network network' + value['id'] + ' network_frame unused" style="top: ' + value['top'] + '; left: ' + value['left'] + '" data-path="' + value['id'] + '"><img src="/images/' + icon + '"><div class="network_name">' + value['name'] + '</div></div>');
+			$('#lab-viewport').append('<div id="network' + value['id'] + '" class="network network' + value['id'] + ' network_frame unused" style="top: ' + value['top'] + '; left: ' + value['left'] + '" data-path="' + value['id'] + '"><img src="/images/' + icon + '"/><div class="network_name">' + value['name'] + '</div></div>');
 		});
 		$.each(nodes, function(key, value) {
-			$('#lab-viewport').append('<div id="node' + value['id'] + '" class="node node' + value['id'] + ' node_frame" style="top: ' + value['top'] + '; left: ' + value['left'] + ';" data-path="' + value['id'] + '" data-url="' + value['url'] + '"><img src="/images/icons/' + value['icon'] + '"><div class="node_name"><i class="node' + value['id'] + '_status"></i> ' + value['name'] + '</div></div>');
+			$('#lab-viewport').append('<div id="node' + value['id'] + '" class="node node' + value['id'] + ' node_frame" style="top: ' + value['top'] + '; left: ' + value['left'] + ';" data-path="' + value['id'] + '"><a href="' + value['url'] + '"><img src="/images/icons/' + value['icon'] + '"/></a><div class="node_name"><i class="node' + value['id'] + '_status"></i> ' + value['name'] + '</div></div>');
 		});
 		
 		// Drawing topology
@@ -858,7 +901,7 @@ function printLabTopology(lab_filename) {
 				Connector: ['Straight'],
 				Endpoint: 'Blank',
 				PaintStyle: {lineWidth: 2, strokeStyle: '#58585a'},
-				cssClass: 'link',
+				cssClass: 'link'
 			});
 			
 			// Create jsPlumb topology
@@ -876,6 +919,7 @@ function printLabTopology(lab_filename) {
 				var source_label = link['source_label'];
 				var destination = link['destination'];
 				var destination_label = link['destination_label'];
+				logger(1, 'DEBUG: linking "' + source + ':' + source_label + '" to "' + destination + ':' + destination_label + '".');
 
 				if (type == 'ethernet') {
 					if (source_label != '') {
@@ -893,7 +937,7 @@ function printLabTopology(lab_filename) {
 						source: source,       // Must attach to the IMG's parent or not printed correctly
 						target: destination,  // Must attach to the IMG's parent or not printed correctly
 						cssClass: source + ' ' + destination + ' frame_ethernet',
-						overlays: [ src_label, dst_label ]
+						overlays: [ src_label, dst_label ],
 					});
 				} else {
 					jsPlumb.connect({
@@ -911,8 +955,8 @@ function printLabTopology(lab_filename) {
 				}
 			});
 
-			// Hide unused elements
-			$('.unused').hide();
+			// Remove unused elements
+			$('.unused').remove();
 
 			// Move elements under the topology node
 			$('._jsPlumb_connector, ._jsPlumb_overlay, ._jsPlumb_endpoint_anchor_').detach().appendTo('#lab-viewport');
@@ -1088,6 +1132,7 @@ function printPageLabOpen(lab) {
 		// Adding actions
 		$('#lab-sidebar ul').empty();
 		$('#lab-sidebar ul').append('<li><a class="action-labobjectadd" href="#" title="' + MESSAGES[56] + '"><i class="glyphicon glyphicon-plus"></i></a></li>');
+		$('#lab-sidebar ul').append('<li><a class="action-labbody" href="#" title="' + MESSAGES[64] + '"><i class="glyphicon glyphicon-list-alt"></i></a></li>');
 		$('#lab-sidebar ul').append('<li><a class="action-labnodesget" href="#" title="' + MESSAGES[62] + '"><i class="glyphicon glyphicon-hdd"></i></a></li>');
 		$('#lab-sidebar ul').append('<li><a class="action-labnetworksget" href="#" title="' + MESSAGES[61] + '"><i class="glyphicon glyphicon-transfer"></i></a></li>');
 		$('#lab-sidebar ul').append('<li><a class="action-labconfigsget" href="#" title="' + MESSAGES[58] + '"><i class="glyphicon glyphicon-align-left"></i></a></li>');
@@ -1107,7 +1152,8 @@ function printPageLabOpen(lab) {
 // Print user management section
 function printUserManagement() {
 	$.when(getUsers()).done(function(data) {
-		var html = '<div id="users" class="col-md-12 col-lg-12"><div class="table-responsive"><table class="table"><thead><tr><th>Username</th><th>' + MESSAGES[19] + '</th><th>' + MESSAGES[28] + '</th><th>' + MESSAGES[29] + '</th><th>' + MESSAGES[30] + '</th><th>' + MESSAGES[31] + '</th><th>' + MESSAGES[32] + '</th><th>' + MESSAGES[33] + '</th></tr></thead><tbody></tbody></table></div></div>';
+		var html = '<div class="row"><div id="users" class="col-md-12 col-lg-12"><div class="table-responsive"><table class="table"><thead><tr><th>' + MESSAGES[44] + '</th><th>' + MESSAGES[19] + '</th><th>' + MESSAGES[28] + '</th><th>' + MESSAGES[29] + '</th><th>' + MESSAGES[30] + '</th><th>' + MESSAGES[31] + '</th><th>' + MESSAGES[32] + '</th></tr></thead><tbody></tbody></table></div></div></div>';
+		html += '<div class="row"><div id="pods" class="col-md-12 col-lg-12"><div class="table-responsive"><table class="table"><thead><tr><th>' + MESSAGES[44] + '</th><th>' + MESSAGES[32] + '</th><th>' + MESSAGES[33] + '</th><th>' + MESSAGES[63] + '</th></tr></thead><tbody></tbody></table></div></div></div>';
 		$('#main-title').hide();
 		$('#main').html(html);
 	
@@ -1128,6 +1174,11 @@ function printUserManagement() {
 			var name = object['name'];
 			var email = object['email'];
 			var role = object['role'];
+			if (object['lab'] == null) {
+				var lab = 'none';
+			} else {
+				var lab = object['lab'];
+			}
 			if (object['pod'] == -1) {
 				var pod = 'none';
 			} else {
@@ -1151,7 +1202,10 @@ function printUserManagement() {
 				var d = new Date(object['pexpiration'] * 1000);
 				pexpiration = d.toLocaleDateString(); 
 			}
-			$('#users tbody').append('<tr class="action-useredit user" data-path="' + username + '"><td class="username">' + username + '</td><td class="class="name">' + name + '</td><td class="email">' + email + '</td><td class="role">' + role + '</td><td class="expiration">' + expiration + '</td><td class="session">' + session + '</td><td class="pod">' + pod + '</td><td class="pexpiration">' + pexpiration + '</td></tr>');
+			$('#users tbody').append('<tr class="action-useredit user" data-path="' + username + '"><td class="username">' + username + '</td><td class="class="name">' + name + '</td><td class="email">' + email + '</td><td class="role">' + role + '</td><td class="expiration">' + expiration + '</td><td class="session">' + session + '</td><td class="pod">' + pod + '</td></tr>');
+			if (object['pod'] >= 0) {
+				$('#pods tbody').append('<tr class="action-useredit user" data-path="' + username + '"><td class="username">' + username + '</td><td class="pod">' + pod + '</td><td class="pexpiration">' + pexpiration + '</td><td class="lab">' + lab + '</td></tr>');
+			}
 		});
 	}).fail(function(message) {
 		addModalError(message);

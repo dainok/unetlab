@@ -878,9 +878,32 @@ function updateUserFolder($db, $cookie, $folder) {
 		$statement -> execute();
 		return 0;
 	} catch (Exception $e) {
-		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][90017]);
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][90033]);
 		error_log(date('M d H:i:s ').(string) $e);
 		return 90033;
+	}
+}
+
+/**
+ * Function to update POD lab.
+ *
+ * @param   PDO     $db                 PDO object for database connection
+ * @param   string  $cookie             Session cookie
+ * @param   string  $lab				Running lab
+ * @return  0                           0 means ok
+ */
+function updatePodLab($db, $tenant, $lab_file) {
+	try {
+		$query = 'UPDATE pods SET lab_id = :lab_id WHERE id = :id;';
+		$statement = $db -> prepare($query);
+		$statement -> bindParam(':id', $tenant, PDO::PARAM_STR);
+		$statement -> bindParam(':lab_id', $lab_file, PDO::PARAM_STR);
+		$statement -> execute();
+		return 0;
+	} catch (Exception $e) {
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][90034]);
+		error_log(date('M d H:i:s ').(string) $e);
+		return 90034;
 	}
 }
 ?>

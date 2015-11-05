@@ -564,7 +564,25 @@ $app -> get('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 		}
 		$output = apiExportLabNode($lab, $id, $tenant);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/topology$/', $s)) {
-		$output = apiGetLabTopology($lab);
+		if ($tenant < 0) {
+			// User does not have an assigned tenant
+			$output['code'] = 400;
+			$output['status'] = 'fail';
+			$output['message'] = $GLOBALS['messages']['60052'];
+			$app -> response -> setStatus($output['code']);
+			$app -> response -> setBody(json_encode($output));
+			return;
+		}
+		// Setting lab as last viewed
+		$rc = updatePodLab($db, $tenant, $lab_file);
+		if ($rc !== 0) {
+			// Cannot update user lab
+			$output['code'] = 500;
+			$output['status'] = 'error';
+			$output['message'] = $GLOBALS['messages'][$rc];
+		} else {
+			$output = apiGetLabTopology($lab);
+		}
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/pictures$/', $s)) {
 		$output = apiGetLabPictures($lab, $id);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/pictures\/[0-9]+$/', $s)) {
@@ -788,6 +806,41 @@ $app -> post('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 		$output['code'] = 400;
 		$output['status'] = 'fail';
 		$output['message'] = $GLOBALS['messages'][60027];
+	}
+
+	$app -> response -> setStatus($output['code']);
+	$app -> response -> setBody(json_encode($output));
+});
+
+// Close a lab
+$app -> delete('/api/labs/close', function() use ($app, $db) {
+	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($user === False) {
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+
+	if ($tenant < 0) {
+		// User does not have an assigned tenant
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages']['60052'];
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+
+	$rc = updatePodLab($db, $tenant, null);
+	if ($rc !== 0) {
+		// Cannot update user lab
+		$output['code'] = 500;
+		$output['status'] = 'error';
+		$output['message'] = $GLOBALS['messages'][$rc];
+	} else {
+		$output['code'] = 200;
+		$output['status'] = 'success';
+		$output['message'] = $GLOBALS['messages'][60053];
 	}
 
 	$app -> response -> setStatus($output['code']);

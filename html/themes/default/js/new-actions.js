@@ -74,6 +74,7 @@ $(document).on('shown.bs.modal', '.modal', function () {
 
 // After node/network move
 $(document).on('dragstop', '.node_frame, .network_frame', function(e) {
+	console.log("UPDATE");
 	var lab_filename = $('#lab-viewport').attr('data-path');
 	var offset = $(this).offset();
 	var left = (100 * (offset.left / $(window).width())).toFixed(0) + '%';
@@ -101,11 +102,6 @@ $(document).on('dragstop', '.node_frame, .network_frame', function(e) {
 	} else {
 		logger(1, 'DEBUG: unknown object.');
 	}
-});
-
-// Connect to a node
-$(document).on('click', '.node_frame', function(e) {
-	window.location = $(this).attr('data-url');
 });
 
 // Open a node
@@ -159,6 +155,16 @@ $(document).on('click', '.action-import', function(e) {
 $(document).on('click', '.action-labadd', function(e) {
 	logger(1, 'DEBUG: action = labadd');
 	printFormLabAdd($('#list-folders').attr('data-path'));
+});
+
+// Lab close
+$(document).on('click', '.action-labclose', function(e) {
+	logger(1, 'DEBUG: action = labclose');
+	$.when(closeLab()).done(function() {
+		postLogin();
+	}).fail(function(message) {
+		addModalError(message);
+	});
 });
 
 // List all labs
@@ -485,8 +491,8 @@ $(document).on('submit', '#form-login', function(e) {
 				$(e.target).parents('.modal').modal('hide');
 				$.when(getUserInfo()).done(function() {
 					// User is authenticated
-					logger(1, 'DEBUG: loading home page.');
-					printPageLabList(FOLDER);
+					logger(1, 'DEBUG: user authenticated.');
+					postLogin();
 				}).fail(function() {
 					// User is not authenticated, or error on API
 					logger(1, 'DEBUG: loading authentication page.');

@@ -84,7 +84,7 @@ function apiGetUUser($db, $user) {
 function apiGetUUsers($db) {
 	$data = Array();
 
-	$query = 'SELECT users.username AS username, email, users.expiration AS expiration, folder, name, session, role, ip, pods.id AS pod, pods.expiration AS pexpiration FROM users LEFT JOIN pods ON users.username = pods.username ORDER BY users.username ASC;';
+	$query = 'SELECT users.username AS username, email, users.expiration AS expiration, folder, name, session, role, ip, pods.id AS pod, pods.expiration AS pexpiration, pods.lab_id AS lab FROM users LEFT JOIN pods ON users.username = pods.username ORDER BY users.username ASC;';
 	try {
 		$statement = $db -> prepare($query);
 		$statement -> execute();
@@ -98,6 +98,7 @@ function apiGetUUsers($db) {
 			$data[$row['username']]['role'] = $row['role'];
 			$data[$row['username']]['ip'] = $row['ip'];
 			$data[$row['username']]['folder'] = $row['folder'];
+			$data[$row['username']]['lab'] = $row['lab'];
 			if ($row['pod'] == Null) {
 				$data[$row['username']]['pod'] = -1;
 			} else {
