@@ -74,7 +74,6 @@ $(document).on('shown.bs.modal', '.modal', function () {
 
 // After node/network move
 $(document).on('dragstop', '.node_frame, .network_frame', function(e) {
-	console.log("UPDATE");
 	var lab_filename = $('#lab-viewport').attr('data-path');
 	var offset = $(this).offset();
 	var left = (100 * (offset.left / $(window).width())).toFixed(0) + '%';
