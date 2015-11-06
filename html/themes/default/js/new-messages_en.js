@@ -95,4 +95,15 @@ MESSAGES[61] = 'Get networks';
 MESSAGES[62] = 'Get nodes';
 MESSAGES[63] = 'Running lab';
 MESSAGES[64] = 'Lab details';
+MESSAGES[65] = 'Delete';
+MESSAGES[66] = 'Start';
+MESSAGES[67] = 'Stop';
+MESSAGES[68] = 'Wipe';
+MESSAGES[69] = 'Export CFG';
+MESSAGES[70] = 'Capture';
+MESSAGES[71] = 'Edit';
+MESSAGES[72] = 'Interfaces';
+MESSAGES[73] = 'Edit';
+MESSAGES[75] = 'Manage';
+
 

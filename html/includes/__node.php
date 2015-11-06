@@ -167,9 +167,14 @@ class Node {
 		}
 
 		if (isset($p['left']) && !checkPosition($p['left'])) {
-			// Left is invalid, ignored
-			unset($p['left']);
-			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40007]);
+			if (preg_match('/^[0-9]+%$/', $p['left']) && substr($p['left'], 0, -1) >= 0 && substr($p['left'], 0, -1) <= 100) {
+				// Converting percentage to absolute using a 800x600 viewport
+				$p['left'] = 1024 * substr($p['left'], 0, -1) / 100;
+			} else {
+				// Left is invalid, ignored
+				unset($p['left']);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40007]);
+			}
 		}
 
 		if (isset($p['name']) && !checkNodeName($p['name'])) {
@@ -179,9 +184,14 @@ class Node {
 		}
 
 		if (isset($p['top']) && !checkPosition($p['top'])) {
-			// Top is invalid, ignored
-			unset($p['top']);
-			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40010]);
+			if (preg_match('/^[0-9]+%$/', $p['top']) && substr($p['top'], 0, -1) >= 0 && substr($p['top'], 0, -1) <= 100) {
+				// Converting percentage to absolute using a 800x600 viewport
+				$p['top'] = 768 * substr($p['top'], 0, -1) / 100;
+			} else {
+				// Top is invalid, ignored
+				unset($p['top']);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40010]);
+			}
 		}
 
 		// Specific parameters
@@ -298,9 +308,9 @@ class Node {
 		if (isset($p['config'])) $this -> config = htmlentities($p['config']);		// TODO it's a template and must exists or set to saved
 		if (isset($p['delay'])) $this -> delay = (int) $p['delay'];
 		if (isset($p['icon'])) $this -> icon = $p['icon'];
-		if (isset($p['left'])) $this -> left = $p['left'];
+		if (isset($p['left'])) $this -> left = (int) $p['left'];
 		if (isset($p['name'])) $this -> name = $p['name'];
-		if (isset($p['top'])) $this -> top = $p['top'];
+		if (isset($p['top'])) $this -> top = (int) $p['top'];
 
 		// Building iol node
 		if ($p['type'] == 'iol') {
@@ -1161,7 +1171,7 @@ class Node {
 	}
 
 	/**
-	* Method to get top offset.
+* Method to get top offset.
 	*
 	* @return  string                      Top offset
 	*/

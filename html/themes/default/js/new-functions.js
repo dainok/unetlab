@@ -263,8 +263,8 @@ function getJsonMessage(response) {
 	try {
 		message = JSON.parse(response)['message'];
 		code = JSON.parse(response)['code'];
-		if (code == 400) {
-			// if 400 should redirect (user timed out)
+		if (code == 412) {
+			// if 412 should redirect (user timed out)
 			window.setTimeout(function() {
 				location.reload();
 			}, 2000);
@@ -795,6 +795,37 @@ function stopAll() {
 /***************************************************************************
  * Print forms and pages
  **************************************************************************/
+// Context menu
+function printContextMenu(title, body, pageX, pageY) {
+    var menu = '<div id="context-menu" class="collapse clearfix dropdown">';
+    menu += '<ul class="dropdown-menu" role="menu"><li role="presentation" class="dropdown-header">' + title + '</li>' + body + '</ul></div>';
+
+	$('#body').append(menu);
+	
+	// Calculating position
+    if (pageX + $('#context-menu').width() > $(window).width()) {
+        // Dropright
+        var left = pageX - $('#context-menu').width();
+    } else {
+        // Dropleft
+        var left = pageX;
+    }
+    if (pageY + $('#context-menu').height() > $(window).height()) {
+        // Dropup
+        var top = pageY - $('#context-menu').height();
+    } else {
+        // Dropdown
+        var top = pageY;
+    }
+
+    // Setting position via CSS
+    $('#context-menu').css({
+        left: left + 'px',
+        top: top + 'px',
+        
+    });
+}
+
 // Folder form
 function printFormFolder(action, values) {
 	var name = (values['name'] != null) ? values['name'] : '';
@@ -885,10 +916,10 @@ function printLabTopology(lab_filename) {
 			} else {
 				var icon = 'cloud.png';
 			}
-			$('#lab-viewport').append('<div id="network' + value['id'] + '" class="network network' + value['id'] + ' network_frame unused" style="top: ' + value['top'] + '; left: ' + value['left'] + '" data-path="' + value['id'] + '"><img src="/images/' + icon + '"/><div class="network_name">' + value['name'] + '</div></div>');
+			$('#lab-viewport').append('<div id="network' + value['id'] + '" class="context-menu network network' + value['id'] + ' network_frame unused" style="top: ' + value['top'] + 'px; left: ' + value['left'] + 'px" data-path="' + value['id'] + '" data-name="' + value['name'] + '"><img src="/images/' + icon + '"/><div class="network_name">' + value['name'] + '</div></div>');
 		});
 		$.each(nodes, function(key, value) {
-			$('#lab-viewport').append('<div id="node' + value['id'] + '" class="node node' + value['id'] + ' node_frame" style="top: ' + value['top'] + '; left: ' + value['left'] + ';" data-path="' + value['id'] + '"><a href="' + value['url'] + '"><img src="/images/icons/' + value['icon'] + '"/></a><div class="node_name"><i class="node' + value['id'] + '_status"></i> ' + value['name'] + '</div></div>');
+			$('#lab-viewport').append('<div id="node' + value['id'] + '" class="context-menu node node' + value['id'] + ' node_frame" style="top: ' + value['top'] + 'px; left: ' + value['left'] + 'px;" data-path="' + value['id'] + '" data-name="' + value['name'] + '"><a href="' + value['url'] + '"><img src="/images/icons/' + value['icon'] + '"/></a><div class="node_name"><i class="node' + value['id'] + '_status"></i> ' + value['name'] + '</div></div>');
 		});
 		
 		// Drawing topology

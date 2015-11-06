@@ -76,8 +76,8 @@ $(document).on('shown.bs.modal', '.modal', function () {
 $(document).on('dragstop', '.node_frame, .network_frame', function(e) {
 	var lab_filename = $('#lab-viewport').attr('data-path');
 	var offset = $(this).offset();
-	var left = (100 * (offset.left / $(window).width())).toFixed(0) + '%';
-	var top = (100 * (offset.top / $(window).height())).toFixed(0) + '%';
+	var left = offset.left - 30;	// 30 is the width of the sidebar
+	var top = offset.top - 30;		// 30 is the height os the topbar
 	var id = $(this).attr('data-path');
 
 	if ($(this).hasClass('node_frame')) {
@@ -103,11 +103,61 @@ $(document).on('dragstop', '.node_frame, .network_frame', function(e) {
 	}
 });
 
-// Open a node
-$(document).on('contextmenu', '.node_frame', function(e) {
+// Close all context menu
+$(document).on('mousedown', '*', function(e) {
+	e.stopPropagation();
+	if (!$(this).hasClass('menu-collapse')) {
+		$('#context-menu').remove();
+	}
+});
+
+// Prevent default context menu on viewport
+$(document).on('contextmenu', '*', function(e) {
 	e.preventDefault();  // Prevent default behaviour
-	console.log("DBL");
-	//$('#hello').hide('slide', {direction: 'left'}, 1000); requires the jQuery-ui library. See http://www.jqueryui.com
+});
+
+// Open context menu block
+$(document).on('click', '.menu-collapse', function(e) {
+	e.preventDefault();  // Prevent default behaviour
+	var item_class = $(this).attr('data-path');
+	$('.' + item_class).slideToggle('slow');
+});
+
+// Manage context menu
+$(document).on('contextmenu', '.context-menu', function(e) {
+	e.preventDefault();  // Prevent default behaviour
+	
+	if ($(this).hasClass('node_frame')) {
+		var title = $(this).attr('data-name');
+		var body = '';
+		body += '<li><a class="menu-collapse" data-path="menu-manage" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[75] + '</a></li>';
+		body += '<li><a class="action-nodestart menu-manage" data-path="" href="#"><i class="glyphicon glyphicon-play"></i> ' + MESSAGES[66] + '</a></li>';
+		body += '<li><a class="action-nodestop menu-manage" data-path="" href="#"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[67] + '</a></li>';
+		body += '<li><a class="action-nodewipe menu-manage" data-path="" href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[68] + '</a></li>';
+		body += '<li><a class="action-nodeexport menu-manage" data-path="" href="#"><i class="glyphicon glyphicon-save"></i> ' + MESSAGES[69] + '</a></li>';
+		body += '<li role="separator" class="divider"></li>';
+
+		body += '<li><a class="menu-collapse" data-path="menu-interface" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[70] + '</a></li>';
+		body += '<li><a class="action-nodecapture menu-interface" data-path="" href="#"><i class="glyphicon glyphicon-search"></i> TEST</a></li>';
+		body += '<li role="separator" class="divider"></li>';
+
+		// Read privileges and set specific actions/elements
+		if (ROLE == 'admin' || ROLE == 'editor') {
+			body += '<li><a class="menu-collapse" data-path="menu-edit" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[73] + '</a></li>';
+			body += '<li><a class="action-nodeinterfaces menu-edit" data-path="" href="#"><i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[72] + '</a></li>';
+			body += '<li><a class="action-nodeedit menu-edit" data-path="" href="#"><i class="glyphicon glyphicon-edit"></i> ' + MESSAGES[71] + '</a></li>';
+			body += '<li><a class="action-nodedelete menu-edit" data-path="" href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[65] + '</a></li>'
+		};
+	} else {
+		// Context menu not defined for this object
+		return false;
+	}
+	
+	printContextMenu(title, body, e.pageX, e.pageY);
+	
+	// Set initial status
+	$('.menu-interface, .menu-edit').slideToggle();
+	$('.menu-interface, .menu-edit').hide();
 });
 
 // Window resize

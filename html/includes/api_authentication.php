@@ -152,7 +152,7 @@ function apiAuthorization($db, $cookie) {
 
 	if (empty($user)) {
 		// Used not logged in
-		$output['code'] = 400;
+		$output['code'] = 412;
 		$output['status'] = 'unauthorized';
 		$output['message'] = $GLOBALS['messages']['90001'];
 		return Array(False, False, $output);

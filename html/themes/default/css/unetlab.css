@@ -1,3 +1,21 @@
+#context-menu {
+	display: block !important;
+	position: absolute;
+	z-index: 5200;
+}
+
+#context-menu > ul {
+	display: block;
+	position: static;
+	margin-bottom: 5px;
+}
+
+#context-menu .dropdown-header {
+	color: #3ba9ba;
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+	font-size: 1em;
+}
+
 #lab-sidebar {
 	background-color: #3ba9ba;
 	bottom: 0px;

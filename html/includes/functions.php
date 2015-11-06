@@ -268,7 +268,7 @@ function checkPictureType($s) {
  * @return	bool						True if valid
  */
 function checkPosition($s) {
-	if (preg_match('/^[0-9]+%$/', $s) && substr($s, 0, -1) >= 0 && substr($s, 0, -1) <= 100) {
+	if (preg_match('/^[0-9]+$/', $s) && $s >= 0) {
 		return True;
 	} else {
 		return False;

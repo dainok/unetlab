@@ -87,9 +87,14 @@ class Network {
 		}
 
 		if (isset($p['left']) && !checkPosition($p['left'])) {
-			// Left is invalid, ignored
-			unset($p['left']);
-			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][30003]);
+			if (preg_match('/^[0-9]+%$/', $p['left']) && substr($p['left'], 0, -1) >= 0 && substr($p['left'], 0, -1) <= 100) {
+				// Converting percentage to absolute using a 800x600 viewport
+				$p['left'] = 1024 * substr($p['left'], 0, -1) / 100;
+			} else {
+				// Left is invalid, ignored
+				unset($p['left']);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][30003]);
+			}
 		}
 
 		if (isset($p['name']) && $p['name'] === '') {
@@ -99,9 +104,14 @@ class Network {
 		}
 
 		if (isset($p['top']) && !checkPosition($p['top'])) {
-			// Top is invalid, ignored
-			unset($p['top']);
-			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][30004]);
+			if (preg_match('/^[0-9]+%$/', $p['top']) && substr($p['top'], 0, -1) >= 0 && substr($p['top'], 0, -1) <= 100) {
+				// Converting percentage to absolute using a 800x600 viewport
+				$p['top'] = 768 * substr($p['top'], 0, -1) / 100;
+			} else {
+				// Top is invalid, ignored
+				unset($p['top']);
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][30004]);
+			}
 		}
 
 		// Now building the network
@@ -109,9 +119,9 @@ class Network {
 		$this -> id = (int) $id;
 		$this -> tenant = (int) $tenant;
 		$this -> type = $p['type'];
-		if (isset($p['left'])) $this -> left = (string) $p['left'];
+		if (isset($p['left'])) $this -> left = (int) $p['left'];
 		if (isset($p['name'])) $this -> name = htmlentities($p['name']);
-		if (isset($p['top'])) $this -> top = (string) $p['top'];
+		if (isset($p['top'])) $this -> top = (int) $p['top'];
 	}
 
 	/**
@@ -200,8 +210,8 @@ class Network {
 		if (isset($this -> left)) {
 			return $this -> left;
 		} else {
-			// By default return a random value between 30 and 70
-			return rand(30, 70).'%';
+			// By default return a random value between 50 and 750
+			return rand(50, 750);
 		}
 	}
 
@@ -237,8 +247,8 @@ class Network {
 		if (isset($this -> top)) {
 			return $this -> top;
 		} else {
-			// By default return a random value between 30 and 70
-			return rand(30, 70).'%';
+			// By default return a random value between 50 and 550
+			return rand(50, 550).'%';
 		}
 	}
 
