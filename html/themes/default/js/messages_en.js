@@ -1,7 +1,7 @@
 // vim: syntax=javascript tabstop=4 softtabstop=0 noexpandtab laststatus=1 ruler
 
 /**
- * html/themes/default/js/new-messages_en.js
+ * html/themes/default/js/messages_en.js
  *
  * English messages for UNetLab.
  *
@@ -105,5 +105,8 @@ MESSAGES[71] = 'Edit';
 MESSAGES[72] = 'Interfaces';
 MESSAGES[73] = 'Edit';
 MESSAGES[75] = 'Manage';
-
+MESSAGES[76] = 'started';
+MESSAGES[77] = 'stopped';
+MESSAGES[78] = 'wiped';
+MESSAGES[78] = 'config exported';
 

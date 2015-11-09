@@ -48,7 +48,7 @@
 	bottom: 0px;
 	position: absolute;
 	left: 30px;
-	overflow: scroll;
+	overflow: auto;
 	right: 0px;
 	top: 30px;
 	white-space: nowrap;
@@ -73,6 +73,15 @@
     font-size: 0.8em;
     font-weight: bold;
     padding: 0px 2px 0px 2px;
+}
+
+#lab-viewport #frame_container {
+	bottom: 0px;
+	left: auto;
+	position: fixed;
+	right: 1%;
+	top: auto;
+	width: 20%;
 }
 
 #list-title-folders {
@@ -418,7 +427,9 @@
 	text-transform: uppercase;
 }
 
-
+.menuhide {
+	display: none;
+}
 
 
 
