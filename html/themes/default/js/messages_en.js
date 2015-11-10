@@ -108,5 +108,11 @@ MESSAGES[75] = 'Manage';
 MESSAGES[76] = 'started';
 MESSAGES[77] = 'stopped';
 MESSAGES[78] = 'wiped';
-MESSAGES[78] = 'config exported';
-
+MESSAGES[79] = 'config exported';
+MESSAGES[80] = 'Add a new object';
+MESSAGES[81] = 'Node';
+MESSAGES[82] = 'Network';
+MESSAGES[83] = 'Picture';
+MESSAGES[84] = 'Template';
+MESSAGES[85] = 'Add a new node';
+MESSAGES[86] = 'Edit node';

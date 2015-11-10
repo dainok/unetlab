@@ -39,6 +39,31 @@ $('body').on('change', 'input[name="import[file]"]', function(e) {
 	$('input[name="import[local]"]').val($(this).val());
 });
 
+// Select node template
+$('body').on('change', '#form-node-add, #form-node-edit', function(e) {
+	var node_template = $(this).find('option:selected').val();
+	
+	printFormNodeData(node_template);
+    var deferred = $.Deferred();
+    var node_template = $(this).find("option:selected").val();
+
+    if (node_template != '') {
+        // Getting template only if a valid option is selected (to avoid requests during typewriting)
+        $.when(displayNodeFormFromTemplate(node_template, false)).done(function(form_template) {
+            // Add the form to the HTML page
+            $('#form-node_add').html(form_template);
+
+            // Validate values and set autofocus
+            $('.selectpicker').selectpicker();
+            validateLabNode();
+
+            deferred.resolve();
+        }).fail(function() {
+            deferred.reject();
+        });
+    }
+});
+
 // Accept privacy
 $(document).on('click', '#privacy', function () {
 	$.cookie('privacy', 'true', {
@@ -132,24 +157,11 @@ $(document).on('contextmenu', '.context-menu', function(e) {
 		logger(1, 'DEBUG: opening node context menu');
 		var node_id = $(this).attr('data-path');
 		var title = $(this).attr('data-name');
-		var body = '';
-		body += '<li><a class="menu-collapse" data-path="menu-manage" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[75] + '</a></li>';
-		body += '<li><a class="action-nodestart menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-play"></i> ' + MESSAGES[66] + '</a></li>';
-		body += '<li><a class="action-nodestop menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[67] + '</a></li>';
-		body += '<li><a class="action-nodewipe menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[68] + '</a></li>';
-		body += '<li><a class="action-nodeexport menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-save"></i> ' + MESSAGES[69] + '</a></li>';
-		body += '<li role="separator" class="divider"></li>';
-
-		body += '<li><a class="menu-collapse" data-path="menu-interface" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[70] + '</a></li>';
-		body += '<li><a class="action-nodecapture menu-interface" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-search"></i> TEST</a></li>';
-		body += '<li role="separator" class="divider"></li>';
+		var body = '<li><a class="menu-collapse" data-path="menu-manage" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[75] + '</a></li><li><a class="action-nodestart menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-play"></i> ' + MESSAGES[66] + '</a></li><li><a class="action-nodestop menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[67] + '</a></li><li><a class="action-nodewipe menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[68] + '</a></li><li><a class="action-nodeexport menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-save"></i> ' + MESSAGES[69] + '</a></li><li role="separator" class="divider"></li><li><a class="menu-collapse" data-path="menu-interface" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[70] + '</a></li><li><a class="action-nodecapture menu-interface" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-search"></i> TEST</a></li><li role="separator" class="divider"></li>';
 
 		// Read privileges and set specific actions/elements
 		if (ROLE == 'admin' || ROLE == 'editor') {
-			body += '<li><a class="menu-collapse" data-path="menu-edit" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[73] + '</a></li>';
-			body += '<li><a class="action-nodeinterfaces menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[72] + '</a></li>';
-			body += '<li><a class="action-nodeedit menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-edit"></i> ' + MESSAGES[71] + '</a></li>';
-			body += '<li><a class="action-nodedelete menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[65] + '</a></li>'
+			body += '<li><a class="menu-collapse" data-path="menu-edit" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[73] + '</a></li><li><a class="action-nodeinterfaces menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[72] + '</a></li><li><a class="action-nodeedit menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-edit"></i> ' + MESSAGES[71] + '</a></li><li><a class="action-nodedelete menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[65] + '</a></li>'
 		};
 	} else {
 		// Context menu not defined for this object
@@ -253,6 +265,24 @@ $(document).on('click', '.action-logout', function(e) {
 	}).fail(function(message) {
 		addModalError(message);
 	});
+});
+
+// Add object in lab_view
+$(document).on('click', '.action-labobjectadd', function(e) {
+	logger(1, 'DEBUG: action = labobjectadd');
+	var title = MESSAGES[80];
+	var body = '';
+	body += '<li><a class="action-nodeadd" data-path="' + $('#lab-viewport').attr('data-path')+ '" href="#"><i class="glyphicon glyphicon-hdd"></i> ' + MESSAGES[81] + '</a></li>';
+	body += '<li><a class="action-networkadd" data-path="' + $('#lab-viewport').attr('data-path')+ '" href="#"><i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[82] + '</a></li>';
+	body += '<li><a class="action-pictureadd" data-path="' + $('#lab-viewport').attr('data-path') + '" href="#"><i class="glyphicon glyphicon-picture"></i> ' + MESSAGES[83] + '</a></li>';
+	printContextMenu(title, body, e.pageX, e.pageY);
+});
+
+// Add node
+$(document).on('click', '.action-nodeadd', function(e) {
+	logger(1, 'DEBUG: action = nodeadd');
+	printFormNode($(this).attr('data-path'), 'add', null);
+	$('#context-menu').remove();
 });
 
 // Clone selected labs

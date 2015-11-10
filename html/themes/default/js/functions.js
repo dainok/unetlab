@@ -329,7 +329,7 @@ function getLabInfo(lab_filename) {
 }
 
 // Get lab networks
-function getLabNetworks(lab_filename) {
+function getNetworks(lab_filename) {
 	var deferred = $.Deferred();
 	var url = '/api/labs' + lab_filename + '/networks';
 	var type = 'GET'
@@ -360,7 +360,7 @@ function getLabNetworks(lab_filename) {
 }
 
 // Get lab nodes
-function getLabNodes(lab_filename) {
+function getNodes(lab_filename) {
 	var deferred = $.Deferred();
 	var url = '/api/labs' + lab_filename + '/nodes';
 	var type = 'GET'
@@ -391,7 +391,7 @@ function getLabNodes(lab_filename) {
 }
 
 // Get lab topology
-function getLabTopology(lab_filename) {
+function getTopology(lab_filename) {
 	var deferred = $.Deferred();
 	var url = '/api/labs' + lab_filename + '/topology';
 	var type = 'GET'
@@ -472,6 +472,37 @@ function getSystemStats() {
                 data['data']['mem'] = data['data']['mem'] / 100;
                 data['data']['cached'] = data['data']['cached'] / 100;
                 data['data']['swap'] = data['data']['swap'] / 100;
+				deferred.resolve(data['data']);
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject(data['message']);
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
+}
+
+// Get templates
+function getTemplates(template) {
+	var deferred = $.Deferred();
+	var url = (template == null) ? '/api/list/templates/': '/api/list/templates/' + template;
+	var type = 'GET'
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: got template(s).');
 				deferred.resolve(data['data']);
 			} else {
 				// Application error
@@ -953,6 +984,67 @@ function printFormLabAdd(path) {
 	validateLabInfo();
 }
 
+// Node form
+function printFormNode(lab_filename, action, values) {
+	var template = (values == null || values['template'] == null) ? null : values['template']; 
+	var template_disabled = (values == null || values['template'] == null) ? '' : 'disabled ';
+	var title = (action == 'add') ? MESSAGES[85] : MESSAGES[86] + ' ' + null;
+	var html = '';
+	
+	// if template == null, open select template form
+	// else
+		// if action is add, print node_Add for, based on template
+		// else print node_edit form, based on template
+	
+	//
+		//if (template == null) {
+
+
+
+		
+	$.when(getTemplates(template)).done(function(templates) {
+		html += '<form id="form-node-add" class="form-horizontal form-node-add">';
+		html += '<div class="form-group">';
+		html += '<label class="col-md-3 control-label">' + MESSAGES[84] + '</label>';
+		html += '<div class="col-md-5"><select class="selectpicker form-control" name="node[template]" data-live-search="true" data-style="selectpicker-button">';
+		$.each(templates, function(id, object) {
+			html += '<option value="' + id + '">' + object + '</option>';
+		});
+		html += '</select></div>';
+		html += '</div><div id="form-node-add-data"></div></form>';
+		
+		addModal(title, html, '');
+		$('.selectpicker').selectpicker();
+		validateNode();
+	
+		//}
+		// Got data
+		/*
+		var username = (values['username'] != null) ? values['username'] : '';
+		var name = (values['name'] != null) ? values['name'] : '';
+		var email = (values['email'] != null) ? values['email'] : '';
+		var role = (values['role'] != null) ? values['role'] : '';
+		var expiration = (values['expiration'] != null && values['expiration'] != -1) ? $.datepicker.formatDate('yy-mm-dd', new Date(values['expiration'] * 1000)) : '';
+		var pod = (values['pod'] != null && values['pod'] != -1) ? values['pod'] : '';
+		var pexpiration = (values['pexpiration'] != null && values['pexpiration'] != -1) ? $.datepicker.formatDate('yy-mm-dd', new Date(values['pexpiration'] * 1000)) : '';
+		var submit = (action == 'add') ? MESSAGES[17] : MESSAGES[47];
+		var title = (action == 'add') ? MESSAGES[34] : MESSAGES[48] + ' ' + username;
+		var user_disabled = (action == 'add') ? '' : 'disabled ';
+		var html = '<form id="form-user-' + action + '" class="form-horizontal form-user-' + action + '"><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[44] + '</label><div class="col-md-5"><input class="form-control autofocus" ' + user_disabled + 'name="user[username]" value="' + username + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control" name="user[name]" value="' + name + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[28] + '</label><div class="col-md-5"><input class="form-control" name="user[email]" value="' + email+ '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[45] + '</label><div class="col-md-5"><input class="form-control" name="user[password]" value="" type="password"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[29] + '</label><div class="col-md-5"><select class="selectpicker show-tick form-control" name="user[role]" data-live-search="true">';
+		$.each(roles, function(key, value) {
+			var role_selected = (role == key) ? 'selected ' : '';
+			html += '<option ' + role_selected + 'value="' + key + '">' + value + '</option>';
+		});
+		html += '</select></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[30] + '</label><div class="col-md-5"><input class="form-control" name="user[expiration]" value="' + expiration + '" type="text"/></div></div><h4>' + MESSAGES[46] + '</h4><div class="form-group"><label class="col-md-3 control-label">POD</label><div class="col-md-5"><input class="form-control" name="user[pod]" value="' + pod + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[30] + '</label><div class="col-md-5"><input class="form-control" name="user[pexpiration]" value="' + pexpiration + '" type="text"/></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + submit + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
+		addModal(title, html, '');
+		validateUser();
+		*/
+	}).fail(function(message) {
+		// Cannot get data
+		addModalError(message);
+	});
+}
+
 // User form
 function printFormUser(action, values) {
 	$.when(getRoles()).done(function(roles) {
@@ -1003,7 +1095,7 @@ function printLabPreview(lab_filename) {
 // Print lab topology
 function printLabTopology(lab_filename) {
 	$('#lab-viewport').empty();
-	$.when(getLabNetworks(lab_filename), getLabNodes(lab_filename), getLabTopology(lab_filename)).done(function(networks, nodes, topology) {
+	$.when(getNetworks(lab_filename), getNodes(lab_filename), getTopology(lab_filename)).done(function(networks, nodes, topology) {
 		$.each(networks, function(key, value) {
 			if (value['type'] == 'cloud') {
 				var icon = 'lan.png';
@@ -1100,7 +1192,7 @@ function printLabTopology(lab_filename) {
 // Display lab status
 function printLabStatus(lab_filename) {
 	logger(1, 'DEBUG: updating node status');
-	$.when(getLabNodes(lab_filename)).done(function(nodes) {
+	$.when(getNodes(lab_filename)).done(function(nodes) {
 		$.each(nodes, function(node_id, node) {
 			if (node['status'] == 0) {
 				// Stopped
