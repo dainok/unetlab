@@ -873,6 +873,7 @@ class Lab {
 		if (isset($this -> version)) $xml -> addAttribute('version', $this -> version);
 		if (isset($this -> author)) $xml -> addAttribute('author', $this -> author);
 		if (isset($this -> description)) $xml -> addChild('description', $this -> description);
+		if (isset($this -> body)) $xml -> addChild('body', $this -> body);
 
 		// Add topology
 		if (!empty($this -> getNodes()) || !empty($this -> getNetworks())) {

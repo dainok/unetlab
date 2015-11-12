@@ -47,7 +47,7 @@ The following API requests are involved on login and logout process. All other A
 
 ### Login
 
-\`curl -s -b $COOKIE -c $COOKIE -X POST -d \'{"username":"${USERNAME}","password":"${PASSWORD}"}\' http://127.0.0.1/api/auth/login\`
+\`curl -s -b $COOKIE -c $COOKIE -X POST -d '{"username":"${USERNAME}","password":"${PASSWORD}"}' http://127.0.0.1/api/auth/login\`
 
 A successful login provides the following output:
 

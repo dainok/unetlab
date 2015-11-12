@@ -101,8 +101,8 @@ $(document).on('shown.bs.modal', '.modal', function () {
 $(document).on('dragstop', '.node_frame, .network_frame', function(e) {
 	var lab_filename = $('#lab-viewport').attr('data-path');
 	var offset = $(this).offset();
-	var left = offset.left - 30;	// 30 is the width of the sidebar
-	var top = offset.top - 30;		// 30 is the height os the topbar
+	var left = Math.round(offset.left - 30 + $('#lab-viewport').scrollLeft());	// 30 is the sidebar
+	var top = Math.round(offset.top - 30 + $('#lab-viewport').scrollTop());		// 30 is the topbar
 	var id = $(this).attr('data-path');
 
 	if ($(this).hasClass('node_frame')) {
@@ -214,7 +214,65 @@ $(document).on('click', '.action-import', function(e) {
 // Add a new lab
 $(document).on('click', '.action-labadd', function(e) {
 	logger(1, 'DEBUG: action = labadd');
-	printFormLabAdd($('#list-folders').attr('data-path'));
+	var values = {};
+	values['path'] = $('#list-folders').attr('data-path');
+	printFormLab('add', values);
+});
+
+// Print lab body
+$(document).on('click', '.action-labbodyget', function(e) {
+	logger(1, 'DEBUG: action = labbodyget');
+	$.when(getLabInfo($('#lab-viewport').attr('data-path')), getLabBody($('#lab-viewport').attr('data-path'))).done(function(info, body) {
+		addModalWide(MESSAGES[64], '<h1>' + info['name'] + '</h1>' + '<p>' + info['description'] + '</p>' + body, '')
+	}).fail(function(message1, message2) {
+		if (message1 != null) {
+			addModalError(message1);
+		} else {
+			addModalError(message2)
+		};
+	});
+});
+
+// Print lab network
+$(document).on('click', '.action-labnetworkget', function(e) {
+	logger(1, 'DEBUG: action = labnetworkget');
+	var id = $(this).attr('data-path');
+	var lab_filename = $('#lab-viewport').attr('data-path');
+	$.when(getNetworks(lab_filename, id)).done(function(values) {
+		values['id'] = id;
+		printFormNetwork('edit', values)
+	}).fail(function(message) {
+		addModalError(message);
+	});
+	$('#context-menu').remove();
+});
+
+// Print lab networks
+$(document).on('click', '.action-labnetworksget', function(e) {
+	logger(1, 'DEBUG: action = labnetworksget');
+	$.when(getNetworks($('#lab-viewport').attr('data-path'), null)).done(function(networks) {
+		var body = '';
+		$.each(networks, function(key, value) {
+			body += '<li><a class="action-labnetworkget" data-path="' + value['id'] + '" href="#" title="network' + value['id'] + '"><i class="glyphicon glyphicon-transfer"></i> ' + value['name'] + ' <code>[ID:' + value['id'] + ']</code></a></li>';
+		});
+		printContextMenu(MESSAGES[62], body, e.pageX, e.pageY);
+	}).fail(function(message) {
+		addModalError(message);
+	});
+});
+
+// Print lab nodes
+$(document).on('click', '.action-labnodesget', function(e) {
+	logger(1, 'DEBUG: action = labnodesget');
+	$.when(getNodes($('#lab-viewport').attr('data-path'), null)).done(function(nodes) {
+		var body = '';
+		$.each(nodes, function(key, value) {
+			body += '<li><a class="action-labnodeget" data-path="' + value['id'] + '" href="#" title="node' + value['id'] + '"><i class="glyphicon glyphicon-hdd"></i> ' + value['name'] + ' <code>[ID:' + value['id'] + ']</code></a></li>';
+		});
+		printContextMenu(MESSAGES[62], body, e.pageX, e.pageY);
+	}).fail(function(message) {
+		addModalError(message);
+	});
 });
 
 // Lab close
@@ -222,6 +280,17 @@ $(document).on('click', '.action-labclose', function(e) {
 	logger(1, 'DEBUG: action = labclose');
 	$.when(closeLab()).done(function() {
 		postLogin();
+	}).fail(function(message) {
+		addModalError(message);
+	});
+});
+
+// Edit a lab
+$(document).on('click', '.action-labedit', function(e) {
+	logger(1, 'DEBUG: action = labedit');
+	$.when(getLabInfo($('#lab-viewport').attr('data-path'))).done(function(values) {
+		values['path'] = $('#lab-viewport').attr('data-path');
+		printFormLab('edit', values);
 	}).fail(function(message) {
 		addModalError(message);
 	});
@@ -270,12 +339,11 @@ $(document).on('click', '.action-logout', function(e) {
 // Add object in lab_view
 $(document).on('click', '.action-labobjectadd', function(e) {
 	logger(1, 'DEBUG: action = labobjectadd');
-	var title = MESSAGES[80];
 	var body = '';
 	body += '<li><a class="action-nodeadd" data-path="' + $('#lab-viewport').attr('data-path')+ '" href="#"><i class="glyphicon glyphicon-hdd"></i> ' + MESSAGES[81] + '</a></li>';
 	body += '<li><a class="action-networkadd" data-path="' + $('#lab-viewport').attr('data-path')+ '" href="#"><i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[82] + '</a></li>';
 	body += '<li><a class="action-pictureadd" data-path="' + $('#lab-viewport').attr('data-path') + '" href="#"><i class="glyphicon glyphicon-picture"></i> ' + MESSAGES[83] + '</a></li>';
-	printContextMenu(title, body, e.pageX, e.pageY);
+	printContextMenu(MESSAGES[80], body, e.pageX, e.pageY);
 });
 
 // Add node
@@ -461,7 +529,7 @@ $(document).on('click', '.action-useradd', function(e) {
 // Edit a user
 $(document).on('dblclick', '.action-useredit', function(e) {
 	logger(1, 'DEBUG: action = useredit');
-	$.when(getUser($(this).attr('data-path'))).done(function(user) {
+	$.when(getUsers($(this).attr('data-path'))).done(function(user) {
 		// Got user
 		printFormUser('edit', user);
 	}).fail(function(message) {
@@ -582,9 +650,8 @@ $(document).on('submit', '#form-lab-add, #form-lab-edit', function(e) {
 		var type = 'POST';
 	} else {
 		logger(1, 'DEBUG: posting form-lab-edit form.');
-		//TODO
-		//var url = '/api/folders' + form_data['original'];
-		//var type = 'PUT';
+		var url = '/api/labs' + form_data['path'];
+		var type = 'PUT';
 	}
 	$.ajax({
 		timeout: TIMEOUT,
@@ -597,8 +664,20 @@ $(document).on('submit', '#form-lab-add, #form-lab-edit', function(e) {
 				logger(1, 'DEBUG: lab "' + form_data['name'] + '" saved.');
 				// Close the modal
 				$(e.target).parents('.modal').modal('hide');
-				// Reload the lab list
-				printPageLabList(form_data['path']);
+				if ($(this).attr('id') == 'form-lab-add') {
+					// Reload the lab list
+					printPageLabList(form_data['path']);
+				} else if (basename($('#lab-viewport').attr('data-path')) != form_data['name'] + '.unl') {
+					// Lab has been renamed, need to close it.
+					logger(1, 'DEBUG: lab "' + form_data['name'] + '" renamed.');
+					$.when(closeLab()).done(function() {
+						postLogin();
+					}).fail(function(message) {
+						addModalError(message);
+					});
+				} else {
+					addMessage(data['status'], data['message']);
+				}
 			} else {
 				// Application error
 				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');

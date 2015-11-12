@@ -76,6 +76,13 @@ function addModalError(message) {
 	$('body > .modal').modal('show');
 }
 
+// Add Modal
+function addModalWide(title, body, footer) {
+	var html = '<div aria-hidden="false" style="display: block;" class="modal modal-wide fade in" tabindex="-1" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">' + title + '</h4></div><div class="modal-body">' + body + '</div><div class="modal-footer">' + footer + '</div></div></div></div>';
+	$('body').append(html);
+	$('body > .modal').modal('show');
+}
+
 // Clone selected labs
 function cloneLab(form_data) {
 	var deferred = $.Deferred();
@@ -328,10 +335,10 @@ function getLabInfo(lab_filename) {
 	return deferred.promise();
 }
 
-// Get lab networks
-function getNetworks(lab_filename) {
+// Get lab body
+function getLabBody(lab_filename) {
 	var deferred = $.Deferred();
-	var url = '/api/labs' + lab_filename + '/networks';
+	var url = '/api/labs' + lab_filename + '/html';
 	var type = 'GET'
 	$.ajax({
 		timeout: TIMEOUT,
@@ -340,7 +347,73 @@ function getNetworks(lab_filename) {
 		dataType: 'json',
 		success: function(data) {
 			if (data['status'] == 'success') {
-				logger(1, 'DEBUG: got networks from lab "' + lab_filename + '".');
+				logger(1, 'DEBUG: lab "' + lab_filename + '" body found.');
+				deferred.resolve(data['data']);
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject(data['message']);
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
+}
+
+// Get lab networks
+function getNetworks(lab_filename, network_id) {
+	var deferred = $.Deferred();
+	if (network_id != null) {
+		var url = '/api/labs' + lab_filename + '/networks/' + network_id;
+	} else {
+		var url = '/api/labs' + lab_filename + '/networks';
+	}
+	var type = 'GET'
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: got network(s) from lab "' + lab_filename + '".');
+				deferred.resolve(data['data']);
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject(data['message']);
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
+}
+
+// Get available network types
+function getNetworkTypes() {
+	var deferred = $.Deferred();
+	var url = '/api/list/networks';
+	var type = 'GET'
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: got network types.');
 				deferred.resolve(data['data']);
 			} else {
 				// Application error
@@ -360,9 +433,13 @@ function getNetworks(lab_filename) {
 }
 
 // Get lab nodes
-function getNodes(lab_filename) {
+function getNodes(lab_filename, node_id) {
 	var deferred = $.Deferred();
-	var url = '/api/labs' + lab_filename + '/nodes';
+	if (node_id != null) {
+		var url = '/api/labs' + lab_filename + '/nodes/' + node_id;
+	} else {
+		var url = '/api/labs' + lab_filename + '/nodes';
+	}
 	var type = 'GET'
 	$.ajax({
 		timeout: TIMEOUT,
@@ -371,7 +448,7 @@ function getNodes(lab_filename) {
 		dataType: 'json',
 		success: function(data) {
 			if (data['status'] == 'success') {
-				logger(1, 'DEBUG: got nodes from lab "' + lab_filename + '".');
+				logger(1, 'DEBUG: got node(s) from lab "' + lab_filename + '".');
 				deferred.resolve(data['data']);
 			} else {
 				// Application error
@@ -521,38 +598,6 @@ function getTemplates(template) {
 	return deferred.promise();
 }
 
-// Get user
-function getUser(user) {
-	var deferred = $.Deferred();
-	var form_data = {};
-	var url = '/api/users/' + user;
-	var type = 'GET';
-	$.ajax({
-		timeout: TIMEOUT,
-		type: type,
-		url: encodeURI(url),
-		dataType: 'json',
-		success: function(data) {
-			if (data['status'] == 'success') {
-				logger(1, 'DEBUG: got user.');
-				deferred.resolve(data['data']);
-			} else {
-				// Application error
-				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-				deferred.reject(data['message']);
-			}
-		},
-		error: function(data) {
-			// Server error
-			var message = getJsonMessage(data['responseText']);
-			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
-			logger(1, 'DEBUG: ' + message);
-			deferred.reject(message);
-		}
-	});
-	return deferred.promise();
-}
-
 // Get user info
 function getUserInfo() {
 	var deferred = $.Deferred();
@@ -592,11 +637,15 @@ function getUserInfo() {
 	return deferred.promise();
 }
 
-// Get user info
-function getUsers() {
+// Get users
+function getUsers(user) {
 	var deferred = $.Deferred();
-	var url = '/api/users/';
-	var type = 'GET'
+	if (user != null) {
+		var url = '/api/users/' + user;
+	} else {
+		var url = '/api/users/';
+	}
+	var type = 'GET';
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,
@@ -604,7 +653,7 @@ function getUsers() {
 		dataType: 'json',
 		success: function(data) {
 			if (data['status'] == 'success') {
-				logger(1, 'DEBUG: got UNetLab users.');
+				logger(1, 'DEBUG: got user(s).');
 				deferred.resolve(data['data']);
 			} else {
 				// Application error
@@ -771,6 +820,8 @@ function setNetworkPosition(lab_filename, network_id, left, top) {
 				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
 				deferred.reject(data['message']);
 			}
+			addMessage(data['status'], data['message']);
+
 		},
 		error: function(data) {
 			// Server error
@@ -919,7 +970,7 @@ function printContextMenu(title, body, pageX, pageY) {
     var menu = '<div id="context-menu" class="collapse clearfix dropdown">';
     menu += '<ul class="dropdown-menu" role="menu"><li role="presentation" class="dropdown-header">' + title + '</li>' + body + '</ul></div>';
 
-	$('#body').append(menu);
+	$('body').append(menu);
 	
 	// Set initial status
 	$('.menu-interface, .menu-edit').slideToggle();
@@ -977,11 +1028,67 @@ function printFormImport(path) {
 }
 
 // Add a new lab
-function printFormLabAdd(path) {
-	var html = '<form id="form-lab-add" class="form-horizontal form-lab-add"><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[20] + '</label><div class="col-md-5"><input class="form-control" name="lab[path]" value="' + path + '" disabled="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control autofocus" name="lab[name]" value="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[26] + '</label><div class="col-md-5"><input class="form-control" name="lab[version]" value="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Author</label><div class="col-md-5"><input class="form-control" name="lab[author]" value="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[27] + '</label><div class="col-md-5"><textarea class="form-control" name="lab[description]"></textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[17] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
+function printFormLab(action, values) {
+	var path = (values['path'] != null) ? values['path'] : '';
+	var name = (values['name'] != null) ? values['name'] : '';
+	var version = (values['version'] != null) ? values['version'] : '';
+	var author = (values['author'] != null) ? values['author'] : '';
+	var description = (values['description'] != null) ? values['description'] : '';
+	var body = (values['body'] != null) ? values['body'] : '';
+	
+	var html = '<form id="form-lab-' + action + '" class="form-horizontal form-lab-' + action + '"><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[20] + '</label><div class="col-md-5"><input class="form-control" name="lab[path]" value="' + path + '" disabled="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control autofocus" name="lab[name]" value="' + name + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[26] + '</label><div class="col-md-5"><input class="form-control" name="lab[version]" value="' + version + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Author</label><div class="col-md-5"><input class="form-control" name="lab[author]" value="' + author + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[27] + '</label><div class="col-md-5"><textarea class="form-control" name="lab[description]">' + description + '</textarea></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[88] + '</label><div class="col-md-5"><textarea class="form-control" name="lab[body]">' + body + '</textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
 	logger(1, 'DEBUG: popping up the lab-add form.');
 	addModal(MESSAGES[5], html, '');
 	validateLabInfo();
+}
+
+// Network Form
+function printFormNetwork(action, values) {
+	var id = (values == null || values['id'] == null) ? '' : values['id']; 
+	var left = (values == null || values['left'] == null) ? '' : values['left']; 
+	var name = (values == null || values['name'] == null) ? '' : values['name']; 
+	var top = (values == null || values['top'] == null) ? '' : values['top']; 
+	var type = (values == null || values['type'] == null) ? '' : values['type'];
+	var title = (action == 'add') ? MESSAGES[85] : MESSAGES[90];
+	var html = '';
+	
+	if (ROLE == 'admin' || ROLE == 'editor') {
+		var left_disabled = '';
+		var name_disabled = '';
+		var top_disabled = '';
+		var type_disabled = '';
+	} else {
+		var left_disabled = 'disabled ';
+		var name_disabled = 'disabled ';
+		var top_disabled = 'disabled ';
+		var type_disabled = 'disabled ';
+	}
+	
+	$.when(getNetworkTypes()).done(function(network_types) {
+		// Read privileges and set specific actions/elements
+		html += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[92] + '</label><div class="col-md-5"><input class="form-control" name="network[id]" value="' + id + '" disabled type="text"/></div></div>';
+		html += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control" name="network[name]" value="' + name + '" ' + name_disabled + 'type="text"/></div></div>';
+		html += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[95] + '</label><div class="col-md-5"><select class="selectpicker show-tick form-control" name="network[type]" ' + type_disabled + 'data-live-search="true" data-style="selectpicker-button">';
+		$.each(network_types, function(key, value) {
+			console.log(value);
+			var type_selected = (key == type) ? 'selected ' : '';
+			html += '<option ' + type_selected + 'value="' + key + '">' + value + '</option>';
+		});
+		html += '</select></div></div>';
+		html += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[93] + '</label><div class="col-md-5"><input class="form-control" name="network[left]" value="' + left + '" ' + left_disabled + 'type="text"/></div></div>';
+		html += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[94] + '</label><div class="col-md-5"><input class="form-control" name="network[top]" value="' + top + '" ' + top_disabled + 'type="text"/></div></div>';
+		
+		// Read privileges and enable or disable the form
+		if (ROLE == 'admin' || ROLE == 'editor') {
+			html = '<form id="form-node-' + action + '" class="form-horizontal">' + html + '<div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form></form>';
+		} else {
+			html = '<form id="form-node-' + action + '" class="form-horizontal">' + html + '</form>';
+		}
+
+		// dainok
+		addModal(title, html, '');
+		$('.selectpicker').selectpicker();
+	});
 }
 
 // Node form
@@ -990,6 +1097,11 @@ function printFormNode(lab_filename, action, values) {
 	var template_disabled = (values == null || values['template'] == null) ? '' : 'disabled ';
 	var title = (action == 'add') ? MESSAGES[85] : MESSAGES[86] + ' ' + null;
 	var html = '';
+	
+
+
+	getNetworkTypes
+	console.log("HERE");
 	
 	// if template == null, open select template form
 	// else
@@ -1095,9 +1207,9 @@ function printLabPreview(lab_filename) {
 // Print lab topology
 function printLabTopology(lab_filename) {
 	$('#lab-viewport').empty();
-	$.when(getNetworks(lab_filename), getNodes(lab_filename), getTopology(lab_filename)).done(function(networks, nodes, topology) {
+	$.when(getNetworks(lab_filename, null), getNodes(lab_filename, null), getTopology(lab_filename)).done(function(networks, nodes, topology) {
 		$.each(networks, function(key, value) {
-			if (value['type'] == 'cloud') {
+			if (value['type'] != 'cloud') {
 				var icon = 'lan.png';
 			} else {
 				var icon = 'cloud.png';
@@ -1124,7 +1236,7 @@ function printLabTopology(lab_filename) {
 
 			// Read privileges and set specific actions/elements
 			if (ROLE == 'admin' || ROLE == 'editor') {
-				// Nodes and netoworks are draggable within a grid
+				// Nodes and networks are draggable within a grid
 				lab_topology.draggable($('.node_frame, .network_frame'), { grid: [20, 20] });
 			}
 			
@@ -1134,7 +1246,6 @@ function printLabTopology(lab_filename) {
 				var source_label = link['source_label'];
 				var destination = link['destination'];
 				var destination_label = link['destination_label'];
-				logger(1, 'DEBUG: linking "' + source + ':' + source_label + '" to "' + destination + ':' + destination_label + '".');
 
 				if (type == 'ethernet') {
 					if (source_label != '') {
@@ -1177,13 +1288,11 @@ function printLabTopology(lab_filename) {
 			$('._jsPlumb_connector, ._jsPlumb_overlay, ._jsPlumb_endpoint_anchor_').detach().appendTo('#lab-viewport');
 		});
 	}).fail(function(message1, message2, message3) {
-		if (message1 == null) {
+		if (message1 != null) {
 			addModalError(message1);
-		}
-		if (message2 == null) {
+		} else if (message2 != null) {
 			addModalError(message2)
-		};
-		if (message3 == null) {
+		} else {
 			addModalError(message2)
 		};
 	});
@@ -1192,7 +1301,7 @@ function printLabTopology(lab_filename) {
 // Display lab status
 function printLabStatus(lab_filename) {
 	logger(1, 'DEBUG: updating node status');
-	$.when(getNodes(lab_filename)).done(function(nodes) {
+	$.when(getNodes(lab_filename, null)).done(function(nodes) {
 		$.each(nodes, function(node_id, node) {
 			if (node['status'] == 0) {
 				// Stopped
@@ -1362,31 +1471,35 @@ function printPageLabOpen(lab) {
 	// Print topology
 	printLabTopology(lab);
 	
+	// Clearing actions (navbar)
+	$('#actions-menu').empty();
+	
+	// Clearing actions (sidebar)
+	$('#lab-sidebar ul').empty();
+	
 	// Read privileges and set specific actions/elements
 	if (ROLE == 'admin' || ROLE == 'editor') {
-		// Adding actions
-		$('#lab-sidebar ul').empty();
 		$('#lab-sidebar ul').append('<li><a class="action-labobjectadd" href="#" title="' + MESSAGES[56] + '"><i class="glyphicon glyphicon-plus"></i></a></li>');
-		$('#lab-sidebar ul').append('<li><a class="action-labbody" href="#" title="' + MESSAGES[64] + '"><i class="glyphicon glyphicon-list-alt"></i></a></li>');
-		$('#lab-sidebar ul').append('<li><a class="action-labnodesget" href="#" title="' + MESSAGES[62] + '"><i class="glyphicon glyphicon-hdd"></i></a></li>');
-		$('#lab-sidebar ul').append('<li><a class="action-labnetworksget" href="#" title="' + MESSAGES[61] + '"><i class="glyphicon glyphicon-transfer"></i></a></li>');
-		$('#lab-sidebar ul').append('<li><a class="action-labconfigsget" href="#" title="' + MESSAGES[58] + '"><i class="glyphicon glyphicon-align-left"></i></a></li>');
-		$('#lab-sidebar ul').append('<li><a class="action-labpicturesget" href="#" title="' + MESSAGES[59] + '"><i class="glyphicon glyphicon-picture"></i></a></li>');
-		$('#lab-sidebar ul').append('<li><a class="action-labtopologyrefresh" href="#" title="' + MESSAGES[57] + '"><i class="glyphicon glyphicon-refresh"></i></a></li>');
-		$('#lab-sidebar ul').append('<li><a class="action-labclose" href="#" title="' + MESSAGES[60] + '"><i class="glyphicon glyphicon-off"></i></a></li>');
-	} else {
-		$('#lab-sidebar ul').append('<li><a class="action-labconfigsget" href="#" title="' + MESSAGES[61] + '"><i class="glyphicon glyphicon-align-left"></i></a></li>');
-		$('#lab-sidebar ul').append('<li><a class="action-labnodesget" href="#" title="' + MESSAGES[62] + '"><i class="glyphicon glyphicon-hdd"></i></a></li>');
-		$('#lab-sidebar ul').append('<li><a class="action-labnetworksget" href="#" title="' + MESSAGES[58] + '"><i class="glyphicon glyphicon-transfer"></i></a></li>');
-		$('#lab-sidebar ul').append('<li><a class="action-labpicturesget" href="#" title="' + MESSAGES[59] + '"><i class="glyphicon glyphicon-picture"></i></a></li>');
-		$('#lab-sidebar ul').append('<li><a class="action-labtopologyrefresh" href="#" title="' + MESSAGES[57] + '"><i class="glyphicon glyphicon-refresh"></i></a></li>');
-		$('#lab-sidebar ul').append('<li><a class="action-labclose" href="#" title="' + MESSAGES[60] + '"><i class="glyphicon glyphicon-off"></i></a></li>');
+	}
+	
+	$('#lab-sidebar ul').append('<li><a class="action-labbodyget" href="#" title="' + MESSAGES[64] + '"><i class="glyphicon glyphicon-list-alt"></i></a></li>');
+	$('#lab-sidebar ul').append('<li><a class="action-labnodesget" href="#" title="' + MESSAGES[62] + '"><i class="glyphicon glyphicon-hdd"></i></a></li>');
+	$('#lab-sidebar ul').append('<li><a class="action-labnetworksget" href="#" title="' + MESSAGES[61] + '"><i class="glyphicon glyphicon-transfer"></i></a></li>');
+	$('#lab-sidebar ul').append('<li><a class="action-labconfigsget" href="#" title="' + MESSAGES[58] + '"><i class="glyphicon glyphicon-align-left"></i></a></li>');
+	$('#lab-sidebar ul').append('<li><a class="action-labpicturesget" href="#" title="' + MESSAGES[59] + '"><i class="glyphicon glyphicon-picture"></i></a></li>');
+	$('#lab-sidebar ul').append('<li><a class="action-labtopologyrefresh" href="#" title="' + MESSAGES[57] + '"><i class="glyphicon glyphicon-refresh"></i></a></li>');
+	$('#lab-sidebar ul').append('<li><a class="action-labclose" href="#" title="' + MESSAGES[60] + '"><i class="glyphicon glyphicon-off"></i></a></li>');
+	
+	// Read privileges and set specific actions/elements
+	if (ROLE == 'admin' || ROLE == 'editor') {
+		// Adding actions (navbar)
+		$('#actions-menu').append('<li><a class="action-labedit" href="#" title="' + MESSAGES[87] + '"><i class="glyphicon glyphicon-edit"></i> ' + MESSAGES[87] + '</a></li>');
 	}
 }
 
 // Print user management section
 function printUserManagement() {
-	$.when(getUsers()).done(function(data) {
+	$.when(getUsers(null)).done(function(data) {
 		var html = '<div class="row"><div id="users" class="col-md-12 col-lg-12"><div class="table-responsive"><table class="table"><thead><tr><th>' + MESSAGES[44] + '</th><th>' + MESSAGES[19] + '</th><th>' + MESSAGES[28] + '</th><th>' + MESSAGES[29] + '</th><th>' + MESSAGES[30] + '</th><th>' + MESSAGES[31] + '</th><th>' + MESSAGES[32] + '</th></tr></thead><tbody></tbody></table></div></div></div>';
 		html += '<div class="row"><div id="pods" class="col-md-12 col-lg-12"><div class="table-responsive"><table class="table"><thead><tr><th>' + MESSAGES[44] + '</th><th>' + MESSAGES[32] + '</th><th>' + MESSAGES[33] + '</th><th>' + MESSAGES[63] + '</th></tr></thead><tbody></tbody></table></div></div></div>';
 		$('#main-title').hide();

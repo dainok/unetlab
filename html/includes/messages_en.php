@@ -214,6 +214,7 @@ $messages[60050] = 'Failed to stop all nodes (60050).';
 $messages[60051] = 'All nodes has been stopped (60051).';
 $messages[60052] = 'User does not have an assigned pod (60052).';
 $messages[60053] = 'Lab has been closed (60053).';
+$messages[60054] = 'Got lab body (60054).';
 
 // Text (70000-79999)
 $messages[70000] = 'Name/prefix';

@@ -453,7 +453,16 @@ $app -> get('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 		return;
 	}
 
-	if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/networks$/', $s)) {
+	if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/html$/', $s)) {
+		$Parsedown = new Parsedown();
+		$output['code'] = 200;
+		$output['status'] = 'success';
+		$output['message'] = $GLOBALS['messages']['60054'];
+		$output['data'] = $Parsedown -> text($lab -> getBody());
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/pdf$/', $s)) {
+	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/networks$/', $s)) {
 		$output = apiGetLabNetworks($lab);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/networks\/[0-9]+$/', $s)) {
 		$output = apiGetLabNetwork($lab, $id);
