@@ -1009,8 +1009,8 @@ class Node {
 		if (isset($this -> left)) {
 			return $this -> left;
 		} else {
-			// By default return a random value between 30 and 70
-			return rand(30, 70).'%';
+			// By default return a random value between 240 and 560
+			return rand(240, 560);
 		}
 	}
 
@@ -1179,8 +1179,8 @@ class Node {
 		if (isset($this -> top)) {
 			return $this -> top;
 		} else {
-			// By default return a random value between 30 and 70
-			return rand(30, 70).'%';
+			// By default return a random value between 180 and 420
+			return rand(180, 420);
 		}
 	}
 

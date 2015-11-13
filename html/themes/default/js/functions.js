@@ -52,12 +52,12 @@ function addMessage(severity, message) {
 	if (severity == 'alert') timeout = 10000;
 	if (severity == 'warning') timeout = 10000;
 	
-	if (!$('#frame_container').length) {
+	if (!$('#alert_container').length) {
 		// Add the frame container if not exists
-		$('#lab-viewport').append('<div id="frame_container"></div>');
+		$('#lab-viewport').append('<div id="alert_container"></div>');
 	}
 	
-    $('<div class="alert alert-' + severity.toLowerCase() + '">' + message + '</div>').prependTo('#frame_container').fadeTo(timeout, 500).slideUp(500, function() {
+    $('<div class="alert alert-' + severity.toLowerCase() + '">' + message + '</div>').prependTo('#alert_container').fadeTo(timeout, 500).slideUp(500, function() {
         $(this).alert('close');
     });
 }
@@ -998,6 +998,7 @@ function printContextMenu(title, body, pageX, pageY) {
     // Setting position via CSS
     $('#context-menu').css({
         left: left + 'px',
+		maxHeight: $('#context-menu').height(),
         top: top + 'px',
     });
 }
@@ -1050,58 +1051,93 @@ function printFormNetwork(action, values) {
 	var top = (values == null || values['top'] == null) ? '' : values['top']; 
 	var type = (values == null || values['type'] == null) ? '' : values['type'];
 	var title = (action == 'add') ? MESSAGES[85] : MESSAGES[90];
-	var html = '';
-	
-	if (ROLE == 'admin' || ROLE == 'editor') {
-		var left_disabled = '';
-		var name_disabled = '';
-		var top_disabled = '';
-		var type_disabled = '';
-	} else {
-		var left_disabled = 'disabled ';
-		var name_disabled = 'disabled ';
-		var top_disabled = 'disabled ';
-		var type_disabled = 'disabled ';
-	}
 	
 	$.when(getNetworkTypes()).done(function(network_types) {
 		// Read privileges and set specific actions/elements
-		html += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[92] + '</label><div class="col-md-5"><input class="form-control" name="network[id]" value="' + id + '" disabled type="text"/></div></div>';
-		html += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control" name="network[name]" value="' + name + '" ' + name_disabled + 'type="text"/></div></div>';
-		html += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[95] + '</label><div class="col-md-5"><select class="selectpicker show-tick form-control" name="network[type]" ' + type_disabled + 'data-live-search="true" data-style="selectpicker-button">';
+		var html = '<form id="form-network-' + action + '" class="form-horizontal"><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[92] + '</label><div class="col-md-5"><input class="form-control" name="network[id]" value="' + id + '" disabled type="text"/></div></div>';
+		html += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control" name="network[name]" value="' + name + '" type="text"/></div></div>';
+		html += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[95] + '</label><div class="col-md-5"><select class="selectpicker show-tick form-control" name="network[type]" data-live-search="true" data-style="selectpicker-button">';
 		$.each(network_types, function(key, value) {
-			console.log(value);
 			var type_selected = (key == type) ? 'selected ' : '';
 			html += '<option ' + type_selected + 'value="' + key + '">' + value + '</option>';
 		});
 		html += '</select></div></div>';
-		html += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[93] + '</label><div class="col-md-5"><input class="form-control" name="network[left]" value="' + left + '" ' + left_disabled + 'type="text"/></div></div>';
-		html += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[94] + '</label><div class="col-md-5"><input class="form-control" name="network[top]" value="' + top + '" ' + top_disabled + 'type="text"/></div></div>';
+		html += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[93] + '</label><div class="col-md-5"><input class="form-control" name="network[left]" value="' + left + '" type="text"/></div></div>';
+		html += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[94] + '</label><div class="col-md-5"><input class="form-control" name="network[top]" value="' + top + '" type="text"/></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form></form>';
 		
-		// Read privileges and enable or disable the form
-		if (ROLE == 'admin' || ROLE == 'editor') {
-			html = '<form id="form-node-' + action + '" class="form-horizontal">' + html + '<div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form></form>';
-		} else {
-			html = '<form id="form-node-' + action + '" class="form-horizontal">' + html + '</form>';
-		}
-
-		// dainok
 		addModal(title, html, '');
 		$('.selectpicker').selectpicker();
 	});
 }
 
 // Node form
-function printFormNode(lab_filename, action, values) {
+function printFormNode(action, values) {
+	var id = (values == null || values['id'] == null) ? '' : values['id']; 
+	var left = (values == null || values['left'] == null) ? '' : values['left']; 
+	var name = (values == null || values['name'] == null) ? '' : values['name']; 
+	var top = (values == null || values['top'] == null) ? '' : values['top']; 
 	var template = (values == null || values['template'] == null) ? null : values['template']; 
-	var template_disabled = (values == null || values['template'] == null) ? '' : 'disabled ';
 	var title = (action == 'add') ? MESSAGES[85] : MESSAGES[86] + ' ' + null;
-	var html = '';
 	
+	var template_disabled = (values == null || values['template'] == null) ? '' : 'disabled ';
+	
+	//$('#lab-viewport').on('change', '#form-node-add'
+	
+	$.when(getTemplates(template)).done(function(templates) {
+		var html = '';
+		
+		/*
+$('body').on('change', '#form-node-add, #form-node-edit', function(e) {
+	console.log('CHANGE');
+			console.log('CHANGE');
+		});
+		*/
+	
+	// dainok
+	
+		html += '<form id="form-node-' + action + '" class="form-horizontal">';
+		html += '<div class="form-group">';
+		html += '<label class="col-md-3 control-label">' + MESSAGES[84] + '</label>';
+		html += '<div class="col-md-5"><select class="selectpicker form-control" name="node[template]" data-live-search="true" data-style="selectpicker-button">';
+		$.each(templates, function(id, object) {
+			html += '<option value="' + id + '">' + object + '</option>';
+		});
+		html += '</select></div>';
+		html += '</div><div id="form-node-add-data"></div></form>';
 
+		$('*').change(function(e2) {
+			console.log('THISCHANGE');
+			console.log(e2);
+		});
+	
+	
+	/*
+// Select node template
+$('body').on('change', '#form-node-add, #form-node-edit', function(e) {
+	var node_template = $(this).find('option:selected').val();
+	
+	printFormNodeData(node_template);
+    var deferred = $.Deferred();
+    var node_template = $(this).find("option:selected").val();
 
-	getNetworkTypes
-	console.log("HERE");
+    if (node_template != '') {
+        // Getting template only if a valid option is selected (to avoid requests during typewriting)
+        $.when(displayNodeFormFromTemplate(node_template, false)).done(function(form_template) {
+            // Add the form to the HTML page
+            $('#form-node_add').html(form_template);
+
+            // Validate values and set autofocus
+            $('.selectpicker').selectpicker();
+            validateLabNode();
+
+            deferred.resolve();
+        }).fail(function() {
+            deferred.reject();
+        });
+    }
+});
+*/
+	
 	
 	// if template == null, open select template form
 	// else
@@ -1114,20 +1150,13 @@ function printFormNode(lab_filename, action, values) {
 
 
 		
-	$.when(getTemplates(template)).done(function(templates) {
-		html += '<form id="form-node-add" class="form-horizontal form-node-add">';
-		html += '<div class="form-group">';
-		html += '<label class="col-md-3 control-label">' + MESSAGES[84] + '</label>';
-		html += '<div class="col-md-5"><select class="selectpicker form-control" name="node[template]" data-live-search="true" data-style="selectpicker-button">';
-		$.each(templates, function(id, object) {
-			html += '<option value="' + id + '">' + object + '</option>';
-		});
-		html += '</select></div>';
-		html += '</div><div id="form-node-add-data"></div></form>';
+
+
 		
 		addModal(title, html, '');
 		$('.selectpicker').selectpicker();
-		validateNode();
+		//validateNode();
+		
 	
 		//}
 		// Got data
@@ -1319,6 +1348,17 @@ function printLabStatus(lab_filename) {
 	});
 }
 
+// Display all networks in a table
+function printListNetwork(networks) {
+	logger(1, 'DEBUG: printing network list');
+	var body = '<div class="table-responsive"><table class="table"><thead><tr><th>' + MESSAGES[92] + '</th><th>' + MESSAGES[19] + '</th><th>' + MESSAGES[95] + '</th><th>' + MESSAGES[97] + '</th><th>' + MESSAGES[99] + '</th></tr></thead><tbody>';
+	$.each(networks, function(key, value) {
+		body += '<tr><td>' + value['id'] + '</td><td>' + value['name'] + '</td><td>' + value['type'] + '</td><td>' + value['count'] + '</td><td><a class="action-networkedit" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[71] + '"><i class="glyphicon glyphicon-edit"></i></a><a class="action-networkdelete" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[65] + '"><i class="glyphicon glyphicon-trash"></i></a></td></tr>';
+	});
+	body += '</tbody></table></div>';
+	addModalWide(MESSAGES[96], body, '');
+}
+
 // Print Authentication Page
 function printPageAuthentication() {
 	var html = '<div class="row full-height"><div class="col-md-5 col-lg-5 full-height" id="auth-left"><div class="middle"><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><img class="response" alt="Logo RR" src="/themes/default/images/logo-rr.png" /></div></div><!-- <div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><img class="response" alt="Signup Icon" src="/themes/default/images/button-signup.png"></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2">to access more features</div></div> --><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2 white">Existing user...</div></div><form id="form-login"><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input name="login[username]" placeholder="USERNAME" type="text" /></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input name="login[password]" placeholder="PASSWORD" type="password" /></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input alt="Login Icon" src="/themes/default/images/button-login.png" type="image" /></div></div></form></div></div><div class="col-md-7 col-lg-7" id="auth-right"><div id="logo-angular"><img class="response" alt="Logo Angular" src="/themes/default/images/logo-angular.png" /></div><div id="logo-ad"><img class="response" alt="Logo AD" src="/themes/default/images/logo-ad.png" /></div><div id="logo-text"><h1>Unified Networking Lab</h1><p>UNetLab can be considered the next major version of<br>iou-web, but the software has been rewritten from<br>scratch. The major advantage over GNS3 and<br>iou-web itself is about multi-hypervisor<br>support within a single entity. UNetLab<br>allows to design labs using IOU, Dy-<br>namips and QEMU nodes without<br>dealing with multi virtual ma-<br>chines: everything run in-<br>side a UNetLab host,<br>and a lab is a single<br>file including all<br>information<br>needed.</p></div></div></div>'
@@ -1483,10 +1523,10 @@ function printPageLabOpen(lab) {
 	}
 	
 	$('#lab-sidebar ul').append('<li><a class="action-labbodyget" href="#" title="' + MESSAGES[64] + '"><i class="glyphicon glyphicon-list-alt"></i></a></li>');
-	$('#lab-sidebar ul').append('<li><a class="action-labnodesget" href="#" title="' + MESSAGES[62] + '"><i class="glyphicon glyphicon-hdd"></i></a></li>');
-	$('#lab-sidebar ul').append('<li><a class="action-labnetworksget" href="#" title="' + MESSAGES[61] + '"><i class="glyphicon glyphicon-transfer"></i></a></li>');
-	$('#lab-sidebar ul').append('<li><a class="action-labconfigsget" href="#" title="' + MESSAGES[58] + '"><i class="glyphicon glyphicon-align-left"></i></a></li>');
-	$('#lab-sidebar ul').append('<li><a class="action-labpicturesget" href="#" title="' + MESSAGES[59] + '"><i class="glyphicon glyphicon-picture"></i></a></li>');
+	$('#lab-sidebar ul').append('<li><a class="action-nodesget" href="#" title="' + MESSAGES[62] + '"><i class="glyphicon glyphicon-hdd"></i></a></li>');
+	$('#lab-sidebar ul').append('<li><a class="action-networksget" href="#" title="' + MESSAGES[61] + '"><i class="glyphicon glyphicon-transfer"></i></a></li>');
+	$('#lab-sidebar ul').append('<li><a class="action-configsget" href="#" title="' + MESSAGES[58] + '"><i class="glyphicon glyphicon-align-left"></i></a></li>');
+	$('#lab-sidebar ul').append('<li><a class="action-picturesget" href="#" title="' + MESSAGES[59] + '"><i class="glyphicon glyphicon-picture"></i></a></li>');
 	$('#lab-sidebar ul').append('<li><a class="action-labtopologyrefresh" href="#" title="' + MESSAGES[57] + '"><i class="glyphicon glyphicon-refresh"></i></a></li>');
 	$('#lab-sidebar ul').append('<li><a class="action-labclose" href="#" title="' + MESSAGES[60] + '"><i class="glyphicon glyphicon-off"></i></a></li>');
 	

@@ -39,8 +39,19 @@ $('body').on('change', 'input[name="import[file]"]', function(e) {
 	$('input[name="import[local]"]').val($(this).val());
 });
 
+// On escape remove mouse_frame
+$(document).on('keydown', 'body', function(e){
+	if('27' == e.which){
+		$('#mouse_frame').remove();
+	};
+});
+
 // Select node template
+// dainok delete
+/*
 $('body').on('change', '#form-node-add, #form-node-edit', function(e) {
+	console.log('CHANGE');
+	// dainok
 	var node_template = $(this).find('option:selected').val();
 	
 	printFormNodeData(node_template);
@@ -63,6 +74,7 @@ $('body').on('change', '#form-node-add, #form-node-edit', function(e) {
         });
     }
 });
+*/
 
 // Accept privacy
 $(document).on('click', '#privacy', function () {
@@ -163,6 +175,13 @@ $(document).on('contextmenu', '.context-menu', function(e) {
 		if (ROLE == 'admin' || ROLE == 'editor') {
 			body += '<li><a class="menu-collapse" data-path="menu-edit" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[73] + '</a></li><li><a class="action-nodeinterfaces menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[72] + '</a></li><li><a class="action-nodeedit menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-edit"></i> ' + MESSAGES[71] + '</a></li><li><a class="action-nodedelete menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[65] + '</a></li>'
 		};
+	} else if ($(this).hasClass('network_frame')) {
+		if (ROLE == 'admin' || ROLE == 'editor') {
+			logger(1, 'DEBUG: opening network context menu');
+			var network_id = $(this).attr('data-path');
+			var title = $(this).attr('data-name');
+			var body = '<li><a class="action-networkedit" data-path="' + network_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-edit"></i> ' + MESSAGES[71] + '</a></li><li><a class="action-networkdelete" data-path="' + network_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[65] + '</a></li>';
+		}
 	} else {
 		// Context menu not defined for this object
 		return false;
@@ -234,8 +253,8 @@ $(document).on('click', '.action-labbodyget', function(e) {
 });
 
 // Print lab network
-$(document).on('click', '.action-labnetworkget', function(e) {
-	logger(1, 'DEBUG: action = labnetworkget');
+$(document).on('click', '.action-networkedit', function(e) {
+	logger(1, 'DEBUG: action = action-networkedit');
 	var id = $(this).attr('data-path');
 	var lab_filename = $('#lab-viewport').attr('data-path');
 	$.when(getNetworks(lab_filename, id)).done(function(values) {
@@ -248,14 +267,10 @@ $(document).on('click', '.action-labnetworkget', function(e) {
 });
 
 // Print lab networks
-$(document).on('click', '.action-labnetworksget', function(e) {
-	logger(1, 'DEBUG: action = labnetworksget');
+$(document).on('click', '.action-networksget', function(e) {
+	logger(1, 'DEBUG: action = networksget');
 	$.when(getNetworks($('#lab-viewport').attr('data-path'), null)).done(function(networks) {
-		var body = '';
-		$.each(networks, function(key, value) {
-			body += '<li><a class="action-labnetworkget" data-path="' + value['id'] + '" href="#" title="network' + value['id'] + '"><i class="glyphicon glyphicon-transfer"></i> ' + value['name'] + ' <code>[ID:' + value['id'] + ']</code></a></li>';
-		});
-		printContextMenu(MESSAGES[62], body, e.pageX, e.pageY);
+		printListNetwork(networks);
 	}).fail(function(message) {
 		addModalError(message);
 	});
@@ -323,7 +338,7 @@ $(document).on('dblclick', '.action-labpreview', function(e) {
 // Redraw topology
 $(document).on('click', '.action-labtopologyrefresh', function(e) {
 	logger(1, 'DEBUG: action = labtopologyrefresh');
-	printLabTopology($('#lab-viewport').attr('data-path'))
+	printLabTopology($('#lab-viewport').attr('data-path'));
 });
 
 // Logout
@@ -340,17 +355,73 @@ $(document).on('click', '.action-logout', function(e) {
 $(document).on('click', '.action-labobjectadd', function(e) {
 	logger(1, 'DEBUG: action = labobjectadd');
 	var body = '';
-	body += '<li><a class="action-nodeadd" data-path="' + $('#lab-viewport').attr('data-path')+ '" href="#"><i class="glyphicon glyphicon-hdd"></i> ' + MESSAGES[81] + '</a></li>';
-	body += '<li><a class="action-networkadd" data-path="' + $('#lab-viewport').attr('data-path')+ '" href="#"><i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[82] + '</a></li>';
+	body += '<li><a class="action-nodeplace" data-path="' + $('#lab-viewport').attr('data-path')+ '" href="#"><i class="glyphicon glyphicon-hdd"></i> ' + MESSAGES[81] + '</a></li>';
+	body += '<li><a class="action-networkplace" data-path="' + $('#lab-viewport').attr('data-path')+ '" href="#"><i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[82] + '</a></li>';
 	body += '<li><a class="action-pictureadd" data-path="' + $('#lab-viewport').attr('data-path') + '" href="#"><i class="glyphicon glyphicon-picture"></i> ' + MESSAGES[83] + '</a></li>';
 	printContextMenu(MESSAGES[80], body, e.pageX, e.pageY);
 });
 
-// Add node
-$(document).on('click', '.action-nodeadd', function(e) {
-	logger(1, 'DEBUG: action = nodeadd');
-	printFormNode($(this).attr('data-path'), 'add', null);
+// Add network
+$(document).on('click', '.action-networkadd', function(e) {
+	logger(1, 'DEBUG: action = networkadd');
+	printFormNetwork('add', null);
 	$('#context-menu').remove();
+});
+
+// Place an object
+$(document).on('click', '.action-nodeplace, .action-networkplace', function(e) {
+	logger(1, 'DEBUG: action = nodeplace');
+	var target = $(this);
+	$('#context-menu').remove();
+
+	if ($(this).hasClass('action-nodeplace')) {
+		var object = 'node';
+	} else if ($(this).hasClass('action-networkplace')) {
+		var object = 'network';
+	} else {
+		return false;
+	}
+	
+	addMessage('info', MESSAGES[100])	
+	if (!$('#mouse_frame').length) {
+		// Add the frame container if not exists
+		$('#lab-viewport').append('<svg id="mouse_frame"><circle cx="20" cy="20" r="10" stroke="#3ba9ba" stroke-width="1" fill="transparent" /></svg>');
+	}
+	
+	// On mouse move, adjust css
+	$('#lab-viewport').mousemove(function(e1) {
+		$('#mouse_frame').css({
+			'left': e1.pageX - 50,
+			'top': e1.pageY - 50
+		});
+	});
+	
+	// On click open the form
+	$('*').click(function(e2) {
+		if ($(e2.target).is('#lab-viewport, #lab-viewport *')) {
+			// Click is within viewport
+			if ($('#mouse_frame').length > 0) {
+				// ESC not pressed
+				var values = {};
+				values['left'] = e2.pageX - 50;
+				values['top'] = e2.pageY - 50;
+				if (object == 'node') {
+					printFormNode('add', values);
+				} else if (object == 'network') {
+					printFormNetwork('add', values);
+				}
+
+				$('#mouse_frame').remove();
+			}
+			$('#mouse_frame').remove();
+			$('*').off();
+		} else {
+			addMessage('warning', MESSAGES[101])
+			$('#mouse_frame').remove();
+			$('*').off();
+		}
+	
+	});
 });
 
 // Clone selected labs
@@ -677,6 +748,53 @@ $(document).on('submit', '#form-lab-add, #form-lab-edit', function(e) {
 					});
 				} else {
 					addMessage(data['status'], data['message']);
+				}
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+		}
+	});
+	return false;  // Stop to avoid POST
+});
+
+// form-network-
+// Submit lab form
+$(document).on('submit', '#form-network-add, #form-network-edit', function(e) {
+	e.preventDefault();  // Prevent default behaviour
+	var form_data = form2Array('network');
+	if ($(this).attr('id') == 'form-network-add') {
+		logger(1, 'DEBUG: posting form-network-add form.');
+		var url = '/api/labs' + $('#lab-viewport').attr('data-path') + '/networks';
+		var type = 'POST';
+	} else {
+		logger(1, 'DEBUG: posting form-network-edit form.');
+		var url = '/api/labs' + $('#lab-viewport').attr('data-path') + '/networks/' + form_data['id'];
+		var type = 'PUT';
+	}
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		data: JSON.stringify(form_data),
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: network "' + form_data['name'] + '" saved.');
+				// Close the modal
+				$('body').children('.modal').modal('hide');
+				addMessage(data['status'], data['message']);
+				if ($(this).attr('id') == 'form-network-edit') {
+					// Refresh topology
+					printLabTopology($('#lab-viewport').attr('data-path'))
 				}
 			} else {
 				// Application error

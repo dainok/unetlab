@@ -21,8 +21,6 @@
 	z-index: 5200;
 	overflow-x: hidden;
 	overflow-y: auto;
-	max-height: 100%;
-
 }
 
 #context-menu code {
@@ -101,13 +99,13 @@
     padding: 0px 2px 0px 2px;
 }
 
-#lab-viewport #frame_container {
+#lab-viewport #alert_container {
 	bottom: 0px;
 	left: auto;
 	position: fixed;
 	right: 1%;
 	top: auto;
-	width: 20%;
+	width: 30%;
 }
 
 #list-title-folders {
@@ -236,6 +234,11 @@
 	font-weight: bold;
 	margin: 0px;
 	padding: 0px;
+}
+
+#mouse_frame {
+	position: absolute;
+	
 }
 
 #navbar-lab {

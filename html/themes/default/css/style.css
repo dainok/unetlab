@@ -101,26 +101,50 @@ p {
 }
 
 table {
-	margin: 10px auto 10px auto;
+	border: 1px solid #3ba9ba;
+	margin: 0px;
+	padding: 0px;
+
 }
 
-tr {
-	margin: 5px auto 5px auto;
+thead {
+	background: #3ba9ba;
+	border: 0px;
 }
 
-th {
-	border-bottom: 3px solid #46a6b6;
-	border-left: 1px solid #46a6b6;
-	border-right: 1px solid #46a6b6;
-	font-weight: bold;
-	padding: 5px 5px 5px 5px;
+thead tr {
+	border: 0px;
 }
 
-td {
-	border-bottom: 1px solid #58585a;
-	border-left: 1px solid #58585a;
-	border-right: 1px solid #58585a;
-	padding: 5px 5px 5px 5px;
+thead th {
+	border: 0px;
+	color: #ffffff;
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+	font-size: 0.8em;
+	padding-bottom: 2px;
+	padding-top: 2px;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+
+tbody {
+	background-color: #ffffff;
+	border: 0px;
+}
+
+tbody tr {
+	border: 1px solid #3ba9ba;
+}
+
+tbody td {
+	border: 0px;
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+	font-size: 0.8em;
+}
+
+tbody td .glyphicon {
+	border: 0px;
+	color: #8b8c90;
 }
 
 #navbar-top, #navbar-top > div {

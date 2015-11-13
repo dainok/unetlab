@@ -210,8 +210,8 @@ class Network {
 		if (isset($this -> left)) {
 			return $this -> left;
 		} else {
-			// By default return a random value between 50 and 750
-			return rand(50, 750);
+			// By default return a random value between 240 and 560
+			return rand(240, 560);
 		}
 	}
 
@@ -247,8 +247,8 @@ class Network {
 		if (isset($this -> top)) {
 			return $this -> top;
 		} else {
-			// By default return a random value between 50 and 550
-			return rand(50, 550).'%';
+			// By default return a random value between 180 and 420
+			return rand(180, 420);
 		}
 	}
 

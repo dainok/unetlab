@@ -122,6 +122,7 @@ function apiGetLabNetwork($lab, $id) {
 		$output['status'] = 'success';
 		$output['message'] = $GLOBALS['messages'][60005];
 		$output['data'] = Array(
+			'count' => $network -> getCount(),
 			'left' => $network -> getLeft(),
 			'name' => $network -> getName(),
 			'top' => $network -> getTop(),
@@ -154,6 +155,7 @@ function apiGetLabNetworks($lab) {
 	foreach ($networks as $network_id => $network) {
 		$output['data'][$network_id] = Array(
 			'id' => $network_id,
+			'count' => $network -> getCount(),
 			'left' => $network -> getLeft(),
 			'name' => $network -> getName(),
 			'top' => $network -> getTop(),
