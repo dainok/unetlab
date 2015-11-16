@@ -32,11 +32,13 @@
 
 $p['type'] = 'qemu';
 $p['name'] = 'VyOS';
+$p['url'] = 'http://vyos.net/';
 $p['icon'] = 'Router.png';
 $p['cpu'] = 1;
-$p['ram'] = 1024;
+$p['ram'] = 512;
 $p['ethernet'] = 4;
 $p['console'] = 'telnet';
 $p['qemu_arch'] = 'x86_64';
-$p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -serial mon:stdio -nographic -nodefconfig -nodefaults -rtc base=utc -no-shutdown -boot order=c';
+$p['qemu_nic'] = 'virtio-net-pci';
+$p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -serial mon:stdio -nographic -nodefconfig -nodefaults -rtc base=utc';
 ?>

@@ -47,5 +47,5 @@ if (function_exists('isVirtual') && isVirtual()) {
 } else {
 	$p['qemu_options'] = '-machine type=pc-1.0,accel=kvm';
 }
-$p['qemu_options'] .= ' -serial mon:stdio -nographic -nodefconfig -nodefaults -rtc base=utc -no-shutdown -boot order=c';
+$p['qemu_options'] .= ' -serial mon:stdio -nographic -nodefconfig -nodefaults -rtc base=utc';
 ?>

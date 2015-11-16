@@ -38,5 +38,5 @@ $p['ram'] = 1024;
 $p['ethernet'] = 4;
 $p['console'] = 'telnet';
 $p['qemu_arch'] = 'x86_64';
-$p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -serial mon:stdio -nographic -display none -nodefconfig -rtc base=utc -no-shutdown -boot order=d';
+$p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -serial mon:stdio -nographic -display none -nodefconfig -rtc base=utc -boot order=d';
 ?>

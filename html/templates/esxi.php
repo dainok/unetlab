@@ -38,5 +38,5 @@ $p['ram'] = 4096;
 $p['ethernet'] = 4; 
 $p['console'] = 'vnc';
 $p['qemu_arch'] = 'x86_64';
-$p['qemu_options'] = '-machine pc,accel=kvm -serial none -nographic -nodefconfig -nodefaults -display none -vga std -rtc base=utc -no-shutdown';
+$p['qemu_options'] = '-machine pc,accel=kvm -serial none -nographic -nodefconfig -nodefaults -display none -vga std -rtc base=utc';
 ?>

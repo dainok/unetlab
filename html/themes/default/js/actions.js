@@ -376,8 +376,10 @@ $(document).on('click', '.action-nodeplace, .action-networkplace', function(e) {
 
 	if ($(this).hasClass('action-nodeplace')) {
 		var object = 'node';
+		var frame = '<div id="mouse_frame" class="context-menu node_frame"><img src="/images/icons/Router.png"/></div>';
 	} else if ($(this).hasClass('action-networkplace')) {
 		var object = 'network';
+		var frame = '<div id="mouse_frame" class="context-menu network_frame"><img src="/images/lan.png"/></div>';
 	} else {
 		return false;
 	}
@@ -385,14 +387,17 @@ $(document).on('click', '.action-nodeplace, .action-networkplace', function(e) {
 	addMessage('info', MESSAGES[100])	
 	if (!$('#mouse_frame').length) {
 		// Add the frame container if not exists
-		$('#lab-viewport').append('<svg id="mouse_frame"><circle cx="20" cy="20" r="10" stroke="#3ba9ba" stroke-width="1" fill="transparent" /></svg>');
+		$('#lab-viewport').append(frame);
+	} else {
+		$('#mouse_frame').remove();
+		$('#lab-viewport').append(frame);
 	}
 	
 	// On mouse move, adjust css
 	$('#lab-viewport').mousemove(function(e1) {
 		$('#mouse_frame').css({
-			'left': e1.pageX - 50,
-			'top': e1.pageY - 50
+			'left': e1.pageX - 30,
+			'top': e1.pageY - 30
 		});
 	});
 	
@@ -403,8 +408,8 @@ $(document).on('click', '.action-nodeplace, .action-networkplace', function(e) {
 			if ($('#mouse_frame').length > 0) {
 				// ESC not pressed
 				var values = {};
-				values['left'] = e2.pageX - 50;
-				values['top'] = e2.pageY - 50;
+				values['left'] = e2.pageX - 30;
+				values['top'] = e2.pageY - 30;
 				if (object == 'node') {
 					printFormNode('add', values);
 				} else if (object == 'network') {

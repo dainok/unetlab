@@ -39,5 +39,5 @@ $p['ethernet'] = 4;
 $p['console'] = 'telnet';
 $p['qemu_arch'] = 'i386';
 $p['qemu_nic'] = 'i82559er';
-$p['qemu_options'] = '-machine type=pc-1.0,accel=tcg -serial mon:stdio -nographic -nodefconfig -nodefaults -rtc base=utc -no-shutdown -boot order=c -smbios type=1,product=asa5520 -icount 1';
+$p['qemu_options'] = '-machine type=pc-1.0,accel=tcg -serial mon:stdio -nographic -nodefconfig -nodefaults -rtc base=utc -smbios type=1,product=asa5520 -icount 1';
 ?>

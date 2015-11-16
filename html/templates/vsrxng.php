@@ -39,5 +39,5 @@ $p['ethernet'] = 4;
 $p['console'] = 'vnc';
 $p['qemu_nic'] = 'virtio-net-pci';
 $p['qemu_arch'] = 'x86_64';
-$p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -vga std -nodefconfig -nodefaults -rtc base=utc -no-shutdown -boot order=c';
+$p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -vga std -nodefconfig -nodefaults -rtc base=utc';
 ?>
