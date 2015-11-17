@@ -336,8 +336,9 @@ function getLabInfo(lab_filename) {
 }
 
 // Get lab body
-function getLabBody(lab_filename) {
+function getLabBody() {
 	var deferred = $.Deferred();
+	var lab_filename = $('#lab-viewport').attr('data-path');
 	var url = '/api/labs' + lab_filename + '/html';
 	var type = 'GET'
 	$.ajax({
@@ -367,7 +368,8 @@ function getLabBody(lab_filename) {
 }
 
 // Get lab networks
-function getNetworks(lab_filename, network_id) {
+function getNetworks(network_id) {
+	var lab_filename = $('#lab-viewport').attr('data-path');
 	var deferred = $.Deferred();
 	if (network_id != null) {
 		var url = '/api/labs' + lab_filename + '/networks/' + network_id;
@@ -433,8 +435,9 @@ function getNetworkTypes() {
 }
 
 // Get lab nodes
-function getNodes(lab_filename, node_id) {
+function getNodes(node_id) {
 	var deferred = $.Deferred();
+	var lab_filename = $('#lab-viewport').attr('data-path');
 	if (node_id != null) {
 		var url = '/api/labs' + lab_filename + '/nodes/' + node_id;
 	} else {
@@ -468,8 +471,9 @@ function getNodes(lab_filename, node_id) {
 }
 
 // Get lab topology
-function getTopology(lab_filename) {
+function getTopology() {
 	var deferred = $.Deferred();
+	var lab_filename = $('#lab-viewport').attr('data-path');
 	var url = '/api/labs' + lab_filename + '/topology';
 	var type = 'GET'
 	$.ajax({
@@ -798,8 +802,9 @@ function postLogin() {
 }
 
 // Set network position
-function setNetworkPosition(lab_filename, network_id, left, top) {
+function setNetworkPosition(network_id, left, top) {
 	var deferred = $.Deferred();
+	var lab_filename = $('#lab-viewport').attr('data-path');
 	var form_data = {}
 	form_data['left'] = left;
 	form_data['top'] = top;
@@ -835,8 +840,9 @@ function setNetworkPosition(lab_filename, network_id, left, top) {
 }
 
 // Set node position
-function setNodePosition(lab_filename, node_id, left, top) {
+function setNodePosition(node_id, left, top) {
 	var deferred = $.Deferred();
+	var lab_filename = $('#lab-viewport').attr('data-path');
 	var form_data = {}
 	form_data['left'] = left;
 	form_data['top'] = top;
@@ -870,8 +876,9 @@ function setNodePosition(lab_filename, node_id, left, top) {
 }
 
 // Start node(s)
-function start(lab_filename, node_id) {
+function start(node_id) {
 	var deferred = $.Deferred();
+	var lab_filename = $('#lab-viewport').attr('data-path');
 	var url = (node_id == null) ? '/api/labs' + lab_filename + '/nodes/start' : '/api/labs' + lab_filename + '/nodes/' + node_id + '/start';
 	var type = 'GET'
 	$.ajax({
@@ -901,8 +908,9 @@ function start(lab_filename, node_id) {
 }
 
 // Stop node(s)
-function stop(lab_filename, node_id) {
+function stop(node_id) {
 	var deferred = $.Deferred();
+	var lab_filename = $('#lab-viewport').attr('data-path');
 	var url = (node_id == null) ? '/api/labs' + lab_filename + '/nodes/stop' : '/api/labs' + lab_filename + '/nodes/' + node_id + '/stop';
 	var type = 'GET'
 	$.ajax({
@@ -1050,12 +1058,12 @@ function printFormNetwork(action, values) {
 	var name = (values == null || values['name'] == null) ? '' : values['name']; 
 	var top = (values == null || values['top'] == null) ? '' : values['top']; 
 	var type = (values == null || values['type'] == null) ? '' : values['type'];
-	var title = (action == 'add') ? MESSAGES[85] : MESSAGES[90];
+	var title = (action == 'add') ? MESSAGES[89] : MESSAGES[90];
 	
 	$.when(getNetworkTypes()).done(function(network_types) {
 		// Read privileges and set specific actions/elements
 		var html = '<form id="form-network-' + action + '" class="form-horizontal"><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[92] + '</label><div class="col-md-5"><input class="form-control" name="network[id]" value="' + id + '" disabled type="text"/></div></div>';
-		html += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control" name="network[name]" value="' + name + '" type="text"/></div></div>';
+		html += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[103] + '</label><div class="col-md-5"><input class="form-control autofocus" name="network[name]" value="' + name + '" type="text"/></div></div>';
 		html += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[95] + '</label><div class="col-md-5"><select class="selectpicker show-tick form-control" name="network[type]" data-live-search="true" data-style="selectpicker-button">';
 		$.each(network_types, function(key, value) {
 			var type_selected = (key == type) ? 'selected ' : '';
@@ -1067,119 +1075,90 @@ function printFormNetwork(action, values) {
 		
 		addModal(title, html, '');
 		$('.selectpicker').selectpicker();
+		$('.autofocus').focus();
 	});
 }
 
 // Node form
 function printFormNode(action, values) {
-	var id = (values == null || values['id'] == null) ? '' : values['id']; 
-	var left = (values == null || values['left'] == null) ? '' : values['left']; 
-	var name = (values == null || values['name'] == null) ? '' : values['name']; 
-	var top = (values == null || values['top'] == null) ? '' : values['top']; 
+	var id = (values == null || values['id'] == null) ? null : values['id']; 
+	var left = (values == null || values['left'] == null) ? null : values['left']; 
+	var top = (values == null || values['top'] == null) ? null : values['top']; 
 	var template = (values == null || values['template'] == null) ? null : values['template']; 
-	var title = (action == 'add') ? MESSAGES[85] : MESSAGES[86] + ' ' + null;
+	console.log(values);
 	
+	var title = (action == 'add') ? MESSAGES[85] : MESSAGES[86];
 	var template_disabled = (values == null || values['template'] == null) ? '' : 'disabled ';
 	
-	//$('#lab-viewport').on('change', '#form-node-add'
+	console.log(values);
 	
-	$.when(getTemplates(template)).done(function(templates) {
+	$.when(getTemplates(null)).done(function(templates) {
 		var html = '';
 		
-		/*
-$('body').on('change', '#form-node-add, #form-node-edit', function(e) {
-	console.log('CHANGE');
-			console.log('CHANGE');
-		});
-		*/
-	
 	// dainok
 	
 		html += '<form id="form-node-' + action + '" class="form-horizontal">';
 		html += '<div class="form-group">';
 		html += '<label class="col-md-3 control-label">' + MESSAGES[84] + '</label>';
-		html += '<div class="col-md-5"><select class="selectpicker form-control" name="node[template]" data-live-search="true" data-style="selectpicker-button">';
-		$.each(templates, function(id, object) {
-			html += '<option value="' + id + '">' + object + '</option>';
-		});
+		html += '<div class="col-md-5">';
+		if (action == 'add') {
+			html += '<select class="selectpicker form-control" name="node[template]" data-live-search="true" data-style="selectpicker-button">';
+			html += '<option value="">' + MESSAGES[102] + '</option>';
+			$.each(templates, function(key, value) {
+				html += '<option value="' + key + '">' + value + '</option>';
+			});
+		} else {
+			html += '<select class="selectpicker form-control" disabled name="node[template]" data-style="selectpicker-button">';
+			html += '<option value="' + template + '">' + templates[template] + '</option>';
+		}
 		html += '</select></div>';
-		html += '</div><div id="form-node-add-data"></div></form>';
-
-		$('*').change(function(e2) {
-			console.log('THISCHANGE');
-			console.log(e2);
-		});
-	
-	
-	/*
-// Select node template
-$('body').on('change', '#form-node-add, #form-node-edit', function(e) {
-	var node_template = $(this).find('option:selected').val();
-	
-	printFormNodeData(node_template);
-    var deferred = $.Deferred();
-    var node_template = $(this).find("option:selected").val();
-
-    if (node_template != '') {
-        // Getting template only if a valid option is selected (to avoid requests during typewriting)
-        $.when(displayNodeFormFromTemplate(node_template, false)).done(function(form_template) {
-            // Add the form to the HTML page
-            $('#form-node_add').html(form_template);
-
-            // Validate values and set autofocus
-            $('.selectpicker').selectpicker();
-            validateLabNode();
-
-            deferred.resolve();
-        }).fail(function() {
-            deferred.reject();
-        });
-    }
-});
-*/
-	
-	
-	// if template == null, open select template form
-	// else
-		// if action is add, print node_Add for, based on template
-		// else print node_edit form, based on template
-	
-	//
-		//if (template == null) {
-
-
-
-		
-
-
+		html += '</div><div id="form-node-data"></div><div id="form-node-buttons"></div></form>';
 		
 		addModal(title, html, '');
 		$('.selectpicker').selectpicker();
-		//validateNode();
 		
-	
-		//}
-		// Got data
-		/*
-		var username = (values['username'] != null) ? values['username'] : '';
-		var name = (values['name'] != null) ? values['name'] : '';
-		var email = (values['email'] != null) ? values['email'] : '';
-		var role = (values['role'] != null) ? values['role'] : '';
-		var expiration = (values['expiration'] != null && values['expiration'] != -1) ? $.datepicker.formatDate('yy-mm-dd', new Date(values['expiration'] * 1000)) : '';
-		var pod = (values['pod'] != null && values['pod'] != -1) ? values['pod'] : '';
-		var pexpiration = (values['pexpiration'] != null && values['pexpiration'] != -1) ? $.datepicker.formatDate('yy-mm-dd', new Date(values['pexpiration'] * 1000)) : '';
-		var submit = (action == 'add') ? MESSAGES[17] : MESSAGES[47];
-		var title = (action == 'add') ? MESSAGES[34] : MESSAGES[48] + ' ' + username;
-		var user_disabled = (action == 'add') ? '' : 'disabled ';
-		var html = '<form id="form-user-' + action + '" class="form-horizontal form-user-' + action + '"><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[44] + '</label><div class="col-md-5"><input class="form-control autofocus" ' + user_disabled + 'name="user[username]" value="' + username + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control" name="user[name]" value="' + name + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[28] + '</label><div class="col-md-5"><input class="form-control" name="user[email]" value="' + email+ '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[45] + '</label><div class="col-md-5"><input class="form-control" name="user[password]" value="" type="password"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[29] + '</label><div class="col-md-5"><select class="selectpicker show-tick form-control" name="user[role]" data-live-search="true">';
-		$.each(roles, function(key, value) {
-			var role_selected = (role == key) ? 'selected ' : '';
-			html += '<option ' + role_selected + 'value="' + key + '">' + value + '</option>';
+		$('*').change(function(e2) {
+			template = $(this).find("option:selected").val();
+			if (template != '') {
+				// Getting template only if a valid option is selected (to avoid requests during typewriting)
+				$.when(getTemplates(template), getNodes(id)).done(function(template_values, node_values) {
+					// TODO: this event is called twice
+					id = (id == null)? '' : id;
+					var html_data = '<input name="node[type]" value="' + template_values['type'] + '" type="hidden"/>';
+					html_data += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[92] + '</label><div class="col-md-5"><input class="form-control" disabled name="node[id]" value="' + id + '" type="text"/></div></div>';
+					$.each(template_values['options'], function(key, value) {
+						if (value['type'] == 'list') {
+							
+							html_data += '<div class="form-group">';
+							html_data += '<label class="col-md-3 control-label">' + value['name'] + '</label>';
+							html_data += '<div class="col-md-5"><select class="selectpicker form-control" name="node[' + key + ']" data-style="selectpicker-button">';
+							$.each(value['list'], function(list_key, list_value) {
+								html_data += '<option value="' + list_key + '">' + list_value + '</option>';
+							});
+							html_data += '</select></div>';
+							html_data += '</div>';
+						} else {
+							html_data += '<div class="form-group"><label class="col-md-3 control-label">' + value['name'] + '</label><div class="col-md-5"><input class="form-control' + ((key == 'name') ? ' autofocus' : '') + '" name="node[' + key + ']" value="' + value['value'] + '" type="text"/></div></div>';
+						}
+					});
+					html_data += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[93] + '</label><div class="col-md-5"><input class="form-control" name="node[left]" value="' + left + '" type="text"/></div></div>';
+					html_data += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[94] + '</label><div class="col-md-5"><input class="form-control" name="node[top]" value="' + top + '" type="text"/></div></div>';
+					
+					$('#form-node-buttons').html('<div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div>');
+					
+					$('#form-node-data').html(html_data);
+					$('.selectpicker').selectpicker();
+					$('.autofocus').focus();
+				}).fail(function(message1, message2) {
+					// Cannot get data
+					if (message1 != null) {
+						addModalError(message1);
+					} else {
+						addModalError(message2)
+					};
+				});
+			}
 		});
-		html += '</select></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[30] + '</label><div class="col-md-5"><input class="form-control" name="user[expiration]" value="' + expiration + '" type="text"/></div></div><h4>' + MESSAGES[46] + '</h4><div class="form-group"><label class="col-md-3 control-label">POD</label><div class="col-md-5"><input class="form-control" name="user[pod]" value="' + pod + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[30] + '</label><div class="col-md-5"><input class="form-control" name="user[pexpiration]" value="' + pexpiration + '" type="text"/></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + submit + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
-		addModal(title, html, '');
-		validateUser();
-		*/
 	}).fail(function(message) {
 		// Cannot get data
 		addModalError(message);
@@ -1234,9 +1213,10 @@ function printLabPreview(lab_filename) {
 }
 
 // Print lab topology
-function printLabTopology(lab_filename) {
+function printLabTopology() {
+	var lab_filename = $('#lab-viewport').attr('data-path');
 	$('#lab-viewport').empty();
-	$.when(getNetworks(lab_filename, null), getNodes(lab_filename, null), getTopology(lab_filename)).done(function(networks, nodes, topology) {
+	$.when(getNetworks(null), getNodes(null), getTopology()).done(function(networks, nodes, topology) {
 		$.each(networks, function(key, value) {
 			if (value['type'] != 'cloud') {
 				var icon = 'lan.png';
@@ -1322,15 +1302,15 @@ function printLabTopology(lab_filename) {
 		} else if (message2 != null) {
 			addModalError(message2)
 		} else {
-			addModalError(message2)
+			addModalError(message3)
 		};
 	});
 }
 
 // Display lab status
-function printLabStatus(lab_filename) {
+function printLabStatus() {
 	logger(1, 'DEBUG: updating node status');
-	$.when(getNodes(lab_filename, null)).done(function(nodes) {
+	$.when(getNodes(null)).done(function(nodes) {
 		$.each(nodes, function(node_id, node) {
 			if (node['status'] == 0) {
 				// Stopped
@@ -1349,11 +1329,27 @@ function printLabStatus(lab_filename) {
 }
 
 // Display all networks in a table
-function printListNetwork(networks) {
+function printListNetworks(networks) {
 	logger(1, 'DEBUG: printing network list');
 	var body = '<div class="table-responsive"><table class="table"><thead><tr><th>' + MESSAGES[92] + '</th><th>' + MESSAGES[19] + '</th><th>' + MESSAGES[95] + '</th><th>' + MESSAGES[97] + '</th><th>' + MESSAGES[99] + '</th></tr></thead><tbody>';
 	$.each(networks, function(key, value) {
 		body += '<tr><td>' + value['id'] + '</td><td>' + value['name'] + '</td><td>' + value['type'] + '</td><td>' + value['count'] + '</td><td><a class="action-networkedit" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[71] + '"><i class="glyphicon glyphicon-edit"></i></a><a class="action-networkdelete" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[65] + '"><i class="glyphicon glyphicon-trash"></i></a></td></tr>';
+	});
+	body += '</tbody></table></div>';
+	addModalWide(MESSAGES[96], body, '');
+}
+
+// Display all nodes in a table
+function printListNodes(nodes) {
+	logger(1, 'DEBUG: printing node list');
+	var body = '<div class="table-responsive"><table class="table"><thead><tr><th>' + MESSAGES[92] + '</th><th>' + MESSAGES[19] + '</th><th>' + MESSAGES[111] + '</th><th>' + MESSAGES[105] + '</th><th>' + MESSAGES[106] + '</th><th>' + MESSAGES[107] + '</th><th>' + MESSAGES[108] + '</th><th>' + MESSAGES[109] + '</th><th>' + MESSAGES[110] + '</th><th>' + MESSAGES[112] + '</th><th>' + MESSAGES[99] + '</th></tr></thead><tbody>';
+	$.each(nodes, function(key, value) {
+		var cpu = (value['cpu'] != null) ? value['cpu'] : '';
+		var ethernet = (value['ethernet'] != null) ? value['ethernet'] : '';
+		var idlepc = (value['idlepc'] != null) ? value['idlepc'] : '';
+		var nvram = (value['nvram'] != null) ? value['nvram'] : '';
+		var serial = (value['serial'] != null) ? value['serial'] : '';
+		body += '<tr><td>' + value['id'] + '</td><td>' + value['name'] + '</td><td>' + value['template'] + '</td><td>' + cpu + '</td><td>' + idlepc + '</td><td>' + nvram + '</td><td>' + value['ram'] + '</td><td>' + ethernet + '</td><td>' + serial + '</td><td>' + value['console'] + '</td><td><a class="action-nodeedit" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[71] + '"><i class="glyphicon glyphicon-edit"></i></a><a class="action-nodedelete" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[65] + '"><i class="glyphicon glyphicon-trash"></i></a></td></tr>';
 	});
 	body += '</tbody></table></div>';
 	addModalWide(MESSAGES[96], body, '');
@@ -1509,7 +1505,7 @@ function printPageLabOpen(lab) {
 	$('#body').html(html);
 	
 	// Print topology
-	printLabTopology(lab);
+	printLabTopology();
 	
 	// Clearing actions (navbar)
 	$('#actions-menu').empty();

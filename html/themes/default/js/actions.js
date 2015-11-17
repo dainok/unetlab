@@ -46,36 +46,6 @@ $(document).on('keydown', 'body', function(e){
 	};
 });
 
-// Select node template
-// dainok delete
-/*
-$('body').on('change', '#form-node-add, #form-node-edit', function(e) {
-	console.log('CHANGE');
-	// dainok
-	var node_template = $(this).find('option:selected').val();
-	
-	printFormNodeData(node_template);
-    var deferred = $.Deferred();
-    var node_template = $(this).find("option:selected").val();
-
-    if (node_template != '') {
-        // Getting template only if a valid option is selected (to avoid requests during typewriting)
-        $.when(displayNodeFormFromTemplate(node_template, false)).done(function(form_template) {
-            // Add the form to the HTML page
-            $('#form-node_add').html(form_template);
-
-            // Validate values and set autofocus
-            $('.selectpicker').selectpicker();
-            validateLabNode();
-
-            deferred.resolve();
-        }).fail(function() {
-            deferred.reject();
-        });
-    }
-});
-*/
-
 // Accept privacy
 $(document).on('click', '#privacy', function () {
 	$.cookie('privacy', 'true', {
@@ -111,7 +81,6 @@ $(document).on('shown.bs.modal', '.modal', function () {
 
 // After node/network move
 $(document).on('dragstop', '.node_frame, .network_frame', function(e) {
-	var lab_filename = $('#lab-viewport').attr('data-path');
 	var offset = $(this).offset();
 	var left = Math.round(offset.left - 30 + $('#lab-viewport').scrollLeft());	// 30 is the sidebar
 	var top = Math.round(offset.top - 30 + $('#lab-viewport').scrollTop());		// 30 is the topbar
@@ -119,7 +88,7 @@ $(document).on('dragstop', '.node_frame, .network_frame', function(e) {
 
 	if ($(this).hasClass('node_frame')) {
 		logger(1, 'DEBUG: setting node' + id + ' position.');
-		$.when(setNodePosition(lab_filename, id, left, top)).done(function() {
+		$.when(setNodePosition(id, left, top)).done(function() {
 			// Position saved -> redraw topology
 			jsPlumb.repaintEverything();
 		}).fail(function(message) {
@@ -128,7 +97,7 @@ $(document).on('dragstop', '.node_frame, .network_frame', function(e) {
 		});
 	} else if ($(this).hasClass('network_frame')) {
 		logger(1, 'DEBUG: setting network' + id + ' position.');
-		$.when(setNetworkPosition(lab_filename, id, left, top)).done(function() {
+		$.when(setNetworkPosition(id, left, top)).done(function() {
 			// Position saved -> redraw topology
 			jsPlumb.repaintEverything();
 		}).fail(function(message) {
@@ -241,7 +210,7 @@ $(document).on('click', '.action-labadd', function(e) {
 // Print lab body
 $(document).on('click', '.action-labbodyget', function(e) {
 	logger(1, 'DEBUG: action = labbodyget');
-	$.when(getLabInfo($('#lab-viewport').attr('data-path')), getLabBody($('#lab-viewport').attr('data-path'))).done(function(info, body) {
+	$.when(getLabInfo($('#lab-viewport').attr('data-path')), getLabBody()).done(function(info, body) {
 		addModalWide(MESSAGES[64], '<h1>' + info['name'] + '</h1>' + '<p>' + info['description'] + '</p>' + body, '')
 	}).fail(function(message1, message2) {
 		if (message1 != null) {
@@ -256,8 +225,7 @@ $(document).on('click', '.action-labbodyget', function(e) {
 $(document).on('click', '.action-networkedit', function(e) {
 	logger(1, 'DEBUG: action = action-networkedit');
 	var id = $(this).attr('data-path');
-	var lab_filename = $('#lab-viewport').attr('data-path');
-	$.when(getNetworks(lab_filename, id)).done(function(values) {
+	$.when(getNetworks(id)).done(function(values) {
 		values['id'] = id;
 		printFormNetwork('edit', values)
 	}).fail(function(message) {
@@ -269,22 +237,31 @@ $(document).on('click', '.action-networkedit', function(e) {
 // Print lab networks
 $(document).on('click', '.action-networksget', function(e) {
 	logger(1, 'DEBUG: action = networksget');
-	$.when(getNetworks($('#lab-viewport').attr('data-path'), null)).done(function(networks) {
-		printListNetwork(networks);
+	$.when(getNetworks(null)).done(function(networks) {
+		printListNetworks(networks);
 	}).fail(function(message) {
 		addModalError(message);
 	});
 });
 
+// Print lab node
+$(document).on('click', '.action-nodeedit', function(e) {
+	logger(1, 'DEBUG: action = action-nodeedit');
+	var id = $(this).attr('data-path');
+	$.when(getNodes(id)).done(function(values) {
+		values['id'] = id;
+		printFormNode('edit', values)
+	}).fail(function(message) {
+		addModalError(message);
+	});
+	$('#context-menu').remove();
+});
+
 // Print lab nodes
-$(document).on('click', '.action-labnodesget', function(e) {
-	logger(1, 'DEBUG: action = labnodesget');
-	$.when(getNodes($('#lab-viewport').attr('data-path'), null)).done(function(nodes) {
-		var body = '';
-		$.each(nodes, function(key, value) {
-			body += '<li><a class="action-labnodeget" data-path="' + value['id'] + '" href="#" title="node' + value['id'] + '"><i class="glyphicon glyphicon-hdd"></i> ' + value['name'] + ' <code>[ID:' + value['id'] + ']</code></a></li>';
-		});
-		printContextMenu(MESSAGES[62], body, e.pageX, e.pageY);
+$(document).on('click', '.action-nodesget', function(e) {
+	logger(1, 'DEBUG: action = nodesget');
+	$.when(getNodes(null)).done(function(nodes) {
+		printListNodes(nodes);
 	}).fail(function(message) {
 		addModalError(message);
 	});
@@ -304,7 +281,6 @@ $(document).on('click', '.action-labclose', function(e) {
 $(document).on('click', '.action-labedit', function(e) {
 	logger(1, 'DEBUG: action = labedit');
 	$.when(getLabInfo($('#lab-viewport').attr('data-path'))).done(function(values) {
-		values['path'] = $('#lab-viewport').attr('data-path');
 		printFormLab('edit', values);
 	}).fail(function(message) {
 		addModalError(message);
@@ -338,7 +314,7 @@ $(document).on('dblclick', '.action-labpreview', function(e) {
 // Redraw topology
 $(document).on('click', '.action-labtopologyrefresh', function(e) {
 	logger(1, 'DEBUG: action = labtopologyrefresh');
-	printLabTopology($('#lab-viewport').attr('data-path'));
+	printLabTopology();
 });
 
 // Logout
@@ -355,9 +331,9 @@ $(document).on('click', '.action-logout', function(e) {
 $(document).on('click', '.action-labobjectadd', function(e) {
 	logger(1, 'DEBUG: action = labobjectadd');
 	var body = '';
-	body += '<li><a class="action-nodeplace" data-path="' + $('#lab-viewport').attr('data-path')+ '" href="#"><i class="glyphicon glyphicon-hdd"></i> ' + MESSAGES[81] + '</a></li>';
-	body += '<li><a class="action-networkplace" data-path="' + $('#lab-viewport').attr('data-path')+ '" href="#"><i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[82] + '</a></li>';
-	body += '<li><a class="action-pictureadd" data-path="' + $('#lab-viewport').attr('data-path') + '" href="#"><i class="glyphicon glyphicon-picture"></i> ' + MESSAGES[83] + '</a></li>';
+	body += '<li><a class="action-nodeplace" href="#"><i class="glyphicon glyphicon-hdd"></i> ' + MESSAGES[81] + '</a></li>';
+	body += '<li><a class="action-networkplace" href="#"><i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[82] + '</a></li>';
+	body += '<li><a class="action-pictureadd" href="#"><i class="glyphicon glyphicon-picture"></i> ' + MESSAGES[83] + '</a></li>';
 	printContextMenu(MESSAGES[80], body, e.pageX, e.pageY);
 });
 
@@ -517,10 +493,9 @@ $(document).on('click', '.action-selectedexport', function(e) {
 // Export a config
 $(document).on('click', '.action-nodeexport', function(e) {
 	logger(1, 'DEBUG: action = nodeexport');
-	var lab_filename = $('#lab-viewport').attr('data-path');
 	var node_id = $(this).attr('data-path');
 	var node_name = $(this).attr('data-name');
-	$.when(cfg_export(lab_filename, node_id)).done(function() {
+	$.when(cfg_export(node_id)).done(function() {
 		// Config exported -> print a small green message
 		addMessage('success', node_name + ': ' + MESSAGES[79])
 	}).fail(function(message) {
@@ -533,10 +508,9 @@ $(document).on('click', '.action-nodeexport', function(e) {
 // Start a node
 $(document).on('click', '.action-nodestart', function(e) {
 	logger(1, 'DEBUG: action = nodestart');
-	var lab_filename = $('#lab-viewport').attr('data-path');
 	var node_id = $(this).attr('data-path');
 	var node_name = $(this).attr('data-name');
-	$.when(start(lab_filename, node_id)).done(function() {
+	$.when(start(node_id)).done(function() {
 		// Node started -> print a small green message
 		addMessage('success', node_name + ': ' + MESSAGES[76])
 	}).fail(function(message) {
@@ -549,10 +523,9 @@ $(document).on('click', '.action-nodestart', function(e) {
 // Stop a node
 $(document).on('click', '.action-nodestop', function(e) {
 	logger(1, 'DEBUG: action = nodestop');
-	var lab_filename = $('#lab-viewport').attr('data-path');
 	var node_id = $(this).attr('data-path');
 	var node_name = $(this).attr('data-name');
-	$.when(stop(lab_filename, node_id)).done(function() {
+	$.when(stop(node_id)).done(function() {
 		// Node stopped -> print a small green message
 		addMessage('success', node_name + ': ' + MESSAGES[77])
 	}).fail(function(message) {
@@ -565,10 +538,9 @@ $(document).on('click', '.action-nodestop', function(e) {
 // Wipe a node
 $(document).on('click', '.action-nodewipe', function(e) {
 	logger(1, 'DEBUG: action = nodewipe');
-	var lab_filename = $('#lab-viewport').attr('data-path');
 	var node_id = $(this).attr('data-path');
 	var node_name = $(this).attr('data-name');
-	$.when(wipe(lab_filename, node_id)).done(function() {
+	$.when(wipe(node_id)).done(function() {
 		// Node wiped -> print a small green message
 		addMessage('success', node_name + ': ' + MESSAGES[78])
 	}).fail(function(message) {
@@ -719,6 +691,7 @@ $(document).on('submit', '#form-import', function(e) {
 // Submit lab form
 $(document).on('submit', '#form-lab-add, #form-lab-edit', function(e) {
 	e.preventDefault();  // Prevent default behaviour
+	var lab_filename = $('#lab-viewport').attr('data-path');
 	var form_data = form2Array('lab');
 	if ($(this).attr('id') == 'form-lab-add') {
 		logger(1, 'DEBUG: posting form-lab-add form.');
@@ -743,7 +716,7 @@ $(document).on('submit', '#form-lab-add, #form-lab-edit', function(e) {
 				if ($(this).attr('id') == 'form-lab-add') {
 					// Reload the lab list
 					printPageLabList(form_data['path']);
-				} else if (basename($('#lab-viewport').attr('data-path')) != form_data['name'] + '.unl') {
+				} else if (basename(lab_filename) != form_data['name'] + '.unl') {
 					// Lab has been renamed, need to close it.
 					logger(1, 'DEBUG: lab "' + form_data['name'] + '" renamed.');
 					$.when(closeLab()).done(function() {
@@ -771,18 +744,18 @@ $(document).on('submit', '#form-lab-add, #form-lab-edit', function(e) {
 	return false;  // Stop to avoid POST
 });
 
-// form-network-
-// Submit lab form
+// Submit network form
 $(document).on('submit', '#form-network-add, #form-network-edit', function(e) {
 	e.preventDefault();  // Prevent default behaviour
+	var lab_filename = $('#lab-viewport').attr('data-path');
 	var form_data = form2Array('network');
 	if ($(this).attr('id') == 'form-network-add') {
 		logger(1, 'DEBUG: posting form-network-add form.');
-		var url = '/api/labs' + $('#lab-viewport').attr('data-path') + '/networks';
+		var url = '/api/labs' + lab_filename + '/networks';
 		var type = 'POST';
 	} else {
 		logger(1, 'DEBUG: posting form-network-edit form.');
-		var url = '/api/labs' + $('#lab-viewport').attr('data-path') + '/networks/' + form_data['id'];
+		var url = '/api/labs' + lab_filename + '/networks/' + form_data['id'];
 		var type = 'PUT';
 	}
 	$.ajax({
@@ -799,8 +772,52 @@ $(document).on('submit', '#form-network-add, #form-network-edit', function(e) {
 				addMessage(data['status'], data['message']);
 				if ($(this).attr('id') == 'form-network-edit') {
 					// Refresh topology
-					printLabTopology($('#lab-viewport').attr('data-path'))
+					printLabTopology();
 				}
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+		}
+	});
+	return false;  // Stop to avoid POST
+});
+
+// Submit node form
+$(document).on('submit', '#form-node-add, #form-node-edit', function(e) {
+	e.preventDefault();  // Prevent default behaviour
+	var lab_filename = $('#lab-viewport').attr('data-path');
+	var form_data = form2Array('node');
+	if ($(this).attr('id') == 'form-node-add') {
+		logger(1, 'DEBUG: posting form-node-add form.');
+		var url = '/api/labs' + lab_filename + '/nodes';
+		var type = 'POST';
+	} else {
+		logger(1, 'DEBUG: posting form-node-edit form.');
+		var url = '/api/labs' + lab_filename + '/nodes/' + form_data['id'];
+		var type = 'PUT';
+	}
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		data: JSON.stringify(form_data),
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: node "' + form_data['name'] + '" saved.');
+				// Close the modal
+				$('body').children('.modal').modal('hide');
+				addMessage(data['status'], data['message']);
+				printLabTopology();
 			} else {
 				// Application error
 				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
