@@ -141,3 +141,6 @@ MESSAGES[109] = 'Ethernets';
 MESSAGES[110] = 'Serials';
 MESSAGES[111] = 'Template';
 MESSAGES[112] = 'Console';
+MESSAGES[113] = 'Number of nodes to add';
+MESSAGES[114] = 'Number of networks to add';
+MESSAGES[115] = 'Link node';

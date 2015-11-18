@@ -129,3 +129,30 @@ function validateUser() {
 		}
 	});
 }
+
+// Validate node form
+function validateNode() {
+	$('#form-node-add, #form-node-edit').validate({
+		rules: {
+			'node[nvram]': {
+				range: [128, 1024]
+			},
+			'node[email]': {
+				required: true,
+				email: true
+			},
+			'node[expiration]': {
+				required: false,
+				date: true
+			},
+			'node[pexpiration]': {
+				required: false,
+				date: true
+			},
+			'node[pod]': {
+				required: false,
+				range: [0, 255]
+			}
+		}
+	});
+}

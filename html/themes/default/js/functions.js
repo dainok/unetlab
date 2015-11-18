@@ -1062,17 +1062,23 @@ function printFormNetwork(action, values) {
 	
 	$.when(getNetworkTypes()).done(function(network_types) {
 		// Read privileges and set specific actions/elements
-		var html = '<form id="form-network-' + action + '" class="form-horizontal"><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[92] + '</label><div class="col-md-5"><input class="form-control" name="network[id]" value="' + id + '" disabled type="text"/></div></div>';
-		html += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[103] + '</label><div class="col-md-5"><input class="form-control autofocus" name="network[name]" value="' + name + '" type="text"/></div></div>';
-		html += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[95] + '</label><div class="col-md-5"><select class="selectpicker show-tick form-control" name="network[type]" data-live-search="true" data-style="selectpicker-button">';
+		var html = '<form id="form-network-' + action + '" class="form-horizontal">';
+		if (action == 'add') {
+			// If action == add -> print the nework count input
+			html_data += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[113] + '</label><div class="col-md-5"><input class="form-control" disabled name="network[count]" value="1" type="text"/></div></div>';
+		} else {
+			// If action == edit -> print the network ID
+			html_data += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[92] + '</label><div class="col-md-5"><input class="form-control" disabled name="network[id]" value="' + id + '" type="text"/></div></div>';
+		}
+		html += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[103] + '</label><div class="col-md-5"><input class="form-control autofocus" name="network[name]" value="' + name + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[95] + '</label><div class="col-md-5"><select class="selectpicker show-tick form-control" name="network[type]" data-live-search="true" data-style="selectpicker-button">';
 		$.each(network_types, function(key, value) {
+			// Print all network types
 			var type_selected = (key == type) ? 'selected ' : '';
 			html += '<option ' + type_selected + 'value="' + key + '">' + value + '</option>';
 		});
-		html += '</select></div></div>';
-		html += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[93] + '</label><div class="col-md-5"><input class="form-control" name="network[left]" value="' + left + '" type="text"/></div></div>';
-		html += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[94] + '</label><div class="col-md-5"><input class="form-control" name="network[top]" value="' + top + '" type="text"/></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form></form>';
+		html += '</select></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[93] + '</label><div class="col-md-5"><input class="form-control" name="network[left]" value="' + left + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[94] + '</label><div class="col-md-5"><input class="form-control" name="network[top]" value="' + top + '" type="text"/></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form></form>';
 		
+		// Show the form
 		addModal(title, html, '');
 		$('.selectpicker').selectpicker();
 		$('.autofocus').focus();
@@ -1085,70 +1091,66 @@ function printFormNode(action, values) {
 	var left = (values == null || values['left'] == null) ? null : values['left']; 
 	var top = (values == null || values['top'] == null) ? null : values['top']; 
 	var template = (values == null || values['template'] == null) ? null : values['template']; 
-	console.log(values);
 	
 	var title = (action == 'add') ? MESSAGES[85] : MESSAGES[86];
 	var template_disabled = (values == null || values['template'] == null) ? '' : 'disabled ';
 	
-	console.log(values);
-	
 	$.when(getTemplates(null)).done(function(templates) {
 		var html = '';
+		html += '<form id="form-node-' + action + '" class="form-horizontal"><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[84] + '</label><div class="col-md-5"><select id="form-node-template" class="selectpicker form-control" name="node[template]" data-live-search="true" data-style="selectpicker-button"><option value="">' + MESSAGES[102] + '</option>';
+		$.each(templates, function(key, value) {
+			// Adding all templates
+			html += '<option value="' + key + '">' + value + '</option>';
+		});
+		html += '</select></div></div><div id="form-node-data"></div><div id="form-node-buttons"></div></form>';
 		
-	// dainok
-	
-		html += '<form id="form-node-' + action + '" class="form-horizontal">';
-		html += '<div class="form-group">';
-		html += '<label class="col-md-3 control-label">' + MESSAGES[84] + '</label>';
-		html += '<div class="col-md-5">';
-		if (action == 'add') {
-			html += '<select class="selectpicker form-control" name="node[template]" data-live-search="true" data-style="selectpicker-button">';
-			html += '<option value="">' + MESSAGES[102] + '</option>';
-			$.each(templates, function(key, value) {
-				html += '<option value="' + key + '">' + value + '</option>';
-			});
-		} else {
-			html += '<select class="selectpicker form-control" disabled name="node[template]" data-style="selectpicker-button">';
-			html += '<option value="' + template + '">' + templates[template] + '</option>';
-		}
-		html += '</select></div>';
-		html += '</div><div id="form-node-data"></div><div id="form-node-buttons"></div></form>';
-		
+		// Show the form
 		addModal(title, html, '');
 		$('.selectpicker').selectpicker();
 		
-		$('*').change(function(e2) {
+		$('#form-node-template').change(function(e2) {
 			template = $(this).find("option:selected").val();
 			if (template != '') {
 				// Getting template only if a valid option is selected (to avoid requests during typewriting)
 				$.when(getTemplates(template), getNodes(id)).done(function(template_values, node_values) {
+					console.log(node_values);
 					// TODO: this event is called twice
 					id = (id == null)? '' : id;
 					var html_data = '<input name="node[type]" value="' + template_values['type'] + '" type="hidden"/>';
-					html_data += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[92] + '</label><div class="col-md-5"><input class="form-control" disabled name="node[id]" value="' + id + '" type="text"/></div></div>';
+					if (action == 'add') {
+						// If action == add -> print the nework count input
+						html_data += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[113] + '</label><div class="col-md-5"><input class="form-control" disabled name="node[count]" value="1" type="text"/></div></div>';
+					} else {
+						// If action == edit -> print the network ID
+						html_data += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[92] + '</label><div class="col-md-5"><input class="form-control" disabled name="node[id]" value="' + id + '" type="text"/></div></div>';
+					}
 					$.each(template_values['options'], function(key, value) {
+						// Print all options form template
+						var value_set = (node_values != null && node_values[key]) ? node_values[key] : value['value'];
 						if (value['type'] == 'list') {
-							
-							html_data += '<div class="form-group">';
-							html_data += '<label class="col-md-3 control-label">' + value['name'] + '</label>';
-							html_data += '<div class="col-md-5"><select class="selectpicker form-control" name="node[' + key + ']" data-style="selectpicker-button">';
+							// Option is a list
+							html_data += '<div class="form-group"><label class="col-md-3 control-label">' + value['name'] + '</label><div class="col-md-5"><select class="selectpicker form-control" name="node[' + key + ']" data-style="selectpicker-button">';
 							$.each(value['list'], function(list_key, list_value) {
-								html_data += '<option value="' + list_key + '">' + list_value + '</option>';
+								var selected = (list_key == value_set)? 'selected ' : '';
+								html_data += '<option ' + selected + 'value="' + list_key + '">' + list_value + '</option>';
 							});
 							html_data += '</select></div>';
 							html_data += '</div>';
 						} else {
-							html_data += '<div class="form-group"><label class="col-md-3 control-label">' + value['name'] + '</label><div class="col-md-5"><input class="form-control' + ((key == 'name') ? ' autofocus' : '') + '" name="node[' + key + ']" value="' + value['value'] + '" type="text"/></div></div>';
+							// Option is standard
+							html_data += '<div class="form-group"><label class="col-md-3 control-label">' + value['name'] + '</label><div class="col-md-5"><input class="form-control' + ((key == 'name') ? ' autofocus' : '') + '" name="node[' + key + ']" value="' + value_set + '" type="text"/></div></div>';
 						}
 					});
-					html_data += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[93] + '</label><div class="col-md-5"><input class="form-control" name="node[left]" value="' + left + '" type="text"/></div></div>';
-					html_data += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[94] + '</label><div class="col-md-5"><input class="form-control" name="node[top]" value="' + top + '" type="text"/></div></div>';
+					html_data += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[93] + '</label><div class="col-md-5"><input class="form-control" name="node[left]" value="' + left + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[94] + '</label><div class="col-md-5"><input class="form-control" name="node[top]" value="' + top + '" type="text"/></div></div>';
 					
+					// Show the buttons
 					$('#form-node-buttons').html('<div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div>');
 					
+					// Show the form
 					$('#form-node-data').html(html_data);
 					$('.selectpicker').selectpicker();
 					$('.autofocus').focus();
+					validateNode();
 				}).fail(function(message1, message2) {
 					// Cannot get data
 					if (message1 != null) {
@@ -1159,6 +1161,13 @@ function printFormNode(action, values) {
 				});
 			}
 		});
+		
+		if (action == 'edit') {
+			// If editing a node, disable the select and trigger
+			$('#form-node-template').prop('disabled', 'disabled');
+			$('#form-node-template').val(template).change();
+		}
+		
 	}).fail(function(message) {
 		// Cannot get data
 		addModalError(message);
@@ -1516,6 +1525,7 @@ function printPageLabOpen(lab) {
 	// Read privileges and set specific actions/elements
 	if (ROLE == 'admin' || ROLE == 'editor') {
 		$('#lab-sidebar ul').append('<li><a class="action-labobjectadd" href="#" title="' + MESSAGES[56] + '"><i class="glyphicon glyphicon-plus"></i></a></li>');
+		$('#lab-sidebar ul').append('<li><a class="action-nodelink" href="#" title="' + MESSAGES[115] + '"><i class="glyphicon glyphicon-link"></i></a></li>');
 	}
 	
 	$('#lab-sidebar ul').append('<li><a class="action-labbodyget" href="#" title="' + MESSAGES[64] + '"><i class="glyphicon glyphicon-list-alt"></i></a></li>');
