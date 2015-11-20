@@ -245,18 +245,43 @@ $(document).on('click', '.action-networksget', function(e) {
 	});
 });
 
+// Delete lab network
+$(document).on('click', '.action-networkdelete', function(e) {
+	logger(1, 'DEBUG: action = action-networkdelete');
+	var id = $(this).attr('data-path');
+	$.when(deleteNetwork(id)).done(function(values) {
+		$('.network' + id).remove();
+	}).fail(function(message) {
+		addModalError(message);
+	});
+	$('#context-menu').remove();
+});
+
 // Delete lab node
 $(document).on('click', '.action-nodedelete', function(e) {
 	logger(1, 'DEBUG: action = action-nodedelete');
 	var id = $(this).attr('data-path');
-	$.when(nodeDelete(id)).done(function(values) {
-		// dainok
+	$.when(deleteNode(id)).done(function(values) {
 		$('.node' + id).remove();
 	}).fail(function(message) {
 		addModalError(message);
 	});
 	$('#context-menu').remove();
 });
+
+// Edit/print node interfaces
+$(document).on('click', '.action-nodeinterfaces', function(e) {
+	logger(1, 'DEBUG: action = action-nodeinterfaces');
+	var id = $(this).attr('data-path');
+	$.when(getNodeInterfaces(id)).done(function(values) {
+		values['node_id'] = id;
+		printFormNodeInterfaces(values)
+	}).fail(function(message) {
+		addModalError(message);
+	});
+	$('#context-menu').remove();
+});
+
 
 // Edit/print lab node
 $(document).on('click', '.action-nodeedit', function(e) {
@@ -707,6 +732,7 @@ $(document).on('submit', '#form-lab-add, #form-lab-edit', function(e) {
 	e.preventDefault();  // Prevent default behaviour
 	var lab_filename = $('#lab-viewport').attr('data-path');
 	var form_data = form2Array('lab');
+	var promises = [];
 	if ($(this).attr('id') == 'form-lab-add') {
 		logger(1, 'DEBUG: posting form-lab-add form.');
 		var url = '/api/labs';
@@ -716,44 +742,67 @@ $(document).on('submit', '#form-lab-add, #form-lab-edit', function(e) {
 		var url = '/api/labs' + form_data['path'];
 		var type = 'PUT';
 	}
-	$.ajax({
-		timeout: TIMEOUT,
-		type: type,
-		url: encodeURI(url),
-		dataType: 'json',
-		data: JSON.stringify(form_data),
-		success: function(data) {
-			if (data['status'] == 'success') {
-				logger(1, 'DEBUG: lab "' + form_data['name'] + '" saved.');
-				// Close the modal
-				$(e.target).parents('.modal').modal('hide');
-				if ($(this).attr('id') == 'form-lab-add') {
-					// Reload the lab list
-					printPageLabList(form_data['path']);
-				} else if (basename(lab_filename) != form_data['name'] + '.unl') {
-					// Lab has been renamed, need to close it.
-					logger(1, 'DEBUG: lab "' + form_data['name'] + '" renamed.');
-					$.when(closeLab()).done(function() {
-						postLogin();
-					}).fail(function(message) {
-						addModalError(message);
-					});
-				} else {
-					addMessage(data['status'], data['message']);
-				}
-			} else {
-				// Application error
-				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-			}
-		},
-		error: function(data) {
-			// Server error
-			var message = getJsonMessage(data['responseText']);
-			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
-			logger(1, 'DEBUG: ' + message);
-			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+	
+	if ($(this).attr('id') == 'form-node-add') {
+		// If adding need to manage multiple add
+		if (form_data['count'] > 1) {
+			form_data['postfix'] = 1;
+		} else {
+			form_data['postfix'] = 0;
 		}
+	} else {
+		// If editing need to post once
+		form_data['count'] = 1;		
+		form_data['postfix'] = 0;		
+	}
+	
+	for (var i = 0; i < form_data['count']; i++) {
+		form_data['left'] = parseInt(form_data['left']) + i * 20;
+		form_data['top'] = parseInt(form_data['top']) + i * 20;
+		var request = $.ajax({
+			timeout: TIMEOUT,
+			type: type,
+			url: encodeURI(url),
+			dataType: 'json',
+			data: JSON.stringify(form_data),
+			success: function(data) {
+				if (data['status'] == 'success') {
+					logger(1, 'DEBUG: lab "' + form_data['name'] + '" saved.');
+					// Close the modal
+					$(e.target).parents('.modal').modal('hide');
+					if ($(this).attr('id') == 'form-lab-add') {
+						// Reload the lab list
+						printPageLabList(form_data['path']);
+					} else if (basename(lab_filename) != form_data['name'] + '.unl') {
+						// Lab has been renamed, need to close it.
+						logger(1, 'DEBUG: lab "' + form_data['name'] + '" renamed.');
+						$.when(closeLab()).done(function() {
+							postLogin();
+						}).fail(function(message) {
+							addModalError(message);
+						});
+					} else {
+						addMessage(data['status'], data['message']);
+					}
+				} else {
+					// Application error
+					logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+					addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+				}
+			},
+			error: function(data) {
+				// Server error
+				var message = getJsonMessage(data['responseText']);
+				logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+				logger(1, 'DEBUG: ' + message);
+				addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+			}
+		});
+		promises.push(request);
+	}
+	
+	$.when.apply(null, promises).done(function() {
+		printLabTopology();
 	});
 	return false;  // Stop to avoid POST
 });
@@ -763,6 +812,7 @@ $(document).on('submit', '#form-network-add, #form-network-edit', function(e) {
 	e.preventDefault();  // Prevent default behaviour
 	var lab_filename = $('#lab-viewport').attr('data-path');
 	var form_data = form2Array('network');
+	var promises = [];
 	if ($(this).attr('id') == 'form-network-add') {
 		logger(1, 'DEBUG: posting form-network-add form.');
 		var url = '/api/labs' + lab_filename + '/networks';
@@ -772,53 +822,66 @@ $(document).on('submit', '#form-network-add, #form-network-edit', function(e) {
 		var url = '/api/labs' + lab_filename + '/networks/' + form_data['id'];
 		var type = 'PUT';
 	}
-	$.ajax({
-		timeout: TIMEOUT,
-		type: type,
-		url: encodeURI(url),
-		dataType: 'json',
-		data: JSON.stringify(form_data),
-		success: function(data) {
-			if (data['status'] == 'success') {
-				logger(1, 'DEBUG: network "' + form_data['name'] + '" saved.');
-				// Close the modal
-				$('body').children('.modal').modal('hide');
-				addMessage(data['status'], data['message']);
-				if ($(this).attr('id') == 'form-network-edit') {
-					// Refresh topology
-					printLabTopology();
-				}
-			} else {
-				// Application error
-				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-			}
-		},
-		error: function(data) {
-			// Server error
-			var message = getJsonMessage(data['responseText']);
-			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
-			logger(1, 'DEBUG: ' + message);
-			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+
+	if ($(this).attr('id') == 'form-network-add') {
+		// If adding need to manage multiple add
+		if (form_data['count'] > 1) {
+			form_data['postfix'] = 1;
+		} else {
+			form_data['postfix'] = 0;
 		}
+	} else {
+		// If editing need to post once
+		form_data['count'] = 1;		
+		form_data['postfix'] = 0;		
+	}
+	
+	for (var i = 0; i < form_data['count']; i++) {
+		form_data['left'] = parseInt(form_data['left']) + i * 20;
+		form_data['top'] = parseInt(form_data['top']) + i * 20;
+		var request = $.ajax({
+			timeout: TIMEOUT,
+			type: type,
+			url: encodeURI(url),
+			dataType: 'json',
+			data: JSON.stringify(form_data),
+			success: function(data) {
+				if (data['status'] == 'success') {
+					logger(1, 'DEBUG: network "' + form_data['name'] + '" saved.');
+					// Close the modal
+					$('body').children('.modal').modal('hide');
+					addMessage(data['status'], data['message']);
+				} else {
+					// Application error
+					logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+					addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+				}
+			},
+			error: function(data) {
+				// Server error
+				var message = getJsonMessage(data['responseText']);
+				logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+				logger(1, 'DEBUG: ' + message);
+				addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+			}
+		});
+		promises.push(request);
+	}
+	
+	$.when.apply(null, promises).done(function() {
+		printLabTopology();
 	});
 	return false;  // Stop to avoid POST
 });
 
-// Submit node form
-$(document).on('submit', '#form-node-add, #form-node-edit', function(e) {
+// Submit node interfaces form
+$(document).on('submit', '#form-node-connect', function(e) {
 	e.preventDefault();  // Prevent default behaviour
 	var lab_filename = $('#lab-viewport').attr('data-path');
-	var form_data = form2Array('node');
-	if ($(this).attr('id') == 'form-node-add') {
-		logger(1, 'DEBUG: posting form-node-add form.');
-		var url = '/api/labs' + lab_filename + '/nodes';
-		var type = 'POST';
-	} else {
-		logger(1, 'DEBUG: posting form-node-edit form.');
-		var url = '/api/labs' + lab_filename + '/nodes/' + form_data['id'];
-		var type = 'PUT';
-	}
+	var form_data = form2Array('interfc');
+	var node_id = $('form :input[name="node_id"]').val();
+	var url = '/api/labs' + lab_filename + '/nodes/' + node_id + '/interfaces';
+	var type = 'PUT';
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,
@@ -827,7 +890,7 @@ $(document).on('submit', '#form-node-add, #form-node-edit', function(e) {
 		data: JSON.stringify(form_data),
 		success: function(data) {
 			if (data['status'] == 'success') {
-				logger(1, 'DEBUG: node "' + form_data['name'] + '" saved.');
+				logger(1, 'DEBUG: node "' + node_id + '" saved.');
 				// Close the modal
 				$('body').children('.modal').modal('hide');
 				addMessage(data['status'], data['message']);
@@ -846,6 +909,67 @@ $(document).on('submit', '#form-node-add, #form-node-edit', function(e) {
 			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
 		}
 	});
+});
+
+// Submit node form
+$(document).on('submit', '#form-node-add, #form-node-edit', function(e) {
+	e.preventDefault();  // Prevent default behaviour
+	var lab_filename = $('#lab-viewport').attr('data-path');
+	var form_data = form2Array('node');
+	if ($(this).attr('id') == 'form-node-add') {
+		logger(1, 'DEBUG: posting form-node-add form.');
+		var url = '/api/labs' + lab_filename + '/nodes';
+		var type = 'POST';
+	} else {
+		logger(1, 'DEBUG: posting form-node-edit form.');
+		var url = '/api/labs' + lab_filename + '/nodes/' + form_data['id'];
+		var type = 'PUT';
+	}
+	
+	if ($(this).attr('id') == 'form-node-add') {
+		// If adding need to manage multiple add
+		if (form_data['count'] > 1) {
+			form_data['postfix'] = 1;
+		} else {
+			form_data['postfix'] = 0;
+		}
+	} else {
+		// If editing need to post once
+		form_data['count'] = 1;		
+		form_data['postfix'] = 0;		
+	}
+	
+	for (var i = 0; i < form_data['count']; i++) {
+		form_data['left'] = parseInt(form_data['left']) + i * 20;
+		form_data['top'] = parseInt(form_data['top']) + i * 20;
+		$.ajax({
+			timeout: TIMEOUT,
+			type: type,
+			url: encodeURI(url),
+			dataType: 'json',
+			data: JSON.stringify(form_data),
+			success: function(data) {
+				if (data['status'] == 'success') {
+					logger(1, 'DEBUG: node "' + form_data['name'] + '" saved.');
+					// Close the modal
+					$('body').children('.modal').modal('hide');
+					addMessage(data['status'], data['message']);
+					printLabTopology();
+				} else {
+					// Application error
+					logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+					addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+				}
+			},
+			error: function(data) {
+				// Server error
+				var message = getJsonMessage(data['responseText']);
+				logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+				logger(1, 'DEBUG: ' + message);
+				addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+			}
+		});
+	}
 	return false;  // Stop to avoid POST
 });
 

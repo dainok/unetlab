@@ -209,6 +209,70 @@ function deleteLab(path) {
 	return deferred.promise();
 }
 
+// Delete network
+function deleteNetwork(id) {
+	var deferred = $.Deferred();
+	var type = 'DELETE'
+	var lab_filename = $('#lab-viewport').attr('data-path');
+	var url = '/api/labs' + lab_filename + '/networks/' + id;
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: node deleted.');
+				deferred.resolve();
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject(data['message']);
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
+}
+
+// Delete node
+function deleteNode(id) {
+	var deferred = $.Deferred();
+	var type = 'DELETE'
+	var lab_filename = $('#lab-viewport').attr('data-path');
+	var url = '/api/labs' + lab_filename + '/nodes/' + id;
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: node deleted.');
+				deferred.resolve();
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject(data['message']);
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
+}
+
 // Delete user
 function deleteUser(path) {
 	var deferred = $.Deferred();
@@ -367,6 +431,38 @@ function getLabBody() {
 	return deferred.promise();
 }
 
+// Get lab endpoints
+function getLabLinks() {
+	var lab_filename = $('#lab-viewport').attr('data-path');
+	var deferred = $.Deferred();
+	var url = '/api/labs' + lab_filename + '/links';
+	var type = 'GET'
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: got available links(s) from lab "' + lab_filename + '".');
+				deferred.resolve(data['data']);
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject(data['message']);
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
+}
+
 // Get lab networks
 function getNetworks(network_id) {
 	var lab_filename = $('#lab-viewport').attr('data-path');
@@ -443,6 +539,38 @@ function getNodes(node_id) {
 	} else {
 		var url = '/api/labs' + lab_filename + '/nodes';
 	}
+	var type = 'GET'
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: got node(s) from lab "' + lab_filename + '".');
+				deferred.resolve(data['data']);
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject(data['message']);
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
+}
+
+// Get lab node interfaces
+function getNodeInterfaces(node_id) {
+	var deferred = $.Deferred();
+	var lab_filename = $('#lab-viewport').attr('data-path');
+	var url = '/api/labs' + lab_filename + '/nodes/' + node_id + '/interfaces';
 	var type = 'GET'
 	$.ajax({
 		timeout: TIMEOUT,
@@ -1055,7 +1183,7 @@ function printFormLab(action, values) {
 function printFormNetwork(action, values) {
 	var id = (values == null || values['id'] == null) ? '' : values['id']; 
 	var left = (values == null || values['left'] == null) ? '' : values['left']; 
-	var name = (values == null || values['name'] == null) ? '' : values['name']; 
+	var name = (values == null || values['name'] == null) ? 'Net' : values['name']; 
 	var top = (values == null || values['top'] == null) ? '' : values['top']; 
 	var type = (values == null || values['type'] == null) ? '' : values['type'];
 	var title = (action == 'add') ? MESSAGES[89] : MESSAGES[90];
@@ -1065,10 +1193,10 @@ function printFormNetwork(action, values) {
 		var html = '<form id="form-network-' + action + '" class="form-horizontal">';
 		if (action == 'add') {
 			// If action == add -> print the nework count input
-			html_data += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[113] + '</label><div class="col-md-5"><input class="form-control" disabled name="network[count]" value="1" type="text"/></div></div>';
+			html += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[114] + '</label><div class="col-md-5"><input class="form-control" name="network[count]" value="1" type="text"/></div></div>';
 		} else {
 			// If action == edit -> print the network ID
-			html_data += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[92] + '</label><div class="col-md-5"><input class="form-control" disabled name="network[id]" value="' + id + '" type="text"/></div></div>';
+			html += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[92] + '</label><div class="col-md-5"><input class="form-control" disabled name="network[id]" value="' + id + '" type="text"/></div></div>';
 		}
 		html += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[103] + '</label><div class="col-md-5"><input class="form-control autofocus" name="network[name]" value="' + name + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[95] + '</label><div class="col-md-5"><select class="selectpicker show-tick form-control" name="network[type]" data-live-search="true" data-style="selectpicker-button">';
 		$.each(network_types, function(key, value) {
@@ -1113,13 +1241,12 @@ function printFormNode(action, values) {
 			if (template != '') {
 				// Getting template only if a valid option is selected (to avoid requests during typewriting)
 				$.when(getTemplates(template), getNodes(id)).done(function(template_values, node_values) {
-					console.log(node_values);
 					// TODO: this event is called twice
 					id = (id == null)? '' : id;
 					var html_data = '<input name="node[type]" value="' + template_values['type'] + '" type="hidden"/>';
 					if (action == 'add') {
 						// If action == add -> print the nework count input
-						html_data += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[113] + '</label><div class="col-md-5"><input class="form-control" disabled name="node[count]" value="1" type="text"/></div></div>';
+						html_data += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[113] + '</label><div class="col-md-5"><input class="form-control" name="node[count]" value="1" type="text"/></div></div>';
 					} else {
 						// If action == edit -> print the network ID
 						html_data += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[92] + '</label><div class="col-md-5"><input class="form-control" disabled name="node[id]" value="' + id + '" type="text"/></div></div>';
@@ -1168,6 +1295,84 @@ function printFormNode(action, values) {
 			$('#form-node-template').val(template).change();
 		}
 		
+	}).fail(function(message) {
+		// Cannot get data
+		addModalError(message);
+	});
+}
+
+// Node interfaces
+function printFormNodeInterfaces(values) {
+	$.when(getLabLinks()).done(function(links) {
+		var html = '<form id="form-node-connect" class="form-horizontal">';
+		html += '<input name="node_id" value="' + values['node_id'] + '" type="hidden"/>';
+		if (values['sort'] == 'iol') {
+			// IOL nodes need to reorder interfaces
+			// i = x/y with x = i % 16 and y = (i - x) / 16
+			var iol_interfc = {};
+			$.each(values['ethernet'], function(interfc_id, interfc) {
+				var x = interfc_id % 16;
+				var y = (interfc_id - x) / 16;
+				iol_interfc[4 * x + y] = '<div class="form-group"><label class="col-md-3 control-label">' + interfc['name'] + '</label><div class="col-md-5"><select class="selectpicker form-control" name="interfc[' + interfc_id + ']" data-live-search="true" data-style="selectpicker-button"><option value="">' + MESSAGES[117] + '</option>';
+				$.each(links['ethernet'], function(link_id, link) {
+					var link_selected = (interfc['network_id'] == link_id) ? 'selected ' : '';
+					iol_interfc[4 * x + y] += '<option ' + link_selected + 'value="' + link_id + '">' + link + '</option>';
+				});
+				iol_interfc[4 * x + y] += '</select></div></div>';
+			});
+			$.each(iol_interfc, function(key, value) {
+				html += value;
+			});
+		} else {
+			$.each(values['ethernet'], function(interfc_id, interfc) {
+				html += '<div class="form-group"><label class="col-md-3 control-label">' + interfc['name'] + '</label><div class="col-md-5"><select class="selectpicker form-control" name="interfc[' + interfc_id + ']" data-live-search="true" data-style="selectpicker-button"><option value="">' + MESSAGES[117] + '</option>';
+				$.each(links['ethernet'], function(link_id, link) {
+					var link_selected = (interfc['network_id'] == link_id) ? 'selected ' : '';
+					html += '<option ' + link_selected + 'value="' + link_id + '">' + link + '</option>';
+				});
+				html += '</select></div></div>';
+			});
+		}
+		if (values['sort'] == 'iol') {
+			// IOL nodes need to reorder interfaces
+			// i = x/y with x = i % 16 and y = (i - x) / 16
+			var iol_interfc = {};
+			$.each(values['serial'], function(interfc_id, interfc) {
+				var x = interfc_id % 16;
+				var y = (interfc_id - x) / 16;
+				iol_interfc[4 * x + y] = '<div class="form-group"><label class="col-md-3 control-label">' + interfc['name'] + '</label><div class="col-md-5"><select class="selectpicker form-control" name="interfc[' + interfc_id + ']" data-live-search="true" data-style="selectpicker-button"><option value="">' + MESSAGES[117] + '</option>';
+				$.each(links['serial'], function(node_id, serial_link) {
+					if (values['node_id'] != node_id) {
+						$.each(serial_link, function(link_id, link) {
+							var link_selected = (interfc['remote_id'] + ':' + interfc['remote_if'] == node_id + ':' + link_id) ? 'selected ' : '';
+							iol_interfc[4 * x + y] += '<option ' + link_selected + 'value="' + node_id + ':' + link_id + '">' + link + '</option>';
+						});
+					}
+				});
+				iol_interfc[4 * x + y] += '</select></div></div>';
+			});
+			$.each(iol_interfc, function(key, value) {
+				html += value;
+			});
+		} else {
+			$.each(values['serial'], function(interfc_id, interfc) {
+				html += '<div class="form-group"><label class="col-md-3 control-label">' + interfc['name'] + '</label><div class="col-md-5"><select class="selectpicker form-control" name="interfc[' + interfc_id + ']" data-live-search="true" data-style="selectpicker-button"><option value="">' + MESSAGES[117] + '</option>';
+				$.each(links['serial'], function(node_id, serial_link) {
+					if (values['node_id'] != node_id) {
+						$.each(serial_link, function(link_id, link) {
+							var link_selected = '';
+							html += '<option ' + link_selected + 'value="' + link_id + '">' + link + '</option>';
+						});
+					}
+				});
+				html += '</select></div></div>';
+			});
+		}
+		
+		html += '<div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
+		
+		addModal(MESSAGES[116], html, '');
+		$('.selectpicker').selectpicker();
 	}).fail(function(message) {
 		// Cannot get data
 		addModalError(message);
@@ -1284,6 +1489,9 @@ function printLabTopology() {
 						overlays: [ src_label, dst_label ],
 					});
 				} else {
+					var src_label = [ "Label", { label: source_label, location: 0.15, cssClass: 'node_interface ' + source + ' ' + destination } ];
+					var dst_label = [ "Label", { label: destination_label, location: 0.85, cssClass: 'node_interface ' + source + ' ' + destination } ];
+					
 					jsPlumb.connect({
 						source: source,       // Must attach to the IMG's parent or not printed correctly
 						target: destination,  // Must attach to the IMG's parent or not printed correctly
@@ -1300,7 +1508,7 @@ function printLabTopology() {
 			});
 
 			// Remove unused elements
-			$('.unused').remove();
+			// $('.unused').remove();
 
 			// Move elements under the topology node
 			$('._jsPlumb_connector, ._jsPlumb_overlay, ._jsPlumb_endpoint_anchor_').detach().appendTo('#lab-viewport');
@@ -1342,7 +1550,7 @@ function printListNetworks(networks) {
 	logger(1, 'DEBUG: printing network list');
 	var body = '<div class="table-responsive"><table class="table"><thead><tr><th>' + MESSAGES[92] + '</th><th>' + MESSAGES[19] + '</th><th>' + MESSAGES[95] + '</th><th>' + MESSAGES[97] + '</th><th>' + MESSAGES[99] + '</th></tr></thead><tbody>';
 	$.each(networks, function(key, value) {
-		body += '<tr><td>' + value['id'] + '</td><td>' + value['name'] + '</td><td>' + value['type'] + '</td><td>' + value['count'] + '</td><td><a class="action-networkedit" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[71] + '"><i class="glyphicon glyphicon-edit"></i></a><a class="action-networkdelete" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[65] + '"><i class="glyphicon glyphicon-trash"></i></a></td></tr>';
+		body += '<tr class="network' + value['id'] + '"><td>' + value['id'] + '</td><td>' + value['name'] + '</td><td>' + value['type'] + '</td><td>' + value['count'] + '</td><td><a class="action-networkedit" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[71] + '"><i class="glyphicon glyphicon-edit"></i></a><a class="action-networkdelete" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[65] + '"><i class="glyphicon glyphicon-trash"></i></a></td></tr>';
 	});
 	body += '</tbody></table></div>';
 	addModalWide(MESSAGES[96], body, '');
@@ -1351,17 +1559,18 @@ function printListNetworks(networks) {
 // Display all nodes in a table
 function printListNodes(nodes) {
 	logger(1, 'DEBUG: printing node list');
-	var body = '<div class="table-responsive"><table class="table"><thead><tr><th>' + MESSAGES[92] + '</th><th>' + MESSAGES[19] + '</th><th>' + MESSAGES[111] + '</th><th>' + MESSAGES[105] + '</th><th>' + MESSAGES[106] + '</th><th>' + MESSAGES[107] + '</th><th>' + MESSAGES[108] + '</th><th>' + MESSAGES[109] + '</th><th>' + MESSAGES[110] + '</th><th>' + MESSAGES[112] + '</th><th>' + MESSAGES[99] + '</th></tr></thead><tbody>';
+	var body = '<div class="table-responsive"><table class="table"><thead><tr><th>' + MESSAGES[92] + '</th><th>' + MESSAGES[19] + '</th><th>' + MESSAGES[111] + '</th><th>' + MESSAGES[119] + '</th><th>' + MESSAGES[105] + '</th><th>' + MESSAGES[106] + '</th><th>' + MESSAGES[107] + '</th><th>' + MESSAGES[108] + '</th><th>' + MESSAGES[109] + '</th><th>' + MESSAGES[110] + '</th><th>' + MESSAGES[112] + '</th><th>' + MESSAGES[99] + '</th></tr></thead><tbody>';
 	$.each(nodes, function(key, value) {
 		var cpu = (value['cpu'] != null) ? value['cpu'] : '';
 		var ethernet = (value['ethernet'] != null) ? value['ethernet'] : '';
 		var idlepc = (value['idlepc'] != null) ? value['idlepc'] : '';
+		var image = (value['image'] != null) ? value['image'] : '';
 		var nvram = (value['nvram'] != null) ? value['nvram'] : '';
 		var serial = (value['serial'] != null) ? value['serial'] : '';
-		body += '<tr><td>' + value['id'] + '</td><td>' + value['name'] + '</td><td>' + value['template'] + '</td><td>' + cpu + '</td><td>' + idlepc + '</td><td>' + nvram + '</td><td>' + value['ram'] + '</td><td>' + ethernet + '</td><td>' + serial + '</td><td>' + value['console'] + '</td><td><a class="action-nodeedit" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[71] + '"><i class="glyphicon glyphicon-edit"></i></a><a class="action-nodedelete" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[65] + '"><i class="glyphicon glyphicon-trash"></i></a></td></tr>';
+		body += '<tr class="node' + value['id'] + '"><td>' + value['id'] + '</td><td>' + value['name'] + '</td><td>' + value['template'] + '</td><td>' + value['image'] + '</td><td>' + cpu + '</td><td>' + idlepc + '</td><td>' + nvram + '</td><td>' + value['ram'] + '</td><td>' + ethernet + '</td><td>' + serial + '</td><td>' + value['console'] + '</td><td><a class="action-nodeedit" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[71] + '"><i class="glyphicon glyphicon-edit"></i></a><a class="action-nodedelete" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[65] + '"><i class="glyphicon glyphicon-trash"></i></a></td></tr>';
 	});
 	body += '</tbody></table></div>';
-	addModalWide(MESSAGES[96], body, '');
+	addModalWide(MESSAGES[118], body, '');
 }
 
 // Print Authentication Page

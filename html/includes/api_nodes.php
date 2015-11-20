@@ -336,6 +336,8 @@ function apiGetLabNodeInterfaces($lab, $id) {
 		$output['status'] = 'success';
 		$output['message'] = $GLOBALS['messages'][60025];
 		$output['data'] = Array();
+		// Addint node type to properly sort IOL interfaces
+		$output['data']['sort'] = $lab -> getNodes()[$id] -> getNType();
 
 		// Getting interfaces
 		$ethernets = Array();
