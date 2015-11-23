@@ -683,7 +683,7 @@ class Node {
 			// -c config TODO                      // Configuration file name
 			$flags .= ' -q';                       // Suppress informational messages
 			$flags .= ' -m '.$this -> getRam();    // Megabytes of router memory
-			if ($this -> getConfig() == 'Saved') {
+			if ($this -> getConfig() == '1') {
 				$flags .= ' -c startup-config';		// Configuration file name
 			}
 		}
@@ -711,7 +711,7 @@ class Node {
 			$flags .= ' -r '.$this -> getRam();            // Set the virtual RAM size
 			$flags .= ' -n '.$this -> getNvram();          // Set the NVRAM size
 			$flags .= ' '.$this -> flags_eth;              // Adding Ethernet flags
-			if ($this -> getConfig() == 'Saved') {
+			if ($this -> getConfig() == '1') {
 				$flags .= ' -C startup-config';			   // Import IOS configuration file into NVRAM
 			}
 		}
@@ -858,7 +858,7 @@ class Node {
 			return $this -> config;
 		} else {
 			// By default return 'Unconfigured'
-			return 'Unconfigured';
+			return '0';
 		}
 	}
 
@@ -1237,9 +1237,7 @@ class Node {
 		if ($config_data === '') {
 			// Config is empty, unset the current one
 			unset($this -> config_data);
-			if ($this -> config = 'Saved') {
-				$this -> config = 'Unconfigured';
-			}
+			$this -> config = '0';
 		} else {
 			$this -> config_data = $config_data;
 		}

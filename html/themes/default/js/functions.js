@@ -566,6 +566,42 @@ function getNodes(node_id) {
 	return deferred.promise();
 }
 
+// Get node startup-config
+function getNodeConfigs(node_id) {
+	var deferred = $.Deferred();
+	var lab_filename = $('#lab-viewport').attr('data-path');
+	if (node_id != null) {
+		var url = '/api/labs' + lab_filename + '/configs/' + node_id;
+	} else {
+		var url = '/api/labs' + lab_filename + '/configs';
+	}
+	var type = 'GET'
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: got sartup-config(s) from lab "' + lab_filename + '".');
+				deferred.resolve(data['data']);
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject(data['message']);
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
+}
+
 // Get lab node interfaces
 function getNodeInterfaces(node_id) {
 	var deferred = $.Deferred();
@@ -1301,6 +1337,17 @@ function printFormNode(action, values) {
 	});
 }
 
+// Node config
+function printFormNodeConfigs(values) {
+	var title = values['name'] + ': ' + MESSAGES[123];
+	if (ROLE == 'admin' || ROLE == 'editor') {
+		var html = '<form id="form-node-config" class="form-horizontal"><input name="config[id]" value="' + values['id'] + '" type="hidden"/><div class="form-group"><div class="col-md-12"><textarea class="form-control autofocus" name="config[data]" rows="15">' + values['data'] + '</textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
+	} else {
+		var html = '<div class="col-md-12"><pre>' + values['data'] + '</pre></div>';
+	}
+	addModalWide(title, html, '');
+}
+
 // Node interfaces
 function printFormNodeInterfaces(values) {
 	$.when(getLabLinks()).done(function(links) {
@@ -1460,7 +1507,7 @@ function printLabTopology() {
 			// Read privileges and set specific actions/elements
 			if (ROLE == 'admin' || ROLE == 'editor') {
 				// Nodes and networks are draggable within a grid
-				lab_topology.draggable($('.node_frame, .network_frame'), { grid: [20, 20] });
+				lab_topology.draggable($('.node_frame, .network_frame'), { grid: [10, 10] });
 			}
 			
 			$.each(topology, function(id, link) {
@@ -1508,7 +1555,7 @@ function printLabTopology() {
 			});
 
 			// Remove unused elements
-			// $('.unused').remove();
+			$('.unused').remove();
 
 			// Move elements under the topology node
 			$('._jsPlumb_connector, ._jsPlumb_overlay, ._jsPlumb_endpoint_anchor_').detach().appendTo('#lab-viewport');
@@ -1537,7 +1584,7 @@ function printLabStatus() {
 				$('.node' + node['id'] + '_status').attr('class', 'node' + node['id'] + '_status glyphicon glyphicon-play');
 			} else if (node['status'] == 2) {
 				// Building
-				$('.node' + node['id'] + '_status').attr('class', 'node' + node['id'] + '_status glyphicon glyphicon-flash');
+				$('.node' + node['id'] + '_status').attr('class', 'node' + node['id'] + '_status glyphicon glyphicon-time');
 			}
 		});
 	}).fail(function(message) {
@@ -1711,25 +1758,12 @@ function printPageLabList(folder) {
 
 // Print lab open page
 function printPageLabOpen(lab) {
-	var html = '';
-	
-	// Navbar: main
-	html += '<nav id="navbar-lab" class="navbar navbar-static-top"><div class="container col-md-12 col-lg-12"><div class="navbar-collapse collapse"><ul class="col-md-9 col-lg-9 nav navbar-nav"><li class="item dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Actions <span class="caret"></span></a><ul id="actions-menu" class="dropdown-menu"><li><a href="#">&lt;' + MESSAGES[3] + '&gt;</a></li></ul></li><li class="item"><a class="action-logout item" href="#"><i class="glyphicon glyphicon-log-out"></i> ' + MESSAGES[14] + '</a></li></ul></div></div></nav>';
-	
-	// Main
-	html += '<div id="lab-sidebar"><ul></ul></div>';
-	html += '<div id="lab-viewport" data-path="' + lab + '"></div>';
+	var html = '<div id="lab-sidebar"><ul></ul></div><div id="lab-viewport" data-path="' + lab + '"></div>';
 	
 	$('#body').html(html);
 	
 	// Print topology
 	printLabTopology();
-	
-	// Clearing actions (navbar)
-	$('#actions-menu').empty();
-	
-	// Clearing actions (sidebar)
-	$('#lab-sidebar ul').empty();
 	
 	// Read privileges and set specific actions/elements
 	if (ROLE == 'admin' || ROLE == 'editor') {
@@ -1744,12 +1778,7 @@ function printPageLabOpen(lab) {
 	$('#lab-sidebar ul').append('<li><a class="action-picturesget" href="#" title="' + MESSAGES[59] + '"><i class="glyphicon glyphicon-picture"></i></a></li>');
 	$('#lab-sidebar ul').append('<li><a class="action-labtopologyrefresh" href="#" title="' + MESSAGES[57] + '"><i class="glyphicon glyphicon-refresh"></i></a></li>');
 	$('#lab-sidebar ul').append('<li><a class="action-labclose" href="#" title="' + MESSAGES[60] + '"><i class="glyphicon glyphicon-off"></i></a></li>');
-	
-	// Read privileges and set specific actions/elements
-	if (ROLE == 'admin' || ROLE == 'editor') {
-		// Adding actions (navbar)
-		$('#actions-menu').append('<li><a class="action-labedit" href="#" title="' + MESSAGES[87] + '"><i class="glyphicon glyphicon-edit"></i> ' + MESSAGES[87] + '</a></li>');
-	}
+	$('#lab-sidebar ul').append('<li><a class="action-logout" href="#" title="' + MESSAGES[14] + '"><i class="glyphicon glyphicon-log-out"></i></a></li>');
 }
 
 // Print user management section

@@ -477,8 +477,8 @@ function export($node_id, $n, $lab) {
 			}
 			break;
 		case 'qemu':
-			if (is_file('/opt/unetlab/scripts/config_'.$n -> getTemplate().'.py')) {
-				$cmd = '/opt/unetlab/scripts/config_'.$n -> getTemplate().'.py -a get -p '.$n -> getPort().' -f '.$tmp.' -t 15';
+			if (!isset($GLOBALS['node_config'][$n -> getTemplate()])) {
+				$cmd = '/opt/unetlab/scripts/'.$GLOBALS['node_config'][$n -> getTemplate()].' -a get -p '.$n -> getPort().' -f '.$tmp.' -t 15';
 				exec($cmd, $o, $rc);
 				error_log(date('M d H:i:s ').'INFO: exporting '.$cmd);
 				if ($rc != 0) {
@@ -678,7 +678,7 @@ function prepareNode($n, $id, $t, $nets) {
 			return 80037;
 		}
 
-		if ($n -> getConfig() == 'Saved' && $n -> getConfigData() != '') {
+		if ($n -> getConfig() == '1' && $n -> getConfigData() != '') {
 			// Node should use saved startup-config
 			if (!dumpConfig($n -> getConfigData(), $n -> getRunningPath().'/startup-config')) {
 				// Cannot dump config to startup-config file

@@ -141,8 +141,7 @@ function checkNetworkType($s) {
  * @return	bool						True if valid
  */
 function checkNodeConfig($s) {
-	if (in_array($s, Array('Saved', 'Unconfigured'))) {
-		// TODO must add templates
+	if (in_array($s, Array('0', '1')) || in_array($s, listNodeConfigTemplates())) {
 		return True;
 	} else {
 		return False;
@@ -579,6 +578,24 @@ function listNetworkTypes() {
 		}
 	}
 
+	return $results;
+}
+
+/**
+ * Function to list all available startup-config templates.
+ *
+ * @return	Array						The list of icons
+ */
+function listNodeConfigTemplates() {
+	$results = Array();
+	foreach (scandir(BASE_DIR.'/html/configs') as $filename) {
+		if (is_file(BASE_DIR.'/html/configs/'.$filename) && preg_match('/^.+\.php$/', $filename)) {
+			$patterns[0] = '/^(.+)\.php$/';  // remove extension
+			$replacements[0] = '$1';
+			$name = preg_replace($patterns, $replacements, $filename);
+			$results[$filename] = $name;
+		}
+	}
 	return $results;
 }
 

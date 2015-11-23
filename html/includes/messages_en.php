@@ -215,6 +215,10 @@ $messages[60051] = 'All nodes has been stopped (60051).';
 $messages[60052] = 'User does not have an assigned pod (60052).';
 $messages[60053] = 'Lab has been closed (60053).';
 $messages[60054] = 'Got lab body (60054).';
+$messages[60055] = 'Successfully listed startup-configs (60055).';
+$messages[60056] = 'Cannot load lab (60056).';
+$messages[60057] = 'Got startup-config (60057).';
+$messages[60058] = 'Startup config not available (60058).';
 
 // Text (70000-79999)
 $messages[70000] = 'Name/prefix';
@@ -236,6 +240,8 @@ $messages[70015] = 'Console';
 $messages[70016] = 'Slot';
 $messages[70017] = 'Serial portgroups (4 int each)';
 $messages[70018] = 'Ethernet portgroups (4 int each)';
+$messages[70019] = 'Saved';
+$messages[70020] = 'Unconfigured';
 
 // CLI (80000-89999)
 $messages[80009] = 'Failed to add the username (80009).';

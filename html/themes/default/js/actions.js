@@ -83,14 +83,15 @@ $(document).on('shown.bs.modal', '.modal', function () {
 $(document).on('dragstop', '.node_frame, .network_frame', function(e) {
 	var offset = $(this).offset();
 	var left = Math.round(offset.left - 30 + $('#lab-viewport').scrollLeft());	// 30 is the sidebar
-	var top = Math.round(offset.top - 30 + $('#lab-viewport').scrollTop());		// 30 is the topbar
+	var top = Math.round(offset.top + $('#lab-viewport').scrollTop());
 	var id = $(this).attr('data-path');
-
+	if (left < 0) left = 0;
+	if (top < 0) top = 0;
 	if ($(this).hasClass('node_frame')) {
 		logger(1, 'DEBUG: setting node' + id + ' position.');
 		$.when(setNodePosition(id, left, top)).done(function() {
 			// Position saved -> redraw topology
-			jsPlumb.repaintEverything();
+			printLabTopology();
 		}).fail(function(message) {
 			// Error on save
 			addModalError(message);
@@ -99,7 +100,7 @@ $(document).on('dragstop', '.node_frame, .network_frame', function(e) {
 		logger(1, 'DEBUG: setting network' + id + ' position.');
 		$.when(setNetworkPosition(id, left, top)).done(function() {
 			// Position saved -> redraw topology
-			jsPlumb.repaintEverything();
+			printLabTopology();
 		}).fail(function(message) {
 			// Error on save
 			addModalError(message);
@@ -171,6 +172,38 @@ $(window).resize(function(){
 /***************************************************************************
  * Actions links
  **************************************************************************/
+
+// startup-config menu
+$(document).on('click', '.action-configsget', function(e) {
+	logger(1, 'DEBUG: action = configsget');
+	$.when(getNodeConfigs(null)).done(function(configs) {
+		var body = '';
+		$.each(configs, function(key, config) {
+			var title = (config['config'] == 0)? MESSAGES[122] : MESSAGES[121];
+			body += '<li><a class="action-configget" data-path="' + key + '" href="#" title="' + title + '">' + config['name'];
+			if (config['config'] == 1) {
+				body += ' <i class="glyphicon glyphicon-pushpin"></i>';
+			}
+			body += '</a></li>';
+		});
+		printContextMenu(MESSAGES[120], body, e.pageX, e.pageY);
+	}).fail(function(message) {
+		addModalError(message);
+	});
+});
+
+// Get startup-config
+$(document).on('click', '.action-configget', function(e) {
+	logger(1, 'DEBUG: action = configget');
+	var id = $(this).attr('data-path');
+	$.when(getNodeConfigs(id)).done(function(config) {
+		printFormNodeConfigs(config);
+	}).fail(function(message) {
+		addModalError(message);
+	});
+	$('#context-menu').remove();
+});
+
 // Add a new folder
 $(document).on('click', '.action-folderadd', function(e) {
 	logger(1, 'DEBUG: action = folderadd');
@@ -232,7 +265,6 @@ $(document).on('click', '.action-networkedit', function(e) {
 	}).fail(function(message) {
 		addModalError(message);
 	});
-	$('#context-menu').remove();
 });
 
 // Print lab networks
@@ -380,7 +412,6 @@ $(document).on('click', '.action-labobjectadd', function(e) {
 $(document).on('click', '.action-networkadd', function(e) {
 	logger(1, 'DEBUG: action = networkadd');
 	printFormNetwork('add', null);
-	$('#context-menu').remove();
 });
 
 // Place an object
@@ -412,7 +443,7 @@ $(document).on('click', '.action-nodeplace, .action-networkplace', function(e) {
 	$('#lab-viewport').mousemove(function(e1) {
 		$('#mouse_frame').css({
 			'left': e1.pageX - 30,
-			'top': e1.pageY - 30
+			'top': e1.pageY
 		});
 	});
 	
@@ -424,7 +455,7 @@ $(document).on('click', '.action-nodeplace, .action-networkplace', function(e) {
 				// ESC not pressed
 				var values = {};
 				values['left'] = e2.pageX - 30;
-				values['top'] = e2.pageY - 30;
+				values['top'] = e2.pageY;
 				if (object == 'node') {
 					printFormNode('add', values);
 				} else if (object == 'network') {
@@ -837,8 +868,8 @@ $(document).on('submit', '#form-network-add, #form-network-edit', function(e) {
 	}
 	
 	for (var i = 0; i < form_data['count']; i++) {
-		form_data['left'] = parseInt(form_data['left']) + i * 20;
-		form_data['top'] = parseInt(form_data['top']) + i * 20;
+		form_data['left'] = parseInt(form_data['left']) + i * 10;
+		form_data['top'] = parseInt(form_data['top']) + i * 10;
 		var request = $.ajax({
 			timeout: TIMEOUT,
 			type: type,
@@ -940,8 +971,8 @@ $(document).on('submit', '#form-node-add, #form-node-edit', function(e) {
 	}
 	
 	for (var i = 0; i < form_data['count']; i++) {
-		form_data['left'] = parseInt(form_data['left']) + i * 20;
-		form_data['top'] = parseInt(form_data['top']) + i * 20;
+		form_data['left'] = parseInt(form_data['left']) + i * 10;
+		form_data['top'] = parseInt(form_data['top']) + i * 10;
 		$.ajax({
 			timeout: TIMEOUT,
 			type: type,
@@ -970,6 +1001,42 @@ $(document).on('submit', '#form-node-add, #form-node-edit', function(e) {
 			}
 		});
 	}
+	return false;  // Stop to avoid POST
+});
+
+// Submit config form
+$(document).on('submit', '#form-node-config', function(e) {
+	e.preventDefault();  // Prevent default behaviour
+	var lab_filename = $('#lab-viewport').attr('data-path');
+	var form_data = form2Array('config');
+	var url = '/api/labs' + lab_filename + '/configs/' + form_data['id'];
+	var type = 'PUT';
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		data: JSON.stringify(form_data),
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: config saved.');
+				// Close the modal
+				$('body').children('.modal').modal('hide');
+				addMessage(data['status'], data['message']);
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+		}
+	});
 	return false;  // Stop to avoid POST
 });
 

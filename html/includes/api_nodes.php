@@ -503,15 +503,16 @@ function apiGetLabNodeTemplate($p) {
 	);
 
 	// Startup configs
-	if (in_array($p['type'], Array('dynamips', 'iol', 'qemu'))) $output['data']['options']['config'] = Array(
-		'name' => $GLOBALS['messages'][70013],
-		'type' => 'list',
-		'value' => 'Unconfigured',
-		'list' => Array(
-			'Saved' => 'Saved',
-			'Unconfigured' => 'Unconfigured'
-		)
-	);
+	if (in_array($p['type'], Array('dynamips', 'iol', 'qemu'))) {
+		$output['data']['options']['config'] = Array(
+			'name' => $GLOBALS['messages'][70013],
+			'type' => 'list',
+			'value' => '0',	// Unconfigured
+			'list' => listNodeConfigTemplates()
+		);
+		$output['data']['options']['config']['list'][0] = $GLOBALS['messages'][70020];	// Unconfigured
+		$output['data']['options']['config']['list'][1] = $GLOBALS['messages'][70019];	// Saved
+	}
 
 	// Delay
 	$output['data']['options']['delay'] = Array(

@@ -34,6 +34,7 @@ require_once('/opt/unetlab/html/includes/init.php');
 require_once(BASE_DIR.'/html/includes/Slim/Slim.php');
 require_once(BASE_DIR.'/html/includes/Slim-Extras/DateTimeFileWriter.php');
 require_once(BASE_DIR.'/html/includes/api_authentication.php');
+require_once(BASE_DIR.'/html/includes/api_configs.php');
 require_once(BASE_DIR.'/html/includes/api_folders.php');
 require_once(BASE_DIR.'/html/includes/api_labs.php');
 require_once(BASE_DIR.'/html/includes/api_networks.php');
@@ -435,7 +436,7 @@ $app -> get('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 		// Lab file does not exists
 		$output['code'] = 404;
 		$output['status'] = 'fail';
-		$output['message'] = $GLOBALS['messages']['60000'];
+		$output['message'] = $GLOBALS['messages'][60000];
 		$app -> response -> setStatus($output['code']);
 		$app -> response -> setBody(json_encode($output));
 		return;
@@ -447,7 +448,8 @@ $app -> get('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 		// Lab file is invalid
 		$output['code'] = 400;
 		$output['status'] = 'fail';
-		$output['message'] = $GLOBALS['messages'][$e -> getMessage()];
+		$output['message'] = $GLOBALS['messages'][60056];
+		$output['message'] = $e -> getMessage();
 		$app -> response -> setStatus($output['code']);
 		$app -> response -> setBody(json_encode($output));
 		return;
@@ -461,7 +463,10 @@ $app -> get('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 		$output['data'] = $Parsedown -> text($lab -> getBody());
 		$app -> response -> setStatus($output['code']);
 		$app -> response -> setBody(json_encode($output));
-	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/pdf$/', $s)) {
+	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/configs$/', $s)) {
+		$output = apiGetLabConfigs($lab);
+	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/configs\/[0-9]+$/', $s)) {
+		$output = apiGetLabConfig($lab, $id);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/networks$/', $s)) {
 		$output = apiGetLabNetworks($lab);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/networks\/[0-9]+$/', $s)) {
@@ -685,6 +690,9 @@ $app -> put('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 			unset($p['count']);
 		}
 		$output = apiEditLabNetwork($lab, $p);
+	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/configs\/[0-9]+$/', $s)) {
+		$p['id'] = $id;
+		$output = apiEditLabConfig($lab, $p);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/[0-9]+$/', $s)) {
 		$p['id'] = $id;
 		$output = apiEditLabNode($lab, $p);

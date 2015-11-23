@@ -53,6 +53,21 @@ if (!defined('SESSION')) define('SESSION', '3600');
 if (!defined('THEME')) define('THEME', 'default');
 if (!defined('TIMEZONE')) define('TIMEZONE', 'Europe/Rome');
 
+if (!isset($node_config)) {
+	$node_config = Array(
+		'iol'			=>	'embedded',
+		'dynamips'		=>	'embedded',
+		'asa'			=>	'config_asa.py',
+		'asav'			=>	'config_asav.py',
+		'csr1000v'		=>	'config_csr1000v.py',
+		'titanium'		=>	'config_titanium.py',
+		'veos'			=>	'config_veos.py',
+		'viosl2'		=>	'config_viosl2.py',
+		'vios'			=>	'config_vios.py',
+		'xrv'			=>	'config_xrv.py'
+	);
+}
+
 if (!isset($node_templates)) {
 	$node_templates = Array(
 		'a10'			=>	'A10 vThunder',

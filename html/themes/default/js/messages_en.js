@@ -148,3 +148,7 @@ MESSAGES[116] = 'Configure interfaces';
 MESSAGES[117] = 'Disconnected';
 MESSAGES[118] = 'Configured nodes';
 MESSAGES[119] = 'Image';
+MESSAGES[120] = 'startup-configs';
+MESSAGES[121] = 'Used as startup-config';
+MESSAGES[122] = 'Not used';
+MESSAGES[123] = 'startup-config';
