@@ -431,27 +431,22 @@ tbody td .glyphicon {
 .modal-body {
 	color: #58585a;
 	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
-	font-size: 1.4vw;
 }
 
 .modal-body h4 {
 	color: #46a6b6;
 	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
-	font-size: 1.4vw;
-	margin-top: 4vmin; /* TODO in px */
 }
 
 .modal-body .error {
 	color: #46a6b6;
 	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
-	font-size: 1vw;
 }
 
 .modal-title {
 	border-bottom: 2px solid #46a6b6;
 	color: #46a6b6;
 	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
-	font-size: 1.4vw;
 }
 
 .modal .btn-aqua {

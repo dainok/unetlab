@@ -85,28 +85,30 @@ $(document).on('dragstop', '.node_frame, .network_frame', function(e) {
 	var left = Math.round(offset.left - 30 + $('#lab-viewport').scrollLeft());	// 30 is the sidebar
 	var top = Math.round(offset.top + $('#lab-viewport').scrollTop());
 	var id = $(this).attr('data-path');
-	if (left < 0) left = 0;
-	if (top < 0) top = 0;
-	if ($(this).hasClass('node_frame')) {
-		logger(1, 'DEBUG: setting node' + id + ' position.');
-		$.when(setNodePosition(id, left, top)).done(function() {
-			// Position saved -> redraw topology
-			printLabTopology();
-		}).fail(function(message) {
-			// Error on save
-			addModalError(message);
-		});
-	} else if ($(this).hasClass('network_frame')) {
-		logger(1, 'DEBUG: setting network' + id + ' position.');
-		$.when(setNetworkPosition(id, left, top)).done(function() {
-			// Position saved -> redraw topology
-			printLabTopology();
-		}).fail(function(message) {
-			// Error on save
-			addModalError(message);
-		});
+	if (left >= 0 && top >= 0) {
+		if ($(this).hasClass('node_frame')) {
+			logger(1, 'DEBUG: setting node' + id + ' position.');
+			$.when(setNodePosition(id, left, top)).done(function() {
+				// Position saved -> redraw topology
+				jsPlumb.repaintEverything();
+			}).fail(function(message) {
+				// Error on save
+				addModalError(message);
+			});
+		} else if ($(this).hasClass('network_frame')) {
+			logger(1, 'DEBUG: setting network' + id + ' position.');
+			$.when(setNetworkPosition(id, left, top)).done(function() {
+				// Position saved -> redraw topology
+				jsPlumb.repaintEverything();
+			}).fail(function(message) {
+				// Error on save
+				addModalError(message);
+			});
+		} else {
+			logger(1, 'DEBUG: unknown object.');
+		}
 	} else {
-		logger(1, 'DEBUG: unknown object.');
+		addMessage('warning', MESSAGES[124]);
 	}
 });
 
@@ -140,11 +142,11 @@ $(document).on('contextmenu', '.context-menu', function(e) {
 		logger(1, 'DEBUG: opening node context menu');
 		var node_id = $(this).attr('data-path');
 		var title = $(this).attr('data-name');
-		var body = '<li><a class="menu-collapse" data-path="menu-manage" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[75] + '</a></li><li><a class="action-nodestart context-collapsible menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-play"></i> ' + MESSAGES[66] + '</a></li><li><a class="action-nodestop context-collapsible menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[67] + '</a></li><li><a class="action-nodewipe context-collapsible menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[68] + '</a></li><li><a class="action-nodeexport context-collapsible menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-save"></i> ' + MESSAGES[69] + '</a></li><li role="separator" class="divider"></li><li><a class="menu-collapse" data-path="menu-interface" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[70] + '</a></li><li><a class="action-nodecapture context-collapsible menu-interface" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-search"></i> TEST</a></li><li role="separator" class="divider"></li>';
+		var body = '<li><a class="menu-collapse" data-path="menu-manage" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[75] + '</a></li><li><a class="action-nodestart context-collapsible menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-play"></i> ' + MESSAGES[66] + '</a></li><li><a class="action-nodestop context-collapsible menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[67] + '</a></li><li><a class="action-nodewipe context-collapsible menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[68] + '</a></li><li role="separator" class="divider"></li><li><a class="menu-collapse" data-path="menu-interface" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[70] + '</a></li><li><a class="action-nodecapture context-collapsible menu-interface" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-search"></i> TEST</a></li>';
 
 		// Read privileges and set specific actions/elements
 		if (ROLE == 'admin' || ROLE == 'editor') {
-			body += '<li><a class="menu-collapse" data-path="menu-edit" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[73] + '</a></li><li><a class="action-nodeinterfaces context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[72] + '</a></li><li><a class="action-nodeedit context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-edit"></i> ' + MESSAGES[71] + '</a></li><li><a class="action-nodedelete context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[65] + '</a></li>'
+			body += '<li role="separator" class="divider"></li><li><a class="menu-collapse" data-path="menu-edit" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[73] + '</a></li><li><a class="action-nodeexport context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-save"></i> ' + MESSAGES[69] + '</a></li><li><a class="action-nodeinterfaces context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[72] + '</a></li><li><a class="action-nodeedit context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-edit"></i> ' + MESSAGES[71] + '</a></li><li><a class="action-nodedelete context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[65] + '</a></li>'
 		};
 	} else if ($(this).hasClass('network_frame')) {
 		if (ROLE == 'admin' || ROLE == 'editor') {
@@ -382,6 +384,20 @@ $(document).on('dblclick', '.action-labpreview', function(e) {
 	printLabPreview($(this).attr('data-path'));
 });
 
+// Action menu
+$(document).on('click', '.action-moreactions', function(e) {
+	logger(1, 'DEBUG: action = moreactions');
+	// dainok
+	var body = '';
+	body += '<li><a class="action-nodesstart" href="#"><i class="glyphicon glyphicon-play"></i> ' + MESSAGES[126] + '</a></li>';
+	body += '<li><a class="action-nodesstop" href="#"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[127] + '</a></li>';
+	body += '<li><a class="action-nodeswipe href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[128] + '</a></li>';
+	if (ROLE == 'admin' || ROLE == 'editor') {
+		body += '<li><a class="action-nodesexport" href="#"><i class="glyphicon glyphicon-save"></i> ' + MESSAGES[129] + '</a></li>';
+	}
+	printContextMenu(MESSAGES[125], body, e.pageX, e.pageY);
+});
+
 // Redraw topology
 $(document).on('click', '.action-labtopologyrefresh', function(e) {
 	logger(1, 'DEBUG: action = labtopologyrefresh');
@@ -561,10 +577,16 @@ $(document).on('click', '.action-selectedexport', function(e) {
  });
 
 // Export a config
-$(document).on('click', '.action-nodeexport', function(e) {
-	logger(1, 'DEBUG: action = nodeexport');
-	var node_id = $(this).attr('data-path');
-	var node_name = $(this).attr('data-name');
+$(document).on('click', '.action-nodeexport, .action-nodesexport', function(e) {
+	if ($(this).hasClass('action-nodeexport')) {
+		logger(1, 'DEBUG: action = nodeexport');
+		var node_id = $(this).attr('data-path');
+		var node_name = $(this).attr('data-name');
+	} else {
+		logger(1, 'DEBUG: action = nodesexport');
+		var node_id = null;
+		var node_name = MESSAGES[130];		
+	}
 	$.when(cfg_export(node_id)).done(function() {
 		// Config exported -> print a small green message
 		addMessage('success', node_name + ': ' + MESSAGES[79])
@@ -576,10 +598,16 @@ $(document).on('click', '.action-nodeexport', function(e) {
 });
  
 // Start a node
-$(document).on('click', '.action-nodestart', function(e) {
-	logger(1, 'DEBUG: action = nodestart');
-	var node_id = $(this).attr('data-path');
-	var node_name = $(this).attr('data-name');
+$(document).on('click', '.action-nodestart, .action-nodesstart', function(e) {
+	if ($(this).hasClass('action-nodestart')) {
+		logger(1, 'DEBUG: action = nodestart');
+		var node_id = $(this).attr('data-path');
+		var node_name = $(this).attr('data-name');
+	} else {
+		logger(1, 'DEBUG: action = nodesstart');
+		var node_id = null;
+		var node_name = MESSAGES[130];		
+	}
 	$.when(start(node_id)).done(function() {
 		// Node started -> print a small green message
 		addMessage('success', node_name + ': ' + MESSAGES[76])
@@ -591,10 +619,16 @@ $(document).on('click', '.action-nodestart', function(e) {
 });
 
 // Stop a node
-$(document).on('click', '.action-nodestop', function(e) {
-	logger(1, 'DEBUG: action = nodestop');
-	var node_id = $(this).attr('data-path');
-	var node_name = $(this).attr('data-name');
+$(document).on('click', '.action-nodesstop', function(e) {
+	if ($(this).hasClass('action-nodestop')) {
+		logger(1, 'DEBUG: action = nodestop');
+		var node_id = $(this).attr('data-path');
+		var node_name = $(this).attr('data-name');
+	} else {
+		logger(1, 'DEBUG: action = nodesstop');
+		var node_id = null;
+		var node_name = MESSAGES[130];		
+	}
 	$.when(stop(node_id)).done(function() {
 		// Node stopped -> print a small green message
 		addMessage('success', node_name + ': ' + MESSAGES[77])
@@ -606,10 +640,16 @@ $(document).on('click', '.action-nodestop', function(e) {
 });
 
 // Wipe a node
-$(document).on('click', '.action-nodewipe', function(e) {
-	logger(1, 'DEBUG: action = nodewipe');
-	var node_id = $(this).attr('data-path');
-	var node_name = $(this).attr('data-name');
+$(document).on('click', '.action-nodewipe, .action-nodeswipe', function(e) {
+	if ($(this).hasClass('action-nodewipe')) {
+		logger(1, 'DEBUG: action = nodewipe');
+		var node_id = $(this).attr('data-path');
+		var node_name = $(this).attr('data-name');
+	} else {
+		logger(1, 'DEBUG: action = nodewwipe');
+		var node_id = null;
+		var node_name = MESSAGES[130];		
+	}
 	$.when(wipe(node_id)).done(function() {
 		// Node wiped -> print a small green message
 		addMessage('success', node_name + ': ' + MESSAGES[78])
@@ -947,6 +987,7 @@ $(document).on('submit', '#form-node-add, #form-node-edit', function(e) {
 	e.preventDefault();  // Prevent default behaviour
 	var lab_filename = $('#lab-viewport').attr('data-path');
 	var form_data = form2Array('node');
+	var promises = [];
 	if ($(this).attr('id') == 'form-node-add') {
 		logger(1, 'DEBUG: posting form-node-add form.');
 		var url = '/api/labs' + lab_filename + '/nodes';
@@ -973,7 +1014,7 @@ $(document).on('submit', '#form-node-add, #form-node-edit', function(e) {
 	for (var i = 0; i < form_data['count']; i++) {
 		form_data['left'] = parseInt(form_data['left']) + i * 10;
 		form_data['top'] = parseInt(form_data['top']) + i * 10;
-		$.ajax({
+		var request = $.ajax({
 			timeout: TIMEOUT,
 			type: type,
 			url: encodeURI(url),
@@ -985,7 +1026,6 @@ $(document).on('submit', '#form-node-add, #form-node-edit', function(e) {
 					// Close the modal
 					$('body').children('.modal').modal('hide');
 					addMessage(data['status'], data['message']);
-					printLabTopology();
 				} else {
 					// Application error
 					logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
@@ -1001,6 +1041,10 @@ $(document).on('submit', '#form-node-add, #form-node-edit', function(e) {
 			}
 		});
 	}
+	
+	$.when.apply(null, promises).done(function() {
+		printLabTopology();
+	});
 	return false;  // Stop to avoid POST
 });
 

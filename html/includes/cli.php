@@ -901,8 +901,7 @@ function stop($n) {
 		}
 		error_log(date('M d H:i:s ').'INFO: stopping '.$cmd);
 		exec($cmd, $o, $rc);
-		sleep(1);  // Need to wait a few
-		if ($n -> getStatus() == 0) {
+		if ($rc  == 0) {
 			return 0;
 		} else {
 			// Node is still running

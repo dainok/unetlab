@@ -19,8 +19,8 @@
 	display: block !important;
 	position: absolute;
 	z-index: 5200;
-	overflow-x: hidden;
-	overflow-y: auto;
+	aoverflow-x: hidden;
+	aoverflow-y: auto;
 }
 
 #context-menu code {
@@ -32,6 +32,7 @@
 	display: block;
 	position: static;
 	margin-bottom: 5px;
+	overflow-y: auto;
 }
 
 #context-menu .dropdown-header {
