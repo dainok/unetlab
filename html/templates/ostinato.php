@@ -35,7 +35,7 @@ $p['name'] = 'Ostinato';
 $p['icon'] = 'Network Analyzer.png';
 $p['cpu'] = 1;
 $p['ram'] = 512; 
-$p['ethernet'] = 1; 
+$p['ethernet'] = 2; 
 $p['console'] = 'telnet'; 
 $p['qemu_arch'] = 'x86_64';
 $p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -serial mon:stdio -nographic -nodefconfig -nodefaults -display none -vga std -rtc base=utc';
