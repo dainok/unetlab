@@ -41,7 +41,7 @@ if (function_exists('isVirtual') && isVirtual()) {
 $p['ram'] = 2048; 
 $p['ethernet'] = 6; 
 $p['console'] = 'telnet'; 
-$p['qemu_arch'] = 'i386';
+$p['qemu_arch'] = 'x86_64';
 if (function_exists('isVirtual') && isVirtual()) {
 	$p['qemu_options'] = '-machine type=pc-1.0,accel=tcg';
 } else {
