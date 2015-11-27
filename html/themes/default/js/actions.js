@@ -179,7 +179,7 @@ $(window).resize(function(){
 $(document).on('click', '.action-configsget', function(e) {
 	logger(1, 'DEBUG: action = configsget');
 	$.when(getNodeConfigs(null)).done(function(configs) {
-		var body = '';
+		var body = '<div class="row"><div class="config-list col-md-2 col-lg-2"><ul>';
 		$.each(configs, function(key, config) {
 			var title = (config['config'] == 0)? MESSAGES[122] : MESSAGES[121];
 			body += '<li><a class="action-configget" data-path="' + key + '" href="#" title="' + title + '">' + config['name'];
@@ -188,7 +188,8 @@ $(document).on('click', '.action-configsget', function(e) {
 			}
 			body += '</a></li>';
 		});
-		printContextMenu(MESSAGES[120], body, e.pageX, e.pageY);
+		body += '</ul></div><div id="config-data" class="col-md-10 col-lg-10"></div></div>';
+		addModalWide(MESSAGES[120], body, '');
 	}).fail(function(message) {
 		addModalError(message);
 	});
@@ -619,7 +620,7 @@ $(document).on('click', '.action-nodestart, .action-nodesstart', function(e) {
 });
 
 // Stop a node
-$(document).on('click', '.action-nodesstop', function(e) {
+$(document).on('click', '.action-nodestop, .action-nodesstop', function(e) {
 	if ($(this).hasClass('action-nodestop')) {
 		logger(1, 'DEBUG: action = nodestop');
 		var node_id = $(this).attr('data-path');
@@ -627,7 +628,7 @@ $(document).on('click', '.action-nodesstop', function(e) {
 	} else {
 		logger(1, 'DEBUG: action = nodesstop');
 		var node_id = null;
-		var node_name = MESSAGES[130];		
+		var node_name = MESSAGES[130];
 	}
 	$.when(stop(node_id)).done(function() {
 		// Node stopped -> print a small green message
@@ -841,7 +842,7 @@ $(document).on('submit', '#form-lab-add, #form-lab-edit', function(e) {
 					logger(1, 'DEBUG: lab "' + form_data['name'] + '" saved.');
 					// Close the modal
 					$(e.target).parents('.modal').modal('hide');
-					if ($(this).attr('id') == 'form-lab-add') {
+					if (type == 'POST') {
 						// Reload the lab list
 						printPageLabList(form_data['path']);
 					} else if (basename(lab_filename) != form_data['name'] + '.unl') {

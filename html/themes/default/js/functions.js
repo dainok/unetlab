@@ -1415,7 +1415,7 @@ function printFormNodeConfigs(values) {
 	} else {
 		var html = '<div class="col-md-12"><pre>' + values['data'] + '</pre></div>';
 	}
-	addModalWide(title, html, '');
+	$('#config-data').html(html);
 }
 
 // Node interfaces
@@ -1841,7 +1841,7 @@ function printPageLabOpen(lab) {
 	// Read privileges and set specific actions/elements
 	if (ROLE == 'admin' || ROLE == 'editor') {
 		$('#lab-sidebar ul').append('<li><a class="action-labobjectadd" href="#" title="' + MESSAGES[56] + '"><i class="glyphicon glyphicon-plus"></i></a></li>');
-		$('#lab-sidebar ul').append('<li><a class="action-nodelink" href="#" title="' + MESSAGES[115] + '"><i class="glyphicon glyphicon-link"></i></a></li>');
+		//TODO $('#lab-sidebar ul').append('<li><a class="action-nodelink" href="#" title="' + MESSAGES[115] + '"><i class="glyphicon glyphicon-link"></i></a></li>');
 	}
 	
 	$('#lab-sidebar ul').append('<li><a class="action-labbodyget" href="#" title="' + MESSAGES[64] + '"><i class="glyphicon glyphicon-list-alt"></i></a></li>');

@@ -1096,7 +1096,7 @@ class Lab {
 			error_log(date('M d H:i:s ').'ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$node_id.' '.$GLOBALS['messages'][20024]);
 			return 20024;
 		} else if ($this -> nodes[$node_id] -> setConfigData($config_data) === 0) {
-			$this -> nodes[$node_id] -> edit(Array('config' => 'Saved'));
+			$this -> nodes[$node_id] -> edit(Array('config' => '1'));
 			return $this -> save();
 		} else {
 			error_log(date('M d H:i:s ').'ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$node_id.' '.$GLOBALS['messages'][20036]);

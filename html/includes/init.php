@@ -56,7 +56,9 @@ if (!defined('TIMEZONE')) define('TIMEZONE', 'Europe/Rome');
 if (!isset($node_config)) {
 	$node_config = Array(
 		'iol'			=>	'embedded',
-		'dynamips'		=>	'embedded',
+		'c1710'			=>	'embedded',
+		'c3725'			=>	'embedded',
+		'c7200'			=>	'embedded',
 		'asa'			=>	'config_asa.py',
 		'asav'			=>	'config_asav.py',
 		'csr1000v'		=>	'config_csr1000v.py',

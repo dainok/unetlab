@@ -477,7 +477,7 @@ function export($node_id, $n, $lab) {
 			}
 			break;
 		case 'qemu':
-			if (!isset($GLOBALS['node_config'][$n -> getTemplate()])) {
+			if (isset($GLOBALS['node_config'][$n -> getTemplate()])) {
 				$cmd = '/opt/unetlab/scripts/'.$GLOBALS['node_config'][$n -> getTemplate()].' -a get -p '.$n -> getPort().' -f '.$tmp.' -t 15';
 				exec($cmd, $o, $rc);
 				error_log(date('M d H:i:s ').'INFO: exporting '.$cmd);
