@@ -480,8 +480,31 @@
 	width: 100%;
 }
 
-.modal.modal-wide .modal-dialog {
-	width: 90%;
+.modal-body  .config-list  {
+	amargin-left: 0px;
+	amargin-right: 0px;
+	overflow: hidden;
+	apadding-left: 45px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.modal-body  .config-list  ul {
+	line-height: 3em;
+	list-style-type: none;
+	margin-left: 0px;
+}
+
+.modal-body  .config-list li {
+	margin-left: -30px;
+}
+
+.modal-body  .config-list a, .modal-body  .config-list a:link, .modal-body  .config-list a:visited {
+	color: #8b8c90;
+}
+
+.modal-body  .config-list a:active, .modal-body  .config-list a:hover {
+	text-decoration: none;
 }
 
 .modal-title {
@@ -490,6 +513,10 @@
 	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
 	font-size: 2.8vmin;
 	text-transform: uppercase;
+}
+
+.modal.modal-wide .modal-dialog {
+	width: 90%;
 }
 
 .selectpicker-button {

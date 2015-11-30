@@ -142,7 +142,7 @@ $(document).on('contextmenu', '.context-menu', function(e) {
 		logger(1, 'DEBUG: opening node context menu');
 		var node_id = $(this).attr('data-path');
 		var title = $(this).attr('data-name');
-		var body = '<li><a class="menu-collapse" data-path="menu-manage" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[75] + '</a></li><li><a class="action-nodestart context-collapsible menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-play"></i> ' + MESSAGES[66] + '</a></li><li><a class="action-nodestop context-collapsible menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[67] + '</a></li><li><a class="action-nodewipe context-collapsible menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[68] + '</a></li><li role="separator" class="divider"></li><li><a class="menu-collapse" data-path="menu-interface" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[70] + '</a></li><li><a class="action-nodecapture context-collapsible menu-interface" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-search"></i> TEST</a></li>';
+		var body = '<li><a class="menu-collapse" data-path="menu-manage" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[75] + '</a></li><li><a class="action-nodestart context-collapsible menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-play"></i> ' + MESSAGES[66] + '</a></li><li><a class="action-nodestop context-collapsible menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[67] + '</a></li><li><a class="action-nodewipe context-collapsible menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-erase"></i> ' + MESSAGES[68] + '</a></li><li role="separator" class="divider"></li><li><a class="menu-collapse" data-path="menu-interface" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[70] + '</a></li><li><a class="action-nodecapture context-collapsible menu-interface" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-search"></i> TEST</a></li>';
 
 		// Read privileges and set specific actions/elements
 		if (ROLE == 'admin' || ROLE == 'editor') {
@@ -392,7 +392,7 @@ $(document).on('click', '.action-moreactions', function(e) {
 	var body = '';
 	body += '<li><a class="action-nodesstart" href="#"><i class="glyphicon glyphicon-play"></i> ' + MESSAGES[126] + '</a></li>';
 	body += '<li><a class="action-nodesstop" href="#"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[127] + '</a></li>';
-	body += '<li><a class="action-nodeswipe href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[128] + '</a></li>';
+	body += '<li><a class="action-nodeswipe href="#"><i class="glyphicon glyphicon-erase"></i> ' + MESSAGES[128] + '</a></li>';
 	if (ROLE == 'admin' || ROLE == 'editor') {
 		body += '<li><a class="action-nodesexport" href="#"><i class="glyphicon glyphicon-save"></i> ' + MESSAGES[129] + '</a></li>';
 	}

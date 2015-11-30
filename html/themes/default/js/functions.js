@@ -149,32 +149,48 @@ function cloneLab(form_data) {
 
 // Close lab
 function closeLab() {
+	// dainok
 	var deferred = $.Deferred();
-	var url = '/api/labs/close';
-	var type = 'DELETE'
-	$.ajax({
-		timeout: TIMEOUT,
-		type: type,
-		url: encodeURI(url),
-		dataType: 'json',
-		success: function(data) {
-			if (data['status'] == 'success') {
-				logger(1, 'DEBUG: lab closed.');
-				LAB = null;
-				deferred.resolve();
-			} else {
-				// Application error
-				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-				deferred.reject(data['message']);
+	$.when(getNodes()).done(function(values) {
+		var running_nodes = false;
+		$.each(values, function(node_id, node) {
+			if (node['status'] != 0) {
+				running_nodes = true;
 			}
-		},
-		error: function(data) {
-			// Server error
-			var message = getJsonMessage(data['responseText']);
-			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
-			logger(1, 'DEBUG: ' + message);
-			deferred.reject(message);
+		});
+		
+		if (running_nodes == false) {
+			var url = '/api/labs/close';
+			var type = 'DELETE'
+			$.ajax({
+				timeout: TIMEOUT,
+				type: type,
+				url: encodeURI(url),
+				dataType: 'json',
+				success: function(data) {
+					if (data['status'] == 'success') {
+						logger(1, 'DEBUG: lab closed.');
+						LAB = null;
+						deferred.resolve();
+					} else {
+						// Application error
+						logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+						deferred.reject(data['message']);
+					}
+				},
+				error: function(data) {
+					// Server error
+					var message = getJsonMessage(data['responseText']);
+					logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+					logger(1, 'DEBUG: ' + message);
+					deferred.reject(message);
+				}
+			});
+		} else {
+			deferred.reject(MESSAGES[131]);
 		}
+	}).fail(function(message) {
+		deferred.reject(message);
 	});
 	return deferred.promise();
 }
@@ -1687,7 +1703,13 @@ function printListNodes(nodes) {
 		var image = (value['image'] != null) ? value['image'] : '';
 		var nvram = (value['nvram'] != null) ? value['nvram'] : '';
 		var serial = (value['serial'] != null) ? value['serial'] : '';
-		body += '<tr class="node' + value['id'] + '"><td>' + value['id'] + '</td><td>' + value['name'] + '</td><td>' + value['template'] + '</td><td>' + value['image'] + '</td><td>' + cpu + '</td><td>' + idlepc + '</td><td>' + nvram + '</td><td>' + value['ram'] + '</td><td>' + ethernet + '</td><td>' + serial + '</td><td>' + value['console'] + '</td><td><a class="action-nodeedit" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[71] + '"><i class="glyphicon glyphicon-edit"></i></a><a class="action-nodedelete" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[65] + '"><i class="glyphicon glyphicon-trash"></i></a></td></tr>';
+		body += '<tr class="node' + value['id'] + '"><td>' + value['id'] + '</td><td>' + value['name'] + '</td><td>' + value['template'] + '</td><td>' + value['image'] + '</td><td>' + cpu + '</td><td>' + idlepc + '</td><td>' + nvram + '</td><td>' + value['ram'] + '</td><td>' + ethernet + '</td><td>' + serial + '</td><td>' + value['console'] + '</td><td><a class="action-nodestart" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[66] + '"><i class="glyphicon glyphicon-play"></i></a> <a class="action-nodestop" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[67] + '"><i class="glyphicon glyphicon-stop"></i></a> <a class="action-nodewipe" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[68] + '"><i class="glyphicon glyphicon-erase"></i></a>';
+		
+		// Read privileges and set specific actions/elements
+		if (ROLE == 'admin' || ROLE == 'editor') {
+			body += ' <a class="action-nodeexport" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[69] + '"><i class="glyphicon glyphicon-save"></i></a> <a class="action-nodeinterfaces" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[72] + '"><i class="glyphicon glyphicon-transfer"></i></a> <a class="action-nodeedit" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[71] + '"><i class="glyphicon glyphicon-edit"></i></a> <a class="action-nodedelete" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[65] + '"><i class="glyphicon glyphicon-trash"></i></a>';
+		}
+		body += '</td></tr>';
 	});
 	body += '</tbody></table></div>';
 	addModalWide(MESSAGES[118], body, '');

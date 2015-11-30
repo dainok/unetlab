@@ -159,3 +159,4 @@ MESSAGES[127] = 'Stop all nodes';
 MESSAGES[128] = 'Wipe all nodes';
 MESSAGES[129] = 'Export all CFGs';
 MESSAGES[130] = 'All nodes';
+MESSAGES[131] = 'There are running nodes, you need to power off them before closing the lab.';
