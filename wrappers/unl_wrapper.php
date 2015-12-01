@@ -127,7 +127,12 @@ switch ($action) {
 		// Exporting node(s) running-config
 		if (isset($node_id)) {
 			// Node ID is set, export a single node
-			export($node_id, $lab -> getNodes()[$node_id], $lab);
+			$rc = export($node_id, $lab -> getNodes()[$node_id], $lab);
+			if ($rc !== 0) {
+				// Failed to export config
+				error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][16]);
+				exit(16);
+			}
 		} else {
 			// Node ID is not set, export all nodes
 			foreach ($lab -> getNodes() as $node_id => $node) {

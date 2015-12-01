@@ -48,6 +48,7 @@ $messages[12] = 'Failed to start node (12).';
 $messages[13] = 'Unable to wipe node(s) (13).';
 $messages[14] = 'Cannot create username (14).';
 $messages[15] = 'Cannot remove UUID from exported labs (15).';
+$messages[16] = 'Failed to export config (16).';
 
 /***************************************************************************
  * Classes
@@ -294,7 +295,7 @@ $messages[80056] = 'Cloud interface does not exist (80056).';
 $messages[80057] = 'Nodes exported (80057).';
 $messages[80058] = 'Node exported (80058).';
 $messages[80059] = 'Cannot delete tmp file (80059).';
-$messages[80060] = 'Failed to run iou_export (80060).';
+$messages[80060] = 'Failed to export (80060).';
 $messages[80061] = 'Node not supported for config export (80061).';
 $messages[80062] = 'Config file not found (80062).';
 $messages[80063] = 'Failed to save startup-config (80063).';
@@ -318,6 +319,7 @@ $messages[80080] = 'File imported (80080).';
 $messages[80081] = 'Failed to upload file, check file size (80081).';
 $messages[80082] = 'Cannot find docker.io installation (80082).';
 $messages[80083] = 'Cannot create docket container (80083).';
+$messages[80084] = 'Skipping powered off and unsupported nodes (80084).';
 
 // Authentication (90000-99999)
 $messages[90001] = 'User is not authenticated or session timed out (90001).';

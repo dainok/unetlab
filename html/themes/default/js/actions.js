@@ -248,7 +248,7 @@ $(document).on('click', '.action-labadd', function(e) {
 $(document).on('click', '.action-labbodyget', function(e) {
 	logger(1, 'DEBUG: action = labbodyget');
 	$.when(getLabInfo($('#lab-viewport').attr('data-path')), getLabBody()).done(function(info, body) {
-		addModalWide(MESSAGES[64], '<h1>' + info['name'] + '</h1>' + '<p>' + info['description'] + '</p>' + body, '')
+		addModalWide(MESSAGES[64], '<h1>' + info['name'] + '</h1><p>' + info['description'] + '</p><p><code>ID: ' + info['id'] + '</code></p>' + body, '')
 	}).fail(function(message1, message2) {
 		if (message1 != null) {
 			addModalError(message1);

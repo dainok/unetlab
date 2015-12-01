@@ -90,7 +90,7 @@ function cfg_export(node_id) {
 	var url = (node_id == null) ? '/api/labs' + lab_filename + '/nodes/export' : '/api/labs' + lab_filename + '/nodes/' + node_id + '/export';
 	var type = 'GET'
 	$.ajax({
-		timeout: TIMEOUT,
+		timeout: TIMEOUT * 10,	// Takes a lot of time
 		type: type,
 		url: encodeURI(url),
 		dataType: 'json',
@@ -154,7 +154,7 @@ function closeLab() {
 	$.when(getNodes()).done(function(values) {
 		var running_nodes = false;
 		$.each(values, function(node_id, node) {
-			if (node['status'] != 0) {
+			if (node['status'] > 1) {
 				running_nodes = true;
 			}
 		});
@@ -1669,11 +1669,17 @@ function printLabStatus() {
 				// Stopped
 				$('.node' + node['id'] + '_status').attr('class', 'node' + node['id'] + '_status glyphicon glyphicon-stop');
 			} else if (node['status'] == 1) {
-				// Started
-				$('.node' + node['id'] + '_status').attr('class', 'node' + node['id'] + '_status glyphicon glyphicon-play');
+				// Stopped and locked
+				$('.node' + node['id'] + '_status').attr('class', 'node' + node['id'] + '_status glyphicon glyphicon-warning-sign');
 			} else if (node['status'] == 2) {
-				// Building
+				// Running
+				$('.node' + node['id'] + '_status').attr('class', 'node' + node['id'] + '_status glyphicon glyphicon-play');
+			} else if (node['status'] == 3) {
+				// Running and locked
 				$('.node' + node['id'] + '_status').attr('class', 'node' + node['id'] + '_status glyphicon glyphicon-time');
+			} else {
+				// Undefined
+				$('.node' + node['id'] + '_status').attr('class', 'node' + node['id'] + '_status glyphicon glyphicon-question-sign');
 			}
 		});
 	}).fail(function(message) {

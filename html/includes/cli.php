@@ -477,7 +477,11 @@ function export($node_id, $n, $lab) {
 			}
 			break;
 		case 'qemu':
-			if (isset($GLOBALS['node_config'][$n -> getTemplate()])) {
+			if ($n -> getStatus() < 2 || !isset($GLOBALS['node_config'][$n -> getTemplate()])) {
+				// Skipping powered off nodes or unsupported nodes
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][80084]);
+				return 80084;
+			} else {
 				$cmd = '/opt/unetlab/scripts/'.$GLOBALS['node_config'][$n -> getTemplate()].' -a get -p '.$n -> getPort().' -f '.$tmp.' -t 15';
 				exec($cmd, $o, $rc);
 				error_log(date('M d H:i:s ').'INFO: exporting '.$cmd);

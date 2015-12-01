@@ -1147,13 +1147,13 @@ class Node {
 					// Node is running and locked
 					return 3;
 				} else {
-					return 1;
+					return 2;
 				}
 			} else {
 				// No console available -> node is stopped
 				if (is_file(BASE_TMP.'/'.$this -> tenant.'/'.$this -> lab_id.'/'.$this -> id.'/.lock')) {
-					// Node is running and locked
-					return 2;
+					// Node is stopped and locked
+					return 1;
 				} else {
 					return 0;
 				}
