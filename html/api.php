@@ -1085,6 +1085,39 @@ $app -> post('/api/export', function() use ($app, $db) {
  });
 
 /***************************************************************************
+ * Update
+ **************************************************************************/
+$app -> get('/api/update', function() use ($app, $db) {
+	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($user === False) {
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+	if (!in_array($user['role'], Array('admin'))) {
+		$app -> response -> setStatus($GLOBALS['forbidden']['code']);
+		$app -> response -> setBody(json_encode($GLOBALS['forbidden']));
+		return;
+	}
+
+	$cmd = 'sudo /opt/unetlab/wrappers/unl_wrapper -a update';
+	exec($cmd, $o, $rc);
+	if ($rc != 0) {
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][60059]);
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages']['60059'];
+	} else {
+		$output['code'] = 200;
+		$output['status'] = 'success';
+		$output['message'] = $GLOBALS['messages']['60060'];
+	}
+
+	$app -> response -> setStatus($output['code']);
+	$app -> response -> setBody(json_encode($output));
+});
+
+/***************************************************************************
  * Run
  **************************************************************************/
 $app -> run();

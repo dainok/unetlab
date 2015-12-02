@@ -395,6 +395,7 @@ $(document).on('click', '.action-moreactions', function(e) {
 	body += '<li><a class="action-nodeswipe href="#"><i class="glyphicon glyphicon-erase"></i> ' + MESSAGES[128] + '</a></li>';
 	if (ROLE == 'admin' || ROLE == 'editor') {
 		body += '<li><a class="action-nodesexport" href="#"><i class="glyphicon glyphicon-save"></i> ' + MESSAGES[129] + '</a></li>';
+		body += '<li><a class="action-labedit" href="#"><i class="glyphicon glyphicon-pencil"></i> ' + MESSAGES[87] + '</a></li>';
 	}
 	printContextMenu(MESSAGES[125], body, e.pageX, e.pageY);
 });
@@ -696,6 +697,19 @@ $(document).on('dblclick', '.action-useredit', function(e) {
 		addModalError(message);
 	});
 });
+
+// Load user management page
+$(document).on('click', '.action-update', function(e) {
+	logger(1, 'DEBUG: action = update');
+	addMessage('info', MESSAGES[133]);
+	$.when(update()).done(function(message) {
+		// Got user
+		addMessage('success', message);
+	}).fail(function(message) {
+		// Cannot get user
+		addMessage('alert', message);
+	});
+}); 
 
 // Load user management page
 $(document).on('click', '.action-usermgmt', function(e) {

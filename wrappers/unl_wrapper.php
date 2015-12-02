@@ -300,6 +300,49 @@ switch ($action) {
 			}
 		}
 		break;
+	case 'update':
+		// Check Internet connection
+		$cmd = 'curl -s http://www.google.com > /dev/null 2>&1';
+		exec($cmd, $o, $rc);
+		if ($rc !== 0) {
+			error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][13]);
+			exit(18);
+		}
+
+		// Update repos
+		$cmd = 'apt-get -o APT::List-Cleanup=0 -o Dir::Etc::sourcelist="/etc/apt/sources.list.d/unetlab.list" -o Dir::Etc::sourceparts="/var/tmp/" update > /dev/null 2>&1';
+		exec($cmd, $o, $rc);
+		if ($rc !== 0) {
+			error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][13]);
+			exit(17);
+		}
+
+		// Compare versions
+		$cmd = 'dpkg -s unetlab | grep Version | sed "s/Version: //"';
+		exec($cmd, $o, $rc);
+		if ($rc !== 0) {
+			error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][13]);
+			exit(17);
+		}
+		$installed_version = $o[0];
+		$cmd = 'apt-cache show unetlab | grep Version | head -n1 | sed "s/Version: //"';
+		exec($cmd, $o, $rc);
+		if ($rc !== 0) {
+			error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][13]);
+			exit(17);
+		}
+		$available_version = $o[0];
+
+		// Update UNetLab
+		if ($installed_version != $available_version) {
+			$cmd = 'apt-get -y install unetlab';
+			exec($cmd, $o, $rc);
+			if ($rc !== 0) {
+				error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][13]);
+				exit(17);
+			}
+		}
+		break;
 	case 'wipe':
 		// Removing temporary files
 		if (isset($node_id)) {

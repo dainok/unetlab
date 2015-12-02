@@ -15,6 +15,15 @@
 	background-color: #8b8c90;
 }
 
+#alert_container {
+	bottom: 0px;
+	left: auto;
+	position: fixed;
+	right: 1%;
+	top: auto;
+	width: 30%;
+}
+
 #context-menu {
 	display: block !important;
 	position: absolute;
@@ -98,15 +107,6 @@
     font-size: 0.8em;
     font-weight: bold;
     padding: 0px 2px 0px 2px;
-}
-
-#lab-viewport #alert_container {
-	bottom: 0px;
-	left: auto;
-	position: fixed;
-	right: 1%;
-	top: auto;
-	width: 30%;
 }
 
 #list-title-folders {

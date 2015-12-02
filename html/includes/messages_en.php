@@ -49,6 +49,8 @@ $messages[13] = 'Unable to wipe node(s) (13).';
 $messages[14] = 'Cannot create username (14).';
 $messages[15] = 'Cannot remove UUID from exported labs (15).';
 $messages[16] = 'Failed to export config (16).';
+$messages[17] = 'Failed to upgrade UNetLab (17).';
+$messages[18] = 'Unable to connect to Internet (18).';
 
 /***************************************************************************
  * Classes
@@ -220,6 +222,8 @@ $messages[60055] = 'Successfully listed startup-configs (60055).';
 $messages[60056] = 'Cannot load lab (60056).';
 $messages[60057] = 'Got startup-config (60057).';
 $messages[60058] = 'Startup config not available (60058).';
+$messages[60059] = 'Failed to update UNetLab (60059).';
+$messages[60060] = 'UNetLab is updated (60060).';
 
 // Text (70000-79999)
 $messages[70000] = 'Name/prefix';

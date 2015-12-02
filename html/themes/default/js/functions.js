@@ -54,7 +54,7 @@ function addMessage(severity, message) {
 	
 	if (!$('#alert_container').length) {
 		// Add the frame container if not exists
-		$('#lab-viewport').append('<div id="alert_container"></div>');
+		$('body').append('<div id="alert_container"></div>');
 	}
 	
     $('<div class="alert alert-' + severity.toLowerCase() + '">' + message + '</div>').prependTo('#alert_container').fadeTo(timeout, 500).slideUp(500, function() {
@@ -1182,6 +1182,37 @@ function stopAll() {
 	return deferred.promise();
 }
 
+// Update
+function update(path) {
+	var deferred = $.Deferred();
+	var type = 'GET'
+	var url = '/api/update';
+	$.ajax({
+		timeout: TIMEOUT * 10,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: system updated.');
+				deferred.resolve(data['message']);
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject(data['message']);
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
+}
+
 // Wipe node(s)
 function wipe(node_id) {
 	var deferred = $.Deferred();
@@ -1288,7 +1319,8 @@ function printFormImport(path) {
 
 // Add a new lab
 function printFormLab(action, values) {
-	var path = (values['path'] != null) ? values['path'] : '';
+	console.log(values);
+	var path = $('#lab-viewport').attr('data-path');
 	var name = (values['name'] != null) ? values['name'] : '';
 	var version = (values['version'] != null) ? values['version'] : '';
 	var author = (values['author'] != null) ? values['author'] : '';
@@ -1297,7 +1329,7 @@ function printFormLab(action, values) {
 	
 	var html = '<form id="form-lab-' + action + '" class="form-horizontal form-lab-' + action + '"><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[20] + '</label><div class="col-md-5"><input class="form-control" name="lab[path]" value="' + path + '" disabled="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control autofocus" name="lab[name]" value="' + name + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[26] + '</label><div class="col-md-5"><input class="form-control" name="lab[version]" value="' + version + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Author</label><div class="col-md-5"><input class="form-control" name="lab[author]" value="' + author + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[27] + '</label><div class="col-md-5"><textarea class="form-control" name="lab[description]">' + description + '</textarea></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[88] + '</label><div class="col-md-5"><textarea class="form-control" name="lab[body]">' + body + '</textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
 	logger(1, 'DEBUG: popping up the lab-add form.');
-	addModal(MESSAGES[5], html, '');
+	addModalWide(MESSAGES[5], html, '');
 	validateLabInfo();
 }
 
@@ -1966,6 +1998,7 @@ function printSystemStats() {
 		$('#actions-menu').empty();
 		$('#actions-menu').append('<li><a class="action-sysstatus" href="#"><i class="glyphicon glyphicon-refresh"></i> ' + MESSAGES[40] + '</a></li>');
 		$('#actions-menu').append('<li><a class="action-stopall" href="#"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[50] + '</a></li>');
+		$('#actions-menu').append('<li><a class="action-update" href="#"><i class="glyphicon glyphicon-repeat"></i> ' + MESSAGES[132] + '</a></li>');
 		
 		// Adding all stats
 		
