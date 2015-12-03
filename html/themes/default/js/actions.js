@@ -601,6 +601,7 @@ $(document).on('click', '.action-nodeexport, .action-nodesexport', function(e) {
  
 // Start a node
 $(document).on('click', '.action-nodestart, .action-nodesstart', function(e) {
+	// dainok
 	if ($(this).hasClass('action-nodestart')) {
 		logger(1, 'DEBUG: action = nodestart');
 		var node_id = $(this).attr('data-path');

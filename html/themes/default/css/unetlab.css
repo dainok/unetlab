@@ -228,15 +228,6 @@
 	padding: 0px;
 }
 
-#list-info  code {
-	background-color: transparent;
-	color: #46a6b6;
-	font-size: 1em;
-	font-weight: bold;
-	margin: 0px;
-	padding: 0px;
-}
-
 #mouse_frame {
 	position: absolute;
 	
@@ -478,6 +469,32 @@
 	text-align: left;
 	text-transform: none;
 	width: 100%;
+}
+
+.modal-body  table {
+	margin: 10px;
+	padding: 0px;
+	width: 98%;
+}
+
+.modal-body thead th {
+	border: 0px;
+	color: #ffffff;
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+	font-size: 0.8em;
+	padding: 2px;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+
+.modal-body tbody td {
+	border: 0px;
+	padding: 2px;
+	font-size: 0.8em;
+}
+
+.modal-body ul li {
+	margin-left: -40px;
 }
 
 .modal-body  .config-list  {

@@ -23,6 +23,15 @@ code, pre {
 	font-family: 'Courier New', Courier, monospace;
 }
 
+p code {
+	background-color: transparent;
+	color: #46a6b6;
+	font-size: 1em;
+	font-weight: bold;
+	margin: 0px;
+	padding: 0px;
+}
+
 pre {
 	margin: 10px;
 	overflow: auto;
