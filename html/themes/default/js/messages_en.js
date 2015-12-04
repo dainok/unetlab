@@ -162,3 +162,4 @@ MESSAGES[130] = 'All nodes';
 MESSAGES[131] = 'There are running nodes, you need to power off them before closing the lab.';
 MESSAGES[132] = 'Update UNetLab';
 MESSAGES[133] = 'Starting update, please wait';
+MESSAGES[134] = 'No pictures in this lab.';

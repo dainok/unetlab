@@ -353,8 +353,10 @@ $(document).on('click', '.action-labclose', function(e) {
 
 // Edit a lab
 $(document).on('click', '.action-labedit', function(e) {
+	// dainok
 	logger(1, 'DEBUG: action = labedit');
 	$.when(getLabInfo($('#lab-viewport').attr('data-path'))).done(function(values) {
+		values['path'] = dirname($('#lab-viewport').attr('data-path'));
 		printFormLab('edit', values);
 	}).fail(function(message) {
 		addModalError(message);
@@ -388,7 +390,6 @@ $(document).on('dblclick', '.action-labpreview', function(e) {
 // Action menu
 $(document).on('click', '.action-moreactions', function(e) {
 	logger(1, 'DEBUG: action = moreactions');
-	// dainok
 	var body = '';
 	body += '<li><a class="action-nodesstart" href="#"><i class="glyphicon glyphicon-play"></i> ' + MESSAGES[126] + '</a></li>';
 	body += '<li><a class="action-nodesstop" href="#"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[127] + '</a></li>';
@@ -493,6 +494,25 @@ $(document).on('click', '.action-nodeplace, .action-networkplace', function(e) {
 	});
 });
 
+// Get picture list
+$(document).on('click', '.action-picturesget', function(e) {
+	logger(1, 'DEBUG: action = picturesget');
+	// dainok
+	$.when(getPictures()).done(function(pictures) {
+		if (!$.isEmptyObject(pictures)) {
+			var body = '';
+			$.each(pictures, function(key, picture) {
+				body += '<li><a class="action-pictureget" data-path="' + key + '" href="#" title="' + picture['name'] + '"><i class="glyphicon glyphicon-picture"></i> ' + picture['name'] + '</a></li>';
+			});
+			printContextMenu(MESSAGES[59], body, e.pageX, e.pageY);
+		} else {
+			addMessage('info', MESSAGES[134]);
+		}
+	}).fail(function(message) {
+		addModalError(message);
+	});
+});
+
 // Clone selected labs
 $(document).on('click', '.action-selectedclone', function(e) {
 	if ($('.selected').size() > 0) {
@@ -580,87 +600,146 @@ $(document).on('click', '.action-selectedexport', function(e) {
 
 // Export a config
 $(document).on('click', '.action-nodeexport, .action-nodesexport', function(e) {
+	$('#context-menu').remove();
 	if ($(this).hasClass('action-nodeexport')) {
 		logger(1, 'DEBUG: action = nodeexport');
 		var node_id = $(this).attr('data-path');
-		var node_name = $(this).attr('data-name');
 	} else {
 		logger(1, 'DEBUG: action = nodesexport');
 		var node_id = null;
-		var node_name = MESSAGES[130];		
 	}
-	$.when(cfg_export(node_id)).done(function() {
-		// Config exported -> print a small green message
-		addMessage('success', node_name + ': ' + MESSAGES[79])
+	
+	$.when(getNodes(null)).done(function(nodes) {
+		if (node_id != null) {
+			$.when(cfg_export(node_id)).done(function() {
+				// Node exported -> print a small green message
+				addMessage('success', nodes[node_id]['name'] + ': ' + MESSAGES[76])
+			}).fail(function(message) {
+				// Cannot export
+				addMessage('danger', nodes[node_id]['name'] + ': ' + message);
+			});
+		} else {
+			$.each(nodes, function(key, values) {
+				$.when(setTimeout(function() { cfg_export(key); }, values['delay'] * 10)).done(function() {
+					// Node exported -> print a small green message
+					addMessage('success', values['name'] + ': ' + MESSAGES[78])
+				}).fail(function(message) {
+					// Cannot exported
+					addMessage('danger', values['name'] + ': ' + message);
+				});
+			});
+		}
 	}).fail(function(message) {
-		// Cannot export
-		addMessage('danger', node_name + ': ' + message);
+		addModalError(message);
 	});
-	$('#context-menu').remove();
 });
  
 // Start a node
 $(document).on('click', '.action-nodestart, .action-nodesstart', function(e) {
-	// dainok
+	$('#context-menu').remove();
 	if ($(this).hasClass('action-nodestart')) {
 		logger(1, 'DEBUG: action = nodestart');
 		var node_id = $(this).attr('data-path');
-		var node_name = $(this).attr('data-name');
 	} else {
 		logger(1, 'DEBUG: action = nodesstart');
 		var node_id = null;
-		var node_name = MESSAGES[130];		
 	}
-	$.when(start(node_id)).done(function() {
-		// Node started -> print a small green message
-		addMessage('success', node_name + ': ' + MESSAGES[76])
+	
+	$.when(getNodes(null)).done(function(nodes) {
+		if (node_id != null) {
+			$.when(start(node_id)).done(function() {
+				// Node started -> print a small green message
+				addMessage('success', nodes[node_id]['name'] + ': ' + MESSAGES[76])
+			}).fail(function(message) {
+				// Cannot start
+				addMessage('danger', nodes[node_id]['name'] + ': ' + message);
+			});
+		} else {
+			$.each(nodes, function(key, values) {
+				$.when(setTimeout(function() { start(key); }, values['delay'] * 10)).done(function() {
+					// Node started -> print a small green message
+					addMessage('success', values['name'] + ': ' + MESSAGES[76])
+				}).fail(function(message) {
+					// Cannot start
+					addMessage('danger', values['name'] + ': ' + message);
+				});
+			});
+		}
 	}).fail(function(message) {
-		// Cannot start
-		addMessage('danger', node_name + ': ' + message);
+		addModalError(message);
 	});
-	$('#context-menu').remove();
 });
 
 // Stop a node
 $(document).on('click', '.action-nodestop, .action-nodesstop', function(e) {
+	$('#context-menu').remove();
 	if ($(this).hasClass('action-nodestop')) {
 		logger(1, 'DEBUG: action = nodestop');
 		var node_id = $(this).attr('data-path');
-		var node_name = $(this).attr('data-name');
 	} else {
 		logger(1, 'DEBUG: action = nodesstop');
 		var node_id = null;
-		var node_name = MESSAGES[130];
 	}
-	$.when(stop(node_id)).done(function() {
-		// Node stopped -> print a small green message
-		addMessage('success', node_name + ': ' + MESSAGES[77])
+	
+	$.when(getNodes(null)).done(function(nodes) {
+		if (node_id != null) {
+			$.when(stop(node_id)).done(function() {
+				// Node stopped -> print a small green message
+				addMessage('success', nodes[node_id]['name'] + ': ' + MESSAGES[76])
+			}).fail(function(message) {
+				// Cannot stop
+				addMessage('danger', nodes[node_id]['name'] + ': ' + message);
+			});
+		} else {
+			$.each(nodes, function(key, values) {
+				$.when(setTimeout(function() { stop(key); }, values['delay'] * 10)).done(function() {
+					// Node stopped -> print a small green message
+					addMessage('success', values['name'] + ': ' + MESSAGES[77])
+				}).fail(function(message) {
+					// Cannot stopped
+					addMessage('danger', values['name'] + ': ' + message);
+				});
+			});
+		}
 	}).fail(function(message) {
-		// Cannot stop
-		addMessage('danger', node_name + ': ' + message);
+		addModalError(message);
 	});
-	$('#context-menu').remove();
 });
 
 // Wipe a node
 $(document).on('click', '.action-nodewipe, .action-nodeswipe', function(e) {
+	$('#context-menu').remove();
 	if ($(this).hasClass('action-nodewipe')) {
 		logger(1, 'DEBUG: action = nodewipe');
 		var node_id = $(this).attr('data-path');
-		var node_name = $(this).attr('data-name');
 	} else {
-		logger(1, 'DEBUG: action = nodewwipe');
+		logger(1, 'DEBUG: action = nodeswipe');
 		var node_id = null;
-		var node_name = MESSAGES[130];		
 	}
-	$.when(wipe(node_id)).done(function() {
-		// Node wiped -> print a small green message
-		addMessage('success', node_name + ': ' + MESSAGES[78])
+	
+	$.when(getNodes(null)).done(function(nodes) {
+		if (node_id != null) {
+			$.when(wipe(node_id)).done(function() {
+				// Node wiped -> print a small green message
+				addMessage('success', nodes[node_id]['name'] + ': ' + MESSAGES[76])
+			}).fail(function(message) {
+				// Cannot wipe
+				addMessage('danger', nodes[node_id]['name'] + ': ' + message);
+			});
+		} else {
+			$.each(nodes, function(key, values) {
+				$.when(setTimeout(function() { wipe(key); }, values['delay'] * 10)).done(function() {
+					// Node wiped -> print a small green message
+					addMessage('success', values['name'] + ': ' + MESSAGES[78])
+				}).fail(function(message) {
+					// Cannot wiped
+					addMessage('danger', values['name'] + ': ' + message);
+				});
+			});
+		}
 	}).fail(function(message) {
-		// Cannot wipe
-		addMessage('danger', node_name + ': ' + message);
+		addModalError(message);
 	});
-	$('#context-menu').remove();
 });
  
 // Stop all nodes
@@ -819,7 +898,6 @@ $(document).on('submit', '#form-lab-add, #form-lab-edit', function(e) {
 	e.preventDefault();  // Prevent default behaviour
 	var lab_filename = $('#lab-viewport').attr('data-path');
 	var form_data = form2Array('lab');
-	var promises = [];
 	if ($(this).attr('id') == 'form-lab-add') {
 		logger(1, 'DEBUG: posting form-lab-add form.');
 		var url = '/api/labs';
@@ -843,53 +921,44 @@ $(document).on('submit', '#form-lab-add, #form-lab-edit', function(e) {
 		form_data['postfix'] = 0;		
 	}
 	
-	for (var i = 0; i < form_data['count']; i++) {
-		form_data['left'] = parseInt(form_data['left']) + i * 20;
-		form_data['top'] = parseInt(form_data['top']) + i * 20;
-		var request = $.ajax({
-			timeout: TIMEOUT,
-			type: type,
-			url: encodeURI(url),
-			dataType: 'json',
-			data: JSON.stringify(form_data),
-			success: function(data) {
-				if (data['status'] == 'success') {
-					logger(1, 'DEBUG: lab "' + form_data['name'] + '" saved.');
-					// Close the modal
-					$(e.target).parents('.modal').modal('hide');
-					if (type == 'POST') {
-						// Reload the lab list
-						printPageLabList(form_data['path']);
-					} else if (basename(lab_filename) != form_data['name'] + '.unl') {
-						// Lab has been renamed, need to close it.
-						logger(1, 'DEBUG: lab "' + form_data['name'] + '" renamed.');
-						$.when(closeLab()).done(function() {
-							postLogin();
-						}).fail(function(message) {
-							addModalError(message);
-						});
-					} else {
-						addMessage(data['status'], data['message']);
-					}
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		data: JSON.stringify(form_data),
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: lab "' + form_data['name'] + '" saved.');
+				// Close the modal
+				$(e.target).parents('.modal').modal('hide');
+				if (type == 'POST') {
+					// Reload the lab list
+					printPageLabList(form_data['path']);
+				} else if (basename(lab_filename) != form_data['name'] + '.unl') {
+					// Lab has been renamed, need to close it.
+					logger(1, 'DEBUG: lab "' + form_data['name'] + '" renamed.');
+					$.when(closeLab()).done(function() {
+						printPageLabOpen(dirname(form_data['path']) + '/' + form_data['name'] + '.unl');
+					}).fail(function(message) {
+						addModalError(message);
+					});
 				} else {
-					// Application error
-					logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-					addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+					addMessage(data['status'], data['message']);
 				}
-			},
-			error: function(data) {
-				// Server error
-				var message = getJsonMessage(data['responseText']);
-				logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
-				logger(1, 'DEBUG: ' + message);
-				addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
 			}
-		});
-		promises.push(request);
-	}
-	
-	$.when.apply(null, promises).done(function() {
-		printLabTopology();
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+		}
 	});
 	return false;  // Stop to avoid POST
 });

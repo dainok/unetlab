@@ -87,7 +87,7 @@ function addModalWide(title, body, footer) {
 function cfg_export(node_id) {
 	var deferred = $.Deferred();
 	var lab_filename = $('#lab-viewport').attr('data-path');
-	var url = (node_id == null) ? '/api/labs' + lab_filename + '/nodes/export' : '/api/labs' + lab_filename + '/nodes/' + node_id + '/export';
+	var url = '/api/labs' + lab_filename + '/nodes/' + node_id + '/export';
 	var type = 'GET'
 	$.ajax({
 		timeout: TIMEOUT * 10,	// Takes a lot of time
@@ -149,7 +149,6 @@ function cloneLab(form_data) {
 
 // Close lab
 function closeLab() {
-	// dainok
 	var deferred = $.Deferred();
 	$.when(getNodes()).done(function(values) {
 		var running_nodes = false;
@@ -190,7 +189,33 @@ function closeLab() {
 			deferred.reject(MESSAGES[131]);
 		}
 	}).fail(function(message) {
-		deferred.reject(message);
+		// Lab maybe does not exist, closing
+		var url = '/api/labs/close';
+		var type = 'DELETE'
+		$.ajax({
+			timeout: TIMEOUT,
+			type: type,
+			url: encodeURI(url),
+			dataType: 'json',
+			success: function(data) {
+				if (data['status'] == 'success') {
+					logger(1, 'DEBUG: lab closed.');
+					LAB = null;
+					deferred.resolve();
+				} else {
+					// Application error
+					logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+					deferred.reject(data['message']);
+				}
+			},
+			error: function(data) {
+				// Server error
+				var message = getJsonMessage(data['responseText']);
+				logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+				logger(1, 'DEBUG: ' + message);
+				deferred.reject(message);
+			}
+		});
 	});
 	return deferred.promise();
 }
@@ -682,6 +707,42 @@ function getNodeInterfaces(node_id) {
 	return deferred.promise();
 }
 
+// Get lab pictures
+function getPictures(picture_id) {
+	var deferred = $.Deferred();
+	var lab_filename = $('#lab-viewport').attr('data-path');
+	if (picture_id != null) {
+		var url = '/api/labs' + lab_filename + '/picture/' + picture_id;
+	} else {
+		var url = '/api/labs' + lab_filename + '/pictures';
+	}
+	var type = 'GET'
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: got pictures(s) from lab "' + lab_filename + '".');
+				deferred.resolve(data['data']);
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject(data['message']);
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
+}
+
 // Get lab topology
 function getTopology() {
 	var deferred = $.Deferred();
@@ -1091,7 +1152,7 @@ function setNodePosition(node_id, left, top) {
 function start(node_id) {
 	var deferred = $.Deferred();
 	var lab_filename = $('#lab-viewport').attr('data-path');
-	var url = (node_id == null) ? '/api/labs' + lab_filename + '/nodes/start' : '/api/labs' + lab_filename + '/nodes/' + node_id + '/start';
+	var url = '/api/labs' + lab_filename + '/nodes/' + node_id + '/start';
 	var type = 'GET'
 	$.ajax({
 		timeout: TIMEOUT,
@@ -1123,7 +1184,7 @@ function start(node_id) {
 function stop(node_id) {
 	var deferred = $.Deferred();
 	var lab_filename = $('#lab-viewport').attr('data-path');
-	var url = (node_id == null) ? '/api/labs' + lab_filename + '/nodes/stop' : '/api/labs' + lab_filename + '/nodes/' + node_id + '/stop';
+	var url = '/api/labs' + lab_filename + '/nodes/' + node_id + '/stop';
 	var type = 'GET'
 	$.ajax({
 		timeout: TIMEOUT,
@@ -1217,7 +1278,7 @@ function update(path) {
 function wipe(node_id) {
 	var deferred = $.Deferred();
 	var lab_filename = $('#lab-viewport').attr('data-path');
-	var url = (node_id == null) ? '/api/labs' + lab_filename + '/nodes/wipe' : '/api/labs' + lab_filename + '/nodes/' + node_id + '/wipe';
+	var url = '/api/labs' + lab_filename + '/nodes/' + node_id + '/wipe';
 	var type = 'GET'
 	$.ajax({
 		timeout: TIMEOUT,
@@ -1319,17 +1380,17 @@ function printFormImport(path) {
 
 // Add a new lab
 function printFormLab(action, values) {
-	console.log(values);
-	var path = $('#lab-viewport').attr('data-path');
+	var path = (action == 'add') ? values['path'] : values['path'] + '/' + values['name'] + '.unl';
 	var name = (values['name'] != null) ? values['name'] : '';
 	var version = (values['version'] != null) ? values['version'] : '';
 	var author = (values['author'] != null) ? values['author'] : '';
 	var description = (values['description'] != null) ? values['description'] : '';
 	var body = (values['body'] != null) ? values['body'] : '';
+	var title = (action == 'add') ? MESSAGES[5] : MESSAGES[87];
 	
 	var html = '<form id="form-lab-' + action + '" class="form-horizontal form-lab-' + action + '"><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[20] + '</label><div class="col-md-5"><input class="form-control" name="lab[path]" value="' + path + '" disabled="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control autofocus" name="lab[name]" value="' + name + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[26] + '</label><div class="col-md-5"><input class="form-control" name="lab[version]" value="' + version + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Author</label><div class="col-md-5"><input class="form-control" name="lab[author]" value="' + author + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[27] + '</label><div class="col-md-5"><textarea class="form-control" name="lab[description]">' + description + '</textarea></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[88] + '</label><div class="col-md-5"><textarea class="form-control" name="lab[body]">' + body + '</textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
 	logger(1, 'DEBUG: popping up the lab-add form.');
-	addModalWide(MESSAGES[5], html, '');
+	addModalWide(title, html, '');
 	validateLabInfo();
 }
 

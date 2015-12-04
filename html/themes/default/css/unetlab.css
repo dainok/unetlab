@@ -493,15 +493,12 @@
 	font-size: 0.8em;
 }
 
-.modal-body ul li {
+.modal-body > ul > li {
 	margin-left: -40px;
 }
 
 .modal-body  .config-list  {
-	amargin-left: 0px;
-	amargin-right: 0px;
 	overflow: hidden;
-	apadding-left: 45px;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
