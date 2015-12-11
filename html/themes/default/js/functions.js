@@ -88,7 +88,7 @@ function cfg_export(node_id) {
 	var deferred = $.Deferred();
 	var lab_filename = $('#lab-viewport').attr('data-path');
 	var url = '/api/labs' + lab_filename + '/nodes/' + node_id + '/export';
-	var type = 'GET'
+	var type = 'GET';
 	$.ajax({
 		timeout: TIMEOUT * 10,	// Takes a lot of time
 		type: type,
@@ -118,7 +118,7 @@ function cfg_export(node_id) {
 // Clone selected labs
 function cloneLab(form_data) {
 	var deferred = $.Deferred();
-	var type = 'POST'
+	var type = 'POST';
 	var url = '/api/labs';
 	$.ajax({
 		timeout: TIMEOUT,
@@ -160,7 +160,7 @@ function closeLab() {
 		
 		if (running_nodes == false) {
 			var url = '/api/labs/close';
-			var type = 'DELETE'
+			var type = 'DELETE';
 			$.ajax({
 				timeout: TIMEOUT,
 				type: type,
@@ -191,7 +191,7 @@ function closeLab() {
 	}).fail(function(message) {
 		// Lab maybe does not exist, closing
 		var url = '/api/labs/close';
-		var type = 'DELETE'
+		var type = 'DELETE';
 		$.ajax({
 			timeout: TIMEOUT,
 			type: type,
@@ -223,7 +223,7 @@ function closeLab() {
 // Delete folder
 function deleteFolder(path) {
 	var deferred = $.Deferred();
-	var type = 'DELETE'
+	var type = 'DELETE';
 	var url = '/api/folders' + path;
 	$.ajax({
 		timeout: TIMEOUT,
@@ -254,7 +254,7 @@ function deleteFolder(path) {
 // Delete lab
 function deleteLab(path) {
 	var deferred = $.Deferred();
-	var type = 'DELETE'
+	var type = 'DELETE';
 	var url = '/api/labs' + path;
 	$.ajax({
 		timeout: TIMEOUT,
@@ -285,7 +285,7 @@ function deleteLab(path) {
 // Delete network
 function deleteNetwork(id) {
 	var deferred = $.Deferred();
-	var type = 'DELETE'
+	var type = 'DELETE';
 	var lab_filename = $('#lab-viewport').attr('data-path');
 	var url = '/api/labs' + lab_filename + '/networks/' + id;
 	$.ajax({
@@ -317,7 +317,7 @@ function deleteNetwork(id) {
 // Delete node
 function deleteNode(id) {
 	var deferred = $.Deferred();
-	var type = 'DELETE'
+	var type = 'DELETE';
 	var lab_filename = $('#lab-viewport').attr('data-path');
 	var url = '/api/labs' + lab_filename + '/nodes/' + id;
 	$.ajax({
@@ -349,7 +349,7 @@ function deleteNode(id) {
 // Delete user
 function deleteUser(path) {
 	var deferred = $.Deferred();
-	var type = 'DELETE'
+	var type = 'DELETE';
 	var url = '/api/users/' + path;
 	$.ajax({
 		timeout: TIMEOUT,
@@ -380,7 +380,7 @@ function deleteUser(path) {
 // Export selected folders and labs
 function exportObjects(form_data) {
 	var deferred = $.Deferred();
-	var type = 'POST'
+	var type = 'POST';
 	var url = '/api/export';
 	$.ajax({
 		timeout: TIMEOUT,
@@ -445,7 +445,7 @@ function getJsonMessage(response) {
 function getLabInfo(lab_filename) {
 	var deferred = $.Deferred();
 	var url = '/api/labs' + lab_filename;
-	var type = 'GET'
+	var type = 'GET';
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,
@@ -477,7 +477,7 @@ function getLabBody() {
 	var deferred = $.Deferred();
 	var lab_filename = $('#lab-viewport').attr('data-path');
 	var url = '/api/labs' + lab_filename + '/html';
-	var type = 'GET'
+	var type = 'GET';
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,
@@ -509,7 +509,7 @@ function getLabLinks() {
 	var lab_filename = $('#lab-viewport').attr('data-path');
 	var deferred = $.Deferred();
 	var url = '/api/labs' + lab_filename + '/links';
-	var type = 'GET'
+	var type = 'GET';
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,
@@ -545,7 +545,7 @@ function getNetworks(network_id) {
 	} else {
 		var url = '/api/labs' + lab_filename + '/networks';
 	}
-	var type = 'GET'
+	var type = 'GET';
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,
@@ -576,7 +576,7 @@ function getNetworks(network_id) {
 function getNetworkTypes() {
 	var deferred = $.Deferred();
 	var url = '/api/list/networks';
-	var type = 'GET'
+	var type = 'GET';
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,
@@ -612,7 +612,7 @@ function getNodes(node_id) {
 	} else {
 		var url = '/api/labs' + lab_filename + '/nodes';
 	}
-	var type = 'GET'
+	var type = 'GET';
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,
@@ -648,7 +648,7 @@ function getNodeConfigs(node_id) {
 	} else {
 		var url = '/api/labs' + lab_filename + '/configs';
 	}
-	var type = 'GET'
+	var type = 'GET';
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,
@@ -680,7 +680,7 @@ function getNodeInterfaces(node_id) {
 	var deferred = $.Deferred();
 	var lab_filename = $('#lab-viewport').attr('data-path');
 	var url = '/api/labs' + lab_filename + '/nodes/' + node_id + '/interfaces';
-	var type = 'GET'
+	var type = 'GET';
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,
@@ -716,7 +716,7 @@ function getPictures(picture_id) {
 	} else {
 		var url = '/api/labs' + lab_filename + '/pictures';
 	}
-	var type = 'GET'
+	var type = 'GET';
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,
@@ -748,7 +748,7 @@ function getTopology() {
 	var deferred = $.Deferred();
 	var lab_filename = $('#lab-viewport').attr('data-path');
 	var url = '/api/labs' + lab_filename + '/topology';
-	var type = 'GET'
+	var type = 'GET';
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,
@@ -812,7 +812,7 @@ function getRoles() {
 function getSystemStats() {
 	var deferred = $.Deferred();
 	var url = '/api/status';
-	var type = 'GET'
+	var type = 'GET';
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,
@@ -848,7 +848,7 @@ function getSystemStats() {
 function getTemplates(template) {
 	var deferred = $.Deferred();
 	var url = (template == null) ? '/api/list/templates/': '/api/list/templates/' + template;
-	var type = 'GET'
+	var type = 'GET';
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,
@@ -879,12 +879,17 @@ function getTemplates(template) {
 function getUserInfo() {
 	var deferred = $.Deferred();
 	var url = '/api/auth';
-	var type = 'GET'
+	var type = 'GET';
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,
 		url: encodeURI(url),
 		dataType: 'json',
+		beforeSend: function(jqXHR) {
+			if (window.BASE_URL) {
+				jqXHR.crossDomain = true;
+			}
+		},
 		success: function(data) {
 			if (data['status'] == 'success') {
 				logger(1, 'DEBUG: user is authenticated.');
@@ -960,7 +965,7 @@ function logger(severity, message) {
 function logoutUser() {
 	var deferred = $.Deferred();
 	var url = '/api/auth/logout';
-	var type = 'GET'
+	var type = 'GET';
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,
@@ -1078,11 +1083,11 @@ function postLogin() {
 function setNetworkPosition(network_id, left, top) {
 	var deferred = $.Deferred();
 	var lab_filename = $('#lab-viewport').attr('data-path');
-	var form_data = {}
+	var form_data = {};
 	form_data['left'] = left;
 	form_data['top'] = top;
 	var url = '/api/labs' + lab_filename + '/networks/' + network_id;
-	var type = 'PUT'
+	var type = 'PUT';
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,
@@ -1116,11 +1121,11 @@ function setNetworkPosition(network_id, left, top) {
 function setNodePosition(node_id, left, top) {
 	var deferred = $.Deferred();
 	var lab_filename = $('#lab-viewport').attr('data-path');
-	var form_data = {}
+	var form_data = {};
 	form_data['left'] = left;
 	form_data['top'] = top;
 	var url = '/api/labs' + lab_filename + '/nodes/' + node_id;
-	var type = 'PUT'
+	var type = 'PUT';
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,
@@ -1153,7 +1158,7 @@ function start(node_id) {
 	var deferred = $.Deferred();
 	var lab_filename = $('#lab-viewport').attr('data-path');
 	var url = '/api/labs' + lab_filename + '/nodes/' + node_id + '/start';
-	var type = 'GET'
+	var type = 'GET';
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,
@@ -1185,7 +1190,7 @@ function stop(node_id) {
 	var deferred = $.Deferred();
 	var lab_filename = $('#lab-viewport').attr('data-path');
 	var url = '/api/labs' + lab_filename + '/nodes/' + node_id + '/stop';
-	var type = 'GET'
+	var type = 'GET';
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,
@@ -1215,7 +1220,7 @@ function stop(node_id) {
 // Stop all nodes
 function stopAll() {
 	var deferred = $.Deferred();
-	var type = 'DELETE'
+	var type = 'DELETE';
 	var url = '/api/status';
 	$.ajax({
 		timeout: TIMEOUT,
@@ -1246,7 +1251,7 @@ function stopAll() {
 // Update
 function update(path) {
 	var deferred = $.Deferred();
-	var type = 'GET'
+	var type = 'GET';
 	var url = '/api/update';
 	$.ajax({
 		timeout: TIMEOUT * 10,
@@ -1279,7 +1284,7 @@ function wipe(node_id) {
 	var deferred = $.Deferred();
 	var lab_filename = $('#lab-viewport').attr('data-path');
 	var url = '/api/labs' + lab_filename + '/nodes/' + node_id + '/wipe';
-	var type = 'GET'
+	var type = 'GET';
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,
@@ -1678,89 +1683,155 @@ function printLabTopology() {
 	var lab_filename = $('#lab-viewport').attr('data-path');
 	$('#lab-viewport').empty();
 	$.when(getNetworks(null), getNodes(null), getTopology()).done(function(networks, nodes, topology) {
+		var networkImgs = [],
+			nodesImgs = [];
+
 		$.each(networks, function(key, value) {
+			var icon;
+
 			if (value['type'] == 'bridge') {
-				var icon = 'lan.png';
+				icon = 'lan.png';
 			} else if (value['type'] == 'ovs') {
-				var icon = 'lan.png';
+				icon = 'lan.png';
 			} else {
-				var icon = 'cloud.png';
+				icon = 'cloud.png';
 			}
-			$('#lab-viewport').append('<div id="network' + value['id'] + '" class="context-menu network network' + value['id'] + ' network_frame unused" style="top: ' + value['top'] + 'px; left: ' + value['left'] + 'px" data-path="' + value['id'] + '" data-name="' + value['name'] + '"><img src="/images/' + icon + '"/><div class="network_name">' + value['name'] + '</div></div>');
+
+			$('#lab-viewport').append(
+				'<div id="network' + value['id'] + '" ' +
+				'class="context-menu network network' + value['id'] + ' network_frame unused" ' +
+				'style="top: ' + value['top'] + 'px; left: ' + value['left'] + 'px" ' +
+				'data-path="' + value['id'] + '" ' +
+				'data-name="' + value['name'] + '">' +
+				'<div class="network_name">' + value['name'] + '</div>' +
+				'</div>');
+
+			networkImgs.push($.Deferred(function (defer) {
+				var img = new Image();
+
+				img.onload = resolve;
+				img.onerror = resolve;
+				img.onabort = resolve;
+
+				img.src = "/images/" + icon;
+
+				$(img).prependTo("#network"+value['id']);
+
+				function resolve(image) {
+					img.onload = null;
+					img.onerror = null;
+					img.onabort = null;
+					defer.resolve(image);
+				}
+			}));
 		});
 		$.each(nodes, function(key, value) {
-			$('#lab-viewport').append('<div id="node' + value['id'] + '" class="context-menu node node' + value['id'] + ' node_frame" style="top: ' + value['top'] + 'px; left: ' + value['left'] + 'px;" data-path="' + value['id'] + '" data-name="' + value['name'] + '"><a href="' + value['url'] + '"><img src="/images/icons/' + value['icon'] + '"/></a><div class="node_name"><i class="node' + value['id'] + '_status"></i> ' + value['name'] + '</div></div>');
+			$('#lab-viewport').append(
+				'<div id="node' + value['id'] + '" ' +
+				'class="context-menu node node' + value['id'] + ' node_frame" ' +
+				'style="top: ' + value['top'] + 'px; left: ' + value['left'] + 'px;" ' +
+				'data-path="' + value['id'] + '" ' +
+				'data-name="' + value['name'] + '">' +
+				'<a href="' + value['url'] + '">' +
+				'</a>' +
+				'<div class="node_name"><i class="node' + value['id'] + '_status"></i> ' + value['name'] + '</div>' +
+				'</div>');
+
+			nodesImgs.push($.Deferred(function(defer) {
+				var img = new Image();
+
+				img.onload = resolve;
+				img.onerror = resolve;
+				img.onabort = resolve;
+
+				img.src = "/images/icons/" + value['icon'];
+
+				$(img).appendTo("#node"+value['id']+" a");
+
+				function resolve(image) {
+					img.onload = null;
+					img.onerror = null;
+					img.onabort = null;
+					defer.resolve(image);
+				}
+			}));
 		});
-		
-		// Drawing topology
-		jsPlumb.ready(function() {
-			// Defaults
-			jsPlumb.importDefaults({
-				Anchor: 'Continuous',
-				Connector: ['Straight'],
-				Endpoint: 'Blank',
-				PaintStyle: {lineWidth: 2, strokeStyle: '#58585a'},
-				cssClass: 'link'
-			});
-			
-			// Create jsPlumb topology
-			var lab_topology = jsPlumb.getInstance();
 
-			// Read privileges and set specific actions/elements
-			if (ROLE == 'admin' || ROLE == 'editor') {
-				// Nodes and networks are draggable within a grid
-				lab_topology.draggable($('.node_frame, .network_frame'), { grid: [10, 10] });
-			}
-			
-			$.each(topology, function(id, link) {
-				var type = link['type'];
-				var source = link['source'];
-				var source_label = link['source_label'];
-				var destination = link['destination'];
-				var destination_label = link['destination_label'];
+		$.when.apply($, networkImgs.concat(nodesImgs)).done(function() {
+			// Drawing topology
+			jsPlumb.ready(function() {
+				// Defaults
+				jsPlumb.importDefaults({
+					Anchor: 'Continuous',
+					Connector: ['Straight'],
+					Endpoint: 'Blank',
+					PaintStyle: {lineWidth: 2, strokeStyle: '#58585a'},
+					cssClass: 'link'
+				});
 
-				if (type == 'ethernet') {
-					if (source_label != '') {
-						var src_label = [ "Label", { label: source_label, location: 0.15, cssClass: 'node_interface ' + source + ' ' + destination } ];
-					} else {
-						var src_label = [ "Label", Object() ];
-					}
-					if (destination_label != '') {
-						var dst_label = [ "Label", { label: destination_label, location: 0.85, cssClass: 'node_interface ' + source + ' ' + destination } ];
-					} else {
-						var dst_label = [ "Label", Object() ];
-					}
-					
-					jsPlumb.connect({
-						source: source,       // Must attach to the IMG's parent or not printed correctly
-						target: destination,  // Must attach to the IMG's parent or not printed correctly
-						cssClass: source + ' ' + destination + ' frame_ethernet',
-						overlays: [ src_label, dst_label ],
-					});
-				} else {
-					var src_label = [ "Label", { label: source_label, location: 0.15, cssClass: 'node_interface ' + source + ' ' + destination } ];
-					var dst_label = [ "Label", { label: destination_label, location: 0.85, cssClass: 'node_interface ' + source + ' ' + destination } ];
-					
-					jsPlumb.connect({
-						source: source,       // Must attach to the IMG's parent or not printed correctly
-						target: destination,  // Must attach to the IMG's parent or not printed correctly
-						cssClass: source + " " + destination + ' frame_serial',
-						paintStyle : { lineWidth : 2, strokeStyle : "#ffcc00" },
-						overlays: [ src_label, dst_label ]
-					});
+				// Create jsPlumb topology
+				var lab_topology = jsPlumb.getInstance();
+
+				// Read privileges and set specific actions/elements
+				if (ROLE == 'admin' || ROLE == 'editor') {
+					// Nodes and networks are draggable within a grid
+					lab_topology.draggable($('.node_frame, .network_frame'), { grid: [10, 10] });
 				}
 
-				// If destination is a network, remove the 'unused' class
-				if (destination.substr(0, 7) == 'network') {
-					$('.' + destination).removeClass('unused');
-				}
+				$.each(topology, function(id, link) {
+					var type = link['type'],
+						source = link['source'],
+						source_label = link['source_label'],
+						destination = link['destination'],
+						destination_label = link['destination_label'],
+						src_label = ["Label"],
+						dst_label = ["Label"];
+
+					if (type == 'ethernet') {
+						if (source_label != '') {
+							src_label.push({ label: source_label, location: 0.15, cssClass: 'node_interface ' + source + ' ' + destination });
+						} else {
+							src_label.push(Object());
+						}
+						if (destination_label != '') {
+							dst_label.push({ label: destination_label, location: 0.85, cssClass: 'node_interface ' + source + ' ' + destination });
+						} else {
+							dst_label.push(Object());
+						}
+
+						jsPlumb.connect({
+							source: source,       // Must attach to the IMG's parent or not printed correctly
+							target: destination,  // Must attach to the IMG's parent or not printed correctly
+							cssClass: source + ' ' + destination + ' frame_ethernet',
+							overlays: [ src_label, dst_label ],
+						});
+					} else {
+						src_label.push({ label: source_label, location: 0.15, cssClass: 'node_interface ' + source + ' ' + destination });
+						dst_label.push({ label: destination_label, location: 0.85, cssClass: 'node_interface ' + source + ' ' + destination });
+
+						jsPlumb.connect({
+							source: source,       // Must attach to the IMG's parent or not printed correctly
+							target: destination,  // Must attach to the IMG's parent or not printed correctly
+							cssClass: source + " " + destination + ' frame_serial',
+							paintStyle : { lineWidth : 2, strokeStyle : "#ffcc00" },
+							overlays: [ src_label, dst_label ]
+						});
+					}
+
+					// If destination is a network, remove the 'unused' class
+					if (destination.substr(0, 7) == 'network') {
+						$('.' + destination).removeClass('unused');
+					}
+				});
+
+				// Remove unused elements
+				$('.unused').remove();
+
+				// Move elements under the topology node
+				$('._jsPlumb_connector, ._jsPlumb_overlay, ._jsPlumb_endpoint_anchor_').detach().appendTo('#lab-viewport');
 			});
-
-			// Remove unused elements
-			$('.unused').remove();
-
-			// Move elements under the topology node
-			$('._jsPlumb_connector, ._jsPlumb_overlay, ._jsPlumb_endpoint_anchor_').detach().appendTo('#lab-viewport');
+		}).fail(function() {
+			logger(1, "DEBUG: not all images of networks or nodes loaded");
 		});
 	}).fail(function(message1, message2, message3) {
 		if (message1 != null) {
@@ -1844,7 +1915,7 @@ function printPageAuthentication() {
 function printPageLabList(folder) {
 	var html = '';
 	var url = '/api/folders' + folder;
-	var type = 'GET'
+	var type = 'GET';
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,
