@@ -168,6 +168,8 @@ $(window).resize(function(){
 	if ($('#lab-viewport').length ) {
         // Update topology on window resize
         jsPlumb.repaintEverything();
+		// Update picture map on window resize
+		$('map').imageMapResize();
     }
 });
 
@@ -353,7 +355,6 @@ $(document).on('click', '.action-labclose', function(e) {
 
 // Edit a lab
 $(document).on('click', '.action-labedit', function(e) {
-	// dainok
 	logger(1, 'DEBUG: action = labedit');
 	$.when(getLabInfo($('#lab-viewport').attr('data-path'))).done(function(values) {
 		values['path'] = dirname($('#lab-viewport').attr('data-path'));
@@ -494,10 +495,54 @@ $(document).on('click', '.action-nodeplace, .action-networkplace', function(e) {
 	});
 });
 
+// Add picture
+$(document).on('click', '.action-pictureadd', function(e) {
+	logger(1, 'DEBUG: action = pictureadd');
+	$('#context-menu').remove();
+	printFormPicture('add', null);
+});
+
+// Edit picture
+$(document).on('click', '.action-pictureedit', function(e) {
+	logger(1, 'DEBUG: action = pictureedit');
+	$('#context-menu').remove();
+	var picture_id = $(this).attr('data-path');
+	$.when(getPictures(picture_id)).done(function(picture) {
+		picture['id'] = picture_id;
+		printFormPicture('edit', picture);
+	}).fail(function(message) {
+		addModalError(message);
+	});
+});
+
+// Get picture
+$(document).on('click', '.action-pictureget', function(e) {
+	logger(1, 'DEBUG: action = pictureget');
+	$('#context-menu').remove();
+	var picture_id = $(this).attr('data-path');
+	var picture_url = '/api/labs' + $('#lab-viewport').attr('data-path') + '/pictures/' + picture_id + '/data';
+
+	$.when(getPictures(picture_id)).done(function(picture) {
+		var picture_map = picture['map'];
+		picture_map = picture_map.replace(/{{IP}}/g, location.hostname);
+		picture_map = picture_map.replace(/{{NODE[0-9]+}}/g, function(e) { return parseInt(e.substr(6, e.length - 8)) + 32768 + 128 * TENANT});
+		// Read privileges and set specific actions/elements
+		var body = '<div id="lab_picture"><img usemap="#picture_map" src="' + picture_url + '" alt="' + picture['name'] + '" title="' + picture['name'] + '" width="' + picture['width'] + '" height="' + picture['height'] + '"/><map name="picture_map">' + picture_map + '</map></div>'
+		if (ROLE == 'admin' || ROLE == 'editor') {
+			var footer = '<button type="button" class="btn btn-aqua action-pictureedit" data-dismiss="modal" data-path="' + picture_id + '">Edit</button>';
+		} else {
+			var footer = '';
+		}
+		addModalWide(picture['name'], body, footer);
+		$('map').imageMapResize();
+	}).fail(function(message) {
+		addModalError(message);
+	});
+});
+
 // Get picture list
 $(document).on('click', '.action-picturesget', function(e) {
 	logger(1, 'DEBUG: action = picturesget');
-	// dainok
 	$.when(getPictures()).done(function(pictures) {
 		if (!$.isEmptyObject(pictures)) {
 			var body = '';

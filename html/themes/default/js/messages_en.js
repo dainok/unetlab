@@ -163,3 +163,6 @@ MESSAGES[131] = 'There are running nodes, you need to power off them before clos
 MESSAGES[132] = 'Update UNetLab';
 MESSAGES[133] = 'Starting update, please wait';
 MESSAGES[134] = 'No pictures in this lab.';
+MESSAGES[135] = 'Add picture';
+MESSAGES[136] = 'Edit picture';
+MESSAGES[137] = 'Image MAP';

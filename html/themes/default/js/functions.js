@@ -712,7 +712,7 @@ function getPictures(picture_id) {
 	var deferred = $.Deferred();
 	var lab_filename = $('#lab-viewport').attr('data-path');
 	if (picture_id != null) {
-		var url = '/api/labs' + lab_filename + '/picture/' + picture_id;
+		var url = '/api/labs' + lab_filename + '/pictures/' + picture_id;
 	} else {
 		var url = '/api/labs' + lab_filename + '/pictures';
 	}
@@ -1603,6 +1603,26 @@ function printFormNodeInterfaces(values) {
 		// Cannot get data
 		addModalError(message);
 	});
+}
+
+// Add a new picture
+function printFormPicture(action, values) {
+	// dainok
+	var map = (values['map'] != null) ? values['map'] : '';
+	var name = (values['name'] != null) ? values['name'] : '';
+	var width = (values['width'] != null) ? values['width'] : '';
+	var height = (values['height'] != null) ? values['height'] : '';
+	var title = (action == 'add') ? MESSAGES[135] : MESSAGES[136];
+	var html = ''
+	
+	if (action == 'add') {
+		html += '<form id="form-picture-' + action + '" class="form-horizontal form-lab-' + action + '"><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control" autofocus name="picture[name]" value="' + name + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[137] + '</label><div class="col-md-5"><textarea class="form-control" name="picture[map]">' + map + '</textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
+	} else {
+		html += '<img src="/api/labs' + $('#lab-viewport').attr('data-path') + '/pictures/' + values['id'] + '/data" alt="' + values['name'] + '" width="' + values['width'] + '" height="' + values['height'] + '"/><form id="form-picture-' + action + '" class="form-horizontal form-lab-' + action + '"><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control" autofocus name="picture[name]" value="' + name + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[137] + '</label><div class="col-md-5"><textarea class="form-control" name="picture[map]">' + map + '</textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
+	}
+	logger(1, 'DEBUG: popping up the picture form.');
+	addModalWide(title, html, '');
+	validateLabInfo();
 }
 
 // User form
