@@ -1771,6 +1771,14 @@ function printLabTopology() {
 
 				// Create jsPlumb topology
 				var lab_topology = jsPlumb.getInstance();
+				lab_topology.setContainer($("#lab-viewport"));
+				lab_topology.importDefaults({
+					Anchor: 'Continuous',
+					Connector: ['Straight'],
+					Endpoint: 'Blank',
+					PaintStyle: {lineWidth: 2, strokeStyle: '#58585a'},
+					cssClass: 'link'
+				});
 
 				// Read privileges and set specific actions/elements
 				if (ROLE == 'admin' || ROLE == 'editor') {
@@ -1799,7 +1807,7 @@ function printLabTopology() {
 							dst_label.push(Object());
 						}
 
-						jsPlumb.connect({
+						lab_topology.connect({
 							source: source,       // Must attach to the IMG's parent or not printed correctly
 							target: destination,  // Must attach to the IMG's parent or not printed correctly
 							cssClass: source + ' ' + destination + ' frame_ethernet',
@@ -1809,7 +1817,7 @@ function printLabTopology() {
 						src_label.push({ label: source_label, location: 0.15, cssClass: 'node_interface ' + source + ' ' + destination });
 						dst_label.push({ label: destination_label, location: 0.85, cssClass: 'node_interface ' + source + ' ' + destination });
 
-						jsPlumb.connect({
+						lab_topology.connect({
 							source: source,       // Must attach to the IMG's parent or not printed correctly
 							target: destination,  // Must attach to the IMG's parent or not printed correctly
 							cssClass: source + " " + destination + ' frame_serial',
