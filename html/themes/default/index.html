@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+	<meta charset="utf-8" />
+	<meta name="author" content="Andrea Dainese"/>
+	<meta name="description" content="Default template for Unified Networking Lab software."/>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+	<title>Unified Networking Lab</title>
+
 	<link href="/themes/default/images/favicon.ico" rel="shortcut icon" />
 	<link href="/themes/default/images/favicon-16x16.ico" rel="shortcut icon" />
 	<link href="/themes/default/images/favicon-32x32.ico" rel="shortcut icon" />
@@ -10,12 +18,42 @@
 	<link href="/themes/default/css/fonts.css" rel="stylesheet" />
 	<link href="/themes/default/css/style.css" rel="stylesheet" />
 	<link href="/themes/default/css/unetlab.css" rel="stylesheet" />
-	<meta charset="utf-8" />
-	<meta name="author" content="Andrea Dainese"/>
-	<meta name="description" content="Default template for Unified Networking Lab software."/>
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	<title>Unified Networking Lab</title>
+
+	<script src="/themes/default/bootstrap/js/jquery-1.11.3.min.js" defer></script>
+	<script src="/themes/default/bootstrap/js/jquery-ui-1.11.4.min.js" defer></script>
+	<script src="/themes/default/bootstrap/js/jquery-cookie-1.4.1.js" defer></script>
+	<script src="/themes/default/bootstrap/js/jquery.validate-1.14.0.min.js" defer></script>
+	<script src="/themes/default/bootstrap/js/bootstrap.min.js" defer></script>
+	<script src="/themes/default/bootstrap/js/bootstrap-select.min.js" defer></script>
+	<script src="/themes/default/bootstrap/js/circle-progress-1.1.3.js" defer></script>
+	<script src="/themes/default/bootstrap/js/jsPlumb-1.6.4-min.js" defer></script>
+	<script src="/themes/default/js/messages_en.js" defer></script>
+	<script src="/themes/default/js/actions.js" defer></script>
+	<script src="/themes/default/js/functions.js" defer></script>
+	<script src="/themes/default/js/validate.js" defer></script>
+	<script src="/themes/default/js/javascript.js" defer></script>
+
+	<script type="text/javascript" defer>
+		function ready(fn) {
+			if (document.readyState != 'loading'){
+				fn();
+			} else {
+				document.addEventListener('DOMContentLoaded', fn);
+			}
+		}
+
+		function fn() {
+			if ($.cookie('privacy') == 'true') {
+				(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+							(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+						m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+				})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+				ga('create', 'UA-426446-19', 'auto');
+				ga('send', 'pageview');
+			}
+		}
+	</script>
 </head>
 <body>
 	<div class="hidden-md hidden-lg container" id="small">
@@ -33,30 +71,5 @@
 			</div>
 		</div>
 	</div>
-	<script src="/themes/default/bootstrap/js/jquery-1.11.3.min.js"></script>
-	<script src="/themes/default/bootstrap/js/jquery-ui-1.11.4.min.js"></script>
-	<script src="/themes/default/bootstrap/js/jquery-cookie-1.4.1.js"></script>
-	<script src="/themes/default/bootstrap/js/jquery.validate-1.14.0.min.js"></script>
-	<script src="/themes/default/bootstrap/js/bootstrap.min.js"></script>
-	<script src="/themes/default/bootstrap/js/bootstrap-select.min.js"></script>
-	<script src="/themes/default/bootstrap/js/circle-progress-1.1.3.js"></script>
-	<script src="/themes/default/bootstrap/js/jsPlumb-1.6.4-min.js"></script>
-	<script src="/themes/default/bootstrap/js/imageMapResizer.min.js"></script>
-	<script src="/themes/default/js/messages_en.js"></script>
-	<script src="/themes/default/js/actions.js"></script>
-	<script src="/themes/default/js/functions.js"></script>
-	<script src="/themes/default/js/validate.js"></script>
-	<script src="/themes/default/js/javascript.js"></script>
-	<script type="text/javascript">
-		if ($.cookie('privacy') == 'true') {
-			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-			ga('create', 'UA-426446-19', 'auto');
-			ga('send', 'pageview');
-		}
-	</script>
 </body>
 </html>

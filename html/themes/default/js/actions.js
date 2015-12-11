@@ -81,16 +81,17 @@ $(document).on('shown.bs.modal', '.modal', function () {
 
 // After node/network move
 $(document).on('dragstop', '.node_frame, .network_frame', function(e) {
-	var offset = $(this).offset();
-	var left = Math.round(offset.left - 30 + $('#lab-viewport').scrollLeft());	// 30 is the sidebar
-	var top = Math.round(offset.top + $('#lab-viewport').scrollTop());
-	var id = $(this).attr('data-path');
+	var that = this,
+		offset = $(this).offset(),
+		left = Math.round(offset.left - 30 + $('#lab-viewport').scrollLeft()),	// 30 is the sidebar
+		top = Math.round(offset.top + $('#lab-viewport').scrollTop()),
+		id = $(this).attr('data-path');
 	if (left >= 0 && top >= 0) {
 		if ($(this).hasClass('node_frame')) {
 			logger(1, 'DEBUG: setting node' + id + ' position.');
 			$.when(setNodePosition(id, left, top)).done(function() {
 				// Position saved -> redraw topology
-				jsPlumb.repaintEverything();
+				jsPlumb.repaint(that);
 			}).fail(function(message) {
 				// Error on save
 				addModalError(message);
@@ -99,7 +100,7 @@ $(document).on('dragstop', '.node_frame, .network_frame', function(e) {
 			logger(1, 'DEBUG: setting network' + id + ' position.');
 			$.when(setNetworkPosition(id, left, top)).done(function() {
 				// Position saved -> redraw topology
-				jsPlumb.repaintEverything();
+				jsPlumb.repaint(that);
 			}).fail(function(message) {
 				// Error on save
 				addModalError(message);
