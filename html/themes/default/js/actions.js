@@ -43,6 +43,7 @@ $('body').on('change', 'input[name="import[file]"]', function(e) {
 $(document).on('keydown', 'body', function(e){
 	if('27' == e.which){
 		$('#mouse_frame').remove();
+		printLabTopology();
 	};
 });
 
