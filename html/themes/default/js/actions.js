@@ -664,7 +664,7 @@ $(document).on('click', '.action-nodeexport, .action-nodesexport', function(e) {
 		if (node_id != null) {
 			$.when(cfg_export(node_id)).done(function() {
 				// Node exported -> print a small green message
-				addMessage('success', nodes[node_id]['name'] + ': ' + MESSAGES[76])
+				addMessage('success', nodes[node_id]['name'] + ': ' + MESSAGES[79])
 			}).fail(function(message) {
 				// Cannot export
 				addMessage('danger', nodes[node_id]['name'] + ': ' + message);
@@ -673,7 +673,7 @@ $(document).on('click', '.action-nodeexport, .action-nodesexport', function(e) {
 			$.each(nodes, function(key, values) {
 				$.when(setTimeout(function() { cfg_export(key); }, values['delay'] * 10)).done(function() {
 					// Node exported -> print a small green message
-					addMessage('success', values['name'] + ': ' + MESSAGES[78])
+					addMessage('success', values['name'] + ': ' + MESSAGES[79])
 				}).fail(function(message) {
 					// Cannot exported
 					addMessage('danger', values['name'] + ': ' + message);
@@ -736,7 +736,7 @@ $(document).on('click', '.action-nodestop, .action-nodesstop', function(e) {
 		if (node_id != null) {
 			$.when(stop(node_id)).done(function() {
 				// Node stopped -> print a small green message
-				addMessage('success', nodes[node_id]['name'] + ': ' + MESSAGES[76])
+				addMessage('success', nodes[node_id]['name'] + ': ' + MESSAGES[77])
 			}).fail(function(message) {
 				// Cannot stop
 				addMessage('danger', nodes[node_id]['name'] + ': ' + message);
@@ -772,7 +772,7 @@ $(document).on('click', '.action-nodewipe, .action-nodeswipe', function(e) {
 		if (node_id != null) {
 			$.when(wipe(node_id)).done(function() {
 				// Node wiped -> print a small green message
-				addMessage('success', nodes[node_id]['name'] + ': ' + MESSAGES[76])
+				addMessage('success', nodes[node_id]['name'] + ': ' + MESSAGES[78])
 			}).fail(function(message) {
 				// Cannot wipe
 				addMessage('danger', nodes[node_id]['name'] + ': ' + message);

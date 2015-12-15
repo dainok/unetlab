@@ -324,6 +324,7 @@ $messages[80081] = 'Failed to upload file, check file size (80081).';
 $messages[80082] = 'Cannot find docker.io installation (80082).';
 $messages[80083] = 'Cannot create docket container (80083).';
 $messages[80084] = 'Skipping powered off and unsupported nodes (80084).';
+$messages[80085] = 'Failed to set MTU 9000 on interface (80085).';
 
 // Authentication (90000-99999)
 $messages[90001] = 'User is not authenticated or session timed out (90001).';

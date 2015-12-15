@@ -210,6 +210,15 @@ function addTap($s, $u) {
 		return 80033;
 	}
 
+	$cmd = 'ip link set dev '.$s.' mtu 9000';
+	exec($cmd, $o, $rc); 
+	if ($rc != 0) {
+		// Failed to activate the TAP interface
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80085]);
+		error_log(date('M d H:i:s ').implode("\n", $o));
+		return 80085;
+	}
+
 	return 0;
 }
 
