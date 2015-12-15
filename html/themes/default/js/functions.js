@@ -33,7 +33,7 @@
 function basename(path) {
 	return path.replace(/\\/g,'/').replace( /.*\//, '');
 }
- 
+
 // Dirname: given /a/b/c return /a/b
 function dirname(path) {
 	var dir = path.replace(/\\/g,'/').replace(/\/[^\/]*$/, '');
@@ -47,16 +47,16 @@ function dirname(path) {
 // Alert management
 function addMessage(severity, message) {
 	// Severity can be success (green), info (blue), warning (yellow) and danger (red)
-	
+
 	var timeout = 3000;		// by default close messges after 3 seconds
 	if (severity == 'alert') timeout = 10000;
 	if (severity == 'warning') timeout = 10000;
-	
+
 	if (!$('#alert_container').length) {
 		// Add the frame container if not exists
 		$('body').append('<div id="alert_container"></div>');
 	}
-	
+
     $('<div class="alert alert-' + severity.toLowerCase() + '">' + message + '</div>').prependTo('#alert_container').fadeTo(timeout, 500).slideUp(500, function() {
         $(this).alert('close');
     });
@@ -157,7 +157,7 @@ function closeLab() {
 				running_nodes = true;
 			}
 		});
-		
+
 		if (running_nodes == false) {
 			var url = '/api/labs/close';
 			var type = 'DELETE';
@@ -250,7 +250,7 @@ function deleteFolder(path) {
 	});
 	return deferred.promise();
 }
-	
+
 // Delete lab
 function deleteLab(path) {
 	var deferred = $.Deferred();
@@ -1066,14 +1066,14 @@ function postLogin() {
 		// Stop updating node_status
 		clearInterval(UPDATEID);
 	}
-	
+
 	if (LAB == null) {
 		logger(1, 'DEBUG: loading folder "' + FOLDER + '".');
 		printPageLabList(FOLDER);
 	} else {
 		logger(1, 'DEBUG: loading lab "' + LAB + '".');
 		printPageLabOpen(LAB);
-				
+
 		// Update node status
         UPDATEID = setInterval('printLabStatus("' + LAB + '")', 5000);
 	}
@@ -1320,11 +1320,11 @@ function printContextMenu(title, body, pageX, pageY) {
     menu += '<ul class="dropdown-menu" role="menu"><li role="presentation" class="dropdown-header">' + title + '</li>' + body + '</ul></div>';
 
 	$('body').append(menu);
-	
+
 	// Set initial status
 	$('.menu-interface, .menu-edit').slideToggle();
 	$('.menu-interface, .menu-edit').hide();
-	
+
 	// Calculating position
     if (pageX + $('#context-menu').width() > $(window).width()) {
         // Dropright
@@ -1374,7 +1374,7 @@ function printFormFolder(action, values) {
 		validateFolder();
 	}
 }
- 
+
 // Import external labs
 function printFormImport(path) {
 	var html = '<form id="form-import" class="form-horizontal form-import"><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[20] + '</label><div class="col-md-5"><input class="form-control" name="import[path]" value="' + path + '" disabled type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[2] + '</label><div class="col-md-5"><input class="form-control" name="import[local]" value="" disabled="" placeholder="' + MESSAGES[25] + '" "type="text"/></div></div><div class="form-group"><div class="col-md-7 col-md-offset-3"><span class="btn btn-default btn-file btn-aqua">' + MESSAGES[23] + ' <input class="form-control" name="import[file]" value="" type="file"></span> <button type="submit" class="btn btn-aqua">' + MESSAGES[24] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
@@ -1392,7 +1392,7 @@ function printFormLab(action, values) {
 	var description = (values['description'] != null) ? values['description'] : '';
 	var body = (values['body'] != null) ? values['body'] : '';
 	var title = (action == 'add') ? MESSAGES[5] : MESSAGES[87];
-	
+
 	var html = '<form id="form-lab-' + action + '" class="form-horizontal form-lab-' + action + '"><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[20] + '</label><div class="col-md-5"><input class="form-control" name="lab[path]" value="' + path + '" disabled="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control autofocus" name="lab[name]" value="' + name + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[26] + '</label><div class="col-md-5"><input class="form-control" name="lab[version]" value="' + version + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Author</label><div class="col-md-5"><input class="form-control" name="lab[author]" value="' + author + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[27] + '</label><div class="col-md-5"><textarea class="form-control" name="lab[description]">' + description + '</textarea></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[88] + '</label><div class="col-md-5"><textarea class="form-control" name="lab[body]">' + body + '</textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
 	logger(1, 'DEBUG: popping up the lab-add form.');
 	addModalWide(title, html, '');
@@ -1401,13 +1401,13 @@ function printFormLab(action, values) {
 
 // Network Form
 function printFormNetwork(action, values) {
-	var id = (values == null || values['id'] == null) ? '' : values['id']; 
-	var left = (values == null || values['left'] == null) ? '' : values['left']; 
-	var name = (values == null || values['name'] == null) ? 'Net' : values['name']; 
-	var top = (values == null || values['top'] == null) ? '' : values['top']; 
+	var id = (values == null || values['id'] == null) ? '' : values['id'];
+	var left = (values == null || values['left'] == null) ? '' : values['left'];
+	var name = (values == null || values['name'] == null) ? 'Net' : values['name'];
+	var top = (values == null || values['top'] == null) ? '' : values['top'];
 	var type = (values == null || values['type'] == null) ? '' : values['type'];
 	var title = (action == 'add') ? MESSAGES[89] : MESSAGES[90];
-	
+
 	$.when(getNetworkTypes()).done(function(network_types) {
 		// Read privileges and set specific actions/elements
 		var html = '<form id="form-network-' + action + '" class="form-horizontal">';
@@ -1425,7 +1425,7 @@ function printFormNetwork(action, values) {
 			html += '<option ' + type_selected + 'value="' + key + '">' + value + '</option>';
 		});
 		html += '</select></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[93] + '</label><div class="col-md-5"><input class="form-control" name="network[left]" value="' + left + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[94] + '</label><div class="col-md-5"><input class="form-control" name="network[top]" value="' + top + '" type="text"/></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form></form>';
-		
+
 		// Show the form
 		addModal(title, html, '');
 		$('.selectpicker').selectpicker();
@@ -1435,14 +1435,14 @@ function printFormNetwork(action, values) {
 
 // Node form
 function printFormNode(action, values) {
-	var id = (values == null || values['id'] == null) ? null : values['id']; 
-	var left = (values == null || values['left'] == null) ? null : values['left']; 
-	var top = (values == null || values['top'] == null) ? null : values['top']; 
-	var template = (values == null || values['template'] == null) ? null : values['template']; 
-	
+	var id = (values == null || values['id'] == null) ? null : values['id'];
+	var left = (values == null || values['left'] == null) ? null : values['left'];
+	var top = (values == null || values['top'] == null) ? null : values['top'];
+	var template = (values == null || values['template'] == null) ? null : values['template'];
+
 	var title = (action == 'add') ? MESSAGES[85] : MESSAGES[86];
 	var template_disabled = (values == null || values['template'] == null) ? '' : 'disabled ';
-	
+
 	$.when(getTemplates(null)).done(function(templates) {
 		var html = '';
 		html += '<form id="form-node-' + action + '" class="form-horizontal"><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[84] + '</label><div class="col-md-5"><select id="form-node-template" class="selectpicker form-control" name="node[template]" data-live-search="true" data-style="selectpicker-button"><option value="">' + MESSAGES[102] + '</option>';
@@ -1451,11 +1451,11 @@ function printFormNode(action, values) {
 			html += '<option value="' + key + '">' + value + '</option>';
 		});
 		html += '</select></div></div><div id="form-node-data"></div><div id="form-node-buttons"></div></form>';
-		
+
 		// Show the form
 		addModal(title, html, '');
 		$('.selectpicker').selectpicker();
-		
+
 		$('#form-node-template').change(function(e2) {
 			template = $(this).find("option:selected").val();
 			if (template != '') {
@@ -1489,10 +1489,10 @@ function printFormNode(action, values) {
 						}
 					});
 					html_data += '<div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[93] + '</label><div class="col-md-5"><input class="form-control" name="node[left]" value="' + left + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[94] + '</label><div class="col-md-5"><input class="form-control" name="node[top]" value="' + top + '" type="text"/></div></div>';
-					
+
 					// Show the buttons
 					$('#form-node-buttons').html('<div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div>');
-					
+
 					// Show the form
 					$('#form-node-data').html(html_data);
 					$('.selectpicker').selectpicker();
@@ -1508,13 +1508,13 @@ function printFormNode(action, values) {
 				});
 			}
 		});
-		
+
 		if (action == 'edit') {
 			// If editing a node, disable the select and trigger
 			$('#form-node-template').prop('disabled', 'disabled');
 			$('#form-node-template').val(template).change();
 		}
-		
+
 	}).fail(function(message) {
 		// Cannot get data
 		addModalError(message);
@@ -1599,9 +1599,9 @@ function printFormNodeInterfaces(values) {
 				html += '</select></div></div>';
 			});
 		}
-		
+
 		html += '<div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
-		
+
 		addModal(MESSAGES[116], html, '');
 		$('.selectpicker').selectpicker();
 	}).fail(function(message) {
@@ -1619,7 +1619,7 @@ function printFormPicture(action, values) {
 	var height = (values['height'] != null) ? values['height'] : '';
 	var title = (action == 'add') ? MESSAGES[135] : MESSAGES[136];
 	var html = ''
-	
+
 	if (action == 'add') {
 		html += '<form id="form-picture-' + action + '" class="form-horizontal form-lab-' + action + '"><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control" autofocus name="picture[name]" value="' + name + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[137] + '</label><div class="col-md-5"><textarea class="form-control" name="picture[map]">' + map + '</textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
 	} else {
@@ -1681,7 +1681,13 @@ function printLabPreview(lab_filename) {
 // Print lab topology
 function printLabTopology() {
 	var lab_filename = $('#lab-viewport').attr('data-path');
+
+	if($('#lab-viewport').data("refreshing") ) {
+		return;
+	}
 	$('#lab-viewport').empty();
+	$('#lab-viewport').data('refreshing', true);
+
 	$.when(getNetworks(null), getNodes(null), getTopology()).done(function(networks, nodes, topology) {
 		var networkImgs = [],
 			nodesImgs = [];
@@ -1839,9 +1845,11 @@ function printLabTopology() {
 
 				// Move elements under the topology node
 				$('._jsPlumb_connector, ._jsPlumb_overlay, ._jsPlumb_endpoint_anchor_').detach().appendTo('#lab-viewport');
+				$('#lab-viewport').data('refreshing', false);
 			});
 		}).fail(function() {
 			logger(1, "DEBUG: not all images of networks or nodes loaded");
+			$('#lab-viewport').data('refreshing', false);
 		});
 	}).fail(function(message1, message2, message3) {
 		if (message1 != null) {
@@ -1851,6 +1859,7 @@ function printLabTopology() {
 		} else {
 			addModalError(message3)
 		};
+		$('#lab-viewport').data('refreshing', false);
 	});
 }
 
@@ -1904,7 +1913,7 @@ function printListNodes(nodes) {
 		var nvram = (value['nvram'] != null) ? value['nvram'] : '';
 		var serial = (value['serial'] != null) ? value['serial'] : '';
 		body += '<tr class="node' + value['id'] + '"><td>' + value['id'] + '</td><td>' + value['name'] + '</td><td>' + value['template'] + '</td><td>' + value['image'] + '</td><td>' + cpu + '</td><td>' + idlepc + '</td><td>' + nvram + '</td><td>' + value['ram'] + '</td><td>' + ethernet + '</td><td>' + serial + '</td><td>' + value['console'] + '</td><td><a class="action-nodestart" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[66] + '"><i class="glyphicon glyphicon-play"></i></a> <a class="action-nodestop" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[67] + '"><i class="glyphicon glyphicon-stop"></i></a> <a class="action-nodewipe" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[68] + '"><i class="glyphicon glyphicon-erase"></i></a>';
-		
+
 		// Read privileges and set specific actions/elements
 		if (ROLE == 'admin' || ROLE == 'editor') {
 			body += ' <a class="action-nodeexport" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[69] + '"><i class="glyphicon glyphicon-save"></i></a> <a class="action-nodeinterfaces" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[72] + '"><i class="glyphicon glyphicon-transfer"></i></a> <a class="action-nodeedit" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[71] + '"><i class="glyphicon glyphicon-edit"></i></a> <a class="action-nodedelete" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[65] + '"><i class="glyphicon glyphicon-trash"></i></a>';
@@ -1934,7 +1943,7 @@ function printPageLabList(folder) {
 		success: function(data) {
 			if (data['status'] == 'success') {
 				logger(1, 'DEBUG: folder "' + folder + '" found.');
-				
+
 				// Navbar: top
 				html += '<nav id="navbar-top" class="hidden-xs hidden-sm navbar navbar-static-top"><div class="container col-md-12 col-lg-12"><div id="logo-main" class="col-md-3 col-lg-3"><img alt="Logo" class="img-responsive" src="/themes/default/images/logo_rr.png"/></div><div class="navbar-collapse collapse"><ul class="nav navbar-nav navbar-right"><li class="navbar-item-aqua"><a href="https://unetlab.freshdesk.com/support/tickets/new" target="_blank"">Help</a></li><li class="navbar-item-grey"><a href="http://www.unetlab.com/" target="_blank">About</a></li><li class="navbar-item-grey"><a href="http://forum.802101.com/forum39.html" target="_blank">Forum</a></li></ul></div></div></nav>';
 
@@ -1943,16 +1952,16 @@ function printPageLabList(folder) {
 
 				// Main: title
 				html += '<div id="main-title" class="container col-md-12 col-lg-12"><div class="row row-eq-height"><div id="list-title-folders" class="col-md-3 col-lg-3"><span title="' + folder + '">' + MESSAGES[0] + ' ' + folder + '</span></div><div id="list-title-labs" class="col-md-3 col-lg-3"><span>' + MESSAGES[1] + '</span></div><div id="list-title-info" class="col-md-6 col-lg-6"><span></span></div></div></div>';
-				
+
 				// Main
 				html += '<div id="main" class="container col-md-12 col-lg-12"><div class="fill-height row row-eq-height"><div id="list-folders" class="col-md-3 col-lg-3" data-path="' + folder + '"><ul></ul></div><div id="list-labs" class="col-md-3 col-lg-3"><ul></ul></div><div id="list-info" class="col-md-6 col-lg-6"></div></div></div>';
-				
+
 				// Footer
 				html += '';
-				
+
 				// Adding to the page
 				$('#body').html(html);
-				
+
 				// Adding all folders
 				$.each(data['data']['folders'], function(id, object) {
 					$('#list-folders > ul').append('<li><a class="folder action-folderopen" data-path="' + object['path'] + '" href="#" title="Double click to open, single click to select.">' + object['name'] + '</a></li>');
@@ -1962,14 +1971,14 @@ function printPageLabList(folder) {
 				$.each(data['data']['labs'], function(id, object) {
 					$('#list-labs > ul').append('<li><a class="lab action-labpreview" data-path="' + object['path'] + '" href="#" title="Double click to open, single click to select.">' + object['file'] + '</a></li>');
 				});
-				
+
 				// Extend height to the bottom if shorter
 				if ($('#main').height() < window.innerHeight - $('#main').offset().top) {
 					$('#main').height(function(index, height) {
 						return window.innerHeight - $(this).offset().top;
 					});
 				}
-				
+
 				// Read privileges and set specific actions/elements
 				if (ROLE == 'admin' || ROLE == 'editor') {
 					// Adding actions
@@ -1981,7 +1990,7 @@ function printPageLabList(folder) {
 					$('#actions-menu').append('<li><a class="action-selectedexport" href="#"><i class="glyphicon glyphicon-export"></i> ' + MESSAGES[8] + '</a></li>');
 					$('#actions-menu').append('<li><a class="action-import" href="#"><i class="glyphicon glyphicon-import"></i> ' + MESSAGES[9] + '</a></li>');
 					$('#actions-menu').append('<li><a class="action-folderrename" href="#"><i class="glyphicon glyphicon-pencil"></i> ' + MESSAGES[10] + '</a></li>');
-					
+
 					// Make labs draggable (to move inside folders)
 					$('.lab').draggable({
 						appendTo: '#body',
@@ -1991,7 +2000,7 @@ function printPageLabList(folder) {
 						snap: '.folder',
 						stack: '.folder'
 					});
-					
+
 					// Make folders draggable (to move inside folders)
 					$('.folder').draggable({
 						appendTo: '#body',
@@ -2001,7 +2010,7 @@ function printPageLabList(folder) {
 						snap: '.folder',
 						stack: '.folder'
 					});
-					
+
 					// Make folders draggable (to receive labs and folders)
 					$('.folder').droppable({
 						drop: function(e, o) {
@@ -2054,18 +2063,18 @@ function printPageLabList(folder) {
 // Print lab open page
 function printPageLabOpen(lab) {
 	var html = '<div id="lab-sidebar"><ul></ul></div><div id="lab-viewport" data-path="' + lab + '"></div>';
-	
+
 	$('#body').html(html);
-	
+
 	// Print topology
 	printLabTopology();
-	
+
 	// Read privileges and set specific actions/elements
 	if (ROLE == 'admin' || ROLE == 'editor') {
 		$('#lab-sidebar ul').append('<li><a class="action-labobjectadd" href="#" title="' + MESSAGES[56] + '"><i class="glyphicon glyphicon-plus"></i></a></li>');
 		//TODO $('#lab-sidebar ul').append('<li><a class="action-nodelink" href="#" title="' + MESSAGES[115] + '"><i class="glyphicon glyphicon-link"></i></a></li>');
 	}
-	
+
 	$('#lab-sidebar ul').append('<li><a class="action-labbodyget" href="#" title="' + MESSAGES[64] + '"><i class="glyphicon glyphicon-list-alt"></i></a></li>');
 	$('#lab-sidebar ul').append('<li><a class="action-nodesget" href="#" title="' + MESSAGES[62] + '"><i class="glyphicon glyphicon-hdd"></i></a></li>');
 	$('#lab-sidebar ul').append('<li><a class="action-networksget" href="#" title="' + MESSAGES[61] + '"><i class="glyphicon glyphicon-transfer"></i></a></li>');
@@ -2084,7 +2093,7 @@ function printUserManagement() {
 		html += '<div class="row"><div id="pods" class="col-md-12 col-lg-12"><div class="table-responsive"><table class="table"><thead><tr><th>' + MESSAGES[44] + '</th><th>' + MESSAGES[32] + '</th><th>' + MESSAGES[33] + '</th><th>' + MESSAGES[63] + '</th></tr></thead><tbody></tbody></table></div></div></div>';
 		$('#main-title').hide();
 		$('#main').html(html);
-	
+
 		// Read privileges and set specific actions/elements
 		if (ROLE == 'admin') {
 			// Adding actions
@@ -2095,7 +2104,7 @@ function printUserManagement() {
 			$('#actions-menu').empty();
 			$('#actions-menu').append('<li><a href="#">&lt;' + MESSAGES[3] + '&gt;</a></li>');
 		}
-	
+
 		// Adding all users
 		$.each(data, function(id, object) {
 			var username = object['username'];
@@ -2116,19 +2125,19 @@ function printUserManagement() {
 				var expiration = MESSAGES[54];
 			} else {
 				var d = new Date(object['expiration'] * 1000);
-				expiration = d.toLocaleDateString(); 
+				expiration = d.toLocaleDateString();
 			}
 			if (object['session'] <= 0) {
 				var session = MESSAGES[53];
 			} else {
 				var d = new Date(object['session'] * 1000);
-				session = d.toLocaleDateString() + ' ' + d.toLocaleTimeString() + ' from ' + object['ip']; 
+				session = d.toLocaleDateString() + ' ' + d.toLocaleTimeString() + ' from ' + object['ip'];
 			}
 			if (object['pexpiration'] <= 0) {
 				var pexpiration = MESSAGES[54];
 			} else {
 				var d = new Date(object['pexpiration'] * 1000);
-				pexpiration = d.toLocaleDateString(); 
+				pexpiration = d.toLocaleDateString();
 			}
 			$('#users tbody').append('<tr class="action-useredit user" data-path="' + username + '"><td class="username">' + username + '</td><td class="class="name">' + name + '</td><td class="email">' + email + '</td><td class="role">' + role + '</td><td class="expiration">' + expiration + '</td><td class="session">' + session + '</td><td class="pod">' + pod + '</td></tr>');
 			if (object['pod'] >= 0) {
@@ -2145,31 +2154,31 @@ function printSystemStats() {
 	$.when(getSystemStats()).done(function(data) {
 		// Main: title
 		var html_title = '<div class="row row-eq-height"><div id="list-title-folders" class="col-md-3 col-lg-3"><span title="' + MESSAGES[13] + '">' + MESSAGES[13] + '</span></div><div id="list-title-labs" class="col-md-3 col-lg-3"><span></span></div><div id="list-title-info" class="col-md-6 col-lg-6"><span></span></div></div>';
-		
+
 		// Main
 		var html = '<div id="main" class="container col-md-12 col-lg-12"><div class="fill-height row row-eq-height"><div id="stats-text" class="col-md-3 col-lg-3"><ul></ul></div><div id="stats-graph" class="col-md-9 col-lg-9"><ul></ul></div></div></div>';
-		
+
 		// Footer
 		html += '</div>';
-		
+
 		$('#main-title').html(html_title);
 		$('#main-title').show();
 		$('#main').html(html);
-		
+
 		// Read privileges and set specific actions/elements
 		$('#actions-menu').empty();
 		$('#actions-menu').append('<li><a class="action-sysstatus" href="#"><i class="glyphicon glyphicon-refresh"></i> ' + MESSAGES[40] + '</a></li>');
 		$('#actions-menu').append('<li><a class="action-stopall" href="#"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[50] + '</a></li>');
 		$('#actions-menu').append('<li><a class="action-update" href="#"><i class="glyphicon glyphicon-repeat"></i> ' + MESSAGES[132] + '</a></li>');
-		
+
 		// Adding all stats
-		
+
 		// Text
 		$('#stats-text ul').append('<li>' + MESSAGES[39] + ': <code>' + data['version'] + '</code></li>');
 		$('#stats-text ul').append('<li>' + MESSAGES[49] + ': <code>' + data['qemu_version'] + '</code></li>');
 		$('#stats-text ul').append('<li>' + MESSAGES[29] + ': <code>' + ROLE + '</code></li>');
 		$('#stats-text ul').append('<li>' + MESSAGES[32] + ': <code>' + ((TENANT == -1) ? 'none' : TENANT) + '</code></li>');
-		
+
 		// CPU usage
 		$('#stats-graph ul').append('<li><div class="circle circle-cpu col-md-3 col-lg-3"><strong></strong><br/><span>' + MESSAGES[36] + '</span></div></li>');
 		$('.circle-cpu').circleProgress({
@@ -2185,7 +2194,7 @@ function printSystemStats() {
 				$(this).find('strong').html(parseInt(100 * progress) + '%');
 			}
 		});
-		
+
 		// Memory usage
 		$('#stats-graph ul').append('<li><div class="circle circle-memory col-md-3 col-lg-3"><strong></strong><br/><span>' + MESSAGES[37] + '</span></div></li>');
 		$('.circle-memory').circleProgress({
@@ -2201,7 +2210,7 @@ function printSystemStats() {
 				$(this).find('strong').html(parseInt(100 * progress) + '%');
 			}
 		});
-		
+
 		// Swap usage
 		$('#stats-graph ul').append('<li><div class="circle circle-swap col-md-3 col-lg-3"><strong></strong><br/><span>Swap usage</span></div></li>');
 		$('.circle-swap').circleProgress({
@@ -2219,7 +2228,7 @@ function printSystemStats() {
 		});
 
 		// Disk usage
-		$('#stats-graph ul').append('<li><div class="circle circle-disk col-md-3 col-lg-3"><strong></strong><br/><span>' + MESSAGES[38]+ '</span></div></li>');		
+		$('#stats-graph ul').append('<li><div class="circle circle-disk col-md-3 col-lg-3"><strong></strong><br/><span>' + MESSAGES[38]+ '</span></div></li>');
 		$('.circle-disk').circleProgress({
 			arcCoef: 0.7,
 			value: data['disk'],
@@ -2233,17 +2242,17 @@ function printSystemStats() {
 				$(this).find('strong').html(parseInt(100 * progress) + '%');
 			}
 		});
-		
+
 		// IOL running nodes
 		$('#stats-graph ul').append('<li><div class="count count-iol col-md-4 col-lg-4"></div>');
 		$('.count-iol').html('<strong>' + data['iol'] + '</strong><br/><span>' + MESSAGES[41] + '</span></li>');
-		
+
 		// Dynamips running nodes
-		$('#stats-graph ul').append('<li><div class="count count-dynamips col-md-4 col-lg-4"></div></li>');	
+		$('#stats-graph ul').append('<li><div class="count count-dynamips col-md-4 col-lg-4"></div></li>');
 		$('.count-dynamips').html('<strong>' + data['dynamips'] + '</strong><br/><span>' + MESSAGES[42] + '</span>');
-		
+
 		// QEMU running nodes
-		$('#stats-graph ul').append('<li><div class="count count-qemu col-md-4 col-lg-4"></div></li>');	
+		$('#stats-graph ul').append('<li><div class="count count-qemu col-md-4 col-lg-4"></div></li>');
 		$('.count-qemu').html('<strong>' + data['qemu'] + '</strong><br/><span>' + MESSAGES[43] + '</span>');
 	}).fail(function(message) {
 		addModalError(message);
