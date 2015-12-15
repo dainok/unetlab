@@ -31,7 +31,7 @@
 
 // Attach files
 $('body').on('change', 'input[type=file]', function(e) {
-    ATTACHMENTS = e.target.files;
+	ATTACHMENTS = e.target.files;
 });
 
 // Add the selected filename to the proper input box
@@ -81,7 +81,7 @@ $(document).on('hide.bs.modal', '.modal', function (e) {
 
 // Set autofocus on show modal
 $(document).on('shown.bs.modal', '.modal', function () {
-    $('.autofocus').focus();
+	$('.autofocus').focus();
 });
 
 // After node/network move
@@ -172,11 +172,11 @@ $(document).on('contextmenu', '.context-menu', function(e) {
 // Window resize
 $(window).resize(function(){
 	if ($('#lab-viewport').length ) {
-        // Update topology on window resize
-        jsPlumb.repaintEverything();
+		// Update topology on window resize
+		jsPlumb.repaintEverything();
 		// Update picture map on window resize
 		$('map').imageMapResize();
-    }
+	}
 });
 
 /***************************************************************************
@@ -649,7 +649,7 @@ $(document).on('click', '.action-selectedexport', function(e) {
 			addModalError(message);
 		});
 	}
- });
+});
 
 // Export a config
 $(document).on('click', '.action-nodeexport, .action-nodesexport', function(e) {
@@ -703,18 +703,28 @@ $(document).on('click', '.action-nodestart, .action-nodesstart', function(e) {
 			$.when(start(node_id)).done(function() {
 				// Node started -> print a small green message
 				addMessage('success', nodes[node_id]['name'] + ': ' + MESSAGES[76])
+				printLabStatus();
 			}).fail(function(message) {
 				// Cannot start
 				addMessage('danger', nodes[node_id]['name'] + ': ' + message);
 			});
 		} else {
+			var nodeLenght = Object.keys(nodes).length;
 			$.each(nodes, function(key, values) {
-				$.when(setTimeout(function() { start(key); }, values['delay'] * 10)).done(function() {
+				$.when(start(key)).done(function() {
 					// Node started -> print a small green message
 					addMessage('success', values['name'] + ': ' + MESSAGES[76])
+					nodeLenght--;
+					if(nodeLenght < 1){
+						printLabStatus();
+					};
 				}).fail(function(message) {
 					// Cannot start
 					addMessage('danger', values['name'] + ': ' + message);
+					nodeLenght--;
+					if(nodeLenght < 1){
+						printLabStatus();
+					};
 				});
 			});
 		}
@@ -738,19 +748,29 @@ $(document).on('click', '.action-nodestop, .action-nodesstop', function(e) {
 		if (node_id != null) {
 			$.when(stop(node_id)).done(function() {
 				// Node stopped -> print a small green message
-				addMessage('success', nodes[node_id]['name'] + ': ' + MESSAGES[76])
+				addMessage('success', nodes[node_id]['name'] + ': ' + MESSAGES[77])
+				printLabStatus();
 			}).fail(function(message) {
 				// Cannot stop
 				addMessage('danger', nodes[node_id]['name'] + ': ' + message);
 			});
 		} else {
+			var nodeLenght = Object.keys(nodes).length;
 			$.each(nodes, function(key, values) {
-				$.when(setTimeout(function() { stop(key); }, values['delay'] * 10)).done(function() {
+				$.when(stop(key)).done(function() {
 					// Node stopped -> print a small green message
 					addMessage('success', values['name'] + ': ' + MESSAGES[77])
+					nodeLenght--;
+					if(nodeLenght < 1){
+						setTimeout(printLabStatus, 1000);
+					};
 				}).fail(function(message) {
 					// Cannot stopped
 					addMessage('danger', values['name'] + ': ' + message);
+					nodeLenght--;
+					if(nodeLenght < 1){
+						setTimeout(printLabStatus, 1000);
+					};
 				});
 			});
 		}
@@ -912,15 +932,15 @@ $(document).on('submit', '#form-import', function(e) {
 		form_data.append($(this).attr('name').substr(form_name.length + 1, $(this).attr('name').length - form_name.length - 2), $(this).val());
 	});
 	// Add attachments
-    $.each(ATTACHMENTS, function(key, value) {
-        form_data.append(key, value);
-    });
+	$.each(ATTACHMENTS, function(key, value) {
+		form_data.append(key, value);
+	});
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,
 		url: encodeURI(url),
-        contentType: false, // Set content type to false as jQuery will tell the server its a query string request
-        processData: false, // Don't process the files
+		contentType: false, // Set content type to false as jQuery will tell the server its a query string request
+		processData: false, // Don't process the files
 		dataType: 'json',
 		data: form_data,
 		success: function(data) {
@@ -1274,7 +1294,7 @@ $(document).on('submit', '#form-login', function(e) {
 });
 
 // Submit user form
- $(document).on('submit', '#form-user-add, #form-user-edit', function(e) {
+$(document).on('submit', '#form-user-add, #form-user-edit', function(e) {
 	e.preventDefault();  // Prevent default behaviour
 	var form_data = form2Array('user');
 	// Converting data

@@ -57,9 +57,9 @@ function addMessage(severity, message) {
 		$('body').append('<div id="alert_container"></div>');
 	}
 
-    $('<div class="alert alert-' + severity.toLowerCase() + '">' + message + '</div>').prependTo('#alert_container').fadeTo(timeout, 500).slideUp(500, function() {
-        $(this).alert('close');
-    });
+	$('<div class="alert alert-' + severity.toLowerCase() + '">' + message + '</div>').prependTo('#alert_container').fadeTo(timeout, 500).slideUp(500, function() {
+		$(this).alert('close');
+	});
 }
 
 // Add Modal
@@ -821,11 +821,11 @@ function getSystemStats() {
 		success: function(data) {
 			if (data['status'] == 'success') {
 				logger(1, 'DEBUG: system stats.');
-                data['data']['cpu'] = data['data']['cpu'] / 100;
-                data['data']['disk'] = data['data']['disk'] / 100;
-                data['data']['mem'] = data['data']['mem'] / 100;
-                data['data']['cached'] = data['data']['cached'] / 100;
-                data['data']['swap'] = data['data']['swap'] / 100;
+				data['data']['cpu'] = data['data']['cpu'] / 100;
+				data['data']['disk'] = data['data']['disk'] / 100;
+				data['data']['mem'] = data['data']['mem'] / 100;
+				data['data']['cached'] = data['data']['cached'] / 100;
+				data['data']['swap'] = data['data']['swap'] / 100;
 				deferred.resolve(data['data']);
 			} else {
 				// Application error
@@ -1075,7 +1075,7 @@ function postLogin() {
 		printPageLabOpen(LAB);
 
 		// Update node status
-        UPDATEID = setInterval('printLabStatus("' + LAB + '")', 5000);
+		UPDATEID = setInterval('printLabStatus("' + LAB + '")', 5000);
 	}
 }
 
@@ -1316,8 +1316,8 @@ function wipe(node_id) {
  **************************************************************************/
 // Context menu
 function printContextMenu(title, body, pageX, pageY) {
-    var menu = '<div id="context-menu" class="collapse clearfix dropdown">';
-    menu += '<ul class="dropdown-menu" role="menu"><li role="presentation" class="dropdown-header">' + title + '</li>' + body + '</ul></div>';
+	var menu = '<div id="context-menu" class="collapse clearfix dropdown">';
+	menu += '<ul class="dropdown-menu" role="menu"><li role="presentation" class="dropdown-header">' + title + '</li>' + body + '</ul></div>';
 
 	$('body').append(menu);
 
@@ -1326,33 +1326,33 @@ function printContextMenu(title, body, pageX, pageY) {
 	$('.menu-interface, .menu-edit').hide();
 
 	// Calculating position
-    if (pageX + $('#context-menu').width() > $(window).width()) {
-        // Dropright
-        var left = pageX - $('#context-menu').width();
-    } else {
-        // Dropleft
-        var left = pageX;
-    }
+	if (pageX + $('#context-menu').width() > $(window).width()) {
+		// Dropright
+		var left = pageX - $('#context-menu').width();
+	} else {
+		// Dropleft
+		var left = pageX;
+	}
 	if ($('#context-menu').height() > $(window).height()) {
 		// Page is too short, drop down by default
-        var top = 0;
+		var top = 0;
 		var max_height = $(window).height();
 	} else if ($(window).height() - pageY >= $('#context-menu').height()) {
-        // Dropdown if enough space
-        var top = pageY;
+		// Dropdown if enough space
+		var top = pageY;
 		var max_height = $('#context-menu').height();
-    } else {
+	} else {
 		// Dropup
-        var top = $(window).height() - $('#context-menu').height();
+		var top = $(window).height() - $('#context-menu').height();
 		var max_height = $('#context-menu').height();
-    }
+	}
 
-    // Setting position via CSS
-    $('#context-menu').css({
-        left: left + 'px',
+	// Setting position via CSS
+	$('#context-menu').css({
+		left: left + 'px',
 		maxHeight: max_height,
-        top: top + 'px',
-    });
+		top: top + 'px',
+	});
 	$('#context-menu > ul').css({
 		maxHeight: max_height - 5
 	});
