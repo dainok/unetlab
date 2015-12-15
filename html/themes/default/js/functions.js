@@ -1835,6 +1835,8 @@ function printLabTopology() {
 				// Remove unused elements
 				$('.unused').remove();
 
+				printLabStatus();
+
 				// Move elements under the topology node
 				$('._jsPlumb_connector, ._jsPlumb_overlay, ._jsPlumb_endpoint_anchor_').detach().appendTo('#lab-viewport');
 			});

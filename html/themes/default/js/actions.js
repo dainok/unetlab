@@ -43,6 +43,7 @@ $('body').on('change', 'input[name="import[file]"]', function(e) {
 $(document).on('keydown', 'body', function(e){
 	if('27' == e.which){
 		$('#mouse_frame').remove();
+		printLabTopology();
 	};
 });
 
@@ -70,8 +71,12 @@ $(document).on('click', 'a.folder, a.lab, tr.user', function(e) {
 });
 
 // Remove modal on close
-$(document).on('hide.bs.modal', '.modal', function () {
-    $(this).remove();
+$(document).on('hide.bs.modal', '.modal', function (e) {
+	$(this).remove();
+	if(!$(this).attr('skipRedraw')){
+		printLabTopology();
+	}
+	$(this).attr('skipRedraw', false);
 });
 
 // Set autofocus on show modal
@@ -138,7 +143,7 @@ $(document).on('click', '.menu-collapse, .menu-collapse i', function(e) {
 // Manage context menu
 $(document).on('contextmenu', '.context-menu', function(e) {
 	e.preventDefault();  // Prevent default behaviour
-	
+
 	if ($(this).hasClass('node_frame')) {
 		logger(1, 'DEBUG: opening node context menu');
 		var node_id = $(this).attr('data-path');
@@ -160,7 +165,7 @@ $(document).on('contextmenu', '.context-menu', function(e) {
 		// Context menu not defined for this object
 		return false;
 	}
-	
+
 	printContextMenu(title, body, e.pageX, e.pageY);
 });
 
@@ -375,7 +380,7 @@ $(document).on('click', '.action-lablist', function(e) {
 $(document).on('click', '.action-labopen', function(e) {
 	logger(1, 'DEBUG: action = labopen');
 	printPageLabOpen($(this).attr('data-path'));
-	
+
 });
 
 // Preview a lab
@@ -450,8 +455,8 @@ $(document).on('click', '.action-nodeplace, .action-networkplace', function(e) {
 	} else {
 		return false;
 	}
-	
-	addMessage('info', MESSAGES[100])	
+
+	addMessage('info', MESSAGES[100])
 	if (!$('#mouse_frame').length) {
 		// Add the frame container if not exists
 		$('#lab-viewport').append(frame);
@@ -459,7 +464,7 @@ $(document).on('click', '.action-nodeplace, .action-networkplace', function(e) {
 		$('#mouse_frame').remove();
 		$('#lab-viewport').append(frame);
 	}
-	
+
 	// On mouse move, adjust css
 	$('#lab-viewport').mousemove(function(e1) {
 		$('#mouse_frame').css({
@@ -467,7 +472,7 @@ $(document).on('click', '.action-nodeplace, .action-networkplace', function(e) {
 			'top': e1.pageY
 		});
 	});
-	
+
 	// On click open the form
 	$('*').click(function(e2) {
 		if ($(e2.target).is('#lab-viewport, #lab-viewport *')) {
@@ -492,7 +497,7 @@ $(document).on('click', '.action-nodeplace, .action-networkplace', function(e) {
 			$('#mouse_frame').remove();
 			$('*').off();
 		}
-	
+
 	});
 });
 
@@ -576,8 +581,8 @@ $(document).on('click', '.action-selectedclone', function(e) {
 			});
 		});
 	}
-}); 
- 
+});
+
 // Delete selected folders and labs
 $(document).on('click', '.action-selecteddelete', function(e) {
 	if ($('.selected').size() > 0) {
@@ -654,7 +659,7 @@ $(document).on('click', '.action-nodeexport, .action-nodesexport', function(e) {
 		logger(1, 'DEBUG: action = nodesexport');
 		var node_id = null;
 	}
-	
+
 	$.when(getNodes(null)).done(function(nodes) {
 		if (node_id != null) {
 			$.when(cfg_export(node_id)).done(function() {
@@ -679,7 +684,7 @@ $(document).on('click', '.action-nodeexport, .action-nodesexport', function(e) {
 		addModalError(message);
 	});
 });
- 
+
 // Start a node
 $(document).on('click', '.action-nodestart, .action-nodesstart', function(e) {
 	$('#context-menu').remove();
@@ -690,7 +695,7 @@ $(document).on('click', '.action-nodestart, .action-nodesstart', function(e) {
 		logger(1, 'DEBUG: action = nodesstart');
 		var node_id = null;
 	}
-	
+
 	$.when(getNodes(null)).done(function(nodes) {
 		if (node_id != null) {
 			$.when(start(node_id)).done(function() {
@@ -726,7 +731,7 @@ $(document).on('click', '.action-nodestop, .action-nodesstop', function(e) {
 		logger(1, 'DEBUG: action = nodesstop');
 		var node_id = null;
 	}
-	
+
 	$.when(getNodes(null)).done(function(nodes) {
 		if (node_id != null) {
 			$.when(stop(node_id)).done(function() {
@@ -762,7 +767,7 @@ $(document).on('click', '.action-nodewipe, .action-nodeswipe', function(e) {
 		logger(1, 'DEBUG: action = nodeswipe');
 		var node_id = null;
 	}
-	
+
 	$.when(getNodes(null)).done(function(nodes) {
 		if (node_id != null) {
 			$.when(wipe(node_id)).done(function() {
@@ -787,7 +792,7 @@ $(document).on('click', '.action-nodewipe, .action-nodeswipe', function(e) {
 		addModalError(message);
 	});
 });
- 
+
 // Stop all nodes
 $(document).on('click', '.action-stopall', function(e) {
 	logger(1, 'DEBUG: action = stopall');
@@ -805,7 +810,7 @@ $(document).on('click', '.action-sysstatus', function(e) {
 	logger(1, 'DEBUG: action = sysstatus');
 	printSystemStats();
 });
- 
+
 // Add a user
 $(document).on('click', '.action-useradd', function(e) {
 	logger(1, 'DEBUG: action = useradd');
@@ -835,13 +840,13 @@ $(document).on('click', '.action-update', function(e) {
 		// Cannot get user
 		addMessage('alert', message);
 	});
-}); 
+});
 
 // Load user management page
 $(document).on('click', '.action-usermgmt', function(e) {
 	logger(1, 'DEBUG: action = usermgmt');
 	printUserManagement();
-}); 
+});
 
 /***************************************************************************
  * Submit
@@ -871,6 +876,7 @@ $(document).on('submit', '#form-folder-add, #form-folder-rename', function(e) {
 			if (data['status'] == 'success') {
 				logger(1, 'DEBUG: folder "' + form_data['name'] + '" added.');
 				// Close the modal
+				$(e.target).parents('.modal').attr('skipRedraw', true);
 				$(e.target).parents('.modal').modal('hide');
 				// Reload the folder list
 				printPageLabList(form_data['path']);
@@ -919,6 +925,7 @@ $(document).on('submit', '#form-import', function(e) {
 			if (data['status'] == 'success') {
 				logger(1, 'DEBUG: labs imported.');
 				// Close the modal
+				$(e.target).parents('.modal').attr('skipRedraw', true);
 				$(e.target).parents('.modal').modal('hide');
 				// Reload the folder list
 				printPageLabList($('#list-folders').attr('data-path'));
@@ -938,7 +945,7 @@ $(document).on('submit', '#form-import', function(e) {
 	});
 	return false;  // Stop to avoid POST
 });
-		
+
 // Submit lab form
 $(document).on('submit', '#form-lab-add, #form-lab-edit', function(e) {
 	e.preventDefault();  // Prevent default behaviour
@@ -953,7 +960,7 @@ $(document).on('submit', '#form-lab-add, #form-lab-edit', function(e) {
 		var url = '/api/labs' + form_data['path'];
 		var type = 'PUT';
 	}
-	
+
 	if ($(this).attr('id') == 'form-node-add') {
 		// If adding need to manage multiple add
 		if (form_data['count'] > 1) {
@@ -963,10 +970,10 @@ $(document).on('submit', '#form-lab-add, #form-lab-edit', function(e) {
 		}
 	} else {
 		// If editing need to post once
-		form_data['count'] = 1;		
-		form_data['postfix'] = 0;		
+		form_data['count'] = 1;
+		form_data['postfix'] = 0;
 	}
-	
+
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,
@@ -977,6 +984,7 @@ $(document).on('submit', '#form-lab-add, #form-lab-edit', function(e) {
 			if (data['status'] == 'success') {
 				logger(1, 'DEBUG: lab "' + form_data['name'] + '" saved.');
 				// Close the modal
+				$(e.target).parents('.modal').attr('skipRedraw', true);
 				$(e.target).parents('.modal').modal('hide');
 				if (type == 'POST') {
 					// Reload the lab list
@@ -1034,10 +1042,10 @@ $(document).on('submit', '#form-network-add, #form-network-edit', function(e) {
 		}
 	} else {
 		// If editing need to post once
-		form_data['count'] = 1;		
-		form_data['postfix'] = 0;		
+		form_data['count'] = 1;
+		form_data['postfix'] = 0;
 	}
-	
+
 	for (var i = 0; i < form_data['count']; i++) {
 		form_data['left'] = parseInt(form_data['left']) + i * 10;
 		form_data['top'] = parseInt(form_data['top']) + i * 10;
@@ -1051,6 +1059,7 @@ $(document).on('submit', '#form-network-add, #form-network-edit', function(e) {
 				if (data['status'] == 'success') {
 					logger(1, 'DEBUG: network "' + form_data['name'] + '" saved.');
 					// Close the modal
+					$('body').children('.modal').attr('skipRedraw', true);
 					$('body').children('.modal').modal('hide');
 					addMessage(data['status'], data['message']);
 				} else {
@@ -1069,7 +1078,7 @@ $(document).on('submit', '#form-network-add, #form-network-edit', function(e) {
 		});
 		promises.push(request);
 	}
-	
+
 	$.when.apply(null, promises).done(function() {
 		printLabTopology();
 	});
@@ -1094,6 +1103,7 @@ $(document).on('submit', '#form-node-connect', function(e) {
 			if (data['status'] == 'success') {
 				logger(1, 'DEBUG: node "' + node_id + '" saved.');
 				// Close the modal
+				$('body').children('.modal').attr('skipRedraw', true);
 				$('body').children('.modal').modal('hide');
 				addMessage(data['status'], data['message']);
 				printLabTopology();
@@ -1128,7 +1138,7 @@ $(document).on('submit', '#form-node-add, #form-node-edit', function(e) {
 		var url = '/api/labs' + lab_filename + '/nodes/' + form_data['id'];
 		var type = 'PUT';
 	}
-	
+
 	if ($(this).attr('id') == 'form-node-add') {
 		// If adding need to manage multiple add
 		if (form_data['count'] > 1) {
@@ -1138,10 +1148,10 @@ $(document).on('submit', '#form-node-add, #form-node-edit', function(e) {
 		}
 	} else {
 		// If editing need to post once
-		form_data['count'] = 1;		
-		form_data['postfix'] = 0;		
+		form_data['count'] = 1;
+		form_data['postfix'] = 0;
 	}
-	
+
 	for (var i = 0; i < form_data['count']; i++) {
 		form_data['left'] = parseInt(form_data['left']) + i * 10;
 		form_data['top'] = parseInt(form_data['top']) + i * 10;
@@ -1155,6 +1165,7 @@ $(document).on('submit', '#form-node-add, #form-node-edit', function(e) {
 				if (data['status'] == 'success') {
 					logger(1, 'DEBUG: node "' + form_data['name'] + '" saved.');
 					// Close the modal
+					$('body').children('.modal').attr('skipRedraw', true);
 					$('body').children('.modal').modal('hide');
 					addMessage(data['status'], data['message']);
 				} else {
@@ -1172,7 +1183,7 @@ $(document).on('submit', '#form-node-add, #form-node-edit', function(e) {
 			}
 		});
 	}
-	
+
 	$.when.apply(null, promises).done(function() {
 		printLabTopology();
 	});
@@ -1196,6 +1207,7 @@ $(document).on('submit', '#form-node-config', function(e) {
 			if (data['status'] == 'success') {
 				logger(1, 'DEBUG: config saved.');
 				// Close the modal
+				$('body').children('.modal').attr('skipRedraw', true);
 				$('body').children('.modal').modal('hide');
 				addMessage(data['status'], data['message']);
 			} else {
@@ -1231,6 +1243,7 @@ $(document).on('submit', '#form-login', function(e) {
 			if (data['status'] == 'success') {
 				logger(1, 'DEBUG: user is authenticated.');
 				// Close the modal
+				$(e.target).parents('.modal').attr('skipRedraw', true);
 				$(e.target).parents('.modal').modal('hide');
 				$.when(getUserInfo()).done(function() {
 					// User is authenticated
@@ -1276,7 +1289,7 @@ $(document).on('submit', '#form-login', function(e) {
 	if (form_data['pod'] == '') {
 		form_data['pod'] = -1;
 	}
-	
+
 	var username = form_data['username'];
 	if ($(this).attr('id') == 'form-user-add') {
 		logger(1, 'DEBUG: posting form-user-add form.');
@@ -1297,6 +1310,7 @@ $(document).on('submit', '#form-login', function(e) {
 			if (data['status'] == 'success') {
 				logger(1, 'DEBUG: user "' + username + '" saved.');
 				// Close the modal
+				$(e.target).parents('.modal').attr('skipRedraw', true);
 				$(e.target).parents('.modal').modal('hide');
 				// Reload the user list
 				printUserManagement();
