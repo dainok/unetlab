@@ -43,7 +43,7 @@ $('body').on('change', 'input[name="import[file]"]', function(e) {
 $(document).on('keydown', 'body', function(e){
 	if('27' == e.which){
 		$('#mouse_frame').remove();
-		printLabTopology();
+		$('#lab-viewport').removeClass('lab-viewport-click-catcher');
 	};
 });
 
@@ -449,9 +449,11 @@ $(document).on('click', '.action-nodeplace, .action-networkplace', function(e) {
 	if ($(this).hasClass('action-nodeplace')) {
 		var object = 'node';
 		var frame = '<div id="mouse_frame" class="context-menu node_frame"><img src="/images/icons/Router.png"/></div>';
+		$("#lab-viewport").addClass('lab-viewport-click-catcher');
 	} else if ($(this).hasClass('action-networkplace')) {
 		var object = 'network';
 		var frame = '<div id="mouse_frame" class="context-menu network_frame"><img src="/images/lan.png"/></div>';
+		$("#lab-viewport").addClass('lab-viewport-click-catcher');
 	} else {
 		return false;
 	}
@@ -474,7 +476,7 @@ $(document).on('click', '.action-nodeplace, .action-networkplace', function(e) {
 	});
 
 	// On click open the form
-	$('*').click(function(e2) {
+	$('.lab-viewport-click-catcher').click(function(e2) {
 		if ($(e2.target).is('#lab-viewport, #lab-viewport *')) {
 			// Click is within viewport
 			if ($('#mouse_frame').length > 0) {
@@ -491,11 +493,11 @@ $(document).on('click', '.action-nodeplace, .action-networkplace', function(e) {
 				$('#mouse_frame').remove();
 			}
 			$('#mouse_frame').remove();
-			$('*').off();
+			$('.lab-viewport-click-catcher').off();
 		} else {
 			addMessage('warning', MESSAGES[101])
 			$('#mouse_frame').remove();
-			$('*').off();
+			$('.lab-viewport-click-catcher').off();
 		}
 
 	});
