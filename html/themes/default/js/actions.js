@@ -73,7 +73,7 @@ $(document).on('click', 'a.folder, a.lab, tr.user', function(e) {
 // Remove modal on close
 $(document).on('hidden.bs.modal', '.modal', function (e) {
 	$(this).remove();
-	if(!$(this).attr('skipRedraw')){
+	if($(this).prop('skipRedraw') && !$(this).attr('skipRedraw')){
 		printLabTopology();
 	}
 	$(this).attr('skipRedraw', false);
