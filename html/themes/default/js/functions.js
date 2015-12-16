@@ -88,7 +88,7 @@ function cfg_export(node_id) {
 	var deferred = $.Deferred();
 	var lab_filename = $('#lab-viewport').attr('data-path');
 	var url = '/api/labs' + lab_filename + '/nodes/' + node_id + '/export';
-	var type = 'GET';
+	var type = 'PUT';
 	$.ajax({
 		timeout: TIMEOUT * 10,	// Takes a lot of time
 		type: type,
@@ -1457,6 +1457,7 @@ function printFormNode(action, values) {
 		$('.selectpicker').selectpicker();
 
 		$('#form-node-template').change(function(e2) {
+			id = (id == '')? null : id;	// Ugly fix for change template after selection
 			template = $(this).find("option:selected").val();
 			if (template != '') {
 				// Getting template only if a valid option is selected (to avoid requests during typewriting)
@@ -1935,6 +1936,7 @@ function printPageLabList(folder) {
 	var html = '';
 	var url = '/api/folders' + folder;
 	var type = 'GET';
+	FOLDER = folder;
 	$.ajax({
 		timeout: TIMEOUT,
 		type: type,

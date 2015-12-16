@@ -195,6 +195,8 @@ switch ($action) {
 		exec($cmd, $o, $rc);
 		$cmd = 'ifconfig | grep vunl | cut -d\' \' -f1 | while read line; do tunctl -d $line; done';
 		exec($cmd, $o, $rc);
+		$cmd = 'find /opt/unetlab/labs/ -name "*.lock" -exec rm -f {} \;';
+		exec($cmd, $o, $rc);
 		break;
 	case 'platform':
 		$cmd = '/usr/sbin/dmidecode -s system-product-name';

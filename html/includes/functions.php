@@ -718,6 +718,41 @@ function resizeImage($image, $width, $height) {
 }
 
 /**
+ * Function to lock a file.
+ *
+ * @param   string  $file               File to lock
+ * @return  bool                        True if locked
+ */
+function lockFile($file) {
+	$timeout = 5000000;
+	$locked = False;
+
+	while ($timeout > 0) {
+		if (file_exists($file.'.lock')) {
+			// File is locked, wait for a random interval
+			$wait = 1000 * rand(0, 500);
+			$timeout = $timeout - $wait;
+			usleep($wait);
+		} else {
+			$locked = True;
+			touch($file.'.lock');
+			break;
+		}
+	}
+	return $locked;
+}
+
+/**
+ * Function to unlock a file.
+ *
+ * @param   string  $file               File to lock
+ * @return  bool                        True if unlocked
+ */
+function unlockFile($file) {
+	return unlink($file.'.lock');
+}
+
+/**
  * Function to update database.
  *
  * @param   PDO     $db                 PDO object for database connection

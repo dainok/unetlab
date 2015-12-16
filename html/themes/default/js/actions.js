@@ -373,7 +373,12 @@ $(document).on('click', '.action-labedit', function(e) {
 // List all labs
 $(document).on('click', '.action-lablist', function(e) {
 	logger(1, 'DEBUG: action = lablist');
-	printPageLabList(FOLDER);
+	if ($('#list-folders').length > 0) {
+		// Already on lab_list view -> open /
+		printPageLabList('/');
+	} else {
+		printPageLabList(FOLDER);
+	}
 });
 
 // Open a lab
@@ -673,7 +678,7 @@ $(document).on('click', '.action-nodeexport, .action-nodesexport', function(e) {
 			});
 		} else {
 			$.each(nodes, function(key, values) {
-				$.when(setTimeout(function() { cfg_export(key); }, values['delay'] * 10)).done(function() {
+				$.when(cfg_export(key)).done(function() {
 					// Node exported -> print a small green message
 					addMessage('success', values['name'] + ': ' + MESSAGES[79])
 				}).fail(function(message) {
@@ -1015,7 +1020,7 @@ $(document).on('submit', '#form-lab-add, #form-lab-edit', function(e) {
 					// Lab has been renamed, need to close it.
 					logger(1, 'DEBUG: lab "' + form_data['name'] + '" renamed.');
 					$.when(closeLab()).done(function() {
-						printPageLabOpen(dirname(form_data['path']) + '/' + form_data['name'] + '.unl');
+						postLogin();
 					}).fail(function(message) {
 						addModalError(message);
 					});

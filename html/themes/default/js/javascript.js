@@ -31,7 +31,7 @@
 
 // Custom vars
 var DEBUG = 5;
-var TIMEOUT = 3000;
+var TIMEOUT = 10000;
 
 // Global vars
 var EMAIL;
