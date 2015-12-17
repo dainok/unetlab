@@ -507,11 +507,11 @@ function apiGetLabNodeTemplate($p) {
 		$output['data']['options']['config'] = Array(
 			'name' => $GLOBALS['messages'][70013],
 			'type' => 'list',
-			'value' => '0',	// Unconfigured
+			'value' => '0',	// None
 			'list' => listNodeConfigTemplates()
 		);
-		$output['data']['options']['config']['list'][0] = $GLOBALS['messages'][70020];	// Unconfigured
-		$output['data']['options']['config']['list'][1] = $GLOBALS['messages'][70019];	// Saved
+		$output['data']['options']['config']['list'][0] = $GLOBALS['messages'][70020];	// None
+		$output['data']['options']['config']['list'][1] = $GLOBALS['messages'][70019];	// Exported
 	}
 
 	// Delay

@@ -1603,7 +1603,7 @@ function printFormNodeInterfaces(values) {
 
 		html += '<div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
 
-		addModal(MESSAGES[116], html, '');
+		addModal(values['node_name'] + ': ' + MESSAGES[116], html, '');
 		$('.selectpicker').selectpicker();
 	}).fail(function(message) {
 		// Cannot get data

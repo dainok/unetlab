@@ -857,7 +857,7 @@ class Node {
 		if (isset($this -> config)) {
 			return $this -> config;
 		} else {
-			// By default return 'Unconfigured'
+			// By default return 'None'
 			return '0';
 		}
 	}

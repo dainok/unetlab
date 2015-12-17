@@ -207,8 +207,8 @@ class Lab {
 				if (isset($node -> attributes() -> type)) $n['type'] = (string) $node -> attributes() -> type;
 				if (isset($node -> attributes() -> uuid)) $n['uuid'] = (string) $node -> attributes() -> uuid;
 
-				$n['config'] == 'Saved' ? $n['config'] = '1' : $n['config'];	// Fix startup-config
-				$n['config'] == 'Unconfigured' ? $n['config'] = '0' : $n['config'];	// Fix startup-config
+				$n['config'] == 'Exported' ? $n['config'] = '1' : $n['config'];	// Fix startup-config
+				$n['config'] == 'None' ? $n['config'] = '0' : $n['config'];	// Fix startup-config
 
 				try {
 					$this -> nodes[$n['id']] = new Node($n, $n['id'], $this -> tenant, $this -> id);

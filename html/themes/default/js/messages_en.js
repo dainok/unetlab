@@ -166,3 +166,4 @@ MESSAGES[134] = 'No pictures in this lab.';
 MESSAGES[135] = 'Add picture';
 MESSAGES[136] = 'Edit picture';
 MESSAGES[137] = 'Image MAP';
+MESSAGES[138] = 'Starting export, please wait';

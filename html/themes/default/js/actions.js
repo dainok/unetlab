@@ -316,8 +316,10 @@ $(document).on('click', '.action-nodedelete', function(e) {
 $(document).on('click', '.action-nodeinterfaces', function(e) {
 	logger(1, 'DEBUG: action = action-nodeinterfaces');
 	var id = $(this).attr('data-path');
+	var name = $(this).attr('data-name');
 	$.when(getNodeInterfaces(id)).done(function(values) {
 		values['node_id'] = id;
+		values['node_name'] = name;
 		printFormNodeInterfaces(values)
 	}).fail(function(message) {
 		addModalError(message);
@@ -669,6 +671,7 @@ $(document).on('click', '.action-nodeexport, .action-nodesexport', function(e) {
 
 	$.when(getNodes(null)).done(function(nodes) {
 		if (node_id != null) {
+			addMessage('info', nodes[node_id]['name'] + ': ' + MESSAGES[138])
 			$.when(cfg_export(node_id)).done(function() {
 				// Node exported -> print a small green message
 				addMessage('success', nodes[node_id]['name'] + ': ' + MESSAGES[79])
@@ -678,6 +681,7 @@ $(document).on('click', '.action-nodeexport, .action-nodesexport', function(e) {
 			});
 		} else {
 			$.each(nodes, function(key, values) {
+				addMessage('info', nodes[node_id]['name'] + ': ' + MESSAGES[138])
 				$.when(cfg_export(key)).done(function() {
 					// Node exported -> print a small green message
 					addMessage('success', values['name'] + ': ' + MESSAGES[79])

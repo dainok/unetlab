@@ -246,8 +246,8 @@ $messages[70015] = 'Console';
 $messages[70016] = 'Slot';
 $messages[70017] = 'Serial portgroups (4 int each)';
 $messages[70018] = 'Ethernet portgroups (4 int each)';
-$messages[70019] = 'Saved';
-$messages[70020] = 'Unconfigured';
+$messages[70019] = 'Exported';
+$messages[70020] = 'None';
 
 // CLI (80000-89999)
 $messages[80009] = 'Failed to add the username (80009).';
