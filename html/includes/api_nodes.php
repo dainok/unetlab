@@ -412,9 +412,13 @@ function apiGetLabNodeTemplate($p) {
 		$output['data']['options']['image'] = Array(
 			'name' => $GLOBALS['messages'][70002],
 			'type' => 'list',
-			'value' => end($node_images),
 			'list' => $node_images
 		);
+		if (isset($p['image'])) {
+			$output['data']['options']['image']['value'] =  $p['image'];
+		} else {
+			$output['data']['options']['image']['value'] =  end($node_images);
+		}
 	}
 
 	// Node Name/Prefix
