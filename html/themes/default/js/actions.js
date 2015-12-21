@@ -42,6 +42,7 @@ $('body').on('change', 'input[name="import[file]"]', function(e) {
 // On escape remove mouse_frame
 $(document).on('keydown', 'body', function(e){
 	if('27' == e.which){
+		$('.lab-viewport-click-catcher').unbind('click');
 		$('#mouse_frame').remove();
 		$('#lab-viewport').removeClass('lab-viewport-click-catcher');
 	};
@@ -143,8 +144,7 @@ $(document).on('click', '.menu-collapse, .menu-collapse i', function(e) {
 // Manage context menu
 $(document).on('contextmenu', '.context-menu', function(e) {
 	e.preventDefault();  // Prevent default behaviour
-
-	if ($(this).hasClass('node_frame')) {
+	if ($(this).hasClass('node_frame') && !$(this).data("block-context-menu")) {
 		logger(1, 'DEBUG: opening node context menu');
 		var node_id = $(this).attr('data-path');
 		var title = $(this).attr('data-name');
@@ -154,7 +154,7 @@ $(document).on('contextmenu', '.context-menu', function(e) {
 		if (ROLE == 'admin' || ROLE == 'editor') {
 			body += '<li role="separator" class="divider"></li><li><a class="menu-collapse" data-path="menu-edit" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[73] + '</a></li><li><a class="action-nodeexport context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-save"></i> ' + MESSAGES[69] + '</a></li><li><a class="action-nodeinterfaces context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[72] + '</a></li><li><a class="action-nodeedit context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-edit"></i> ' + MESSAGES[71] + '</a></li><li><a class="action-nodedelete context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[65] + '</a></li>'
 		};
-	} else if ($(this).hasClass('network_frame')) {
+	} else if ($(this).hasClass('network_frame') && !$(this).data("block-context-menu")) {
 		if (ROLE == 'admin' || ROLE == 'editor') {
 			logger(1, 'DEBUG: opening network context menu');
 			var network_id = $(this).attr('data-path');
@@ -451,15 +451,16 @@ $(document).on('click', '.action-networkadd', function(e) {
 $(document).on('click', '.action-nodeplace, .action-networkplace', function(e) {
 	logger(1, 'DEBUG: action = nodeplace');
 	var target = $(this);
+	var object, frame = '';
 	$('#context-menu').remove();
 
 	if ($(this).hasClass('action-nodeplace')) {
-		var object = 'node';
-		var frame = '<div id="mouse_frame" class="context-menu node_frame"><img src="/images/icons/Router.png"/></div>';
+		object = 'node';
+		frame = '<div id="mouse_frame" class="context-menu node_frame"><img src="/images/icons/Router.png"/></div>';
 		$("#lab-viewport").addClass('lab-viewport-click-catcher');
 	} else if ($(this).hasClass('action-networkplace')) {
-		var object = 'network';
-		var frame = '<div id="mouse_frame" class="context-menu network_frame"><img src="/images/lan.png"/></div>';
+		object = 'network';
+		frame = '<div id="mouse_frame" class="context-menu network_frame"><img src="/images/lan.png"/></div>';
 		$("#lab-viewport").addClass('lab-viewport-click-catcher');
 	} else {
 		return false;
@@ -469,6 +470,8 @@ $(document).on('click', '.action-nodeplace, .action-networkplace', function(e) {
 	if (!$('#mouse_frame').length) {
 		// Add the frame container if not exists
 		$('#lab-viewport').append(frame);
+		$(".context-menu.node_frame").data("block-context-menu", true);
+		$(".context-menu.network_frame").data("block-context-menu", true);
 	} else {
 		$('#mouse_frame').remove();
 		$('#lab-viewport').append(frame);
