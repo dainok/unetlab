@@ -212,7 +212,7 @@ $(document).on('click', '.action-configget', function(e) {
 	var id = $(this).attr('data-path');
 	$.when(getNodeConfigs(id)).done(function(config) {
 		printFormNodeConfigs(config);
-		('#form-node-config').find('.form-control').focusout(function(){
+		('#config-data').find('.form-control').focusout(function(){
 			saveLab();
 		})
 	}).fail(function(message) {
