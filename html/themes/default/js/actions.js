@@ -536,8 +536,30 @@ $(document).on('click', '.action-pictureedit', function(e) {
 	});
 });
 
-// Get picture
-$(document).on('click', '.action-pictureget', function(e) {
+// Get pictures list
+$(document).on('click', '.action-picturesget', function(e) {
+	logger(1, 'DEBUG: action = picturesget');
+	$.when(getPictures()).done(function(pictures) {
+		if (!$.isEmptyObject(pictures)) {
+			var body = '<div class="row"><div class="picture-list col-md-1 col-lg-1"><ul class="map">';
+			$.each(pictures, function(key, picture) {
+				console.log("### picture", picture);
+				var title = picture['name'] || "pic name";
+				body += '<li><a class="action-pictureget" data-path="' + key + '" href="#" title="' + title + '">' + picture['name'].split(' ')[0];
+				body += '</a></li>';
+			});
+			body += '</ul></div><div id="config-data" class="col-md-11 col-lg-11"></div></div>';
+			addModalWide(MESSAGES[137], body, '');
+		} else {
+			addMessage('info', MESSAGES[134]);
+		}
+	}).fail(function(message) {
+		addModalError(message);
+	});
+});
+
+// Get picture list old
+$(document).on('click', '.action-picturesget-stop', function(e) {
 	logger(1, 'DEBUG: action = pictureget');
 	$('#context-menu').remove();
 	var picture_id = $(this).attr('data-path');
@@ -550,12 +572,13 @@ $(document).on('click', '.action-pictureget', function(e) {
 		// Read privileges and set specific actions/elements
 		var body = '<div id="lab_picture"><img usemap="#picture_map" src="' + picture_url + '" alt="' + picture['name'] + '" title="' + picture['name'] + '" width="' + picture['width'] + '" height="' + picture['height'] + '"/><map name="picture_map">' + picture_map + '</map></div>'
 		if (ROLE == 'admin' || ROLE == 'editor') {
-			var footer = '<button type="button" class="btn btn-aqua action-pictureedit" data-dismiss="modal" data-path="' + picture_id + '">Edit</button>';
+			var footer = '<button type="button" class="btn btn-aqua action-pictureedit" data-path="' + picture_id + '">Edit</button>';
 		} else {
 			var footer = '';
 		}
-		addModalWide(picture['name'], body, footer);
-		$('map').imageMapResize();
+		printNodesMap({name:picture['name'], body:body, footer:footer}, function(){
+			$('map').imageMapResize();
+		});
 	}).fail(function(message) {
 		addModalError(message);
 	});

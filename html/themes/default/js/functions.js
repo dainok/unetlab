@@ -1535,6 +1535,14 @@ function printFormNodeConfigs(values, cb) {
 	cb && cb();
 }
 
+// Map picture
+function printNodesMap(values, cb) {
+	var title = values['name'] + ': ' + MESSAGES[123];
+	var html = '<div class="col-md-12">' + values.body + '</div><div class="text-right">' + values.footer + '</div>'
+	$('#config-data').html(html);
+	cb && cb();
+}
+
 //save lab handler
 function saveLab(from) {
 	var lab_filename = $('#lab-viewport').attr('data-path');
