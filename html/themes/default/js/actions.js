@@ -42,6 +42,7 @@ $('body').on('change', 'input[name="import[file]"]', function(e) {
 // On escape remove mouse_frame
 $(document).on('keydown', 'body', function(e){
 	if('27' == e.which){
+		$('.lab-viewport-click-catcher').unbind('click');
 		$('#mouse_frame').remove();
 		$('#lab-viewport').removeClass('lab-viewport-click-catcher');
 	};
@@ -73,6 +74,9 @@ $(document).on('click', 'a.folder, a.lab, tr.user', function(e) {
 // Remove modal on close
 $(document).on('hidden.bs.modal', '.modal', function (e) {
 	$(this).remove();
+	if($('body').children('.modal.fade.in')){
+		$('body').children('.modal.fade.in').focus();
+	}
 	if($(this).prop('skipRedraw') && !$(this).attr('skipRedraw')){
 		printLabTopology();
 	}
@@ -143,8 +147,7 @@ $(document).on('click', '.menu-collapse, .menu-collapse i', function(e) {
 // Manage context menu
 $(document).on('contextmenu', '.context-menu', function(e) {
 	e.preventDefault();  // Prevent default behaviour
-
-	if ($(this).hasClass('node_frame')) {
+	if ($(this).hasClass('node_frame') && !$(this).data("block-context-menu")) {
 		logger(1, 'DEBUG: opening node context menu');
 		var node_id = $(this).attr('data-path');
 		var title = $(this).attr('data-name');
@@ -154,7 +157,7 @@ $(document).on('contextmenu', '.context-menu', function(e) {
 		if (ROLE == 'admin' || ROLE == 'editor') {
 			body += '<li role="separator" class="divider"></li><li><a class="menu-collapse" data-path="menu-edit" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[73] + '</a></li><li><a class="action-nodeexport context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-save"></i> ' + MESSAGES[69] + '</a></li><li><a class="action-nodeinterfaces context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[72] + '</a></li><li><a class="action-nodeedit context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-edit"></i> ' + MESSAGES[71] + '</a></li><li><a class="action-nodedelete context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[65] + '</a></li>'
 		};
-	} else if ($(this).hasClass('network_frame')) {
+	} else if ($(this).hasClass('network_frame') && !$(this).data("block-context-menu")) {
 		if (ROLE == 'admin' || ROLE == 'editor') {
 			logger(1, 'DEBUG: opening network context menu');
 			var network_id = $(this).attr('data-path');
@@ -209,6 +212,9 @@ $(document).on('click', '.action-configget', function(e) {
 	var id = $(this).attr('data-path');
 	$.when(getNodeConfigs(id)).done(function(config) {
 		printFormNodeConfigs(config);
+		('#form-node-config').find('.form-control').focusout(function(){
+			saveLab();
+		})
 	}).fail(function(message) {
 		addModalError(message);
 	});
@@ -451,15 +457,16 @@ $(document).on('click', '.action-networkadd', function(e) {
 $(document).on('click', '.action-nodeplace, .action-networkplace', function(e) {
 	logger(1, 'DEBUG: action = nodeplace');
 	var target = $(this);
+	var object, frame = '';
 	$('#context-menu').remove();
 
 	if ($(this).hasClass('action-nodeplace')) {
-		var object = 'node';
-		var frame = '<div id="mouse_frame" class="context-menu node_frame"><img src="/images/icons/Router.png"/></div>';
+		object = 'node';
+		frame = '<div id="mouse_frame" class="context-menu node_frame"><img src="/images/icons/Router.png"/></div>';
 		$("#lab-viewport").addClass('lab-viewport-click-catcher');
 	} else if ($(this).hasClass('action-networkplace')) {
-		var object = 'network';
-		var frame = '<div id="mouse_frame" class="context-menu network_frame"><img src="/images/lan.png"/></div>';
+		object = 'network';
+		frame = '<div id="mouse_frame" class="context-menu network_frame"><img src="/images/lan.png"/></div>';
 		$("#lab-viewport").addClass('lab-viewport-click-catcher');
 	} else {
 		return false;
@@ -469,6 +476,8 @@ $(document).on('click', '.action-nodeplace, .action-networkplace', function(e) {
 	if (!$('#mouse_frame').length) {
 		// Add the frame container if not exists
 		$('#lab-viewport').append(frame);
+		$(".context-menu.node_frame").data("block-context-menu", true);
+		$(".context-menu.network_frame").data("block-context-menu", true);
 	} else {
 		$('#mouse_frame').remove();
 		$('#lab-viewport').append(frame);
@@ -530,8 +539,30 @@ $(document).on('click', '.action-pictureedit', function(e) {
 	});
 });
 
-// Get picture
-$(document).on('click', '.action-pictureget', function(e) {
+// Get pictures list
+$(document).on('click', '.action-picturesget', function(e) {
+	logger(1, 'DEBUG: action = picturesget');
+	$.when(getPictures()).done(function(pictures) {
+		if (!$.isEmptyObject(pictures)) {
+			var body = '<div class="row"><div class="picture-list col-md-1 col-lg-1"><ul class="map">';
+			$.each(pictures, function(key, picture) {
+				console.log("### picture", picture);
+				var title = picture['name'] || "pic name";
+				body += '<li><a class="action-pictureget" data-path="' + key + '" href="#" title="' + title + '">' + picture['name'].split(' ')[0];
+				body += '</a></li>';
+			});
+			body += '</ul></div><div id="config-data" class="col-md-11 col-lg-11"></div></div>';
+			addModalWide(MESSAGES[137], body, '');
+		} else {
+			addMessage('info', MESSAGES[134]);
+		}
+	}).fail(function(message) {
+		addModalError(message);
+	});
+});
+
+// Get picture list old
+$(document).on('click', '.action-picturesget-stop', function(e) {
 	logger(1, 'DEBUG: action = pictureget');
 	$('#context-menu').remove();
 	var picture_id = $(this).attr('data-path');
@@ -544,12 +575,13 @@ $(document).on('click', '.action-pictureget', function(e) {
 		// Read privileges and set specific actions/elements
 		var body = '<div id="lab_picture"><img usemap="#picture_map" src="' + picture_url + '" alt="' + picture['name'] + '" title="' + picture['name'] + '" width="' + picture['width'] + '" height="' + picture['height'] + '"/><map name="picture_map">' + picture_map + '</map></div>'
 		if (ROLE == 'admin' || ROLE == 'editor') {
-			var footer = '<button type="button" class="btn btn-aqua action-pictureedit" data-dismiss="modal" data-path="' + picture_id + '">Edit</button>';
+			var footer = '<button type="button" class="btn btn-aqua action-pictureedit" data-path="' + picture_id + '">Edit</button>';
 		} else {
 			var footer = '';
 		}
-		addModalWide(picture['name'], body, footer);
-		$('map').imageMapResize();
+		printNodesMap({name:picture['name'], body:body, footer:footer}, function(){
+			$('map').imageMapResize();
+		});
 	}).fail(function(message) {
 		addModalError(message);
 	});
@@ -1135,7 +1167,8 @@ $(document).on('submit', '#form-node-connect', function(e) {
 				logger(1, 'DEBUG: node "' + node_id + '" saved.');
 				// Close the modal
 				$('body').children('.modal').attr('skipRedraw', true);
-				$('body').children('.modal').modal('hide');
+				$('body').children('.modal.second-win').modal('hide');
+				$('body').children('.modal.fade.in').focus();
 				addMessage(data['status'], data['message']);
 				printLabTopology();
 			} else {
@@ -1197,7 +1230,8 @@ $(document).on('submit', '#form-node-add, #form-node-edit', function(e) {
 					logger(1, 'DEBUG: node "' + form_data['name'] + '" saved.');
 					// Close the modal
 					$('body').children('.modal').attr('skipRedraw', true);
-					$('body').children('.modal').modal('hide');
+					$('body').children('.modal.second-win').modal('hide');
+					$('body').children('.modal.fade.in').focus();
 					addMessage(data['status'], data['message']);
 				} else {
 					// Application error
@@ -1213,6 +1247,7 @@ $(document).on('submit', '#form-node-add, #form-node-edit', function(e) {
 				addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
 			}
 		});
+		promises.push(request);
 	}
 
 	$.when.apply(null, promises).done(function() {
@@ -1224,38 +1259,7 @@ $(document).on('submit', '#form-node-add, #form-node-edit', function(e) {
 // Submit config form
 $(document).on('submit', '#form-node-config', function(e) {
 	e.preventDefault();  // Prevent default behaviour
-	var lab_filename = $('#lab-viewport').attr('data-path');
-	var form_data = form2Array('config');
-	var url = '/api/labs' + lab_filename + '/configs/' + form_data['id'];
-	var type = 'PUT';
-	$.ajax({
-		timeout: TIMEOUT,
-		type: type,
-		url: encodeURI(url),
-		dataType: 'json',
-		data: JSON.stringify(form_data),
-		success: function(data) {
-			if (data['status'] == 'success') {
-				logger(1, 'DEBUG: config saved.');
-				// Close the modal
-				$('body').children('.modal').attr('skipRedraw', true);
-				$('body').children('.modal').modal('hide');
-				addMessage(data['status'], data['message']);
-			} else {
-				// Application error
-				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-			}
-		},
-		error: function(data) {
-			// Server error
-			var message = getJsonMessage(data['responseText']);
-			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
-			logger(1, 'DEBUG: ' + message);
-			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-		}
-	});
-	return false;  // Stop to avoid POST
+	saveLab('form-node-config');
 });
 
 // Submit login form

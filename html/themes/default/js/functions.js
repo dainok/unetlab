@@ -63,8 +63,9 @@ function addMessage(severity, message) {
 }
 
 // Add Modal
-function addModal(title, body, footer) {
-	var html = '<div aria-hidden="false" style="display: block;" class="modal fade in" tabindex="-1" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">' + title + '</h4></div><div class="modal-body">' + body + '</div><div class="modal-footer">' + footer + '</div></div></div></div>';
+function addModal(title, body, footer, property) {
+	var prop = property || "";
+	var html = '<div aria-hidden="false" style="display: block;" class="modal ' + ' ' + prop + ' fade in" tabindex="-1" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">' + title + '</h4></div><div class="modal-body">' + body + '</div><div class="modal-footer">' + footer + '</div></div></div></div>';
 	$('body').append(html);
 	$('body > .modal').modal('show');
 }
@@ -1453,7 +1454,7 @@ function printFormNode(action, values) {
 		html += '</select></div></div><div id="form-node-data"></div><div id="form-node-buttons"></div></form>';
 
 		// Show the form
-		addModal(title, html, '');
+		addModal(title, html, '', 'second-win');
 		$('.selectpicker').selectpicker();
 
 		$('#form-node-template').change(function(e2) {
@@ -1523,7 +1524,7 @@ function printFormNode(action, values) {
 }
 
 // Node config
-function printFormNodeConfigs(values) {
+function printFormNodeConfigs(values, cb) {
 	var title = values['name'] + ': ' + MESSAGES[123];
 	if (ROLE == 'admin' || ROLE == 'editor') {
 		var html = '<form id="form-node-config" class="form-horizontal"><input name="config[id]" value="' + values['id'] + '" type="hidden"/><div class="form-group"><div class="col-md-12"><textarea class="form-control autofocus" name="config[data]" rows="15">' + values['data'] + '</textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
@@ -1531,6 +1532,53 @@ function printFormNodeConfigs(values) {
 		var html = '<div class="col-md-12"><pre>' + values['data'] + '</pre></div>';
 	}
 	$('#config-data').html(html);
+	cb && cb();
+}
+
+// Map picture
+function printNodesMap(values, cb) {
+	var title = values['name'] + ': ' + MESSAGES[123];
+	var html = '<div class="col-md-12">' + values.body + '</div><div class="text-right">' + values.footer + '</div>'
+	$('#config-data').html(html);
+	cb && cb();
+}
+
+//save lab handler
+function saveLab(from) {
+	var lab_filename = $('#lab-viewport').attr('data-path');
+	var form_data = form2Array('config');
+	var url = '/api/labs' + lab_filename + '/configs/' + form_data['id'];
+	var type = 'PUT';
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		data: JSON.stringify(form_data),
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: config saved.');
+				// Close the modal
+				$('body').children('.modal').attr('skipRedraw', true);
+				if(from) {
+					$('body').children('.modal').modal('hide');
+					addMessage(data['status'], data['message']);
+				}
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+			}
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+		}
+	});
+	return false;  // Stop to avoid POST
 }
 
 // Node interfaces
