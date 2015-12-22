@@ -209,6 +209,9 @@ $(document).on('click', '.action-configget', function(e) {
 	var id = $(this).attr('data-path');
 	$.when(getNodeConfigs(id)).done(function(config) {
 		printFormNodeConfigs(config);
+		('#form-node-config').find('.form-control').focusout(function(){
+			saveLab();
+		})
 	}).fail(function(message) {
 		addModalError(message);
 	});
@@ -1227,38 +1230,7 @@ $(document).on('submit', '#form-node-add, #form-node-edit', function(e) {
 // Submit config form
 $(document).on('submit', '#form-node-config', function(e) {
 	e.preventDefault();  // Prevent default behaviour
-	var lab_filename = $('#lab-viewport').attr('data-path');
-	var form_data = form2Array('config');
-	var url = '/api/labs' + lab_filename + '/configs/' + form_data['id'];
-	var type = 'PUT';
-	$.ajax({
-		timeout: TIMEOUT,
-		type: type,
-		url: encodeURI(url),
-		dataType: 'json',
-		data: JSON.stringify(form_data),
-		success: function(data) {
-			if (data['status'] == 'success') {
-				logger(1, 'DEBUG: config saved.');
-				// Close the modal
-				$('body').children('.modal').attr('skipRedraw', true);
-				$('body').children('.modal').modal('hide');
-				addMessage(data['status'], data['message']);
-			} else {
-				// Application error
-				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-				addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-			}
-		},
-		error: function(data) {
-			// Server error
-			var message = getJsonMessage(data['responseText']);
-			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
-			logger(1, 'DEBUG: ' + message);
-			addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
-		}
-	});
-	return false;  // Stop to avoid POST
+	saveLab('form-node-config');
 });
 
 // Submit login form
