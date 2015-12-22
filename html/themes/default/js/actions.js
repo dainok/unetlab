@@ -1219,6 +1219,7 @@ $(document).on('submit', '#form-node-add, #form-node-edit', function(e) {
 				addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
 			}
 		});
+		promises.push(request);
 	}
 
 	$.when.apply(null, promises).done(function() {
