@@ -74,6 +74,9 @@ $(document).on('click', 'a.folder, a.lab, tr.user', function(e) {
 // Remove modal on close
 $(document).on('hidden.bs.modal', '.modal', function (e) {
 	$(this).remove();
+	if($('body').children('.modal.fade.in')){
+		$('body').children('.modal.fade.in').focus();
+	}
 	if($(this).prop('skipRedraw') && !$(this).attr('skipRedraw')){
 		printLabTopology();
 	}
@@ -1164,7 +1167,8 @@ $(document).on('submit', '#form-node-connect', function(e) {
 				logger(1, 'DEBUG: node "' + node_id + '" saved.');
 				// Close the modal
 				$('body').children('.modal').attr('skipRedraw', true);
-				$('body').children('.modal').modal('hide');
+				$('body').children('.modal.second-win').modal('hide');
+				$('body').children('.modal.fade.in').focus();
 				addMessage(data['status'], data['message']);
 				printLabTopology();
 			} else {
@@ -1227,6 +1231,7 @@ $(document).on('submit', '#form-node-add, #form-node-edit', function(e) {
 					// Close the modal
 					$('body').children('.modal').attr('skipRedraw', true);
 					$('body').children('.modal.second-win').modal('hide');
+					$('body').children('.modal.fade.in').focus();
 					addMessage(data['status'], data['message']);
 				} else {
 					// Application error
