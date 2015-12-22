@@ -1200,7 +1200,7 @@ $(document).on('submit', '#form-node-add, #form-node-edit', function(e) {
 					logger(1, 'DEBUG: node "' + form_data['name'] + '" saved.');
 					// Close the modal
 					$('body').children('.modal').attr('skipRedraw', true);
-					$('body').children('.modal').modal('hide');
+					$('body').children('.modal.second-win').modal('hide');
 					addMessage(data['status'], data['message']);
 				} else {
 					// Application error

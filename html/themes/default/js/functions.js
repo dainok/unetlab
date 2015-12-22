@@ -63,8 +63,9 @@ function addMessage(severity, message) {
 }
 
 // Add Modal
-function addModal(title, body, footer) {
-	var html = '<div aria-hidden="false" style="display: block;" class="modal fade in" tabindex="-1" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">' + title + '</h4></div><div class="modal-body">' + body + '</div><div class="modal-footer">' + footer + '</div></div></div></div>';
+function addModal(title, body, footer, property) {
+	var prop = property || "";
+	var html = '<div aria-hidden="false" style="display: block;" class="modal ' + ' ' + prop + ' fade in" tabindex="-1" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">' + title + '</h4></div><div class="modal-body">' + body + '</div><div class="modal-footer">' + footer + '</div></div></div></div>';
 	$('body').append(html);
 	$('body > .modal').modal('show');
 }
@@ -1453,7 +1454,7 @@ function printFormNode(action, values) {
 		html += '</select></div></div><div id="form-node-data"></div><div id="form-node-buttons"></div></form>';
 
 		// Show the form
-		addModal(title, html, '');
+		addModal(title, html, '', 'second-win');
 		$('.selectpicker').selectpicker();
 
 		$('#form-node-template').change(function(e2) {
