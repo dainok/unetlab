@@ -212,7 +212,7 @@ $(document).on('click', '.action-configget', function(e) {
 	var id = $(this).attr('data-path');
 	$.when(getNodeConfigs(id)).done(function(config) {
 		printFormNodeConfigs(config);
-		('#form-node-config').find('.form-control').focusout(function(){
+		('#config-data').find('.form-control').focusout(function(){
 			saveLab();
 		})
 	}).fail(function(message) {
@@ -539,6 +539,32 @@ $(document).on('click', '.action-pictureedit', function(e) {
 	});
 });
 
+// Get picture
+$(document).on('click', '.action-pictureget', function(e) {
+	logger(1, 'DEBUG: action = pictureget');
+	$('#context-menu').remove();
+	var picture_id = $(this).attr('data-path');
+	var picture_url = '/api/labs' + $('#lab-viewport').attr('data-path') + '/pictures/' + picture_id + '/data';
+
+	$.when(getPictures(picture_id)).done(function(picture) {
+		var picture_map = picture['map'];
+		picture_map = picture_map.replace(/{{IP}}/g, location.hostname);
+		picture_map = picture_map.replace(/{{NODE[0-9]+}}/g, function(e) { return parseInt(e.substr(6, e.length - 8)) + 32768 + 128 * TENANT});
+		// Read privileges and set specific actions/elements
+		var body = '<div id="lab_picture"><img usemap="#picture_map" src="' + picture_url + '" alt="' + picture['name'] + '" title="' + picture['name'] + '" width="' + picture['width'] + '" height="' + picture['height'] + '"/><map name="picture_map">' + picture_map + '</map></div>'
+		if (ROLE == 'admin' || ROLE == 'editor') {
+			var footer = '<button type="button" class="btn btn-aqua action-pictureedit" data-path="' + picture_id + '">Edit</button>';
+		} else {
+			var footer = '';
+		}
+		printNodesMap({name:picture['name'], body:body, footer:footer}, function(){
+			$('map').imageMapResize();
+		});
+	}).fail(function(message) {
+		addModalError(message);
+	});
+});
+
 // Get pictures list
 $(document).on('click', '.action-picturesget', function(e) {
 	logger(1, 'DEBUG: action = picturesget');
@@ -582,24 +608,6 @@ $(document).on('click', '.action-picturesget-stop', function(e) {
 		printNodesMap({name:picture['name'], body:body, footer:footer}, function(){
 			$('map').imageMapResize();
 		});
-	}).fail(function(message) {
-		addModalError(message);
-	});
-});
-
-// Get picture list
-$(document).on('click', '.action-picturesget', function(e) {
-	logger(1, 'DEBUG: action = picturesget');
-	$.when(getPictures()).done(function(pictures) {
-		if (!$.isEmptyObject(pictures)) {
-			var body = '';
-			$.each(pictures, function(key, picture) {
-				body += '<li><a class="action-pictureget" data-path="' + key + '" href="#" title="' + picture['name'] + '"><i class="glyphicon glyphicon-picture"></i> ' + picture['name'] + '</a></li>';
-			});
-			printContextMenu(MESSAGES[59], body, e.pageX, e.pageY);
-		} else {
-			addMessage('info', MESSAGES[134]);
-		}
 	}).fail(function(message) {
 		addModalError(message);
 	});
