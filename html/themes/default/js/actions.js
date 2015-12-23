@@ -76,6 +76,7 @@ $(document).on('hidden.bs.modal', '.modal', function (e) {
 	$(this).remove();
 	if($('body').children('.modal.fade.in')){
 		$('body').children('.modal.fade.in').focus();
+		$('body').children('.modal.fade.in').css("overflow-y", "auto");
 	}
 	if($(this).prop('skipRedraw') && !$(this).attr('skipRedraw')){
 		printLabTopology();
@@ -392,8 +393,14 @@ $(document).on('click', '.action-lablist', function(e) {
 // Open a lab
 $(document).on('click', '.action-labopen', function(e) {
 	logger(1, 'DEBUG: action = labopen');
-	printPageLabOpen($(this).attr('data-path'));
-
+	var self = this;
+	$.when(getUserInfo()).done(function() {
+		postLogin($(self).attr('data-path'));
+	}).fail(function() {
+		// User is not authenticated, or error on API
+		logger(1, 'DEBUG: loading authentication page.');
+		printPageAuthentication();
+	});
 });
 
 // Preview a lab
