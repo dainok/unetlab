@@ -78,8 +78,9 @@ function addModalError(message) {
 }
 
 // Add Modal
-function addModalWide(title, body, footer) {
-	var html = '<div aria-hidden="false" style="display: block;" class="modal modal-wide fade in" tabindex="-1" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">' + title + '</h4></div><div class="modal-body">' + body + '</div><div class="modal-footer">' + footer + '</div></div></div></div>';
+function addModalWide(title, body, footer, property) {
+	var prop = property || "";
+	var html = '<div aria-hidden="false" style="display: block;" class="modal modal-wide ' + prop + ' fade in" tabindex="-1" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">' + title + '</h4></div><div class="modal-body">' + body + '</div><div class="modal-footer">' + footer + '</div></div></div></div>';
 	$('body').append(html);
 	$('body > .modal').modal('show');
 }
@@ -1062,19 +1063,19 @@ function moveLab(lab, path) {
 }
 
 // Post login
-function postLogin() {
+function postLogin(param) {
 	if (UPDATEID != null) {
 		// Stop updating node_status
 		clearInterval(UPDATEID);
 	}
 
-	if (LAB == null) {
+	if (LAB == null && param == null) {
 		logger(1, 'DEBUG: loading folder "' + FOLDER + '".');
 		printPageLabList(FOLDER);
 	} else {
+		LAB = LAB || param;
 		logger(1, 'DEBUG: loading lab "' + LAB + '".');
 		printPageLabOpen(LAB);
-
 		// Update node status
 		UPDATEID = setInterval('printLabStatus("' + LAB + '")', 5000);
 	}
@@ -1651,7 +1652,7 @@ function printFormNodeInterfaces(values) {
 
 		html += '<div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
 
-		addModal(values['node_name'] + ': ' + MESSAGES[116], html, '');
+		addModal(values['node_name'] + ': ' + MESSAGES[116], html, '', 'second-win');
 		$('.selectpicker').selectpicker();
 	}).fail(function(message) {
 		// Cannot get data
