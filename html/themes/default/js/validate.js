@@ -156,3 +156,14 @@ function validateNode() {
 		}
 	});
 }
+
+// Validate lab picture form
+function validateLabPicture() {
+    $('.form-picture').validate({
+        rules: {
+            'picture[name]': {
+                required: true
+            }
+        }
+    });
+}
