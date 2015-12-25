@@ -1694,17 +1694,17 @@ function printFormNodeInterfaces(values) {
 	});
 }
 
+// Display picture in form
 function printPictureInForm(id){
-	console.log("### id", id);
 	var picture_id = id;
 	var picture_url = '/api/labs' + $('#lab-viewport').attr('data-path') + '/pictures/' + picture_id + '/data';
 	
 	$.when(getPictures(picture_id)).done(function(picture) {
-		console.log("### picture1", picture);
 		var picture_map = picture['map'];
 		picture_map = picture_map.replace(/{{IP}}/g, location.hostname);
 		picture_map = picture_map.replace(/{{NODE[0-9]+}}/g, function(e) { return parseInt(e.substr(6, e.length - 8)) + 32768 + 128 * TENANT});
 		// Read privileges and set specific actions/elements
+		console.log("### picture_map", picture_map);
 		var body = '<div id="lab_picture"><img usemap="#picture_map" src="' + picture_url + '" alt="' + picture['name'] + '" title="' + picture['name'] + '" width="' + picture['width'] + '" height="' + picture['height'] + '"/><map name="picture_map">' + picture_map + '</map></div>'
 		if (ROLE == 'admin' || ROLE == 'editor') {
 			var footer = '<button type="button" class="btn btn-aqua action-pictureedit" data-path="' + picture_id + '">Edit</button>';
@@ -1712,7 +1712,9 @@ function printPictureInForm(id){
 			var footer = '';
 		}
 		printNodesMap({name:picture['name'], body:body, footer:footer}, function(){
-			$('map').imageMapResize();
+			setTimeout(function(){
+				$('map').imageMapResize();
+			}, 500);
 		});
 	}).fail(function(message) {
 		addModalError(message);
@@ -1732,7 +1734,7 @@ function displayPictureForm(picture_id) {
         // Header
         form += '<form id="form-' + action + '" class="form-horizontal form-picture">';
 				// Name
-		form += '<div class="form-group"><label class="col-md-3 control-label">Name</label><div class="col-md-5"><input type="text" class="form-control" name="picture[name]" value=""/></div></div>';
+		form += '<div class="form-group"><label class="col-md-3 control-label">Name</label><div class="col-md-5"><input type="text" class="form-control-static" name="picture[name]" value=""/></div></div>';
 				// File (add only)
 		form += '<div class="form-group"><label class="col-md-3 control-label">Picture</label><div class="col-md-5"><input type="file" name="picture[file]" value=""/></div></div>';
 				// Footer
@@ -1740,7 +1742,7 @@ function displayPictureForm(picture_id) {
 		// Add the form to the HTML page
         // $('#form_frame').html(form);
 
-        addModal("Add picture", form);
+        addModal("Add picture", form, '<div></div>');
 
         // Show the form
         // $('#modal-' + action).modal('show');
@@ -1823,7 +1825,7 @@ function printFormPicture(action, values) {
 	var name = (values['name'] != null) ? values['name'] : '';
 	var width = (values['width'] != null) ? values['width'] : '';
 	var height = (values['height'] != null) ? values['height'] : '';
-	var title = (action == 'add') ? MESSAGES[135] : MESSAGES[136];
+	var title = (action == 'add') ? MESSAGES[135] : MESSAGES[137];
 	var html = ''
 
 	if (action == 'add') {
@@ -1832,7 +1834,7 @@ function printFormPicture(action, values) {
 		html += '<form id="form-picture-' + action + '" class="form-horizontal form-lab-' + action + '" data-path=' + values['id'] + '><img src="/api/labs' + $('#lab-viewport').attr('data-path') + '/pictures/' + values['id'] + '/data" alt="' + values['name'] + '" width="' + values['width'] + '" height="' + values['height'] + '"/><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control" autofocus name="picture[name]" value="' + name + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[137] + '</label><div class="col-md-5"><textarea class="form-control" name="picture[map]">' + map + '</textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
 	}
 	logger(1, 'DEBUG: popping up the picture form.');
-	addModalWide(title, html, '', 'second-win');
+	addModalWide(title, html, '', 'second-win modal-ultra-wide');
 	validateLabInfo();
 }
 
