@@ -628,12 +628,12 @@ $(document).on('click', '.action-picturesget', function(e) {
 			$.each(pictures, function(key, picture) {
 				console.log("### picture", picture);
 				var title = picture['name'] || "pic name";
-				body += '<li><a class="action-pictureget" data-path="' + key + '" href="#" title="' + title + '">' + picture['name'].split(' ')[0];
-				body += ' <i class="glyphicon glyphicon-remove-circle delete-picture" title="Detete"></i>';
+				body += '<li><a class="action-pictureget" data-path="' + key + '" href="#" title="' + title + '">' + picture['name'].split(' ')[0] + '</a>';
+				body += '<a class="delete-picture" href="#" data-path="' + key + '"><i class="glyphicon glyphicon-trash delete-picture" title="Delete"></i>';
 				body += '</a></li>';
 			});
 			body += '</ul></div><div id="config-data" class="col-md-10 col-lg-10"></div></div>';
-			addModalWide(MESSAGES[137], body, '');
+			addModalWide(MESSAGES[59], body, '', "modal-ultra-wide");
 		} else {
 			addMessage('info', MESSAGES[134]);
 		}
@@ -669,19 +669,16 @@ $(document).on('click', '.action-picturesget-stop', function(e) {
 });
 
 //Detele picture
-$(document).on('click', '.glyphicon-remove-circle', function(e){
+$(document).on('click', '.delete-picture', function(e){
 	e.stopPropagation();  // Prevent default behaviour
 	logger(1, 'DEBUG: action = pictureremove');
 	var $self = $(this);
 
 	var picture_id = $self.parent().attr('data-path');
 	var lab_filename = $('#lab-viewport').attr('data-path');
-	$.when(deletePicture(lab_filename, picture_id)).done(function(){
-		$self.parents('li').remove();
-		$("#config-data").html("");
-	}).fail(function(message) {
-		addModalError(message);
-	});
+	var body = '<form id="form-picture-delete" data-path="' + picture_id + '" class="form-horizontal form-picture" novalidate="novalidate"><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-success">Delete</button><button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button></div></div></form>'
+	var title = "Delete this picture?"
+	addModal(title, body, "", "second-win");
 });
 
 // Clone selected labs
@@ -1486,6 +1483,28 @@ $('body').on('submit', '#form-picture-edit', function(e) {
 
     // Hide and delete the modal (or will be posted twice)
     $('#form_frame > div').modal('hide');
+
+    // Stop or form will follow the action link
+    return false;
+});
+
+// Delete picture form
+$('body').on('submit', '#form-picture-delete', function(e) {
+    e.preventDefault();  // Prevent default behaviour
+	var lab_filename = $('#lab-viewport').attr('data-path');
+    var picture_id = $(this).attr('data-path');
+	var picture_name = $('li a[data-path="' + picture_id + '"]').attr("title");
+    $.when(deletePicture(lab_filename, picture_id)).done(function(){
+    	addMessage('SUCCESS', 'Picture "' + picture_name + '" deleted.');
+		$('li a[data-path="' + picture_id + '"]').parent().remove();
+		$("#config-data").html("");
+	}).fail(function(message) {
+		addModalError(message);
+	});
+    
+
+    // Hide and delete the modal (or will be posted twice)
+    $('body').children('.modal.second-win').modal('hide');
 
     // Stop or form will follow the action link
     return false;

@@ -533,6 +533,10 @@
 	width: 90%;
 }
 
+.modal.modal-ultra-wide .modal-dialog{
+	width: 97%;
+}
+
 .selectpicker-button {
 	width: 100%;
 }

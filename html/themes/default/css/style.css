@@ -491,3 +491,7 @@ ul.map {
 	margin: 0;
 	padding-left: 20px;
 }
+
+ul.map i.delete-picture {
+	margin-left: 15px;
+}
