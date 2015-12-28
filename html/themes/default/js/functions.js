@@ -80,7 +80,11 @@ function addModalError(message) {
 // Add Modal
 function addModalWide(title, body, footer, property) {
 	var prop = property || "";
-	var html = '<div aria-hidden="false" style="display: block;" class="modal modal-wide ' + prop + ' fade in" tabindex="-1" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">' + title + '</h4></div><div class="modal-body">' + body + '</div><div class="modal-footer">' + footer + '</div></div></div></div>';
+	var addittionalHeaderBtns = "";
+	if(title.toUpperCase() == "STARTUP-CONFIGS" || title.toUpperCase() == "CONFIGURED NODES") {
+		addittionalHeaderBtns = '<i class="glyphicon glyphicon-certificate pull-right action-changeopacity"></i>'
+	} 
+	var html = '<div aria-hidden="false" style="display: block;" class="modal modal-wide ' + prop + ' fade in" tabindex="-1" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"></i><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' + addittionalHeaderBtns + '<h4 class="modal-title">' + title + '</h4></div><div class="modal-body">' + body + '</div><div class="modal-footer">' + footer + '</div></div></div></div>';
 	$('body').append(html);
 	$('body > .modal').modal('show');
 }
@@ -1066,8 +1070,7 @@ function moveLab(lab, path) {
 function deletePicture(lab_file, picture_id, cb) {
     var deferred = $.Deferred();
     var data = [];
-    console.log("### lab_file, picture_id", lab_file, picture_id)
-
+    
     // Delete network
     var url = '/api/labs' + lab_file + '/pictures/' + picture_id;
     $.ajax({
@@ -1704,7 +1707,7 @@ function printPictureInForm(id){
 		picture_map = picture_map.replace(/{{IP}}/g, location.hostname);
 		picture_map = picture_map.replace(/{{NODE[0-9]+}}/g, function(e) { return parseInt(e.substr(6, e.length - 8)) + 32768 + 128 * TENANT});
 		// Read privileges and set specific actions/elements
-		console.log("### picture_map", picture_map);
+		
 		var body = '<div id="lab_picture"><img usemap="#picture_map" src="' + picture_url + '" alt="' + picture['name'] + '" title="' + picture['name'] + '" width="' + picture['width'] + '" height="' + picture['height'] + '"/><map name="picture_map">' + picture_map + '</map></div>'
 		if (ROLE == 'admin' || ROLE == 'editor') {
 			var footer = '<button type="button" class="btn btn-aqua action-pictureedit" data-path="' + picture_id + '">Edit</button>';
