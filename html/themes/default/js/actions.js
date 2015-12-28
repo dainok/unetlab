@@ -50,8 +50,7 @@ $(document).on('keydown', 'body', function(e){
 
 // Add picture MAP
 $('body').on('click', '#form-picture-edit img', function(e) {
-	console.log("### app picture map");
-    var offset = $(this).offset();
+	var offset = $(this).offset();
     var y = (e.pageY - offset.top).toFixed(0);
     var x = (e.pageX - offset.left).toFixed(0);
     $('form :input[name="picture[map]"]').append("&lt;area shape='circle' coords='" + x + "," + y + ",30' href='telnet://{{IP}}:{{NODE1}}'&gt;\n");
@@ -214,6 +213,17 @@ $(document).on('click', '.action-configsget', function(e) {
 	}).fail(function(message) {
 		addModalError(message);
 	});
+});
+
+// Change opacity
+$(document).on('click', '.action-changeopacity', function(e) {
+	if($(this).data("transparent")){
+		$('.modal-content').fadeTo("fast", 1);
+		$(this).data("transparent", false);
+	} else {
+		$('.modal-content').fadeTo("fast", 0.3);
+		$(this).data("transparent", true);
+	}
 });
 
 // Get startup-config
@@ -546,8 +556,7 @@ $(document).on('click', '.action-pictureadd', function(e) {
 // Attach files
 var attachments;
 $('body').on('change', 'input[type=file]', function(e) {
-	console.log("### change input data");
-    attachments = e.target.files;
+	attachments = e.target.files;
 });
 
 // Add picture form
@@ -624,15 +633,14 @@ $(document).on('click', '.action-picturesget', function(e) {
 	logger(1, 'DEBUG: action = picturesget');
 	$.when(getPictures()).done(function(pictures) {
 		if (!$.isEmptyObject(pictures)) {
-			var body = '<div class="row"><div class="picture-list col-md-2 col-lg-2"><ul class="map">';
+			var body = '<div class="row"><div class="picture-list col-md-1 col-lg-1"><ul class="map">';
 			$.each(pictures, function(key, picture) {
-				console.log("### picture", picture);
 				var title = picture['name'] || "pic name";
 				body += '<li><a class="action-pictureget" data-path="' + key + '" href="#" title="' + title + '">' + picture['name'].split(' ')[0] + '</a>';
 				body += '<a class="delete-picture" href="#" data-path="' + key + '"><i class="glyphicon glyphicon-trash delete-picture" title="Delete"></i>';
 				body += '</a></li>';
 			});
-			body += '</ul></div><div id="config-data" class="col-md-10 col-lg-10"></div></div>';
+			body += '</ul></div><div id="config-data" class="col-md-11 col-lg-11"></div></div>';
 			addModalWide(MESSAGES[59], body, '', "modal-ultra-wide");
 		} else {
 			addMessage('info', MESSAGES[134]);
@@ -1448,6 +1456,7 @@ $('body').on('submit', '#form-picture-edit', function(e) {
 	var lab_file = $('#lab-viewport').attr('data-path');
     var form_data = {};
     var picture_id = $(this).attr('data-path');
+    
     // Setting options
     $('form :input[name^="picture["]').each(function(id, object) {
         // Standard options
@@ -1468,9 +1477,9 @@ $('body').on('submit', '#form-picture-edit', function(e) {
                 // Fetching ok
                 addMessage('SUCCESS', 'Picture "' + form_data['name'] + '" saved.');
                 printPictureInForm(picture_id);
+                $('ul.map a.action-pictureget[data-path="' + picture_id + '"]').attr('title', form_data['name']);
+                $('ul.map a.action-pictureget[data-path="' + picture_id + '"]').text(form_data['name'].split(" ")[0]);
                 $('body').children('.modal.second-win').modal('hide');
-                // Picture saved  -> reopen this page (not reload, or will be posted twice)
-                // window.location.href = '/lab_edit.php' + window.location.search;
             } else {
                 // Fetching failed
                 addMessage('DANGER', data['status']);
