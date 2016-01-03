@@ -143,7 +143,7 @@ switch ($action) {
 		exec($cmd, $o, $rc);
 
 		// Default permissions for files
-		$cmd = '/usr/bin/find /opt/unetlab -type d -exec chown root:root {} \; > /dev/null 2>&1';
+		$cmd = '/usr/bin/find /opt/unetlab -type f -exec chown root:root {} \; > /dev/null 2>&1';
 		exec($cmd, $o, $rc);
 		$cmd = '/usr/bin/find /opt/unetlab -type f -exec chmod 644 {} \; > /dev/null 2>&1';
 		exec($cmd, $o, $rc);
