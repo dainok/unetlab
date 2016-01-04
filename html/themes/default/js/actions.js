@@ -162,9 +162,13 @@ $(document).on('contextmenu', '.context-menu', function(e) {
 
 		// Adding interfaces
 		$.when(getNodeInterfaces(node_id)).done(function(values) {
+			//dainok
+			var interfaces = '';
 			$.each(values['ethernet'], function(id, object) {
-				$('<li><a class="action-nodecapture context-collapsible menu-interface" href="capture://' + window.location.hostname  + '/vunl' + TENANT + '_' + node_id + '_' + id + '" style="display: none;"><i class="glyphicon glyphicon-search"></i> ' + object['name'] + '</a></li>').insertBefore('#menu-node-interfaces');
+				interfaces += '<li><a class="action-nodecapture context-collapsible menu-interface" href="capture://' + window.location.hostname  + '/vunl' + TENANT + '_' + node_id + '_' + id + '" style="display: none;"><i class="glyphicon glyphicon-search"></i> ' + object['name'] + '</a></li>';
 			});
+			$(interfaces).insertAfter('#menu-node-interfaces');
+			//dainok
 		}).fail(function(message) {
 			// Error on getting node interfaces
 			addModalError(message);
