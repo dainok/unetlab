@@ -167,3 +167,5 @@ MESSAGES[135] = 'Add picture';
 MESSAGES[136] = 'Edit picture';
 MESSAGES[137] = 'Image MAP';
 MESSAGES[138] = 'Starting export, please wait';
+MESSAGES[139] = 'Set nodes boot from CFG';
+MESSAGES[140] = 'Set nodes boot from scratch';

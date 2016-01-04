@@ -80,11 +80,7 @@ function addModalError(message) {
 // Add Modal
 function addModalWide(title, body, footer, property) {
 	var prop = property || "";
-	var addittionalHeaderBtns = "";
-	if(title.toUpperCase() == "STARTUP-CONFIGS" || title.toUpperCase() == "CONFIGURED NODES") {
-		addittionalHeaderBtns = '<i class="glyphicon glyphicon-certificate pull-right action-changeopacity"></i>'
-	} 
-	var html = '<div aria-hidden="false" style="display: block;" class="modal modal-wide ' + prop + ' fade in" tabindex="-1" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"></i><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' + addittionalHeaderBtns + '<h4 class="modal-title">' + title + '</h4></div><div class="modal-body">' + body + '</div><div class="modal-footer">' + footer + '</div></div></div></div>';
+	var html = '<div aria-hidden="false" style="display: block;" class="modal modal-wide ' + prop + ' fade in" tabindex="-1" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">' + title + '</h4></div><div class="modal-body">' + body + '</div><div class="modal-footer">' + footer + '</div></div></div></div>';
 	$('body').append(html);
 	$('body > .modal').modal('show');
 }
@@ -1066,39 +1062,6 @@ function moveLab(lab, path) {
 	return deferred.promise();
 }
 
-// Delete picture
-function deletePicture(lab_file, picture_id, cb) {
-    var deferred = $.Deferred();
-    var data = [];
-    
-    // Delete network
-    var url = '/api/labs' + lab_file + '/pictures/' + picture_id;
-    $.ajax({
-        timeout: TIMEOUT,
-        type: 'DELETE',
-        url: encodeURI(url),
-        dataType: 'json',
-        success: function(data) {
-            if (data['status'] == 'success') {
-                // Fetching ok
-                $('.picture' + picture_id).fadeOut(300, function() {
-                    $(this).remove();
-                });
-                deferred.resolve(data);
-            } else {
-                // Fetching failed
-                addMessage('DANGER', data['status']);
-                deferred.reject(data['status']);
-            }
-        },
-        error: function(data) {
-            addMessage('DANGER', getJsonMessage(data['responseText']));
-            deferred.reject();
-        }
-    });
-    return deferred.promise();
-}
-
 // Post login
 function postLogin(param) {
 	if (UPDATEID != null) {
@@ -1144,6 +1107,41 @@ function setNetworkPosition(network_id, left, top) {
 			}
 			addMessage(data['status'], data['message']);
 
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
+}
+
+// Set node boot
+function setNodeBoot(node_id, config) {
+	var deferred = $.Deferred();
+	var lab_filename = $('#lab-viewport').attr('data-path');
+	var form_data = {};
+	form_data['config'] = config;
+	var url = '/api/labs' + lab_filename + '/nodes/' + node_id;
+	var type = 'PUT';
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		data: JSON.stringify(form_data),
+		success: function(data) {
+			if (data['status'] == 'success') {
+				logger(1, 'DEBUG: node bootflag updated.');
+				deferred.resolve();
+			} else {
+				// Application error
+				logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+				deferred.reject(data['message']);
+			}
 		},
 		error: function(data) {
 			// Server error
@@ -1424,13 +1422,18 @@ function printFormImport(path) {
 
 // Add a new lab
 function printFormLab(action, values) {
-	var path = (action == 'add') ? values['path'] : values['path'] + '/' + values['name'] + '.unl';
+	if (action == 'add') {
+		var path = values['path'];
+	} else {
+		var path = (values['path'] == '/') ? '/' + values['name'] + '.unl' : values['path'] + '/' + values['name'] + '.unl';
+	}
 	var name = (values['name'] != null) ? values['name'] : '';
 	var version = (values['version'] != null) ? values['version'] : '';
 	var author = (values['author'] != null) ? values['author'] : '';
 	var description = (values['description'] != null) ? values['description'] : '';
 	var body = (values['body'] != null) ? values['body'] : '';
 	var title = (action == 'add') ? MESSAGES[5] : MESSAGES[87];
+	console.log(values);
 
 	var html = '<form id="form-lab-' + action + '" class="form-horizontal form-lab-' + action + '"><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[20] + '</label><div class="col-md-5"><input class="form-control" name="lab[path]" value="' + path + '" disabled="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control autofocus" name="lab[name]" value="' + name + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[26] + '</label><div class="col-md-5"><input class="form-control" name="lab[version]" value="' + version + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Author</label><div class="col-md-5"><input class="form-control" name="lab[author]" value="' + author + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[27] + '</label><div class="col-md-5"><textarea class="form-control" name="lab[description]">' + description + '</textarea></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[88] + '</label><div class="col-md-5"><textarea class="form-control" name="lab[body]">' + body + '</textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
 	logger(1, 'DEBUG: popping up the lab-add form.');
@@ -1697,147 +1700,22 @@ function printFormNodeInterfaces(values) {
 	});
 }
 
-// Display picture in form
-function printPictureInForm(id){
-	var picture_id = id;
-	var picture_url = '/api/labs' + $('#lab-viewport').attr('data-path') + '/pictures/' + picture_id + '/data';
-	
-	$.when(getPictures(picture_id)).done(function(picture) {
-		var picture_map = picture['map'];
-		picture_map = picture_map.replace(/{{IP}}/g, location.hostname);
-		picture_map = picture_map.replace(/{{NODE[0-9]+}}/g, function(e) { return parseInt(e.substr(6, e.length - 8)) + 32768 + 128 * TENANT});
-		// Read privileges and set specific actions/elements
-		
-		var body = '<div id="lab_picture"><img usemap="#picture_map" src="' + picture_url + '" alt="' + picture['name'] + '" title="' + picture['name'] + '" width="' + picture['width'] + '" height="' + picture['height'] + '"/><map name="picture_map">' + picture_map + '</map></div>'
-		if (ROLE == 'admin' || ROLE == 'editor') {
-			var footer = '<button type="button" class="btn btn-aqua action-pictureedit" data-path="' + picture_id + '">Edit</button>';
-		} else {
-			var footer = '';
-		}
-		printNodesMap({name:picture['name'], body:body, footer:footer}, function(){
-			setTimeout(function(){
-				$('map').imageMapResize();
-			}, 500);
-		});
-	}).fail(function(message) {
-		addModalError(message);
-	});
-}
-
-// Display picture form
-function displayPictureForm(picture_id) {
-    var deferred = $.Deferred();
-    var form = '';
-    var lab_file = LAB;
-    if (picture_id == null) {
-        // Adding a new picture
-        var title = 'Add new picture';
-        var action = 'picture-add';
-        var button = 'Add';
-        // Header
-        form += '<form id="form-' + action + '" class="form-horizontal form-picture">';
-				// Name
-		form += '<div class="form-group"><label class="col-md-3 control-label">Name</label><div class="col-md-5"><input type="text" class="form-control-static" name="picture[name]" value=""/></div></div>';
-				// File (add only)
-		form += '<div class="form-group"><label class="col-md-3 control-label">Picture</label><div class="col-md-5"><input type="file" name="picture[file]" value=""/></div></div>';
-				// Footer
-		form += '<div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-success">' + button + '</button><button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button></div></div></form>';
-		// Add the form to the HTML page
-        // $('#form_frame').html(form);
-
-        addModal("Add picture", form, '<div></div>');
-
-        // Show the form
-        // $('#modal-' + action).modal('show');
-        $('.selectpicker').selectpicker();
-        validateLabPicture();
-        deferred.resolve();
-    } else {
-        // Can be lab_edit or lab_open
-
-        $.when(getPicture(lab_file, picture_id)).done(function(picture) {
-            if (picture != null) {
-                if ($(location).attr('pathname') == '/lab_edit.php') {
-                    var title = 'Edit picture';
-                    var action = 'picture_edit';
-                    var button = 'Save';
-
-                    picture_name = picture['name'];
-                    if (typeof picture['map'] != 'undefined') {
-                        picture_map = picture['map'];
-                    } else {
-                        picture_map = '';
-                    }
-                    // Header
-                    form += '<div class="modal fade" id="modal-' + action + '" tabindex="-1" role="dialog"><div class="modal-dialog" style="width: 100%;"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal">&times;</button><h4 class="modal-title">' + title + '</h4></div><div class="modal-body"><form id="form-' + action + '" class="form-horizontal form-picture">';
-                    // Name
-                    form += '<div class="form-group"><label class="col-md-3 control-label">Name</label><div class="col-md-5"><input type="text" class="form-control" name="picture[name]" value="' + picture_name + '"/></div></div>';
-                    // Picure
-                    form += '<img id="lab_picture" src="/api/labs' + lab_file + '/pictures/' + picture_id + '/data">'
-                    // MAP
-                    form += '<div class="form-group"><label class="col-md-3 control-label">Map</label><div class="col-md-5"><textarea type="textarea" name="picture[map]">' + picture_map + '</textarea></div></div>';
-                    // Footer
-                    form += '<input type="hidden" name="picture[id]" value="' + picture_id + '"/>';
-                    form += '<div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-success">' + button + '</button> <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button></div></div></form></div></div></div></div>';
-                    // Add the form to the HTML page
-                    $('#form_frame').html(form);
-
-                    // Show the form
-                    $('#modal-' + action).modal('show');
-                    $('.selectpicker').selectpicker();
-                    validateLabPicture();
-                    deferred.resolve();
-                } else {
-                    var action = 'picture_open';
-                    var title = picture['name'];
-                    if (typeof picture['map'] != 'undefined') {
-                        picture_map = picture['map'];
-                    } else {
-                        picture_map = '';
-                    }
-                    // Header
-                    form += '<div class="modal fade" id="modal-' + action + '" tabindex="-1" role="dialog"><div class="modal-dialog" style="width: 100%;"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal">&times;</button><h4 class="modal-title">' + title + '</h4></div><div class="modal-body">';
-                    // Picure
-                    form += '<img id="lab_picture" src="/api/labs' + lab_file + '/pictures/' + picture_id + '/data" usemap="#picture_map">';
-                    // Map
-                    form += '<map name="picture_map">' + translateMap(picture_map) + '</map>';
-                    // Footer
-                    form += '</div></div></div></div>';
-                    // Add the form to the HTML page
-                    $('#form_frame').html(form);
-
-                    // Show the form
-                    $('#modal-' + action).modal('show');
-                    deferred.resolve();
-                }
-            } else {
-                // Cannot get picture
-                raiseMessage('DANGER', 'Cannot get picture (picture_id = ' + picture_id + ').');
-                deferred.reject();
-            }
-        });
-    }
-
-    return deferred.promise();
-}
-
 // Add a new picture
 function printFormPicture(action, values) {
-	// dainok
 	var map = (values['map'] != null) ? values['map'] : '';
 	var name = (values['name'] != null) ? values['name'] : '';
 	var width = (values['width'] != null) ? values['width'] : '';
 	var height = (values['height'] != null) ? values['height'] : '';
-	var title = (action == 'add') ? MESSAGES[135] : MESSAGES[137];
+	var title = (action == 'add') ? MESSAGES[135] : MESSAGES[136];
 	var html = ''
 
 	if (action == 'add') {
 		html += '<form id="form-picture-' + action + '" class="form-horizontal form-lab-' + action + '"><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control" autofocus name="picture[name]" value="' + name + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[137] + '</label><div class="col-md-5"><textarea class="form-control" name="picture[map]">' + map + '</textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
 	} else {
-		html += '<form id="form-picture-' + action + '" class="form-horizontal form-lab-' + action + '" data-path=' + values['id'] + '><img src="/api/labs' + $('#lab-viewport').attr('data-path') + '/pictures/' + values['id'] + '/data" alt="' + values['name'] + '" width="' + values['width'] + '" height="' + values['height'] + '"/><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control" autofocus name="picture[name]" value="' + name + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[137] + '</label><div class="col-md-5"><textarea class="form-control" name="picture[map]">' + map + '</textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
+		html += '<img src="/api/labs' + $('#lab-viewport').attr('data-path') + '/pictures/' + values['id'] + '/data" alt="' + values['name'] + '" width="' + values['width'] + '" height="' + values['height'] + '"/><form id="form-picture-' + action + '" class="form-horizontal form-lab-' + action + '"><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control" autofocus name="picture[name]" value="' + name + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[137] + '</label><div class="col-md-5"><textarea class="form-control" name="picture[map]">' + map + '</textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
 	}
 	logger(1, 'DEBUG: popping up the picture form.');
-	addModalWide(title, html, '', 'second-win modal-ultra-wide');
+	addModalWide(title, html, '');
 	validateLabInfo();
 }
 
