@@ -48,6 +48,14 @@ $(document).on('keydown', 'body', function(e){
 	};
 });
 
+// Add picture MAP
+$('body').on('click', '#form-picture-edit img', function(e) {
+	var offset = $(this).offset();
+    var y = (e.pageY - offset.top).toFixed(0) - 30;
+    var x = (e.pageX - offset.left).toFixed(0);
+    $('form textarea').val($('form textarea').val() +"<area shape='circle' coords='" + x + "," + y + ",30' href='telnet://{{IP}}:{{NODE1}}'>\n");
+});
+
 // Accept privacy
 $(document).on('click', '#privacy', function () {
 	$.cookie('privacy', 'true', {
@@ -148,7 +156,6 @@ $(document).on('click', '.menu-collapse, .menu-collapse i', function(e) {
 // Manage context menu
 $(document).on('contextmenu', '.context-menu', function(e) {
 	e.preventDefault();  // Prevent default behaviour
-
 	if ($(this).hasClass('node_frame') && !$(this).data("block-context-menu")) {
 		logger(1, 'DEBUG: opening node context menu');
 		var node_id = $(this).attr('data-path');
@@ -220,6 +227,17 @@ $(document).on('click', '.action-configsget', function(e) {
 	}).fail(function(message) {
 		addModalError(message);
 	});
+});
+
+// Change opacity
+$(document).on('click', '.action-changeopacity', function(e) {
+	if($(this).data("transparent")){
+		$('.modal-content').fadeTo("fast", 1);
+		$(this).data("transparent", false);
+	} else {
+		$('.modal-content').fadeTo("fast", 0.3);
+		$(this).data("transparent", true);
+	}
 });
 
 // Get startup-config
@@ -529,7 +547,6 @@ $(document).on('click', '.action-nodeplace, .action-networkplace', function(e) {
 				} else if (object == 'network') {
 					printFormNetwork('add', values);
 				}
-
 				$('#mouse_frame').remove();
 			}
 			$('#mouse_frame').remove();
@@ -547,7 +564,62 @@ $(document).on('click', '.action-nodeplace, .action-networkplace', function(e) {
 $(document).on('click', '.action-pictureadd', function(e) {
 	logger(1, 'DEBUG: action = pictureadd');
 	$('#context-menu').remove();
-	printFormPicture('add', null);
+	displayPictureForm();
+	//printFormPicture('add', null);
+});
+
+// Attach files
+var attachments;
+$('body').on('change', 'input[type=file]', function(e) {
+	attachments = e.target.files;
+});
+
+// Add picture form
+$('body').on('submit', '#form-picture-add', function(e) {
+    // lab_file = getCurrentLab//getParameter('filename');
+    var lab_file = $('#lab-viewport').attr('data-path');
+    var form_data = new FormData();
+    var picture_name = $('form :input[name^="picture[name]"]').val();
+    // Setting options
+    $('form :input[name^="picture["]').each(function(id, object) {
+        form_data.append($(this).attr('name').substr(8, $(this).attr('name').length - 9), $(this).val());
+    });
+
+    // Add attachments
+    $.each(attachments, function(key, value) {
+        form_data.append(key, value);
+    });
+
+    // Get action URL
+    var url = '/api/labs' + lab_file + '/pictures';
+    $.ajax({
+        timeout: TIMEOUT,
+        type: 'POST',
+        url: encodeURI(url),
+        contentType: false, // Set content type to false as jQuery will tell the server its a query string request
+        processData: false, // Don't process the files
+        dataType: 'json',
+        data: form_data,
+        success: function(data) {
+            if (data['status'] == 'success') {
+				addMessage('SUCCESS', 'Picture "' + picture_name + '" added.');
+                // Picture added -> reopen this page (not reload, or will be posted twice)
+                // window.location.href = '/lab_edit.php' + window.location.search;
+            } else {
+                // Fetching failed
+                addMessage('DANGER', data['status']);
+            }
+        },
+        error: function(data) {
+            addMessage('DANGER', getJsonMessage(data['responseText']));
+        }
+    });
+
+    // Hide and delete the modal (or will be posted twice)
+    $('body').children('.modal').modal('hide');
+
+    // Stop or form will follow the action link
+    return false;
 });
 
 // Edit picture
@@ -568,25 +640,7 @@ $(document).on('click', '.action-pictureget', function(e) {
 	logger(1, 'DEBUG: action = pictureget');
 	$('#context-menu').remove();
 	var picture_id = $(this).attr('data-path');
-	var picture_url = '/api/labs' + $('#lab-viewport').attr('data-path') + '/pictures/' + picture_id + '/data';
-
-	$.when(getPictures(picture_id)).done(function(picture) {
-		var picture_map = picture['map'];
-		picture_map = picture_map.replace(/{{IP}}/g, location.hostname);
-		picture_map = picture_map.replace(/{{NODE[0-9]+}}/g, function(e) { return parseInt(e.substr(6, e.length - 8)) + 32768 + 128 * TENANT});
-		// Read privileges and set specific actions/elements
-		var body = '<div id="lab_picture"><img usemap="#picture_map" src="' + picture_url + '" alt="' + picture['name'] + '" title="' + picture['name'] + '" width="' + picture['width'] + '" height="' + picture['height'] + '"/><map name="picture_map">' + picture_map + '</map></div>'
-		if (ROLE == 'admin' || ROLE == 'editor') {
-			var footer = '<button type="button" class="btn btn-aqua action-pictureedit" data-path="' + picture_id + '">Edit</button>';
-		} else {
-			var footer = '';
-		}
-		printNodesMap({name:picture['name'], body:body, footer:footer}, function(){
-			$('map').imageMapResize();
-		});
-	}).fail(function(message) {
-		addModalError(message);
-	});
+	printPictureInForm(picture_id);
 });
 
 // Get pictures list
@@ -596,13 +650,13 @@ $(document).on('click', '.action-picturesget', function(e) {
 		if (!$.isEmptyObject(pictures)) {
 			var body = '<div class="row"><div class="picture-list col-md-1 col-lg-1"><ul class="map">';
 			$.each(pictures, function(key, picture) {
-				console.log("### picture", picture);
 				var title = picture['name'] || "pic name";
-				body += '<li><a class="action-pictureget" data-path="' + key + '" href="#" title="' + title + '">' + picture['name'].split(' ')[0];
+				body += '<li><a class="action-pictureget" data-path="' + key + '" href="#" title="' + title + '">' + picture['name'].split(' ')[0] + '</a>';
+				body += '<a class="delete-picture" href="#" data-path="' + key + '"><i class="glyphicon glyphicon-trash delete-picture" title="Delete"></i>';
 				body += '</a></li>';
 			});
 			body += '</ul></div><div id="config-data" class="col-md-11 col-lg-11"></div></div>';
-			addModalWide(MESSAGES[137], body, '');
+			addModalWide(MESSAGES[59], body, '', "modal-ultra-wide");
 		} else {
 			addMessage('info', MESSAGES[134]);
 		}
@@ -613,28 +667,33 @@ $(document).on('click', '.action-picturesget', function(e) {
 
 // Get picture list old
 $(document).on('click', '.action-picturesget-stop', function(e) {
-	logger(1, 'DEBUG: action = pictureget');
-	$('#context-menu').remove();
-	var picture_id = $(this).attr('data-path');
-	var picture_url = '/api/labs' + $('#lab-viewport').attr('data-path') + '/pictures/' + picture_id + '/data';
-
-	$.when(getPictures(picture_id)).done(function(picture) {
-		var picture_map = picture['map'];
-		picture_map = picture_map.replace(/{{IP}}/g, location.hostname);
-		picture_map = picture_map.replace(/{{NODE[0-9]+}}/g, function(e) { return parseInt(e.substr(6, e.length - 8)) + 32768 + 128 * TENANT});
-		// Read privileges and set specific actions/elements
-		var body = '<div id="lab_picture"><img usemap="#picture_map" src="' + picture_url + '" alt="' + picture['name'] + '" title="' + picture['name'] + '" width="' + picture['width'] + '" height="' + picture['height'] + '"/><map name="picture_map">' + picture_map + '</map></div>'
-		if (ROLE == 'admin' || ROLE == 'editor') {
-			var footer = '<button type="button" class="btn btn-aqua action-pictureedit" data-path="' + picture_id + '">Edit</button>';
+	logger(1, 'DEBUG: action = picturesget');
+	$.when(getPictures()).done(function(pictures) {
+		if (!$.isEmptyObject(pictures)) {
+			var body = '';
+			$.each(pictures, function(key, picture) {
+				body += '<li><a class="action-pictureget" data-path="' + key + '" href="#" title="' + picture['name'] + '"><i class="glyphicon glyphicon-picture"></i> ' + picture['name'] + '</a></li>';
+			});
+			printContextMenu(MESSAGES[59], body, e.pageX, e.pageY);
 		} else {
-			var footer = '';
+			addMessage('info', MESSAGES[134]);
 		}
-		printNodesMap({name:picture['name'], body:body, footer:footer}, function(){
-			$('map').imageMapResize();
-		});
 	}).fail(function(message) {
 		addModalError(message);
 	});
+});
+
+//Detele picture
+$(document).on('click', '.delete-picture', function(e){
+	e.stopPropagation();  // Prevent default behaviour
+	logger(1, 'DEBUG: action = pictureremove');
+	var $self = $(this);
+
+	var picture_id = $self.parent().attr('data-path');
+	var lab_filename = $('#lab-viewport').attr('data-path');
+	var body = '<form id="form-picture-delete" data-path="' + picture_id + '" class="form-horizontal form-picture" novalidate="novalidate"><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-success">Delete</button><button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button></div></div></form>'
+	var title = "Delete this picture?"
+	addModal(title, body, "", "second-win");
 });
 
 // Clone selected labs
@@ -1432,4 +1491,75 @@ $(document).on('submit', '#form-user-add, #form-user-edit', function(e) {
 		}
 	});
 	return false;  // Stop to avoid POST
+});
+
+// Edit picture form
+$('body').on('submit', '#form-picture-edit', function(e) {
+    e.preventDefault();  // Prevent default behaviour
+	var lab_file = $('#lab-viewport').attr('data-path');
+    var form_data = {};
+    var picture_id = $(this).attr('data-path');
+
+    // Setting options
+    $('form :input[name^="picture["]').each(function(id, object) {
+        // Standard options
+        var field_name = $(this).attr('name').replace(/^picture\[([a-z]+)\]$/, '$1');
+        form_data[field_name] = $(this).val();
+    });
+    
+    // Get action URL
+    var url = '/api/labs' + lab_file + '/pictures/' + picture_id;//form_data['id'];
+    $.ajax({
+        timeout: TIMEOUT,
+        type: 'PUT',
+        url: encodeURI(url),
+        dataType: 'json',
+        data: JSON.stringify(form_data),
+        success: function(data) {
+            if (data['status'] == 'success') {
+                // Fetching ok
+                addMessage('SUCCESS', 'Picture "' + form_data['name'] + '" saved.');
+                printPictureInForm(picture_id);
+                $('ul.map a.action-pictureget[data-path="' + picture_id + '"]').attr('title', form_data['name']);
+                $('ul.map a.action-pictureget[data-path="' + picture_id + '"]').text(form_data['name'].split(" ")[0]);
+                $('body').children('.modal.second-win').modal('hide');
+                // Picture saved  -> reopen this page (not reload, or will be posted twice)
+                // window.location.href = '/lab_edit.php' + window.location.search;
+            } else {
+                // Fetching failed
+                addMessage('DANGER', data['status']);
+            }
+        },
+        error: function(data) {
+            addMessage('DANGER', getJsonMessage(data['responseText']));
+        }
+    });
+
+    // Hide and delete the modal (or will be posted twice)
+    $('#form_frame > div').modal('hide');
+
+    // Stop or form will follow the action link
+    return false;
+});
+
+// Edit picture form
+$('body').on('submit', '#form-picture-delete', function(e) {
+    e.preventDefault();  // Prevent default behaviour
+	var lab_filename = $('#lab-viewport').attr('data-path');
+    var picture_id = $(this).attr('data-path');
+	var picture_name = $('li a[data-path="' + picture_id + '"]').attr("title");
+    $.when(deletePicture(lab_filename, picture_id)).done(function(){
+    	addMessage('SUCCESS', 'Picture "' + picture_name + '" deleted.');
+		$('li a[data-path="' + picture_id + '"]').parent().remove();
+		$("#config-data").html("");
+	}).fail(function(message) {
+		addModalError(message);
+	});
+    
+
+    // Hide and delete the modal (or will be posted twice)
+    $('body').children('.modal.second-win').modal('hide');
+
+    // Stop or form will follow the action link
+    return false;
 });
