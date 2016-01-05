@@ -32,6 +32,7 @@
 // Custom vars
 var DEBUG = 5;
 var TIMEOUT = 10000;
+var STATUSINTERVAL = 5000;
 
 // Global vars
 var EMAIL;
@@ -44,6 +45,7 @@ var TENANT;
 var USERNAME;
 var ATTACHMENTS;
 var UPDATEID;
+
 
 $(document).ready(function() {
 	if ($.cookie('privacy') != 'true') {

@@ -979,6 +979,10 @@ function logoutUser() {
 		success: function(data) {
 			if (data['status'] == 'success') {
 				logger(1, 'DEBUG: user is logged off.');
+				if (UPDATEID != null) {
+					// Stop updating node_status
+					clearInterval(UPDATEID);
+				}
 				deferred.resolve();
 			} else {
 				// Authentication error
@@ -1113,7 +1117,7 @@ function postLogin(param) {
 		logger(1, 'DEBUG: loading lab "' + LAB + '".');
 		printPageLabOpen(LAB);
 		// Update node status
-		UPDATEID = setInterval('printLabStatus("' + LAB + '")', 5000);
+		UPDATEID = setInterval('printLabStatus("' + LAB + '")', STATUSINTERVAL);
 	}
 }
 
