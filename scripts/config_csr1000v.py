@@ -2,7 +2,7 @@
 
 # scripts/config_csr1000v.py
 #
-# Import/Export script for CSR 1000v.
+# Import/Export script for vIOS.
 #
 # LICENSE:
 #
@@ -27,35 +27,59 @@
 # @link http://www.unetlab.com/
 # @version 20150826
 
-import getopt, os, pexpect, re, sys, time
+import getopt, multiprocessing, os, pexpect, re, sys, time
 
 username = 'cisco'
 password = 'cisco'
-secret = ''
+secret = 'cisco'
+conntimeout = 3     # Maximum time for console connection
+expctimeout = 3     # Maximum time for each short expect
+longtimeout = 30    # Maximum time for each long expect
+timeout = 60        # Maximum run time (conntimeout is included)
 
-def node_login(handler, end_before):
+def node_login(handler):
     # Send an empty line, and wait for the login prompt
     i = -1
-    while (i == -1 or now() > end_before):
+    while i == -1:
         try:
             handler.sendline('\r\n')
             i = handler.expect([
                 'Username:',
                 '\(config',
                 '>',
-                '#'], timeout = 1)
+                '#',
+                'Would you like to enter the'], timeout = 5)
         except:
             i = -1
 
     if i == 0:
         # Need to send username and password
         handler.sendline(username)
-        handler.expect('Password:', timeout = end_before - now())
+        try:
+            handler.expect('Password:', timeout = expctimeout)
+        except:
+            print('ERROR: error waiting for "Password:" prompt.')
+            node_quit(handler)
+            return False
+
         handler.sendline(password)
-        j = handler.expect(['>', '#'], timeout = end_before - now())
+        try:
+            j = handler.expect(['>', '#'], timeout = expctimeout)
+        except:
+            print('ERROR: error waiting for [">", "#"] prompt.')
+            node_quit(handler)
+            return False
+
         if j == 0:
             # Secret password required
-            return node_login(handler, end_before)
+            handler.sendline(secret)
+            try:
+                handler.expect('#', timeout = expctimeout)
+            except:
+                print('ERROR: error waiting for "#" prompt.')
+                node_quit(handler)
+                return False
+            return True
         elif j == 1:
             # Nothing to do
             return True
@@ -66,16 +90,31 @@ def node_login(handler, end_before):
     elif i == 1:
         # Config mode detected, need to exit
         handler.sendline('end')
-        handler.expect('#', timeout = end_before - now())
+        try:
+            handler.expect('#', timeout = expctimeout)
+        except:
+            print('ERROR: error waiting for "#" prompt.')
+            node_quit(handler)
+            return False
         return True
     elif i == 2:
         # Need higher privilege
         handler.sendline('enable')
-        j = handler.expect(['Password:', '#'], timeout = end_before - now())
+        try:
+            j = handler.expect(['Password:', '#'])
+        except:
+            print('ERROR: error waiting for ["Password:", "#"] prompt.')
+            node_quit(handler)
+            return False
         if j == 0:
             # Need do provide secret
             handler.sendline(secret)
-            handler.expect('#', timeout = end_before - now())
+            try:
+                handler.expect('#', timeout = expctimeout)
+            except:
+                print('ERROR: error waiting for "#" prompt.')
+                node_quit(handler)
+                return False
             return True
         elif j == 1:
             # Nothing to do
@@ -87,16 +126,41 @@ def node_login(handler, end_before):
     elif i == 3:
         # Nothing to do
         return True
+    elif i == 4:
+        # First boot detected
+        handler.sendline('no')
+        try:
+            handler.expect('Press RETURN to get started', timeout = longtimeout)
+        except:
+            print('ERROR: error waiting for "Press RETURN to get started" prompt.')
+            node_quit(handler)
+            return False
+        handler.sendline('\r\n')
+        try:
+            handler.expect('Router>', timeout = expctimeout)
+        except:
+            print('ERROR: error waiting for "Router> prompt.')
+            node_quit(handler)
+            return False
+        handler.sendline('enable')
+        try:
+            handler.expect('Router#', timeout = expctimeout)
+        except:
+            print('ERROR: error waiting for "Router# prompt.')
+            node_quit(handler)
+            return False
+        return True
     else:
         # Unexpected output
         node_quit(handler)
         return False
 
 def node_quit(handler):
-    handler.sendline('quit\n')
+    if handler.isalive() == True:
+        handler.sendline('quit\n')
     handler.close()
 
-def config_get(handler, end_before):
+def config_get(handler):
     # Clearing all "expect" buffer
     while True:
         try:
@@ -106,11 +170,21 @@ def config_get(handler, end_before):
 
     # Disable paging
     handler.sendline('terminal length 0')
-    handler.expect('#', timeout = end_before - now())
+    try:
+        handler.expect('#', timeout = expctimeout)
+    except:
+        print('ERROR: error waiting for "#" prompt.')
+        node_quit(handler)
+        return False
 
     # Getting the config
     handler.sendline('more system:running-config')
-    handler.expect('#', timeout = end_before - now())
+    try:
+        handler.expect('#', timeout = expctimeout)
+    except:
+        print('ERROR: error waiting for "#" prompt.')
+        node_quit(handler)
+        return False
     config = handler.before.decode()
 
     # Manipulating the config
@@ -121,25 +195,50 @@ def config_get(handler, end_before):
 
     return config
 
-def config_put(handler, end_before, config):
+def config_put(handler, config):
     # Got to configure mode
     handler.sendline('configure terminal')
-    handler.expect('\(config', timeout = end_before - now())
+    try:
+        handler.expect('\(config', timeout = expctimeout)
+    except:
+        print('ERROR: error waiting for "(config prompt.')
+        node_quit(handler)
+        return False
 
     # Pushing the config
     for line in config.splitlines():
         handler.sendline(line)
-        handler.expect('\r\n')
+        try:
+            handler.expect('\r\n', timeout = expctimeout)
+        except:
+            print('ERROR: error waiting for EOL.')
+            node_quit(handler)
+            return False
 
     # At the end of configuration be sure we are in non config mode (sending CTRl + Z)
     handler.sendline('\x1A')
-    handler.expect('#')
+    try:
+        handler.expect('#', timeout = expctimeout)
+    except:
+        print('ERROR: error waiting for "#" prompt.')
+        node_quit(handler)
+        return False
 
     # Save
     handler.sendline('copy running-config startup-config')
-    handler.expect('Destination filename', timeout = end_before - now())
+    try:
+        handler.expect('Destination filename', timeout = expctimeout)
+    except:
+        print('ERROR: error waiting for "Destination filename" prompt.')
+        node_quit(handler)
+        return False
     handler.sendline('\r\n')
-    handler.expect('#', timeout = end_before - now())
+    try:
+        handler.expect('#', timeout = longtimeout)
+    except:
+        print('ERROR: error waiting for "#" prompt.')
+        node_quit(handler)
+        return False
 
     return True
 
@@ -151,18 +250,93 @@ def usage():
     print('           - put: put the file as startup-configuration')
     print('-f <s>    *File');
     print('-p <n>    *Console port');
-    print('-t <n>     Timeout (default = 0)');
+    print('-t <n>     Timeout (default = %i)' %(timeout));
     print('* Mandatory option')
 
 def now():
     # Return current UNIX time in milliseconds
     return int(round(time.time() * 1000))
 
-def main():
+def main(action, fiename, port):
+    try:
+        # Connect to the device
+        tmp = conntimeout
+        while (tmp > 0):
+            handler = pexpect.spawn('telnet 127.0.0.1 %i' %(port))
+            time.sleep(0.1)
+            tmp = tmp - 0.1
+            if handler.isalive() == True:
+                break
+
+        if (handler.isalive() != True):
+            print('ERROR: cannot connect to port "%i".' %(port))
+            node_quit(handler)
+            sys.exit(1)
+
+        # Login to the device and get a privileged prompt
+        rc = node_login(handler)
+        if rc != True:
+            print('ERROR: failed to login.')
+            node_quit(handler)
+            sys.exit(1)
+
+        if action == 'get':
+            config = config_get(handler)
+            if config in [False, None]:
+                print('ERROR: failed to retrieve config.')
+                node_quit(handler)
+                sys.exit(1)
+
+            try:
+                fd = open(filename, 'a')
+                fd.write(config)
+                fd.close()
+            except:
+                print('ERROR: cannot write config to file.')
+                node_quit(handler)
+                sys.exit(1)
+        elif action == 'put':
+            try:
+                fd = open(filename, 'r')
+                config = fd.read()
+                fd.close()
+            except:
+                print('ERROR: cannot read config from file.')
+                node_quit(handler)
+                sys.exit(1)
+
+            rc = config_put(handler, config)
+            if rc != True:
+                print('ERROR: failed to push config.')
+                node_quit(handler)
+                sys.exit(1)
+
+            # Remove lock file
+            lock = '%s/.lock' %(os.path.dirname(filename))
+
+            if os.path.exists(lock):
+                os.remove(lock)
+
+            # Mark as configured
+            configured = '%s/.configured' %(os.path.dirname(filename))
+            if not os.path.exists(configured):
+                open(configured, 'a').close()
+
+        node_quit(handler)
+        sys.exit(0)
+
+    except Exception as e:
+        print('ERROR: got an exception')
+        print(type(e))  # the exception instance
+        print(e.args)   # arguments stored in .args
+        print(e)        # __str__ allows args to be printed directly,
+        node_quit(handler)
+        return False
+
+if __name__ == "__main__":
     action = None
     filename = None
     port = None
-    timeout = 0
 
     # Getting parameters from command line
     try:
@@ -224,71 +398,22 @@ def main():
             print('ERROR: cannot read from file.')
             sys.exit(1)
 
-
+    # Backgrounding the script
     end_before = now() + timeout
+    p = multiprocessing.Process(target=main, name="Main", args=(action, filename, port))
+    p.start()
 
-    try:
-        # Connect to the device
-        while (now() < end_before):
-            handler = pexpect.spawn('telnet 127.0.0.1 %i' %(port))
-            time.sleep(0.1)
-            if handler.isalive() == True:
-                break
+    while (p.is_alive() and now() < end_before):
+        # Waiting for the child process to end
+        time.sleep(1)
 
-        if (handler.isalive() != True):
-            print('ERROR: cannot connect to port "%i".' %(port))
-            node_quit(handler)
-            sys.exit(2)
-
-        # Login to the device and get a privileged prompt
-        rc = node_login(handler, end_before)
-        if rc != True:
-            print('ERROR: failed to login.')
-            node_quit(handler)
-            sys.exit(3)
-
-        if action == 'get':
-            config = config_get(handler, end_before)
-            if config in [False, None]:
-                print('ERROR: failed to retrieve config.')
-                node_quit(handler)
-                sys.exit(4)
-
-            try:
-                fd = open(filename, 'a')
-                fd.write(config)
-                fd.close()
-            except:
-                print('ERROR: cannot write config to file.')
-
-        elif action == 'put':
-            rc = config_put(handler, end_before, config)
-            if rc != True:
-                print('ERROR: failed to push config.')
-                node_quit(handler)
-                sys.exit(4)
-
-            # Remove lock file
-            lock = '%s/.lock' %(os.path.dirname(filename))
-
-            if os.path.exists(lock):
-                os.remove(lock)
-
-            # Mark as configured
-            configured = '%s/.configured' %(os.path.dirname(filename))
-            if not os.path.exists(configured):
-                open(configured, 'a').close()
-
-        node_quit(handler)
-
-    except Exception as e:
-        print('ERROR: got an exception')
-        print(type(e))  # the exception instance
-        print(e.args)   # arguments stored in .args
-        print(e)        # __str__ allows args to be printed directly,
-        node_quit(handler)
+    if p.is_alive():
+        # Timeout occurred
+        print('ERROR: timeout occurred.')
+        p.terminate()
         sys.exit(127)
 
-if __name__ == "__main__":
-    main()
+    if p.exitcode != 0:
+        sys.exit(127)
+
     sys.exit(0)
