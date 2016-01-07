@@ -48,7 +48,7 @@ function dirname(path) {
 function addMessage(severity, message) {
 	// Severity can be success (green), info (blue), warning (yellow) and danger (red)
 
-	var timeout = 3000;		// by default close messges after 3 seconds
+	var timeout = 3000;		// by default close messages after 3 seconds
 	if (severity == 'alert') timeout = 10000;
 	if (severity == 'warning') timeout = 10000;
 
@@ -56,10 +56,17 @@ function addMessage(severity, message) {
 		// Add the frame container if not exists
 		$('body').append('<div id="alert_container"></div>');
 	}
+	
+	var msgalert = $('<div class="alert alert-' + severity.toLowerCase() + ' fade in">').append($('<button type="button" class="close" data-dismiss="alert">').append("&times;")).append(message);
 
-	$('<div class="alert alert-' + severity.toLowerCase() + '">' + message + '</div>').prependTo('#alert_container').fadeTo(timeout, 500).slideUp(500, function() {
-		$(this).alert('close');
-	});
+	// Add the alert div to top (prepend()) or to bottom (append())
+	$('#alert_container').append(msgalert);
+	
+	if (timeout) {
+		window.setTimeout(function() {
+			msgalert.alert("close");
+		}, timeout);
+	}
 }
 
 // Add Modal

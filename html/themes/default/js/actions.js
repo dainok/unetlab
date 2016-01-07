@@ -839,8 +839,9 @@ $(document).on('click', '.action-nodeexport, .action-nodesexport', function(e) {
 				addMessage('danger', nodes[node_id]['name'] + ': ' + message);
 			});
 		} else {
+			var nodeLenght = Object.keys(nodes).length;
 			$.each(nodes, function(key, values) {
-				addMessage('info', nodes[node_id]['name'] + ': ' + MESSAGES[138])
+				addMessage('info', values['name'] + ': ' + MESSAGES[138])
 				$.when(cfg_export(key)).done(function() {
 					// Node exported -> print a small green message
 					addMessage('success', values['name'] + ': ' + MESSAGES[79])
