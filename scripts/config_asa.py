@@ -29,7 +29,7 @@
 
 import getopt, multiprocessing, os, pexpect, re, sys, time
 
-username = 'cisco'
+username = 'admin'
 password = 'cisco'
 secret = ''
 conntimeout = 3     # Maximum time for console connection
@@ -42,37 +42,16 @@ def node_login(handler):
     i = -1
     while i == -1:
         try:
-            handler.sendline('\r\n')
+            handler.sendline('a\r\n')
             i = handler.expect([
-                'CPU#',
-                'PME#',
-                '=>',
-                '->',
-                '<bio-0>',
-                '<maxk@qualcomm.com>',
-                '<greearb@candelatech.com>',
-                '<davem@redhat.com>',
-                '>,',
-                '<dzo@simtreas.ru>',
-                '<rob@landley.net>',
-                '<rep.nop@aon.at>',
-                '<rob@landley.net>',
-                '<bruce@pixar.com>',
-                '<andersen@codepoet.org>',
-                '<rob@landley.net>',
-                '<andersen@codepoet.org>',
-                '<rob@landley.net>',
                 'Username:',
                 '\(config',
                 '>',
                 '#'], timeout = 5)
         except:
             i = -1
-        if i < 18:
-            # Drop false match
-            i = -1
 
-    if i == 18:
+    if i == 0:
         # Need to send username and password
         handler.sendline(username)
         try:
@@ -107,7 +86,7 @@ def node_login(handler):
             # Unexpected output
             node_quit(handler)
             return False
-    elif i == 19:
+    elif i == 1:
         # Config mode detected, need to exit
         handler.sendline('end')
         try:
@@ -117,7 +96,7 @@ def node_login(handler):
             node_quit(handler)
             return False
         return True
-    elif i == 20:
+    elif i == 2:
         # Need higher privilege
         handler.sendline('enable')
         try:
@@ -143,9 +122,50 @@ def node_login(handler):
             # Unexpected output
             node_quit(handler)
             return False
-    elif i == 21:
+    elif i == 3:
         # Nothing to do
         return True
+    else:
+        # Unexpected output
+        node_quit(handler)
+        return False
+
+def node_firstlogin(handler):
+    # Send an empty line, and wait for the login prompt
+    i = -1
+    while i == -1:
+        try:
+            handler.sendline('\r\n')
+            i = handler.expect('ciscoasa>', timeout = 5)
+        except:
+            i = -1
+
+    if i == 0:
+        # Need higher privilege
+        handler.sendline('enable')
+        try:
+            j = handler.expect(['Password:', '#'])
+        except:
+            print('ERROR: error waiting for ["Password:", "#"] prompt.')
+            node_quit(handler)
+            return False
+        if j == 0:
+            # Need do provide secret
+            handler.sendline('')
+            try:
+                handler.expect('#', timeout = expctimeout)
+            except:
+                print('ERROR: error waiting for "#" prompt.')
+                node_quit(handler)
+                return False
+            return True
+        elif j == 1:
+            # Nothing to do
+            return True
+        else:
+            # Unexpected output
+            node_quit(handler)
+            return False
     else:
         # Unexpected output
         node_quit(handler)
@@ -268,14 +288,14 @@ def main(action, fiename, port):
             node_quit(handler)
             sys.exit(1)
 
-        # Login to the device and get a privileged prompt
-        rc = node_login(handler)
-        if rc != True:
-            print('ERROR: failed to login.')
-            node_quit(handler)
-            sys.exit(1)
-
         if action == 'get':
+            # Login to the device and get a privileged prompt
+            rc = node_login(handler)
+            if rc != True:
+                print('ERROR: failed to login.')
+                node_quit(handler)
+                sys.exit(1)
+
             config = config_get(handler)
             if config in [False, None]:
                 print('ERROR: failed to retrieve config.')
@@ -291,6 +311,13 @@ def main(action, fiename, port):
                 node_quit(handler)
                 sys.exit(1)
         elif action == 'put':
+            # Login to the device and get a privileged prompt
+            rc = node_firstlogin(handler)
+            if rc != True:
+                print('ERROR: failed to login.')
+                node_quit(handler)
+                sys.exit(1)
+
             try:
                 fd = open(filename, 'r')
                 config = fd.read()
