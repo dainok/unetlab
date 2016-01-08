@@ -1240,6 +1240,7 @@ class Node {
 			$this -> config = '0';
 		} else {
 			$this -> config_data = $config_data;
+			$this -> config = '1';
 		}
 		return 0;
 	}

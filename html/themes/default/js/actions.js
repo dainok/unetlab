@@ -169,13 +169,11 @@ $(document).on('contextmenu', '.context-menu', function(e) {
 
 		// Adding interfaces
 		$.when(getNodeInterfaces(node_id)).done(function(values) {
-			//dainok
 			var interfaces = '';
 			$.each(values['ethernet'], function(id, object) {
 				interfaces += '<li><a class="action-nodecapture context-collapsible menu-interface" href="capture://' + window.location.hostname  + '/vunl' + TENANT + '_' + node_id + '_' + id + '" style="display: none;"><i class="glyphicon glyphicon-search"></i> ' + object['name'] + '</a></li>';
 			});
 			$(interfaces).insertAfter('#menu-node-interfaces');
-			//dainok
 		}).fail(function(message) {
 			// Error on getting node interfaces
 			addModalError(message);
@@ -218,7 +216,7 @@ $(document).on('click', '.action-configsget', function(e) {
 			var title = (config['config'] == 0)? MESSAGES[122] : MESSAGES[121];
 			body += '<li><a class="action-configget" data-path="' + key + '" href="#" title="' + title + '">' + config['name'];
 			if (config['config'] == 1) {
-				body += ' <i class="glyphicon glyphicon-pushpin"></i>';
+				body += ' <i class="glyphicon glyphicon-floppy-saved"></i>';
 			}
 			body += '</a></li>';
 		});
@@ -453,12 +451,13 @@ $(document).on('click', '.action-moreactions', function(e) {
 	var body = '';
 	body += '<li><a class="action-nodesstart" href="#"><i class="glyphicon glyphicon-play"></i> ' + MESSAGES[126] + '</a></li>';
 	body += '<li><a class="action-nodesstop" href="#"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[127] + '</a></li>';
-	body += '<li><a class="action-nodeswipe href="#"><i class="glyphicon glyphicon-erase"></i> ' + MESSAGES[128] + '</a></li>';
+	body += '<li><a class="action-nodeswipe" href="#"><i class="glyphicon glyphicon-erase"></i> ' + MESSAGES[128] + '</a></li>';
 	if (ROLE == 'admin' || ROLE == 'editor') {
 		body += '<li><a class="action-nodesexport" href="#"><i class="glyphicon glyphicon-save"></i> ' + MESSAGES[129] + '</a></li>';
 		body += '<li><a class="action-labedit" href="#"><i class="glyphicon glyphicon-pencil"></i> ' + MESSAGES[87] + '</a></li>';
 		body += '<li><a class="action-nodesbootsaved" href="#"><i class="glyphicon glyphicon-floppy-saved"></i> ' + MESSAGES[139] + '</a></li>';
-		body += '<li><a class="action-nodesbootscratch" href="#"><i class="glyphicon glyphicon-floppy-remove"></i> ' + MESSAGES[140] + '</a></li>';
+		body += '<li><a class="action-nodesbootscratch" href="#"><i class="glyphicon glyphicon-floppy-save"></i> ' + MESSAGES[140] + '</a></li>';
+		body += '<li><a class="action-nodesbootdelete" href="#"><i class="glyphicon glyphicon-floppy-remove"></i> ' + MESSAGES[141] + '</a></li>';
 	}
 	printContextMenu(MESSAGES[125], body, e.pageX, e.pageY);
 });
@@ -779,6 +778,44 @@ $(document).on('click', '.action-selectedexport', function(e) {
 			addModalError(message);
 		});
 	}
+});
+
+// Delete all startup-config
+$(document).on('click', '.action-nodesbootdelete', function(e) {
+	//dainok
+	$('#context-menu').remove();
+	$.when(getNodes(null)).done(function(nodes) {
+		var nodeLenght = Object.keys(nodes).length;
+		$.each(nodes, function(key, values) {
+			var lab_filename = $('#lab-viewport').attr('data-path');
+			var form_data = {};
+			form_data['id'] = key;
+			form_data['data'] = '';
+			var url = '/api/labs' + lab_filename + '/configs/' + key;
+			var type = 'PUT';
+			$.when($.ajax({
+				timeout: TIMEOUT,
+				type: type,
+				url: encodeURI(url),
+				dataType: 'json',
+				data: JSON.stringify(form_data)
+			})).done(function(message) {
+				// Config deleted
+				nodeLenght--;
+				if(nodeLenght < 1){
+					addMessage('success', MESSAGES[142])
+				};
+			}).fail(function(message) {
+				// Cannot delete config
+				nodeLenght--;
+				if(nodeLenght < 1){
+					addMessage('danger', values['name'] + ': ' + message);
+				};
+			});
+		});
+	}).fail(function(message) {
+		addModalError(message);
+	});
 });
 
 // Configure nodes to boot from scratch

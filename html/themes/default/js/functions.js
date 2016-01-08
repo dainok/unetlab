@@ -1629,7 +1629,7 @@ function printNodesMap(values, cb) {
 }
 
 //save lab handler
-function saveLab(from) {
+function saveLab(form) {
 	var lab_filename = $('#lab-viewport').attr('data-path');
 	var form_data = form2Array('config');
 	var url = '/api/labs' + lab_filename + '/configs/' + form_data['id'];
@@ -1645,7 +1645,7 @@ function saveLab(from) {
 				logger(1, 'DEBUG: config saved.');
 				// Close the modal
 				$('body').children('.modal').attr('skipRedraw', true);
-				if(from) {
+				if(form) {
 					$('body').children('.modal').modal('hide');
 					addMessage(data['status'], data['message']);
 				}
@@ -1869,7 +1869,6 @@ function displayPictureForm(picture_id) {
 
 // Add a new picture
 function printFormPicture(action, values) {
-	// dainok
 	var map = (values['map'] != null) ? values['map'] : '';
 	var name = (values['name'] != null) ? values['name'] : '';
 	var width = (values['width'] != null) ? values['width'] : '';
