@@ -876,6 +876,9 @@ $(document).on('click', '.action-nodeexport, .action-nodesexport', function(e) {
 				addMessage('danger', nodes[node_id]['name'] + ': ' + message);
 			});
 		} else {
+			/*
+			 * Better call single export_all API
+			 *
 			var nodeLenght = Object.keys(nodes).length;
 			$.each(nodes, function(key, values) {
 				addMessage('info', values['name'] + ': ' + MESSAGES[138])
@@ -886,6 +889,18 @@ $(document).on('click', '.action-nodeexport, .action-nodesexport', function(e) {
 					// Cannot exported
 					addMessage('danger', values['name'] + ': ' + message);
 				});
+			});
+			 */
+			
+			addMessage('info', MESSAGES[138])
+			var lab_filename = $('#lab-viewport').attr('data-path');
+			var url = '/api/labs' + lab_filename + '/nodes/export';
+			var type = 'PUT';
+			$.ajax({
+				timeout: TIMEOUT * 10,	// Takes a lot of time
+				type: type,
+				url: encodeURI(url),
+				dataType: 'json',
 			});
 		}
 	}).fail(function(message) {
