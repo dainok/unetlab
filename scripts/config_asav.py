@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# scripts/config_asa.py
+# scripts/config_asav.py
 #
 # Import/Export script for vIOS.
 #
