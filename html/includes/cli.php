@@ -481,7 +481,7 @@ function export($node_id, $n, $lab) {
 			error_log(date('M d H:i:s ').'INFO: exporting '.$cmd);
 			if ($rc != 0) {
 				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80060]);
-				error_log(date('M d H:i:s ').(string) $o);
+				error_log(date('M d H:i:s ').implode("\n", $o));
 				return 80060;
 			}
 			break;
