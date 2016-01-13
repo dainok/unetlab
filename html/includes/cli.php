@@ -726,7 +726,7 @@ function prepareNode($n, $id, $t, $nets) {
 					return 80082;
 				}
 
-				$cmd = 'docker inspect --format="{{ .State.Running }}" '.$n -> getUuid();
+				$cmd = 'docker -H=tcp://127.0.0.1:4243 inspect --format="{{ .State.Running }}" '.$n -> getUuid();
 				exec($cmd, $o, $rc);
 				if ($rc != 0) {
 					// Must create docker.io container
@@ -839,7 +839,7 @@ function start($n, $id, $t, $nets) {
 			$cmd .= ' -- '.$flags.' > '.$n -> getRunningPath().'/wrapper.txt 2>&1 &';
 			break;
 		case 'docker':
-			$cmd = 'docker start -ai '.$n -> getUuid();
+			$cmd = 'docker -H=tcp://127.0.0.1:4243 start -ai '.$n -> getUuid();
 			break;
 		case 'dynamips':
 			$cmd = '/opt/unetlab/wrappers/dynamips_wrapper -T '.$t.' -D '.$id.' -t "'.$n -> getName().'" -F /opt/unetlab/addons/dynamips/'.$n -> getImage().' -d '.$n -> getDelay();
@@ -884,7 +884,7 @@ function start($n, $id, $t, $nets) {
 			error_log(date('M d H:i:s ').'INFO: starting '.$cmd);
 			exec($cmd, $o, $rc);
 			// PID=$(docker inspect --format '{{ .State.Pid }}' docker3_4) # Must be greater than 0
-			$cmd = 'docker inspect --format "{{ .State.Pid }}" '.$n -> getUuid();
+			$cmd = 'docker -H=tcp://127.0.0.1:4243 inspect --format "{{ .State.Pid }}" '.$n -> getUuid();
 			error_log(date('M d H:i:s ').'INFO: starting '.$cmd);
 			exec($cmd, $o, $rc);
 			// ip link set netns ${PID} docker3_4_5 name eth0 address 22:ce:e0:99:04:05 up
@@ -908,7 +908,7 @@ function start($n, $id, $t, $nets) {
 function stop($n) {
 	if ($n -> getStatus() != 0) {
 		if ($n -> getNType() == 'docker') {
-			$cmd = 'docker stop '.$n -> getUuid();
+			$cmd = 'docker -H=tcp://127.0.0.1:4243 stop '.$n -> getUuid();
 		} else {
 			$cmd = 'fuser -n tcp -k -TERM '.$n -> getPort().' > /dev/null 2>&1';
 		}

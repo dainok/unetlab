@@ -652,7 +652,7 @@ function listNodeImages($t, $p) {
 			}
 			break;
 		case 'docker':
-			$cmd = '/usr/bin/docker images | sed \'s/^\([^[:space:]]\+\)[[:space:]]\+\([^[:space:]]\+\).\+/\1:\2/g\'';
+			$cmd = '/usr/bin/docker -H=tcp://127.0.0.1:4243 images | sed \'s/^\([^[:space:]]\+\)[[:space:]]\+\([^[:space:]]\+\).\+/\1:\2/g\'';
 			exec($cmd, $o, $rc);
 			if (!empty($o) && sizeof($o) > 1) {
 				unset($o[0]);	// Removing header

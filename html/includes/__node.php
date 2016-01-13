@@ -829,7 +829,7 @@ class Node {
 
 		if ($this -> type == 'docker') {
 			// Docker.io node
-			$bin .= '/usr/bin/docker';
+			$bin .= '/usr/bin/docker -H=tcp://127.0.0.1:4243';
 			$flags .= 'run -dti --net=none --rm=false -n INSTANCENAME -h HOSTNAME';
 			$flags .= ' -m '.$this -> getRam();		// Maximum RAM
 			$flags .= ' '.$this -> getImage();		// Docker image
@@ -897,7 +897,9 @@ class Node {
 	 * @return	string                      Node console URL
 	 */
 	public function getConsoleUrl() {
-		if (isset($this -> console)) {
+		if ($this -> type == 'docker') {
+			return 'docker://'.$_SERVER['HTTP_HOST'].':4243/'.$this -> lab_id.'-'.$this -> tenant.'-'.$this -> id;
+		} else if (isset($this -> console)) {
 			return $this -> console.'://'.$_SERVER['HTTP_HOST'].':'.$this -> port;
 		} else {
 			return 'telnet://'.$_SERVER['HTTP_HOST'].':'.$this -> port;
@@ -1125,13 +1127,24 @@ class Node {
 	 */
 	public function getStatus() {
 		if ($this -> type == 'docker') {
-			$cmd = 'docker inspect --format="{{ .State.Running }}" '.$this -> getUuid();
+			$cmd = 'docker -H=tcp://127.0.0.1:4243 inspect --format="{{ .State.Running }}" '.$this -> getUuid();
 			exec($cmd, $o, $rc);
 			if ($rc == 0) {
 				if ($o[0] == 'true') {
-					return 1;
+					// Node is running
+					if (is_file(BASE_TMP.'/'.$this -> tenant.'/'.$this -> lab_id.'/'.$this -> id.'/.lock')) {
+						// Node is running and locked
+						return 3;
+					} else {
+						return 2;
+					}
 				} else {
-					return 0;
+					if (is_file(BASE_TMP.'/'.$this -> tenant.'/'.$this -> lab_id.'/'.$this -> id.'/.lock')) {
+						// Node is stopped and locked
+						return 1;
+					} else {
+						return 0;
+					}
 				}
 			} else {
 				// Instance does not exist
