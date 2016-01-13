@@ -894,6 +894,12 @@ function start($n, $id, $t, $nets) {
 			// /opt/unetlab/wrappers/nsenter -t ${PID} -n ip addr add 1.1.1.1/24 dev eth0
 			// /opt/unetlab/wrappers/nsenter -t ${PID} -n ip route add default via 1.1.1.254
 		}
+
+		// Start configuration process
+		touch($n -> getRunningPath().'/.lock');
+		$cmd = 'nohup /opt/unetlab/scripts/config_'.$n -> getTemplate().'.py -a put -i '.$n -> getUuid().' -f '.$n -> getRunningPath().'/startup-config -t '.($n -> getDelay() + 300).' &';
+		exec($cmd, $o, $rc);
+		error_log(date('M d H:i:s ').'INFO: importing '.$cmd);
 	}
 
 	return 0;

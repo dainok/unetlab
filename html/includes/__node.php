@@ -833,16 +833,6 @@ class Node {
 			$flags .= 'run -dti --net=none --rm=false -n INSTANCENAME -h HOSTNAME';
 			$flags .= ' -m '.$this -> getRam();		// Maximum RAM
 			$flags .= ' '.$this -> getImage();		// Docker image
-			// docker run -dti --net=none --rm=false --name=ae89c614-dc96-4019-b713-22b251ab4704 -h docker -m 64MB wataru/quagga:latest
-			// TODO
-			// --dns=[]                        Set custom DNS servers
-			// --dns-search=[]                 Set custom DNS search domains
-			// -e, --env=[]                    Set environment variables
-			// --env-file=[]                   Read in a file of environment variables
-			// -h, --hostname=                 Container host name
-			// --lxc-conf=[]                   Add custom lxc options
-			// --add-host=[]                   Add a custom host-to-IP mapping (host:ip)
-			//
 		}
 
 		return Array($bin, $flags);
@@ -898,7 +888,7 @@ class Node {
 	 */
 	public function getConsoleUrl() {
 		if ($this -> type == 'docker') {
-			return 'docker://'.$_SERVER['HTTP_HOST'].':4243/'.$this -> lab_id.'-'.$this -> tenant.'-'.$this -> id;
+			return 'docker://'.$_SERVER['HTTP_HOST'].':4243/'.$this -> lab_id.'-'.$this -> tenant.'-'.$this -> id.'?'.$this -> name;
 		} else if (isset($this -> console)) {
 			return $this -> console.'://'.$_SERVER['HTTP_HOST'].':'.$this -> port;
 		} else {
