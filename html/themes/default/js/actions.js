@@ -825,7 +825,7 @@ $(document).on('click', '.action-nodesbootscratch', function(e) {
 		$.each(nodes, function(key, values) {
 			$.when(setNodeBoot(key, 0)).done(function() {
 				// Node configured -> print a small green message
-				addMessage('success', values['name'] + ': ' + MESSAGES[76])
+				addMessage('success', values['name'] + ': ' + MESSAGES[144])
 			}).fail(function(message) {
 				// Cannot start
 				addMessage('danger', values['name'] + ': ' + message);
@@ -843,7 +843,7 @@ $(document).on('click', '.action-nodesbootsaved', function(e) {
 		$.each(nodes, function(key, values) {
 			$.when(setNodeBoot(key, 1)).done(function() {
 				// Node configured -> print a small green message
-				addMessage('success', values['name'] + ': ' + MESSAGES[76])
+				addMessage('success', values['name'] + ': ' + MESSAGES[143])
 			}).fail(function(message) {
 				// Cannot start
 				addMessage('danger', values['name'] + ': ' + message);

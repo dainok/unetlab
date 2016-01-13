@@ -305,7 +305,7 @@ class Node {
 		$this -> tenant = (int) $tenant;
 		$this -> type = $p['type'];
 		$this -> image = $p['image'];
-		if (isset($p['config'])) $this -> config = htmlentities($p['config']);		// TODO it's a template and must exists or set to saved
+		if (isset($p['config'])) $this -> config = $p['config'];	// TODO it's a template and must exists or set to saved
 		if (isset($p['delay'])) $this -> delay = (int) $p['delay'];
 		if (isset($p['icon'])) $this -> icon = $p['icon'];
 		if (isset($p['left'])) $this -> left = (int) $p['left'];
@@ -1243,7 +1243,6 @@ class Node {
 			$this -> config = '0';
 		} else {
 			$this -> config_data = $config_data;
-			$this -> config = '1';
 		}
 		return 0;
 	}
