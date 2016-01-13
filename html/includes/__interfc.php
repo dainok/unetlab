@@ -24,10 +24,10 @@
  * along with UNetLab.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
- * @copyright 2014-2015 Andrea Dainese
+ * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150715
+ * @version 20151020
  * @property type $id Interface ID. It's mandatory and automatically set during contruction phase.
  * @property type $name Name of the interface. It's optional.
  * @property type $network_id Remote network ID for Ethernet interfaces. If not set, it's automatically set to 0.

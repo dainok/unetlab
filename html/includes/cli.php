@@ -24,10 +24,10 @@
  * along with UNetLab.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
- * @copyright 2014-2015 Andrea Dainese
+ * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150925
+ * @version 20160113
  */
 
 /**
@@ -730,7 +730,7 @@ function prepareNode($n, $id, $t, $nets) {
 				exec($cmd, $o, $rc);
 				if ($rc != 0) {
 					// Must create docker.io container
-					$cmd = 'docker create -ti --net=none --name='.$n -> getUuid().' -h '.$n -> getName().' '.$n -> getImage();
+					$cmd = 'docker -H=tcp://127.0.0.1:4243 create -ti --net=none --name='.$n -> getUuid().' -h '.$n -> getName().' '.$n -> getImage();
 					exec($cmd, $o, $rc);
 					if ($rc != 0) {
 						// Failed to create container

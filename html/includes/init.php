@@ -35,10 +35,10 @@
  * along with UNetLab. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
- * @copyright 2014-2015 Andrea Dainese
+ * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150918
+ * @version 20160113
  */
 
 // Include custom configuration
@@ -62,6 +62,7 @@ if (!isset($node_config)) {
 		'asa'			=>	'config_asa.py',
 		'asav'			=>	'config_asav.py',
 		'csr1000v'		=>	'config_csr1000v.py',
+		'docker'		=>	'config_docker.py',
 		'titanium'		=>	'config_titanium.py',
 		#'veos'			=>	'config_veos.py',
 		'viosl2'		=>	'config_viosl2.py',

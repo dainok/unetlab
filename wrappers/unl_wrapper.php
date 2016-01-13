@@ -25,10 +25,10 @@
  * along with Foobar. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
- * @copyright 2014-2015 Andrea Dainese
+ * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150828
+ * @version 20160113
  */
 
 require_once('/opt/unetlab/html/includes/init.php');
@@ -172,7 +172,7 @@ switch ($action) {
 		exec($cmd, $o, $rc);
 
 		// Wrappers
-		$cmd = '/bin/chmod 755 /opt/unetlab/wrappers/*_wrapper* > /dev/null 2>&1';
+		$cmd = '/bin/chmod 755 /opt/unetlab/wrappers/nsenter /opt/unetlab/wrappers/*_wrapper* > /dev/null 2>&1';
 		exec($cmd, $o, $rc);
 
 		// /tmp
