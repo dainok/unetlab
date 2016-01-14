@@ -27,7 +27,7 @@
  * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20160113
+ * @version 20160114
  * @property type $author Author name of the lab. It's optional.
  * @property type $body Long text for lab usage. It's optional.
  * @property type $description Description of the lab. It's optional
@@ -209,6 +209,12 @@ class Lab {
 
 				$n['config'] == 'Exported' ? $n['config'] = '1' : $n['config'];	// Fix startup-config
 				$n['config'] == 'None' ? $n['config'] = '0' : $n['config'];	// Fix startup-config
+
+				// If config is empty, force "None"
+				$result = (string) array_pop($xml -> xpath('//lab/objects/configs/config[@id="'.$node_id.'"]'));
+				if (strlen($result) === 0) {
+					$n['config'] = 0;
+				}
 
 				try {
 					$this -> nodes[$n['id']] = new Node($n, $n['id'], $this -> tenant, $this -> id);
