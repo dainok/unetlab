@@ -877,8 +877,9 @@ $(document).on('click', '.action-nodeexport, .action-nodesexport', function(e) {
 			});
 		} else {
 			/*
-			 * Better to call single export_all API
-			 *
+			 * Parallel call for each node
+			 */
+			addMessage('info', MESSAGES[138])
 			var nodeLenght = Object.keys(nodes).length;
 			$.each(nodes, function(key, values) {
 				addMessage('info', values['name'] + ': ' + MESSAGES[138])
@@ -890,8 +891,9 @@ $(document).on('click', '.action-nodeexport, .action-nodesexport', function(e) {
 					addMessage('danger', values['name'] + ': ' + message);
 				});
 			});
-			 */
 			
+			/*
+			 * Single call
 			addMessage('info', MESSAGES[138])
 			var lab_filename = $('#lab-viewport').attr('data-path');
 			var url = '/api/labs' + lab_filename + '/nodes/export';
@@ -902,6 +904,7 @@ $(document).on('click', '.action-nodeexport, .action-nodesexport', function(e) {
 				url: encodeURI(url),
 				dataType: 'json',
 			});
+			*/
 		}
 	}).fail(function(message) {
 		addModalError(message);
