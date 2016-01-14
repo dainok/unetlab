@@ -25,7 +25,7 @@
 # @copyright 2014-2016 Andrea Dainese
 # @license http://www.gnu.org/licenses/gpl.html
 # @link http://www.unetlab.com/
-# @version 20160113
+# @version 20160114
 
 import getopt, multiprocessing, os, pexpect, re, sys, time
 
@@ -139,14 +139,14 @@ def node_login(handler):
         try:
             handler.expect('Switch>', timeout = expctimeout)
         except:
-            print('ERROR: error waiting for "Router> prompt.')
+            print('ERROR: error waiting for "Switch> prompt.')
             node_quit(handler)
             return False
         handler.sendline('enable')
         try:
             handler.expect('Switch#', timeout = expctimeout)
         except:
-            print('ERROR: error waiting for "Router# prompt.')
+            print('ERROR: error waiting for "Switch# prompt.')
             node_quit(handler)
             return False
         return True
@@ -180,7 +180,7 @@ def config_get(handler):
     # Getting the config
     handler.sendline('more system:running-config')
     try:
-        handler.expect('#', timeout = expctimeout)
+        handler.expect('#', timeout = longtimeout)
     except:
         print('ERROR: error waiting for "#" prompt.')
         node_quit(handler)

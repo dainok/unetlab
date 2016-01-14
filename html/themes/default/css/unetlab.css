@@ -497,27 +497,31 @@
 	margin-left: -40px;
 }
 
-.modal-body  .config-list  {
+.modal-body  .config-list, .modal-body  .picture-list  {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
 
-.modal-body  .config-list  ul {
+.modal-body  .config-list  ul, .modal-body  .picture-list  ul {
 	line-height: 3em;
 	list-style-type: none;
 	margin-left: 0px;
 }
 
-.modal-body  .config-list li {
+.modal-body  .config-list li, .modal-body  .picture-list li {
 	margin-left: -30px;
 }
 
-.modal-body  .config-list a, .modal-body  .config-list a:link, .modal-body  .config-list a:visited {
+.modal-body  .config-list li .glyphicon, .modal-body  .picture-list li .glyphicon {
+	margin-left: 5px;
+}
+
+.modal-body  .config-list a, .modal-body  .config-list a:link, .modal-body  .config-list a:visited, .modal-body  .picture-list a, .modal-body  .picture-list a:link, .modal-body  .picture-list a:visited {
 	color: #8b8c90;
 }
 
-.modal-body  .config-list a:active, .modal-body  .config-list a:hover {
+.modal-body  .config-list a:active, .modal-body  .config-list a:hover, .modal-body  .picture-list a:active, .modal-body  .picture-list a:hover {
 	text-decoration: none;
 }
 

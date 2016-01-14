@@ -26,7 +26,7 @@
  * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20160111
+ * @version 20160114
  */
 
 // Attach files
@@ -782,7 +782,6 @@ $(document).on('click', '.action-selectedexport', function(e) {
 
 // Delete all startup-config
 $(document).on('click', '.action-nodesbootdelete', function(e) {
-	//dainok
 	$('#context-menu').remove();
 	$.when(getNodes(null)).done(function(nodes) {
 		var nodeLenght = Object.keys(nodes).length;
@@ -845,7 +844,7 @@ $(document).on('click', '.action-nodesbootsaved', function(e) {
 				// Node configured -> print a small green message
 				addMessage('success', values['name'] + ': ' + MESSAGES[143])
 			}).fail(function(message) {
-				// Cannot start
+				// Cannot configure
 				addMessage('danger', values['name'] + ': ' + message);
 			});
 		});
@@ -870,6 +869,7 @@ $(document).on('click', '.action-nodeexport, .action-nodesexport', function(e) {
 			addMessage('info', nodes[node_id]['name'] + ': ' + MESSAGES[138])
 			$.when(cfg_export(node_id)).done(function() {
 				// Node exported -> print a small green message
+				setNodeBoot(node_id, '1');	
 				addMessage('success', nodes[node_id]['name'] + ': ' + MESSAGES[79])
 			}).fail(function(message) {
 				// Cannot export
@@ -877,7 +877,7 @@ $(document).on('click', '.action-nodeexport, .action-nodesexport', function(e) {
 			});
 		} else {
 			/*
-			 * Better call single export_all API
+			 * Better to call single export_all API
 			 *
 			var nodeLenght = Object.keys(nodes).length;
 			$.each(nodes, function(key, values) {

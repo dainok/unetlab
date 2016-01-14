@@ -27,7 +27,7 @@
  * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20160108
+ * @version 20160113
  * @property type $author Author name of the lab. It's optional.
  * @property type $body Long text for lab usage. It's optional.
  * @property type $description Description of the lab. It's optional

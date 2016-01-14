@@ -498,12 +498,3 @@ tbody td .glyphicon-trash {
 	display: -ms-flexbox;
 	display: flex;
 }
-
-ul.map {
-	margin: 0;
-	padding-left: 20px;
-}
-
-ul.map i.delete-picture {
-	margin-left: 8px;
-}
