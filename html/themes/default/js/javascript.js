@@ -31,7 +31,7 @@
 
 // Custom vars
 var DEBUG = 5;
-var TIMEOUT = 10000;
+var TIMEOUT = 30000;
 var STATUSINTERVAL = 5000;
 
 // Global vars
