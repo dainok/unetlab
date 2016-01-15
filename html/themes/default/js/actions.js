@@ -879,12 +879,12 @@ $(document).on('click', '.action-nodeexport, .action-nodesexport', function(e) {
 			/*
 			 * Parallel call for each node
 			 */
-			addMessage('info', MESSAGES[138])
 			var nodeLenght = Object.keys(nodes).length;
 			$.each(nodes, function(key, values) {
 				addMessage('info', values['name'] + ': ' + MESSAGES[138])
 				$.when(cfg_export(key)).done(function() {
 					// Node exported -> print a small green message
+					setNodeBoot(key, '1');	
 					addMessage('success', values['name'] + ': ' + MESSAGES[79])
 				}).fail(function(message) {
 					// Cannot exported

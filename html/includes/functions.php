@@ -724,7 +724,7 @@ function resizeImage($image, $width, $height) {
  * @return  bool                        True if locked
  */
 function lockFile($file) {
-	$timeout = 5000000;
+	$timeout = TIMEOUT * 1000000;
 	$locked = False;
 
 	while ($timeout > 0) {

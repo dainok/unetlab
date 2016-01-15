@@ -224,7 +224,7 @@ $messages[60057] = 'Got startup-config (60057).';
 $messages[60058] = 'Startup config not available (60058).';
 $messages[60059] = 'Failed to update UNetLab (60059).';
 $messages[60060] = 'UNetLab is updated (60060).';
-$messages[60061] = 'Failed to lock the lab (60060).';
+$messages[60061] = 'Failed to lock the lab (60061).';
 
 // Text (70000-79999)
 $messages[70000] = 'Name/prefix';
