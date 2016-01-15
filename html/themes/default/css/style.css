@@ -456,6 +456,10 @@ tbody td .glyphicon-trash {
 	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
 }
 
+.modal-body .error.valid {
+	display: none !important;
+}
+
 .modal-title {
 	border-bottom: 2px solid #46a6b6;
 	color: #46a6b6;

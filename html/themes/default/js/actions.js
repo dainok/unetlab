@@ -408,6 +408,7 @@ $(document).on('click', '.action-labedit', function(e) {
 	}).fail(function(message) {
 		addModalError(message);
 	});
+  $('#context-menu').remove();
 });
 
 // List all labs
@@ -884,7 +885,6 @@ $(document).on('click', '.action-nodeexport, .action-nodesexport', function(e) {
 				addMessage('info', values['name'] + ': ' + MESSAGES[138])
 				$.when(cfg_export(key)).done(function() {
 					// Node exported -> print a small green message
-					setNodeBoot(key, '1');	
 					addMessage('success', values['name'] + ': ' + MESSAGES[79])
 				}).fail(function(message) {
 					// Cannot exported
