@@ -408,6 +408,7 @@ $(document).on('click', '.action-labedit', function(e) {
 	}).fail(function(message) {
 		addModalError(message);
 	});
+  $('#context-menu').remove();
 });
 
 // List all labs
@@ -884,7 +885,7 @@ $(document).on('click', '.action-nodeexport, .action-nodesexport', function(e) {
 				addMessage('info', values['name'] + ': ' + MESSAGES[138])
 				$.when(cfg_export(key)).done(function() {
 					// Node exported -> print a small green message
-					setNodeBoot(key, '1');	
+					setNodeBoot(key, '1');
 					addMessage('success', values['name'] + ': ' + MESSAGES[79])
 				}).fail(function(message) {
 					// Cannot exported
@@ -1092,6 +1093,23 @@ $(document).on('click', '.action-update', function(e) {
 $(document).on('click', '.action-usermgmt', function(e) {
 	logger(1, 'DEBUG: action = usermgmt');
 	printUserManagement();
+});
+
+// Show status
+$(document).on('click', '.action-status', function(e) {
+  logger(1, 'DEBUG: action = show status');
+  $.when(getSystemStats()).done(function(data){
+
+    // Body
+    var html = '<div id="main" class="container col-md-12 col-lg-12"><div class="fill-height row row-eq-height"><div id="stats-text" class="col-md-3 col-lg-3"><ul></ul></div><div id="stats-graph" class="col-md-9 col-lg-9"><ul></ul></div></div></div>';
+
+    addModalWide("STATUS", html, '');
+    drawStatusInModal(data);
+
+  }).fail(function(message) {
+    // Cannot get status
+    addModalError(message);
+  });
 });
 
 /***************************************************************************
@@ -1416,6 +1434,15 @@ $(document).on('submit', '#form-node-add, #form-node-edit', function(e) {
 					$('body').children('.modal.second-win').modal('hide');
 					$('body').children('.modal.fade.in').focus();
 					addMessage(data['status'], data['message']);
+          $(".modal .node" + form_data['id'] + " td:nth-child(2)").text(form_data["name"]);
+          $(".modal .node" + form_data['id'] + " td:nth-child(3)").html(form_data["template"]);
+          $(".modal .node" + form_data['id'] + " td:nth-child(4)").html(form_data["image"]);
+          $(".modal .node" + form_data['id'] + " td:nth-child(5)").html(form_data["cpu"]);
+          $(".modal .node" + form_data['id'] + " td:nth-child(7)").html(form_data["nvram"]);
+          $(".modal .node" + form_data['id'] + " td:nth-child(8)").html(form_data["ram"]);
+          $(".modal .node" + form_data['id'] + " td:nth-child(9)").html(form_data["ethernet"]);
+          $(".modal .node" + form_data['id'] + " td:nth-child(10)").html(form_data["serial"]);
+          $(".modal .node" + form_data['id'] + " td:nth-child(11)").html(form_data["console"]);
 				} else {
 					// Application error
 					logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
