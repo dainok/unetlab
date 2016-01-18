@@ -1095,6 +1095,23 @@ $(document).on('click', '.action-usermgmt', function(e) {
 	printUserManagement();
 });
 
+// Show status
+$(document).on('click', '.action-status', function(e) {
+  logger(1, 'DEBUG: action = show status');
+  $.when(getSystemStats()).done(function(data){
+
+    // Body
+    var html = '<div id="main" class="container col-md-12 col-lg-12"><div class="fill-height row row-eq-height"><div id="stats-text" class="col-md-3 col-lg-3"><ul></ul></div><div id="stats-graph" class="col-md-9 col-lg-9"><ul></ul></div></div></div>';
+
+    addModalWide("STATUS", html, '');
+    drawStatusInModal(data);
+
+  }).fail(function(message) {
+    // Cannot get status
+    addModalError(message);
+  });
+});
+
 /***************************************************************************
  * Submit
  **************************************************************************/
@@ -1417,6 +1434,15 @@ $(document).on('submit', '#form-node-add, #form-node-edit', function(e) {
 					$('body').children('.modal.second-win').modal('hide');
 					$('body').children('.modal.fade.in').focus();
 					addMessage(data['status'], data['message']);
+          $(".modal .node" + form_data['id'] + " td:nth-child(2)").text(form_data["name"]);
+          $(".modal .node" + form_data['id'] + " td:nth-child(3)").html(form_data["template"]);
+          $(".modal .node" + form_data['id'] + " td:nth-child(4)").html(form_data["image"]);
+          $(".modal .node" + form_data['id'] + " td:nth-child(5)").html(form_data["cpu"]);
+          $(".modal .node" + form_data['id'] + " td:nth-child(7)").html(form_data["nvram"]);
+          $(".modal .node" + form_data['id'] + " td:nth-child(8)").html(form_data["ram"]);
+          $(".modal .node" + form_data['id'] + " td:nth-child(9)").html(form_data["ethernet"]);
+          $(".modal .node" + form_data['id'] + " td:nth-child(10)").html(form_data["serial"]);
+          $(".modal .node" + form_data['id'] + " td:nth-child(11)").html(form_data["console"]);
 				} else {
 					// Application error
 					logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');

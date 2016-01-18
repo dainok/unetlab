@@ -2339,6 +2339,7 @@ function printPageLabOpen(lab) {
 	$('#lab-sidebar ul').append('<li><a class="action-picturesget" href="#" title="' + MESSAGES[59] + '"><i class="glyphicon glyphicon-picture"></i></a></li>');
 	$('#lab-sidebar ul').append('<li><a class="action-moreactions" href="#" title="' + MESSAGES[125] + '"><i class="glyphicon glyphicon-th"></i></a></li>');
 	$('#lab-sidebar ul').append('<li><a class="action-labtopologyrefresh" href="#" title="' + MESSAGES[57] + '"><i class="glyphicon glyphicon-refresh"></i></a></li>');
+  $('#lab-sidebar ul').append('<li><a class="action-status" href="#" title="' + MESSAGES[13] + '"><i class="glyphicon glyphicon-info-sign"></i></a></li>');
 	$('#lab-sidebar ul').append('<li><a class="action-labclose" href="#" title="' + MESSAGES[60] + '"><i class="glyphicon glyphicon-off"></i></a></li>');
 	$('#lab-sidebar ul').append('<li><a class="action-logout" href="#" title="' + MESSAGES[14] + '"><i class="glyphicon glyphicon-log-out"></i></a></li>');
 }
@@ -2406,7 +2407,106 @@ function printUserManagement() {
 	});
 }
 
-// Print system stats
+// Print system status in modal
+function drawStatusInModal(data) {
+  // Main: title
+  var html_title = '<div class="row row-eq-height"><div id="list-title-folders" class="col-md-3 col-lg-3"><span title="' + MESSAGES[13] + '">' + MESSAGES[13] + '</span></div><div id="list-title-labs" class="col-md-3 col-lg-3"><span></span></div><div id="list-title-info" class="col-md-6 col-lg-6"><span></span></div></div>';
+  $('#main-title').html(html_title);
+  $('#main-title').show();
+  //$('#main').html(html);
+
+  // Read privileges and set specific actions/elements
+  $('#actions-menu').empty();
+  $('#actions-menu').append('<li><a class="action-sysstatus" href="#"><i class="glyphicon glyphicon-refresh"></i> ' + MESSAGES[40] + '</a></li>');
+  $('#actions-menu').append('<li><a class="action-stopall" href="#"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[50] + '</a></li>');
+  $('#actions-menu').append('<li><a class="action-update" href="#"><i class="glyphicon glyphicon-repeat"></i> ' + MESSAGES[132] + '</a></li>');
+
+  // Adding all stats
+
+  // Text
+  $('#stats-text ul').append('<li>' + MESSAGES[39] + ': <code>' + data['version'] + '</code></li>');
+  $('#stats-text ul').append('<li>' + MESSAGES[49] + ': <code>' + data['qemu_version'] + '</code></li>');
+  $('#stats-text ul').append('<li>' + MESSAGES[29] + ': <code>' + ROLE + '</code></li>');
+  $('#stats-text ul').append('<li>' + MESSAGES[32] + ': <code>' + ((TENANT == -1) ? 'none' : TENANT) + '</code></li>');
+
+  // CPU usage
+  $('#stats-graph ul').append('<li><div class="circle circle-cpu col-md-3 col-lg-3"><strong></strong><br/><span>' + MESSAGES[36] + '</span></div></li>');
+  $('.circle-cpu').circleProgress({
+    arcCoef: 0.7,
+    value: data['cpu'],
+    thickness: 10,
+    startAngle: -Math.PI / 2,
+    fill: {	gradient: ['#46a6b6'] }
+  }).on('circle-animation-progress', function(event, progress) {
+    if (progress > data['cpu']) {
+      $(this).find('strong').html(parseInt(100 * data['cpu']) + '%');
+    } else {
+      $(this).find('strong').html(parseInt(100 * progress) + '%');
+    }
+  });
+
+  // Memory usage
+  $('#stats-graph ul').append('<li><div class="circle circle-memory col-md-3 col-lg-3"><strong></strong><br/><span>' + MESSAGES[37] + '</span></div></li>');
+  $('.circle-memory').circleProgress({
+    arcCoef: 0.7,
+    value: data['mem'],
+    thickness: 10,
+    startAngle: -Math.PI / 2,
+    fill: {	gradient: ['#46a6b6'] }
+  }).on('circle-animation-progress', function(event, progress) {
+    if (progress > data['mem']) {
+      $(this).find('strong').html(parseInt(100 * data['mem']) + '%');
+    } else {
+      $(this).find('strong').html(parseInt(100 * progress) + '%');
+    }
+  });
+
+  // Swap usage
+  $('#stats-graph ul').append('<li><div class="circle circle-swap col-md-3 col-lg-3"><strong></strong><br/><span>Swap usage</span></div></li>');
+  $('.circle-swap').circleProgress({
+    arcCoef: 0.7,
+    value: data['swap'],
+    thickness: 10,
+    startAngle: -Math.PI / 2,
+    fill: {	gradient: ['#46a6b6'] }
+  }).on('circle-animation-progress', function(event, progress) {
+    if (progress > data['swap']) {
+      $(this).find('strong').html(parseInt(100 * data['swap']) + '%');
+    } else {
+      $(this).find('strong').html(parseInt(100 * progress) + '%');
+    }
+  });
+
+  // Disk usage
+  $('#stats-graph ul').append('<li><div class="circle circle-disk col-md-3 col-lg-3"><strong></strong><br/><span>' + MESSAGES[38]+ '</span></div></li>');
+  $('.circle-disk').circleProgress({
+    arcCoef: 0.7,
+    value: data['disk'],
+    thickness: 10,
+    startAngle: -Math.PI / 2,
+    fill: {	gradient: ['#46a6b6'] }
+  }).on('circle-animation-progress', function(event, progress) {
+    if (progress > data['disk']) {
+      $(this).find('strong').html(parseInt(100 * data['disk']) + '%');
+    } else {
+      $(this).find('strong').html(parseInt(100 * progress) + '%');
+    }
+  });
+
+  // IOL running nodes
+  $('#stats-graph ul').append('<li><div class="count count-iol col-md-4 col-lg-4"></div>');
+  $('.count-iol').html('<strong>' + data['iol'] + '</strong><br/><span>' + MESSAGES[41] + '</span></li>');
+
+  // Dynamips running nodes
+  $('#stats-graph ul').append('<li><div class="count count-dynamips col-md-4 col-lg-4"></div></li>');
+  $('.count-dynamips').html('<strong>' + data['dynamips'] + '</strong><br/><span>' + MESSAGES[42] + '</span>');
+
+  // QEMU running nodes
+  $('#stats-graph ul').append('<li><div class="count count-qemu col-md-4 col-lg-4"></div></li>');
+  $('.count-qemu').html('<strong>' + data['qemu'] + '</strong><br/><span>' + MESSAGES[43] + '</span>');
+};
+
+// Print system status
 function printSystemStats() {
 	$.when(getSystemStats()).done(function(data) {
 		// Main: title
