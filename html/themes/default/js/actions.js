@@ -48,12 +48,14 @@ $(document).on('keydown', 'body', function(e){
 	};
 });
 
-// Add picture MAP
+//Add picture MAP
 $('body').on('click', '#form-picture-edit img', function(e) {
-	var offset = $(this).offset();
-    var y = (e.pageY - offset.top).toFixed(0) - 30;
-    var x = (e.pageX - offset.left).toFixed(0);
-    $('form textarea').val($('form textarea').val() +"<area shape='circle' coords='" + x + "," + y + ",30' href='telnet://{{IP}}:{{NODE1}}'>\n");
+  var data_x = $("#follower").data("data_x");
+  var data_y = $("#follower").data("data_y");
+  var offset = $("#follower").data("data_offset");
+  var y = (data_y - offset.top).toFixed(0) - 30;
+  var x = (data_x - offset.left).toFixed(0);
+  $('form textarea').val($('form textarea').val() +"<area shape='circle' coords='" + x + "," + y + ",30' href='telnet://{{IP}}:{{NODE1}}'>\n");
 });
 
 // Accept privacy
@@ -641,7 +643,40 @@ $(document).on('click', '.action-pictureget', function(e) {
 	$('#context-menu').remove();
 	var picture_id = $(this).attr('data-path');
 	printPictureInForm(picture_id);
+
 });
+
+
+//Show circle under cursor
+$(document).on('mousemove', '#form-picture-edit > img', function(e){
+  var offset = $('.modal-body #form-picture-edit img').offset()
+    , limitY = $('.modal-body #form-picture-edit img').height()
+    , limitX = $('.modal-body #form-picture-edit img').width()
+    , mouseX = Math.min(e.pageX - offset.left, limitX)
+    , mouseY = Math.min(e.pageY - offset.top, limitY);
+
+  if (mouseX < 0) mouseX = 0;
+  if (mouseY < 0) mouseY = 0;
+
+  $('#follower').css({left:mouseX, top:mouseY});
+  $("#follower").data("data_x", mouseX);
+  $("#follower").data("data_y", mouseY);
+  $("#follower").data("data_offset", offset);
+
+});
+
+$(document).on('click','#follower', function(e){
+  $("#form-picture-edit img").trigger('click');
+});
+$(document).on('click', '#follower', function(e){
+  e.preventDefault();
+  e.folowerPosition = {
+    left: parseFloat($("#follower").css("left")) - 30,
+    top: parseFloat($("#follower").css("top")) + 30
+  };
+});
+
+
 
 // Get pictures list
 $(document).on('click', '.action-picturesget', function(e) {
@@ -885,7 +920,6 @@ $(document).on('click', '.action-nodeexport, .action-nodesexport', function(e) {
 				addMessage('info', values['name'] + ': ' + MESSAGES[138])
 				$.when(cfg_export(key)).done(function() {
 					// Node exported -> print a small green message
-					setNodeBoot(key, '1');
 					addMessage('success', values['name'] + ': ' + MESSAGES[79])
 				}).fail(function(message) {
 					// Cannot exported
@@ -1435,14 +1469,14 @@ $(document).on('submit', '#form-node-add, #form-node-edit', function(e) {
 					$('body').children('.modal.fade.in').focus();
 					addMessage(data['status'], data['message']);
           $(".modal .node" + form_data['id'] + " td:nth-child(2)").text(form_data["name"]);
-          $(".modal .node" + form_data['id'] + " td:nth-child(3)").html(form_data["template"]);
-          $(".modal .node" + form_data['id'] + " td:nth-child(4)").html(form_data["image"]);
-          $(".modal .node" + form_data['id'] + " td:nth-child(5)").html(form_data["cpu"]);
-          $(".modal .node" + form_data['id'] + " td:nth-child(7)").html(form_data["nvram"]);
-          $(".modal .node" + form_data['id'] + " td:nth-child(8)").html(form_data["ram"]);
-          $(".modal .node" + form_data['id'] + " td:nth-child(9)").html(form_data["ethernet"]);
-          $(".modal .node" + form_data['id'] + " td:nth-child(10)").html(form_data["serial"]);
-          $(".modal .node" + form_data['id'] + " td:nth-child(11)").html(form_data["console"]);
+          $(".modal .node" + form_data['id'] + " td:nth-child(3)").text(form_data["template"]);
+          $(".modal .node" + form_data['id'] + " td:nth-child(4)").text(form_data["image"]);
+          $(".modal .node" + form_data['id'] + " td:nth-child(5)").text(form_data["cpu"]);
+          $(".modal .node" + form_data['id'] + " td:nth-child(7)").text(form_data["nvram"]);
+          $(".modal .node" + form_data['id'] + " td:nth-child(8)").text(form_data["ram"]);
+          $(".modal .node" + form_data['id'] + " td:nth-child(9)").text(form_data["ethernet"]);
+          $(".modal .node" + form_data['id'] + " td:nth-child(10)").text(form_data["serial"]);
+          $(".modal .node" + form_data['id'] + " td:nth-child(11)").text(form_data["console"]);
 				} else {
 					// Application error
 					logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
