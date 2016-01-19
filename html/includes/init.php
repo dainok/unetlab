@@ -65,7 +65,7 @@ if (!isset($node_config)) {
 		'csr1000v'		=>	'config_csr1000v.py',
 		'docker'		=>	'config_docker.py',
 		'titanium'		=>	'config_titanium.py',
-		#'veos'			=>	'config_veos.py',
+		'veos'			=>	'config_veos.py',
 		'viosl2'		=>	'config_viosl2.py',
 		'vios'			=>	'config_vios.py',
 		'xrv'			=>	'config_xrv.py'
