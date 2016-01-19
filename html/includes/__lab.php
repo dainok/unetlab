@@ -211,8 +211,8 @@ class Lab {
 				$n['config'] == 'None' ? $n['config'] = '0' : $n['config'];	// Fix startup-config
 
 				// If config is empty, force "None"
-				$result = (string) array_pop($xml -> xpath('//lab/objects/configs/config[@id="'.$node_id.'"]'));
-				if (strlen($result) === 0) {
+				$result = (string) array_pop($xml -> xpath('//lab/objects/configs/config[@id="'.$n['id'].'"]'));
+				if (strlen($result) == 0) {
 					$n['config'] = 0;
 				}
 
