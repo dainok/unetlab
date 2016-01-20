@@ -175,13 +175,6 @@ def config_put(handler, config):
     # Save
     handler.sendline('copy running-config startup-config')
     try:
-        handler.expect('Destination filename', timeout = expctimeout)
-    except:
-        print('ERROR: error waiting for "Destination filename" prompt.')
-        node_quit(handler)
-        return False
-    handler.sendline('\r\n')
-    try:
         handler.expect('#', timeout = longtimeout)
     except:
         print('ERROR: error waiting for "#" prompt.')
@@ -261,6 +254,7 @@ def main(action, fiename, port):
 
             # Remove lock file
             lock = '%s/.lock' %(os.path.dirname(filename))
+            print(lock)
 
             if os.path.exists(lock):
                 os.remove(lock)
