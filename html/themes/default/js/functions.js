@@ -1479,7 +1479,48 @@ function printFormLab(action, values) {
 	var description = (values['description'] != null) ? values['description'] : '';
 	var body = (values['body'] != null) ? values['body'] : '';
 	var title = (action == 'add') ? MESSAGES[5] : MESSAGES[87];
-	var html = '<form id="form-lab-' + action + '" class="form-horizontal form-lab-' + action + '"><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[20] + '</label><div class="col-md-5"><input class="form-control" name="lab[path]" value="' + path + '" disabled="" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control autofocus" name="lab[name]" value="' + name + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[26] + '</label><div class="col-md-5"><input class="form-control" name="lab[version]" value="' + version + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">Author</label><div class="col-md-5"><input class="form-control" name="lab[author]" value="' + author + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[27] + '</label><div class="col-md-5"><textarea class="form-control" name="lab[description]">' + description + '</textarea></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[88] + '</label><div class="col-md-5"><textarea class="form-control" name="lab[body]">' + body + '</textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
+	var html = '<form id="form-lab-' + action + '" class="form-horizontal form-lab-' + action + '">' +
+                '<div class="form-group">' +
+                  '<label class="col-md-3 control-label">' + MESSAGES[20] + '</label>' +
+                  '<div class="col-md-5">' +
+                    '<input class="form-control" name="lab[path]" value="' + path + '" disabled="" type="text"/>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="form-group">' +
+                  '<label class="col-md-3 control-label">' + MESSAGES[19] + '</label>' +
+                  '<div class="col-md-5"><input class="form-control autofocus" name="lab[name]" value="' + name + '" type="text"/>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="form-group">' +
+                  '<label class="col-md-3 control-label">' + MESSAGES[26] + '</label>' +
+                  '<div class="col-md-5"><input class="form-control" name="lab[version]" value="' + version + '" type="text"/>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="form-group">' +
+                  '<label class="col-md-3 control-label">Author</label>' +
+                  '<div class="col-md-5">' +
+                    '<input class="form-control" name="lab[author]" value="' + author + '" type="text"/>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="form-group">' +
+                  '<label class="col-md-3 control-label">' + MESSAGES[27] + '</label>' +
+                  '<div class="col-md-5">' +
+                   '<textarea class="form-control" name="lab[description]">' + description + '</textarea>' +
+                  '</div>' +
+               '</div>' +
+                '<div class="form-group"> ' +
+                  '<label class="col-md-3 control-label">' + MESSAGES[88] + '</label>' +
+                  '<div class="col-md-5">' +
+                    '<textarea class="form-control" name="lab[body]">' + body + '</textarea>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="form-group">' +
+                  '<div class="col-md-5 col-md-offset-3">' +
+                    '<button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button>' +
+                    '<button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button>' +
+                  '</div>' +
+                '</div>' +
+              '</form>';
 	logger(1, 'DEBUG: popping up the lab-add form.');
 	addModalWide(title, html, '');
 	validateLabInfo();
@@ -1879,7 +1920,7 @@ function printFormPicture(action, values) {
 	if (action == 'add') {
 		html += '<form id="form-picture-' + action + '" class="form-horizontal form-lab-' + action + '"><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control" autofocus name="picture[name]" value="' + name + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[137] + '</label><div class="col-md-5"><textarea class="form-control" name="picture[map]">' + map + '</textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
 	} else {
-		html += '<form id="form-picture-' + action + '" class="form-horizontal form-lab-' + action + '" data-path=' + values['id'] + '><img src="/api/labs' + $('#lab-viewport').attr('data-path') + '/pictures/' + values['id'] + '/data" alt="' + values['name'] + '" width="' + values['width'] + '" height="' + values['height'] + '"/><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control" autofocus name="picture[name]" value="' + name + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[137] + '</label><div class="col-md-5"><textarea class="form-control" name="picture[map]">' + map + '</textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
+		html += '<form id="form-picture-' + action + '" class="form-horizontal form-lab-' + action + '" data-path=' + values['id'] + '><img src="/api/labs' + $('#lab-viewport').attr('data-path') + '/pictures/' + values['id'] + '/data" alt="' + values['name'] + '" width="' + values['width'] + '" height="' + values['height'] + '"/><div id="follower"></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control" autofocus name="picture[name]" value="' + name + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[137] + '</label><div class="col-md-5"><textarea class="form-control" name="picture[map]">' + map + '</textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
 	}
 	logger(1, 'DEBUG: popping up the picture form.');
 	addModalWide(title, html, '', 'second-win modal-ultra-wide');
