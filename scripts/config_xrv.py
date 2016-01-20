@@ -121,6 +121,50 @@ def node_login(handler):
         node_quit(handler)
         return False
 
+def node_firstlogin(handler):
+    # Send an empty line, and wait for the login prompt
+    i = -1
+    while i == -1:
+        try:
+            handler.sendline('\r\n')
+            i = handler.expect('SYSTEM CONFIGURATION COMPLETED', timeout = 5)
+        except:
+            i = -1
+
+    if i == 0:
+        # Need to send username and password
+        handler.sendline('\r\n')
+
+        try:
+            handler.expect('Username:', timeout = expctimeout)
+        except:
+            print('ERROR: error waiting for "Username:" prompt.')
+            node_quit(handler)
+            return False
+
+        handler.sendline(username)
+
+        try:
+            handler.expect('Password:', timeout = expctimeout)
+        except:
+            print('ERROR: error waiting for "Password:" prompt.')
+            node_quit(handler)
+            return False
+
+        handler.sendline(password)
+
+        try:
+            handler.expect('#', timeout = expctimeout)
+        except:
+            print('ERROR: error waiting for "#" prompt.')
+            node_quit(handler)
+            return False
+        return True
+    else:
+        # Unexpected output
+        node_quit(handler)
+        return False
+
 def node_quit(handler):
     if handler.isalive() == True:
         handler.sendline('quit\n')
@@ -233,7 +277,11 @@ def main(action, fiename, port):
             sys.exit(1)
 
         # Login to the device and get a privileged prompt
-        rc = node_login(handler)
+        if action == 'get':
+            rc = node_login(handler)
+        else:
+            rc = node_firstlogin(handler)
+
         if rc != True:
             print('ERROR: failed to login.')
             node_quit(handler)
