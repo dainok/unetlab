@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-# scripts/config_xrv.py
+# scripts/config_vsrx.py
 #
-# Import/Export script for vIOS.
+# Import/Export script for vsrx.
 #
 # LICENSE:
 #
@@ -29,9 +29,8 @@
 
 import getopt, multiprocessing, os, pexpect, re, sys, time
 
-username = 'cisco'
-password = 'cisco'
-secret = 'cisco'
+username = 'root'
+password = 'password1'
 conntimeout = 3     # Maximum time for console connection
 expctimeout = 3     # Maximum time for each short expect
 longtimeout = 30    # Maximum time for each long expect
@@ -44,10 +43,12 @@ def node_login(handler):
         try:
             handler.sendline('\r\n')
             i = handler.expect([
-                'Username:',
-                '\(config',
-                '[^)]#',
-                'Uncommitted changes found'], timeout = 5)
+                'login:',
+                'root@.*%',
+                'root>',
+                'root@.*>',
+                'root#',
+                'root@.*#'], timeout = 5)
         except:
             i = -1
 
@@ -55,45 +56,21 @@ def node_login(handler):
         # Need to send username and password
         handler.sendline(username)
         try:
-            handler.expect('Password:', timeout = expctimeout)
+            j = handler.expect(['root@.*%', 'Password:'], timeout = longtimeout)
         except:
-            print('ERROR: error waiting for "Password:" prompt.')
+            print('ERROR: error waiting for ["root@.*%", "password:"] prompt.')
             node_quit(handler)
             return False
 
-        handler.sendline(password)
-        try:
-            handler.expect('[^)]#', timeout = expctimeout)
-        except:
-            print('ERROR: error waiting for "#" prompt.')
-            node_quit(handler)
-            return False
-        return True
-    elif i == 1:
-        # Config mode detected, need to exit
-        # Clearing all "expect" buffer
-        while True:
-            try:
-                handler.expect('#', timeout = 0.1)
-            except:
-                break
-        handler.sendline('end')
-        try:
-            i = handler.expect(['[^)]#', 'Uncommitted changes found'], timeout = expctimeout)
-        except:
-            print('ERROR: error waiting for ["#", "Uncommitted changes found"] prompt.')
-            node_quit(handler)
-            return False
-
-        if i == 0:
+        if j == 0:
             # Nothing to do
             return True
-        elif i == 1:
-            handler.sendline('no')
+        elif j == 1:
+            handler.sendline(password)
             try:
-                handler.expect('[^)]#', timeout = expctimeout)
+                handler.expect('root@.*%', timeout = longtimeout)
             except:
-                print('ERROR: error waiting for "#" prompt.')
+                print('ERROR: error waiting for "root@.*%" prompt.')
                 node_quit(handler)
                 return False
             return True
@@ -101,62 +78,34 @@ def node_login(handler):
             # Unexpected output
             node_quit(handler)
             return False
-
-        return True
-    elif i == 2:
+    elif i == 1:
         # Nothing to do
         return True
-    elif i == 3:
-        # Need to exit the commit prompt
-        handler.sendline('no')
+    elif i == 2 or i == 3:
+        # Exit from CLI mode
+        handler.sendline('exit')
         try:
-            handler.expect('[^)]#', timeout = expctimeout)
+            handler.expect('root@.*%', timeout = expctimeout)
         except:
-            print('ERROR: error waiting for "#" prompt.')
+            print('ERROR: error waiting for "root@.*%" prompt.')
             node_quit(handler)
             return False
         return True
-    else:
-        # Unexpected output
-        node_quit(handler)
-        return False
-
-def node_firstlogin(handler):
-    # Send an empty line, and wait for the login prompt
-    i = -1
-    while i == -1:
+    elif i == 4 or i == 5:
+        # Exit from configuration mode
+        handler.sendline('exit')
         try:
-            handler.sendline('\r\n')
-            i = handler.expect('SYSTEM CONFIGURATION COMPLETED', timeout = 5)
+            handler.expect(['root>', 'root@.*>'], timeout = expctimeout)
         except:
-            i = -1
-
-    if i == 0:
-        # Need to send username and password
-        handler.sendline('\r\n')
-
-        try:
-            handler.expect('Username:', timeout = expctimeout)
-        except:
-            print('ERROR: error waiting for "Username:" prompt.')
+            print('ERROR: error waiting for ["root>", "root@.*>"] prompt.')
             node_quit(handler)
             return False
-
-        handler.sendline(username)
-
+        # Exit from CLI mode
+        handler.sendline('exit')
         try:
-            handler.expect('Password:', timeout = expctimeout)
+            handler.expect('root.*%', timeout = expctimeout)
         except:
-            print('ERROR: error waiting for "Password:" prompt.')
-            node_quit(handler)
-            return False
-
-        handler.sendline(password)
-
-        try:
-            handler.expect('#', timeout = expctimeout)
-        except:
-            print('ERROR: error waiting for "#" prompt.')
+            print('ERROR: error waiting for "root@.*%" prompt.')
             node_quit(handler)
             return False
         return True
@@ -167,50 +116,87 @@ def node_firstlogin(handler):
 
 def node_quit(handler):
     if handler.isalive() == True:
-        handler.sendline('quit\n')
+        handler.sendline('exit\n')
     handler.close()
 
 def config_get(handler):
     # Clearing all "expect" buffer
     while True:
         try:
-            handler.expect('#', timeout = 0.1)
+            handler.expect('root@.*%', timeout = 0.1)
         except:
             break
 
-    # Disable paging
-    handler.sendline('terminal length 0')
+    # Go into CLI mode
+    handler.sendline('cli')
     try:
-        handler.expect('#', timeout = expctimeout)
+        handler.expect(['root>', 'root@.*>'], timeout = expctimeout)
     except:
-        print('ERROR: error waiting for "#" prompt.')
+        print('ERROR: error waiting for ["root>", "root@.*>"] prompt.')
+        node_quit(handler)
+        return False
+
+    # Disable paging
+    handler.sendline('set cli screen-length 0')
+    try:
+        handler.expect(['root>', 'root@.*>'], timeout = expctimeout)
+    except:
+        print('ERROR: error waiting for ["root>", "root@.*>"] prompt.')
         node_quit(handler)
         return False
 
     # Getting the config
-    handler.sendline('show running-config')
+    handler.sendline('show configuration')
     try:
-        handler.expect('[^)]#', timeout = longtimeout)
+        handler.expect(['root>', 'root@.*>'], timeout = expctimeout)
     except:
-        print('ERROR: error waiting for "#" prompt.')
+        print('ERROR: error waiting for ["root>", "root@.*>"] prompt.')
         node_quit(handler)
         return False
+
     config = handler.before.decode()
 
+    # Exit from config mode
+    handler.sendline('exit')
+    try:
+        handler.expect('root@.*%', timeout = longtimeout)
+    except:
+        print('ERROR: error waiting for "root@.*%" prompt.')
+        node_quit(handler)
+        return False
+    
     # Manipulating the config
     config = re.sub('\r', '', config, flags=re.DOTALL)                                      # Unix style
-    config = re.sub('.*!! IOS XR Configuration', '!! IOS XR Configuration', config, flags=re.DOTALL)   # Header
-    config = re.sub('!\nend.*', '!\nend\n', config, flags=re.DOTALL)                # Footer
+    config = re.sub('.*show configuration', '', config, flags=re.DOTALL)          # Header
+    config = re.sub('\nroot.*>.*', '\n', config, flags=re.DOTALL)                        # Footer
 
     return config
 
 def config_put(handler, config):
-    # Got to configure mode
-    handler.sendline('configure terminal')
+    # Go into CLI mode
+    handler.sendline('cli')
     try:
-        handler.expect('\(config', timeout = expctimeout)
+        handler.expect(['root>', 'root@.*>'], timeout = expctimeout)
     except:
-        print('ERROR: error waiting for "(config prompt.')
+        print('ERROR: error waiting for ["root>", "root@.*>"] prompt.')
+        node_quit(handler)
+        return False
+
+    # Got to configure mode
+    handler.sendline('configure')
+    try:
+        handler.expect(['root#', 'root@.*#'], timeout = expctimeout)
+    except:
+        print('ERROR: error waiting for ["root#", "root@.*#"] prompt.')
+        node_quit(handler)
+        return False
+
+    # Start the load mode
+    handler.sendline('load merge terminal')
+    try:
+        handler.expect('to end input', timeout = expctimeout)
+    except:
+        print('ERROR: error waiting for "to end input" prompt.')
         node_quit(handler)
         return False
 
@@ -224,25 +210,32 @@ def config_put(handler, config):
             node_quit(handler)
             return False
 
-    # At the end of configuration be sure we are in non config mode
-    handler.sendline('end')
+    # At the end of configuration be sure we are in non config mode (sending CTRl + D)
+    handler.sendline('\x04')
+    try:
+        handler.expect(['root#', 'root@.*#'], timeout = expctimeout)
+    except:
+        print('ERROR: error waiting for ["root#", "root@.*#"] prompt.')
+        node_quit(handler)
+        return False
 
     # Save
+    handler.sendline('commit')
     try:
-        handler.expect('Uncommitted changes found', timeout = expctimeout)
+        handler.expect(['root#', 'root@.*#'], timeout = longtimeout)
     except:
-        print('ERROR: error waiting for "Uncommitted changes found prompt.')
+        print('ERROR: error waiting for ["root#", "root@.*#"] prompt.')
         node_quit(handler)
         return False
 
-    # Confirm the commit
-    handler.sendline('yes')
+    handler.sendline('exit')
     try:
-        handler.expect('[^)]#', timeout = expctimeout)
+        handler.expect(['root>', 'root@.*>'], timeout = longtimeout)
     except:
-        print('ERROR: error waiting for "#" prompt.')
+        print('ERROR: error waiting for ["root>", "root@.*>"] prompt.')
         node_quit(handler)
         return False
+
     return True
 
 def usage():
@@ -277,11 +270,7 @@ def main(action, fiename, port):
             sys.exit(1)
 
         # Login to the device and get a privileged prompt
-        if action == 'get':
-            rc = node_login(handler)
-        else:
-            rc = node_firstlogin(handler)
-
+        rc = node_login(handler)
         if rc != True:
             print('ERROR: failed to login.')
             node_quit(handler)
@@ -406,7 +395,7 @@ if __name__ == "__main__":
             sys.exit(1)
 
     # Backgrounding the script
-    end_before = now() + timeout * 1000
+    end_before = now() + timeout
     p = multiprocessing.Process(target=main, name="Main", args=(action, filename, port))
     p.start()
 

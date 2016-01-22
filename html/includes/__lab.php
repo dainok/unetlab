@@ -214,6 +214,9 @@ class Lab {
 				$result = (string) array_pop($xml -> xpath('//lab/objects/configs/config[@id="'.$n['id'].'"]'));
 				if (strlen($result) == 0) {
 					$n['config'] = 0;
+					$config_data = False;
+				} else {
+					$config_data = base64_decode($result);
 				}
 
 				try {
@@ -262,22 +265,16 @@ class Lab {
 							break;
 					}
 				}
-			}
 
-			// startup-config
-			foreach ($xml -> xpath('//lab/objects/configs/config') as $config) {
-				$node_id = 0;
-				$config_data = '';
-				if (isset($config -> attributes() -> id)) $node_id = (string) $config -> attributes() -> id;
-				$result = (string) array_pop($config -> xpath('.'));
-				if (strlen($result) > 0) $config_data = base64_decode($result);
-
-				$rc = $this -> nodes[$node_id] -> setConfigData($config_data);
-				if ($rc != 0) {
-					error_log(date('M d H:i:s ').'WARNING: '.$f.':cfg'.$node_id.' '.$GLOBALS['messages'][20037]);
-					continue;
+				// startup-config (read before)
+				if ($config_data !== False) {
+					$rc = $this -> nodes[$n['id']] -> setConfigData($config_data);
+					if ($rc != 0) {
+						error_log(date('M d H:i:s ').'WARNING: '.$f.':cfg'.$node_id.' '.$GLOBALS['messages'][20037]);
+					}
 				}
 			}
+
 
 			// Lab Pictures
 			foreach ($xml -> xpath('//lab/objects/pictures/picture') as $picture) {
