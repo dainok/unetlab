@@ -49,6 +49,7 @@ function addMessage(severity, message) {
 	// Severity can be success (green), info (blue), warning (yellow) and danger (red)
 
 	var timeout = 3000;		// by default close messages after 3 seconds
+  if (severity == 'danger') timeout = 8000;
 	if (severity == 'alert') timeout = 10000;
 	if (severity == 'warning') timeout = 10000;
 
