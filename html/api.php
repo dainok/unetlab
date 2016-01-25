@@ -27,7 +27,7 @@
  * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20151216
+ * @version 20160125
  */
 
 require_once('/opt/unetlab/html/includes/init.php');
@@ -41,6 +41,7 @@ require_once(BASE_DIR.'/html/includes/api_networks.php');
 require_once(BASE_DIR.'/html/includes/api_nodes.php');
 require_once(BASE_DIR.'/html/includes/api_pictures.php');
 require_once(BASE_DIR.'/html/includes/api_status.php');
+require_once(BASE_DIR.'/html/includes/api_textobjects.php');
 require_once(BASE_DIR.'/html/includes/api_topology.php');
 require_once(BASE_DIR.'/html/includes/api_uusers.php');
 \Slim\Slim::registerAutoloader();
@@ -565,6 +566,10 @@ $app -> get('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 		} else {
 			$output = apiGetLabTopology($lab);
 		}
+	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/textobjects$/', $s)) {
+		$output = apiGetLabTextObjects($lab, $id);
+	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/textobjects\/[0-9]+$/', $s)) {
+		$output = apiGetLabTextObject($lab, $id);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/pictures$/', $s)) {
 		$output = apiGetLabPictures($lab, $id);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/pictures\/[0-9]+$/', $s)) {
@@ -705,6 +710,9 @@ $app -> put('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 		$output = apiExportLabNode($lab, $id, $tenant);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/[0-9]+\/interfaces$/', $s)) {
 		$output = apiEditLabNodeInterfaces($lab, $id, $p);
+	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/textobjects\/[0-9]+$/', $s)) {
+		$p['id'] = $id;
+		$output = apiEditLabTextObject($lab, $p);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/pictures\/[0-9]+$/', $s)) {
 		$p['id'] = $id;
 		$output = apiEditLabPicture($lab, $p);
@@ -822,6 +830,8 @@ $app -> post('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 			unset($p['count']);
 		}
 		$output = apiAddLabNode($lab, $p, $o);
+	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/textobjects$/', $s)) {
+		$output = apiAddLabTextObject($lab, $p, $o);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/pictures$/', $s)) {
 		// Cannot use $app -> request() -> getBody()
 		$p = $_POST;
@@ -949,6 +959,8 @@ $app -> delete('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 		$output = apiDeleteLabNetwork($lab, $id);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/[0-9]+$/', $s)) {
 		$output = apiDeleteLabNode($lab, $id);
+	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/textobjects\/[0-9]+$/', $s)) {
+		$output = apiDeleteLabTextObject($lab, $id);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/pictures\/[0-9]+$/', $s)) {
 		$output = apiDeleteLabPicture($lab, $id);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl$/', $s)) {

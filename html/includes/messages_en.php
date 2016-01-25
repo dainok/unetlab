@@ -27,7 +27,7 @@
  * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20151217
+ * @version 20160125
  */
 
 /***************************************************************************
@@ -108,6 +108,10 @@ $messages[20037] = 'Config ignored, cannot load it (20037).';
 $messages[20038] = 'Attribute ignored, invalid lab_name (20038).';
 $messages[20039] = 'Lab already exists (20039).';
 $messages[20040] = 'Attribute ignored, invalid lab_body (20040).';
+$messages[20041] = 'cwObjectPicture ignored, invalid object (20041).';
+$messages[20042] = 'Cannot add object to the lab (20042).';
+$messages[20043] = 'Cannot find object in the selected lab (20043).';
+$messages[20044] = 'Cannot edit object in the selected lab (20044).';
 
 // __network.php (30000-39999)
 $messages[30000] = 'Cannot create network, invalid or missing mandatory parameters (30000).';
@@ -150,13 +154,19 @@ $messages[40025] = 'Node has no valid image (40025).';
 $messages[40026] = 'Attribute ignored, invalid node_uuid (40026).';
 $messages[40027] = 'Attribute ignored, invalid node_console (40027).';
 
-// __picture.php (50000-59999)
+// __picture.php (50000-50999)
 $messages[50000] = 'Cannot create picture, invalid or missing mandatory parameters (50000).';
 $messages[50002] = 'Cannot create picture, invalid picture_data (50002).';
 $messages[50003] = 'Attribute ignored, invalid picture_name (50003).';
 $messages[50004] = 'Cannot create picture, invalid picture_type (50004).';
 $messages[50005] = 'Attribute ignored, invalid picture_map (50005).';
 $messages[50006] = 'Picture has not been modified (50006).';
+
+// __object.php (51000-51999)
+$messages[51000] = 'Cannot create object, invalid or missing mandatory parameters (51000).';
+$messages[51001] = 'Cannot create object, invalid object_type (51001).';
+$messages[51002] = 'Attribute ignored, invalid object_name (51002).';
+$messages[51003] = 'Attribute ignored, invalid object_data (51003).';
 
 /***************************************************************************
  * Functions and others
@@ -225,6 +235,7 @@ $messages[60058] = 'Startup config not available (60058).';
 $messages[60059] = 'Failed to update UNetLab (60059).';
 $messages[60060] = 'UNetLab is updated (60060).';
 $messages[60061] = 'Failed to lock the lab (60061).';
+$messages[60062] = 'Successfully listed textobjects (60062).';
 
 // Text (70000-79999)
 $messages[70000] = 'Name/prefix';

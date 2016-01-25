@@ -3,7 +3,7 @@
 # vim: syntax=php tabstop=4 softtabstop=0 noexpandtab laststatus=1 ruler
 
 /**
- * wrappers/unl_wrapper
+ * wrappers/unl_wrapper.php
  *
  * CLI handler for UNetLab
  *
@@ -28,7 +28,7 @@
  * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20160113
+ * @version 20160125
  */
 
 require_once('/opt/unetlab/html/includes/init.php');

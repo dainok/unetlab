@@ -12,17 +12,20 @@ LINK="http:\/\/www.unetlab.com\/"
 
 
 for f in ${FILES}; do
+	if [ "${f}" = "scripts/fix_metadata.sh" ]; then
+		continue
+	fi
     VERSION=$(date -d @$(stat --printf '%Y' ${f}) +%Y%m%d)
 	TIMESTAMP=$(date -d @$(stat --printf '%Y' ${f}) +%Y%m%d%H%M)
-    sed -i "s/@author .*$/@author ${AUTHOR}/g" ${f}
-    sed -i "s/@copyright .*$/@copyright ${COPYRIGHT}/g" ${f}
-    sed -i "s/@license .*$/@license ${LICENSE}/g" ${f}
-    sed -i "s/@link .*$/@link ${LINK}/g" ${f}
-    sed -i "s/@version .*$/@version ${VERSION}/g" ${f}
+	sed -i "s/@author .*$/@author ${AUTHOR}/g" ${f}
+	sed -i "s/@copyright .*$/@copyright ${COPYRIGHT}/g" ${f}
+	sed -i "s/@license .*$/@license ${LICENSE}/g" ${f}
+	sed -i "s/@link .*$/@link ${LINK}/g" ${f}
+	sed -i "s/@version .*$/@version ${VERSION}/g" ${f}
 	fgrep "# ${f}" ${f} > /dev/null 2>&1 || fgrep "* ${f}" ${f} > /dev/null 2>&1
-    if [ $? -ne 0 ]; then
-        echo "Missing or wrong file on header (${f})"
-    fi
-    dos2unix ${f} > /dev/null 2>&1
+	if [ $? -ne 0 ]; then
+		echo "Missing or wrong file on header (${f})"
+	fi
+	dos2unix ${f} > /dev/null 2>&1
 	touch -t ${TIMESTAMP} ${f}
 done

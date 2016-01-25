@@ -1,10 +1,10 @@
 <?php
-# vim: syntax=php tabstop=4 softtabstop=0 noexpandtab laststatus=1 ruler
+# vim: syntax=php tabstop=4 softtabstop=0 noexpandtab laststatus=1
 
 /**
- * html/includes/api_configs.php
+ * html/includes/api_textobjects.php
  *
- * Configs related functions for REST APIs.
+ * Pictures related functions for REST APIs.
  *
  * LICENSE:
  *
@@ -27,51 +27,41 @@
  * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20160119
+ * @version 20160125
  */
 
 /**
- * Function to add a network to a lab.
+ * Function to add a textobject to a lab.
  *
  * @param   Lab     $lab                Lab
  * @param   Array   $p                  Parameters
- * @param   bool    $o                  True if need to add ID to name
  * @return  Array                       Return code (JSend data)
  */
-/*
-function apiAddLabNetwork($lab, $p, $o) {
-	// Adding network_id to network_name if required
-	if ($o == True && isset($p['name'])) $p['name'] = $p['name'].$lab -> getFreeNetworkId();
-
-	// Adding the network
-	$rc = $lab -> addNetwork($p);
-
+function apiAddLabTextObject($lab, $p) {
+	// Adding the object
+	$rc = $lab -> addTextObject($p);
 	if ($rc === 0) {
-		// Network added
 		$output['code'] = 201;
 		$output['status'] = 'success';
-		$output['message'] = $GLOBALS['messages'][60006];
+		$output['message'] = $GLOBALS['messages'][60023];
 	} else {
-		// Failed to add network
 		$output['code'] = 400;
 		$output['status'] = 'fail';
 		$output['message'] = $GLOBALS['messages'][$rc];
-	}
+    }
 	return $output;
 }
- */
 
 /**
- * Function to delete a lab network.
+ * Function to delete a textobject.
  *
  * @param   Lab     $lab                Lab
- * @param   int     $id                 Network ID
+ * @param   int     $id                 Object ID
  * @return  Array                       Return code (JSend data)
  */
-/*
-function apiDeleteLabNetwork($lab, $id) {
-	// Deleting the network
-	$rc = $lab -> deleteNetwork($id);
+function apiDeleteLabTextObject($lab, $id) {
+	// Deleting the picture
+	$rc = $lab -> deleteTextObject($id);
 
 	if ($rc === 0) {
 		$output['code'] = 200;
@@ -84,88 +74,83 @@ function apiDeleteLabNetwork($lab, $id) {
 	}
 	return $output;
 }
- */
 
 /**
- * Function to edit a lab config.
+ * Function to edit a textobject.
  *
  * @param   Lab     $lab                Lab
  * @param   Array   $p                  Parameters
  * @return  Array                       Return code (JSend data)
  */
-function apiEditLabConfig($lab, $p) {
-	if (!isset($lab -> getNodes()[$p['id']])) {
-		// Node not found
+function apiEditLabTextObject($lab, $p) {
+	$rc = $lab -> editTextObject($p);
+
+	if ($rc === 0) {
+		$output['code'] = 201;
+		$output['status'] = 'success';
+		$output['message'] = $GLOBALS['messages'][60023];
+	} else {
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][$rc];
+	}
+	return $output;
+}
+
+/**
+ * Function to get a single textobject.
+ *
+ * @param   Lab     $lab                Lab
+ * @param   int     $id                 Object ID
+ * @return  Array                       Lab object (JSend data)
+ */
+function apiGetLabTextObject($lab, $id) {
+	// Getting picture
+	if (isset($lab -> getTextObjects()[$id])) {
+		$textobject = $lab -> getTextObjects()[$id];
+		// Printing picture
+		$output['code'] = 200;
+		$output['status'] = 'success';
+		$output['message'] = 'Object loaded';
+		$output['data'] = Array(
+			'id' => $id,
+			'name' => $textobject -> getName(),
+			'type' => $textobject -> getNType(),
+			'data' => $textobject -> getData()
+		);
+	} else {
 		$output['code'] = 404;
 		$output['status'] = 'fail';
-		$output['message'] = $GLOBALS['messages'][20024];
-		return $output;
-	}
-
-	// Edit config
-	$rc = $lab -> setNodeConfigData($p['id'], $p['data']);
-	if ($rc === 0) {
-		$output['code'] = 201;
-		$output['status'] = 'success';
-		$output['message'] = $GLOBALS['messages'][60023];
-	} else {
-		$output['code'] = 400;
-		$output['status'] = 'fail';
-		$output['message'] = $GLOBALS['messages'][$rc];
+		$output['message'] = 'Object "'.$id.'" not found on lab "'.$lab_file.'".';
 	}
 	return $output;
 }
 
 /**
- * Function to get a single startup-config.
+ * Function to get all lab textobjects.
  *
  * @param   Lab     $lab                Lab
- * @param   int     $id                 Node  ID
- * @return  Array                       startup-config (JSend data)
+ * @return  Array                       Lab objects (JSend data)
  */
-function apiGetLabConfig($lab, $id) {
-	// Getting startup-configs
-	$nodes = $lab -> getNodes();
+function apiGetLabTextObjects($lab) {
+	// Getting pictures
+	$textobjects = $lab -> getTextObjects();
 
-	if (isset($nodes[$id]) && isset($GLOBALS['node_config'][$nodes[$id] -> getTemplate()])) {
-		$output['code'] = 200;
-		$output['status'] = 'success';
-		$output['message'] = $GLOBALS['messages'][60057];
-		$output['data'] = Array();
-		$output['data']['name'] = $nodes[$id] -> getName();
-		$output['data']['id'] = $id;
-		$output['data']['data'] = $nodes[$id] -> getConfigData();
-	} else {
-		$output['code'] = 200;
-		$output['status'] = 'fail';
-		$output['message'] = $GLOBALS['messages'][60058];
-	}
-	return $output;
-}
-
-/**
- * Function to get all startup-configs.
- *
- * @param   Lab     $lab                Lab
- * @return  Array                       startup-configs (JSend data)
- */
-function apiGetLabConfigs($lab) {
-	// Getting startup-configs
-	$nodes = $lab -> getNodes();
-
-	// Printing startup-configs
+	// Printing objects
 	$output['code'] = 200;
 	$output['status'] = 'success';
-	$output['message'] = $GLOBALS['messages'][60055];
+	$output['message'] = $GLOBALS['messages'][60062];
 	$output['data'] = Array();
-	foreach ($nodes as $node_id => $node) {
-		if (isset($GLOBALS['node_config'][$node -> getTemplate()])) {
-			$output['data'][$node_id] = Array(
-				'config' => $node -> getConfig(),
-				'name' => $node -> getName()
+	if (!empty($textobjects)) {
+		foreach ($textobjects as $textobject_id => $textobject) {
+			$output['data'][$textobject_id] = Array(
+				'id' => $textobject_id,
+				'name' => $textobject -> getName(),
+				'type' => $textobject -> getNType(),
 			);
 		}
 	}
-	return $output;
+    
+    return $output;
 }
 ?>

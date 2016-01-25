@@ -38,7 +38,7 @@
  * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20160113
+ * @version 20160125
  */
 
 // Include custom configuration
@@ -107,7 +107,7 @@ if (!isset($node_templates)) {
 		'extremexos'	=>	'ExtremeXOS',
 		'bigip'			=>	'F5 BIG-IP LTM VE',
 		'fortinet'		=>	'Fortinet FortiGate',
-		#'radware'		=>	'Radware Alteon',
+		//'radware'		=>	'Radware Alteon',
 		'hpvsr'			=>	'HP VSR1000',
 		'olive'			=>	'Juniper Olive',
 		'vmx'			=>	'Juniper vMX',
@@ -140,6 +140,7 @@ require_once(BASE_DIR.'/html/includes/__interfc.php');
 require_once(BASE_DIR.'/html/includes/__lab.php');
 require_once(BASE_DIR.'/html/includes/__network.php');
 require_once(BASE_DIR.'/html/includes/__node.php');
+require_once(BASE_DIR.'/html/includes/__textobject.php');
 require_once(BASE_DIR.'/html/includes/__picture.php');
 require_once(BASE_DIR.'/html/includes/functions.php');
 require_once(BASE_DIR.'/html/includes/messages_en.php');

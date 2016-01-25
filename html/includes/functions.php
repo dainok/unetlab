@@ -27,7 +27,7 @@
  * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20160113
+ * @version 20160125
  */
 
 /**
@@ -228,6 +228,30 @@ function checkNodeName($s) {
  */
 function checkNodeType($s) {
 	if (in_array($s, listNodeTypes())) {
+		return True;
+	} else {
+		return False;
+	}
+}
+
+/**
+ * Function to check if a string is valid as object_name.
+ *
+ * @param	string	$s					String to check
+ * @return	bool						True if valid
+ */
+function checkTextObjectName($s) {
+	return True;
+}
+
+/**
+ * Function to check if a string is valid as object_type.
+ *
+ * @param	string	$s					String to check
+ * @return	bool						True if valid
+ */
+function checkTextObjectType($s) {
+	if (preg_match('/^[a-z0-9]+$/', $s)) {
 		return True;
 	} else {
 		return False;

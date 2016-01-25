@@ -26,10 +26,10 @@
  * along with UNetLab.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
- * @copyright 2014-2015 Andrea Dainese
+ * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150423
+ * @version 20151019
  */
 
 $default_image = 'L3-TPGEN+ADVENTERPRISEK9-M-12.4-20090714.bin';
