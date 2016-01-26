@@ -38,7 +38,7 @@
  * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20160125
+ * @version 20160126
  */
 
 // Include custom configuration
@@ -68,6 +68,7 @@ if (!isset($node_config)) {
 		'veos'			=>	'config_veos.py',
 		'viosl2'		=>	'config_viosl2.py',
 		'vios'			=>	'config_vios.py',
+		'vsrx'			=>	'config_vsrx.py',
 		'xrv'			=>	'config_xrv.py'
 	);
 }
