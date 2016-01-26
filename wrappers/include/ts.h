@@ -1,5 +1,5 @@
 /**
- * wrappers/includes/ts.h
+ * wrappers/include/ts.h
  *
  * Terminal server functions for wrappers.
  *
@@ -24,7 +24,7 @@
  * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20151019
+ * @version 20160126
  */
 
 #include <sys/types.h>

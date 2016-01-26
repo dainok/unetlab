@@ -1,7 +1,7 @@
 // vim: syntax=c tabstop=4 softtabstop=0 noexpandtab laststatus=1 ruler
 
 /**
- * wrappers/includes/params.h
+ * wrappers/include/params.h
  *
  * Parameters for wrappers.
  *
@@ -26,7 +26,7 @@
  * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20151019
+ * @version 20160126
  */
 
 #define BUFFER 10000
