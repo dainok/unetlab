@@ -1796,7 +1796,15 @@ function printPictureInForm(id){
 		picture_map = picture_map.replace(/{{IP}}/g, location.hostname);
 		picture_map = picture_map.replace(/{{NODE[0-9]+}}/g, function(e) { return parseInt(e.substr(6, e.length - 8)) + 32768 + 128 * TENANT});
 		// Read privileges and set specific actions/elements
-		var body = '<div id="lab_picture"><img usemap="#picture_map" src="' + picture_url + '" alt="' + picture['name'] + '" title="' + picture['name'] + '" width="' + picture['width'] + '" height="' + picture['height'] + '"/><map name="picture_map">' + picture_map + '</map></div>'
+		var body = '<div id="lab_picture">' +
+        '<img usemap="#picture_map" ' +
+             'src="' + picture_url + '" ' +
+             'alt="' + picture['name'] + '" ' +
+             'title="' + picture['name'] + '" ' +
+             'width="' + picture['width'] + '" ' +
+             'height="' + picture['height'] + '"/>' +
+        '<map name="picture_map">' + picture_map + '</map>' +
+      '</div>';
 		if (ROLE == 'admin' || ROLE == 'editor') {
 			var footer = '<button type="button" class="btn btn-aqua action-pictureedit" data-path="' + picture_id + '">Edit</button>';
 		} else {
@@ -1911,17 +1919,17 @@ function displayPictureForm(picture_id) {
 
 // Add a new picture
 function printFormPicture(action, values) {
-	var map = (values['map'] != null) ? values['map'] : '';
-	var name = (values['name'] != null) ? values['name'] : '';
-	var width = (values['width'] != null) ? values['width'] : '';
-	var height = (values['height'] != null) ? values['height'] : '';
-	var title = (action == 'add') ? MESSAGES[135] : MESSAGES[137];
-	var html = ''
+	var map = (values['map'] != null) ? values['map'] : ''
+    , name = (values['name'] != null) ? values['name'] : ''
+    , width = (values['width'] != null) ? values['width'] : ''
+    , height = (values['height'] != null) ? values['height'] : ''
+    , title = (action == 'add') ? MESSAGES[135] : MESSAGES[137]
+    , html = '';
 
 	if (action == 'add') {
 		html += '<form id="form-picture-' + action + '" class="form-horizontal form-lab-' + action + '"><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control" autofocus name="picture[name]" value="' + name + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[137] + '</label><div class="col-md-5"><textarea class="form-control" name="picture[map]">' + map + '</textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
 	} else {
-		html += '<form id="form-picture-' + action + '" class="form-horizontal form-lab-' + action + '" data-path=' + values['id'] + '><img src="/api/labs' + $('#lab-viewport').attr('data-path') + '/pictures/' + values['id'] + '/data" alt="' + values['name'] + '" width="' + values['width'] + '" height="' + values['height'] + '"/><div id="follower"></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control" autofocus name="picture[name]" value="' + name + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[137] + '</label><div class="col-md-5"><textarea class="form-control" name="picture[map]">' + map + '</textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
+		html += '<form id="form-picture-' + action + '" class="form-horizontal form-lab-' + action + '" data-path=' + values['id'] + '><div class="follower-wrapper"><img src="/api/labs' + $('#lab-viewport').attr('data-path') + '/pictures/' + values['id'] + '/data" alt="' + values['name'] + '" width="' + values['width'] + '" height="' + values['height'] + '"/><div id="follower"></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[19] + '</label><div class="col-md-5"><input class="form-control" autofocus name="picture[name]" value="' + name + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[137] + '</label><div class="col-md-5"><textarea class="form-control" name="picture[map]">' + map + '</textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
 	}
 	logger(1, 'DEBUG: popping up the picture form.');
 	addModalWide(title, html, '', 'second-win modal-ultra-wide');
