@@ -69,6 +69,7 @@ if (!isset($node_config)) {
 		'viosl2'		=>	'config_viosl2.py',
 		'vios'			=>	'config_vios.py',
 		'vsrx'			=>	'config_vsrx.py',
+		'vmx'			=>	'config_vmx.py',
 		'xrv'			=>	'config_xrv.py'
 	);
 }
