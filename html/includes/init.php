@@ -69,6 +69,7 @@ if (!isset($node_config)) {
 		'viosl2'		=>	'config_viosl2.py',
 		'vios'			=>	'config_vios.py',
 		'vsrx'			=>	'config_vsrx.py',
+		'vmx'			=>	'config_vmx.py',
 		'xrv'			=>	'config_xrv.py'
 	);
 }
@@ -79,7 +80,7 @@ if (!isset($node_templates)) {
 		'clearpass'		=>	'Aruba ClearPass',
 		'timos'			=>	'Alcatel 7750 SR',
 		'veos'			=>	'Arista vEOS',
-		'brocadevadx'	=>	'Brocade vADX',
+		'brocadevadx'		=>	'Brocade vADX',
 		'cpsg'			=>	'CheckPoint Security Gateway VE',
 		'docker'		=>	'Docker.io',
 		'acs'			=>	'Cisco ACS',
@@ -94,7 +95,7 @@ if (!isset($node_templates)) {
 		'c7200'			=>	'Cisco IOS 7206VXR (Dynamips)',
 		'iol'			=>	'Cisco IOL',
 		'titanium'		=>	'Cisco NX-OSv (Titanium)',
-		'sourcefire'	=>	'Cisco Sourcefire',
+		'sourcefire'		=>	'Cisco Sourcefire',
 		'ucspe'			=>	'Cisco UCS-PE',
 		'vios'			=>	'Cisco vIOS',
 		'viosl2'		=>	'Cisco vIOS L2',
@@ -105,7 +106,7 @@ if (!isset($node_templates)) {
 		'xrv'			=>	'Cisco XRv',
 		'nsvpx'			=>	'Citrix Netscaler',
 		'cumulus'		=>	'Cumulus VX',
-		'extremexos'	=>	'ExtremeXOS',
+		'extremexos'		=>	'ExtremeXOS',
 		'bigip'			=>	'F5 BIG-IP LTM VE',
 		'fortinet'		=>	'Fortinet FortiGate',
 		//'radware'		=>	'Radware Alteon',
@@ -118,7 +119,7 @@ if (!isset($node_templates)) {
 		'mikrotik'		=>	'MikroTik RouterOS',
 		'ostinato'		=>	'Ostinato',
 		'paloalto'		=>	'Palo Alto VM-100 Firewall',
-		//'riverbed'	=>	'Riverbed',
+		//'riverbed'		=>	'Riverbed',
 		'sterra'		=>	'S-Terra',
 		'vyos'			=>	'VyOS',
 		//'esxi'		=>	'VMware ESXi',

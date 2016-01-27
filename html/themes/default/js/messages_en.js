@@ -171,5 +171,5 @@ MESSAGES[139] = 'Set all startup-cfg to exported';
 MESSAGES[140] = 'Set all startup-cfg to none';
 MESSAGES[141] = 'Delete all startup-cfg';
 MESSAGES[142] = 'Deleted all startup-cfg';
-MESSAGES[143] = 'after wipe, node will boot from startup-cfg';
-MESSAGES[144] = 'after wipe, node will boot from scratch';
+MESSAGES[143] = 'after wipe, node will boot from to export-cfg';
+MESSAGES[144] = 'after wipe, node will boot with default/no config';
