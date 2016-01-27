@@ -545,41 +545,6 @@
 	width: 100%;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* TODO */
-
 img, input[type='image'] {
 	display: block;
 	height: auto;
@@ -688,9 +653,6 @@ input[name='login[username]'], input[name='login[password]']{
 	font-size: 1.8vmin;
 	line-height: 180%;
 }
-
-
-
 
 .btn-aqua {
 	/* http://charliepark.org/bootstrap_buttons/ */
@@ -807,8 +769,6 @@ input[name='login[username]'], input[name='login[password]']{
 	width: 25%;
 }
 
-
-
 .selected, .selected:visited, .selected:active, .selected:hover {
 	background: rgba(60, 153, 171, 0.75);
 	text-decoration: underline;
@@ -817,8 +777,6 @@ input[name='login[username]'], input[name='login[password]']{
 .selected:hover {
 	color: red;
 }
-
-
 
 .middle {
 	/* parent must use: "display: table; table-layout: fixed;" */
@@ -838,12 +796,17 @@ input[name='login[username]'], input[name='login[password]']{
     border-radius:50%;
 }
 
-#form-picture-edit{
+.follower-wrapper{
     position:relative;
 }
 
-#form-picture-edit:hover #follower {
+.follower-wrapper:hover #follower {
     display:block;
 }
 
-
+map area,
+map area:active,
+map area:focus,
+map area:visited {
+    outline: none;
+}

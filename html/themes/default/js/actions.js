@@ -49,13 +49,12 @@ $(document).on('keydown', 'body', function(e){
 });
 
 //Add picture MAP
-$('body').on('click', '#form-picture-edit img', function(e) {
+$('body').on('click', '.follower-wrapper', function(e) {
   var data_x = $("#follower").data("data_x");
   var data_y = $("#follower").data("data_y");
-  var offset = $("#follower").data("data_offset");
-  var y = (data_y - offset.top).toFixed(0) - 30;
-  var x = (data_x - offset.left).toFixed(0);
-  $('form textarea').val($('form textarea').val() +"<area shape='circle' coords='" + x + "," + y + ",30' href='telnet://{{IP}}:{{NODE1}}'>\n");
+  var y = parseInt((data_y).toFixed(0));
+  var x = parseInt((data_x).toFixed(0));
+  $('form textarea').val($('form textarea').val() +"<area shape='circle' alt='img' coords='" + x + "," + y + ",30' href='telnet://{{IP}}:{{NODE1}}'>\n");
 });
 
 // Accept privacy
@@ -648,10 +647,10 @@ $(document).on('click', '.action-pictureget', function(e) {
 
 
 //Show circle under cursor
-$(document).on('mousemove', '#form-picture-edit > img', function(e){
-  var offset = $('.modal-body #form-picture-edit img').offset()
-    , limitY = $('.modal-body #form-picture-edit img').height()
-    , limitX = $('.modal-body #form-picture-edit img').width()
+$(document).on('mousemove', '.follower-wrapper', function(e){
+  var offset = $('.follower-wrapper img').offset()
+    , limitY = $('.follower-wrapper img').height()
+    , limitX = $('.follower-wrapper img').width()
     , mouseX = Math.min(e.pageX - offset.left, limitX)
     , mouseY = Math.min(e.pageY - offset.top, limitY);
 
@@ -661,13 +660,8 @@ $(document).on('mousemove', '#form-picture-edit > img', function(e){
   $('#follower').css({left:mouseX, top:mouseY});
   $("#follower").data("data_x", mouseX);
   $("#follower").data("data_y", mouseY);
-  $("#follower").data("data_offset", offset);
-
 });
 
-$(document).on('click','#follower', function(e){
-  $("#form-picture-edit img").trigger('click');
-});
 $(document).on('click', '#follower', function(e){
   e.preventDefault();
   e.folowerPosition = {
