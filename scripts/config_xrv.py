@@ -121,50 +121,6 @@ def node_login(handler):
         node_quit(handler)
         return False
 
-def node_firstlogin(handler):
-    # Send an empty line, and wait for the login prompt
-    i = -1
-    while i == -1:
-        try:
-            handler.sendline('\r\n')
-            i = handler.expect('SYSTEM CONFIGURATION COMPLETED', timeout = 10)
-        except:
-            i = -1
-
-    if i == 0:
-        # Need to send username and password
-        handler.sendline('\r\n')
-
-        try:
-            handler.expect('Username:', timeout = expctimeout)
-        except:
-            print('ERROR: error waiting for "Username:" prompt.')
-            node_quit(handler)
-            return False
-
-        handler.sendline(username)
-
-        try:
-            handler.expect('Password:', timeout = expctimeout)
-        except:
-            print('ERROR: error waiting for "Password:" prompt.')
-            node_quit(handler)
-            return False
-
-        handler.sendline(password)
-
-        try:
-            handler.expect('#', timeout = expctimeout)
-        except:
-            print('ERROR: error waiting for "#" prompt.')
-            node_quit(handler)
-            return False
-        return True
-    else:
-        # Unexpected output
-        node_quit(handler)
-        return False
-
 def node_quit(handler):
     if handler.isalive() == True:
         handler.sendline('quit\n')
@@ -205,12 +161,29 @@ def config_get(handler):
     return config
 
 def config_put(handler, config):
+    # Clearing all "expect" buffer
+    while True:
+        try:
+            handler.expect('#', timeout = 0.1)
+        except:
+            break
+
     # Got to configure mode
-    handler.sendline('configure terminal')
-    try:
-        handler.expect('\(config', timeout = expctimeout)
-    except:
-        print('ERROR: error waiting for "(config prompt.')
+    i = -1
+    while i != 1:
+        try: 
+            handler.sendline('configure terminal')
+            i = handler.expect(['Would you like to proceed in configuration mode', '\(config'], timeout = expctimeout)
+        except:
+            i = -1
+
+        if i == 0:
+            # XRv not ready yet
+            handler.sendline('no')
+            time.sleep(5)
+
+    if i == -1:
+        print('ERROR: error waiting for ["Would you like to proceed in configuration mode","(config"] prompt.')
         node_quit(handler)
         return False
 
@@ -277,10 +250,7 @@ def main(action, fiename, port):
             sys.exit(1)
 
         # Login to the device and get a privileged prompt
-        if action == 'get':
-            rc = node_login(handler)
-        else:
-            rc = node_firstlogin(handler)
+        rc = node_login(handler)
 
         if rc != True:
             print('ERROR: failed to login.')
