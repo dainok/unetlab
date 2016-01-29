@@ -121,6 +121,40 @@ def node_login(handler):
         node_quit(handler)
         return False
 
+def node_firstlogin(handler):
+    # Send an empty line, and wait for the login prompt
+    i = -1
+    while i == -1:
+        try:
+            handler.sendline('\r\n')
+            i = handler.expect('Username:', timeout = 5)
+        except:
+            i = -1
+
+    if i == 0:
+        # Need to send username and password
+        handler.sendline(username)
+        try:
+            handler.expect('Password:', timeout = expctimeout)
+        except:
+            print('ERROR: error waiting for "Password:" prompt.')
+            node_quit(handler)
+            return False
+
+        handler.sendline(password)
+        try:
+            handler.expect('[^)]#', timeout = expctimeout)
+        except:
+            print('ERROR: error waiting for "#" prompt.')
+            node_quit(handler)
+            return False
+        return True
+    else:
+        # Unexpected output
+        node_quit(handler)
+        return False
+
+
 def node_quit(handler):
     if handler.isalive() == True:
         handler.sendline('quit\n')
@@ -180,12 +214,20 @@ def config_put(handler, config):
         if i == 0:
             # XRv not ready yet
             handler.sendline('no')
+            handler.expect('#', timeout = expctimeout)
             time.sleep(5)
 
     if i == -1:
         print('ERROR: error waiting for ["Would you like to proceed in configuration mode","(config"] prompt.')
         node_quit(handler)
         return False
+
+    # Clearing all "expect" buffer
+    while True:
+        try:
+            handler.expect('#', timeout = 0.1)
+        except:
+            break
 
     # Pushing the config
     for line in config.splitlines():
@@ -250,7 +292,10 @@ def main(action, fiename, port):
             sys.exit(1)
 
         # Login to the device and get a privileged prompt
-        rc = node_login(handler)
+        if action == 'get':
+            rc = node_login(handler)
+        else:
+            rc = node_firstlogin(handler)
 
         if rc != True:
             print('ERROR: failed to login.')
