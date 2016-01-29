@@ -37,10 +37,10 @@
  */
 function apiGetCPUUsage() {
 	// Checking CPU usage
-	$cmd = 'top -b -n1 -p1';
+	$cmd = 'top -b -n2 -p1 -d1';
 	exec($cmd, $o, $rc);
 	if ($rc == 0) {
-		return 100 - (int) round(preg_replace('/^.+ni[, ]+([0-9\.]+) id,.+/', '$1', $o[2]));
+		return 100 - (int) round(preg_replace('/^.+ni[, ]+([0-9\.]+) id,.+/', '$1', $o[11]));
 	} else {
 		return -1;
 	}
