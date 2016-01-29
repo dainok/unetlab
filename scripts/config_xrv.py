@@ -127,7 +127,7 @@ def node_firstlogin(handler):
     while i == -1:
         try:
             handler.sendline('\r\n')
-            i = handler.expect('Username:', timeout = 5)
+            i = handler.expect('SYSTEM CONFIGURATION COMPLETED', timeout = 10)
         except:
             i = -1
 
