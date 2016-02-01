@@ -239,10 +239,11 @@ def config_put(handler, config):
             node_quit(handler)
             return False
 
-    # At the end of configuration be sure we are in non config mode
-    handler.sendline('end')
+    # At the end of configuration be sure we are in config mode
+    handler.sendline('\r\n')
 
     # Save
+    handler.sendline('end')
     try:
         handler.expect('Uncommitted changes found', timeout = expctimeout)
     except:
