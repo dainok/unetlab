@@ -110,7 +110,7 @@ def node_login(handler):
         # Need to exit the commit prompt
         handler.sendline('no')
         try:
-            handler.expect('[^)]#', timeout = expctimeout)
+            handler.expect('[^)]#', timeout = longtimeout)
         except:
             print('ERROR: error waiting for "#" prompt.')
             node_quit(handler)
