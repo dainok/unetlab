@@ -486,7 +486,19 @@ $app -> get('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 			$app -> response -> setBody(json_encode($output));
 			return;
 		}
+
+		// Locking to avoid "device vnet12_20 already exists; can't create bridge with the same name"
+		if (!lockFile(BASE_LAB.$lab_file)) {
+			// Failed to lockFile within the time
+			$output['code'] = 400;
+			$output['status'] = 'fail';
+			$output['message'] = $GLOBALS['messages'][60061];
+			$app -> response -> setStatus($output['code']);
+			$app -> response -> setBody(json_encode($output));
+			return;
+		}
 		$output = apiStartLabNodes($lab, $tenant);
+		unlockFile(BASE_LAB.$lab_file);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/stop$/', $s)) {
 		if ($tenant < 0) {
 			// User does not have an assigned tenant
