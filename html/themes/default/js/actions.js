@@ -160,7 +160,7 @@ $(document).on('contextmenu', '.context-menu', function(e) {
 	if ($(this).hasClass('node_frame') && !$(this).data("block-context-menu")) {
 		logger(1, 'DEBUG: opening node context menu');
 		var node_id = $(this).attr('data-path');
-		var title = $(this).attr('data-name');
+		var title = $(this).attr('data-name') + ' (' + node_id + ')';
 		var body = '<li><a class="menu-collapse" data-path="menu-manage" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[75] + '</a></li><li><a class="action-nodestart context-collapsible menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-play"></i> ' + MESSAGES[66] + '</a></li><li><a class="action-nodestop context-collapsible menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[67] + '</a></li><li><a class="action-nodewipe context-collapsible menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-erase"></i> ' + MESSAGES[68] + '</a></li><li role="separator" class="divider"></li><li id="menu-node-interfaces"><a class="menu-collapse" data-path="menu-interface" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[70] + '</a></li>';
 
 		// Read privileges and set specific actions/elements
