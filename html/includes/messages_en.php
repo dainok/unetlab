@@ -330,13 +330,15 @@ $messages[80075] = 'Export is ready (80075).';
 $messages[80076] = 'Import path is not set (80076).';
 $messages[80077] = 'Import path is not valid (80077).';
 $messages[80078] = 'Import file must be a Zip file (80078).';
-$messages[80079] = 'Cannot import file (80079).';
-$messages[80080] = 'File imported (80080).';
+$messages[80079] = 'Cannot import UNeTLab file (80079).';
+$messages[80080] = 'UNetLab file imported (80080).';
 $messages[80081] = 'Failed to upload file, check file size (80081).';
 $messages[80082] = 'Cannot find docker.io installation (80082).';
 $messages[80083] = 'Cannot create docket container (80083).';
 $messages[80084] = 'Skipping powered off and unsupported nodes (80084).';
 $messages[80085] = 'Failed to set MTU 9000 on interface (80085).';
+$messages[80086] = 'Cannot import iou-web file (80086).';
+$messages[80087] = 'iou-web file imported (80087).';
 
 // Authentication (90000-99999)
 $messages[90001] = 'User is not authenticated or session timed out (90001).';

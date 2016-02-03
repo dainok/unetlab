@@ -536,7 +536,7 @@ class Lab {
 	public function edit($p) {
 		$modified = False;
 
-		if (!isset($p['name']) && !checkLabFilename($p['name'].'.unl')) {
+		if (isset($p['name']) && !checkLabFilename($p['name'].'.unl')) {
 			// Name is not valid, ignored
 			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][20038]);
 		} else if (isset($p['name'])) {
