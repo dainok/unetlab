@@ -505,24 +505,23 @@ function apiImportLabs($p) {
 				$statement_pictures -> bindParam(':lab_id', $result_labs['lab_id'], PDO::PARAM_INT);
 				$statement_pictures -> execute();
 				$statement_pictures -> execute();
+				while ($result_pictures = $statement_pictures -> fetch(PDO::FETCH_ASSOC)) {
+					//error_log('INFO: found iou-web picture img_name = '.$result_pictures['img_name'].' with img_id = '.$result_pictures['img_id'].'.');
+					$p_picture = Array(
+						'type' => 'image/png',
+						'data' => $result_pictures['img_content']
+					);
+					if (!empty($result_pictures['img_name'])) $p_picture['name'] =  $result_pictures['img_name'];
+					if (!empty($result_pictures['img_map'])) $p_picture['map'] =  preg_replace('/:20*([0-9]+)/', ':{{NODE$1}}', $result_pictures['img_map']);
+					$rc = $lab -> addPicture($p_picture);
+					if ($rc !== 0) {
+						error_log('ERROR: skipping picture img_id = '.$result_pictures['img_id'].', error while creating picture.');
+						error_log($GLOBALS['messages'][$rc]);
+					}
+				}
 			} catch (Exception $e) {
 				error_log('ERROR: cannot list pictures for iou-web lab "'.$result_labs['lab_name'].'.');
 				error_log((string) $e);
-			}
-			
-			while ($result_pictures = $statement_pictures -> fetch(PDO::FETCH_ASSOC)) {
-				//error_log('INFO: found iou-web picture img_name = '.$result_pictures['img_name'].' with img_id = '.$result_pictures['img_id'].'.');
-				$p_picture = Array(
-					'type' => 'image/png',
-					'data' => $result_pictures['img_content']
-				);
-				if (!empty($result_pictures['img_name'])) $p_picture['name'] =  $result_pictures['img_name'];
-				if (!empty($result_pictures['img_map'])) $p_picture['map'] =  preg_replace('/:20*([0-9]+)/', ':{{NODE$1}}', $result_pictures['img_map']);
-				$rc = $lab -> addPicture($p_picture);
-				if ($rc !== 0) {
-					error_log('ERROR: skipping picture img_id = '.$result_pictures['img_id'].', error while creating picture.');
-					error_log($GLOBALS['messages'][$rc]);
-				}
 			}
 			
 			// Parsing NETMAP
