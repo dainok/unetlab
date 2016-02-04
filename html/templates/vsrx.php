@@ -38,5 +38,6 @@ $p['ram'] = 2048;
 $p['ethernet'] = 4;
 $p['console'] = 'telnet';
 $p['qemu_arch'] = 'x86_64';
+$p['qemu_nic'] = 'e1000-82544gc';
 $p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -serial mon:stdio -nographic -nodefconfig -nodefaults -rtc base=utc';
 ?>
