@@ -146,7 +146,7 @@ def config_get(handler):
         return False
 
     # Getting the config
-    handler.sendline('show configuration')
+    handler.sendline('show configuration | display set')
     try:
         handler.expect(['root>', 'root@.*>'], timeout = expctimeout)
     except:
@@ -167,7 +167,7 @@ def config_get(handler):
     
     # Manipulating the config
     config = re.sub('\r', '', config, flags=re.DOTALL)                                      # Unix style
-    config = re.sub('.*show configuration', '', config, flags=re.DOTALL)          # Header
+    config = re.sub('.*show configuration \| display set', '', config, flags=re.DOTALL)          # Header
     config = re.sub('\nroot.*>.*', '\n', config, flags=re.DOTALL)                        # Footer
 
     return config
@@ -192,7 +192,7 @@ def config_put(handler, config):
         return False
 
     # Start the load mode
-    handler.sendline('load merge terminal')
+    handler.sendline('load set terminal')
     try:
         handler.expect('to end input', timeout = expctimeout)
     except:
