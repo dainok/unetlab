@@ -366,6 +366,9 @@ function apiGetLabLinks($lab) {
  * @return	Array						Return code (JSend data)
  */
 function apiImportLabs($p) {
+	ini_set('max_execution_time', '300');
+	ini_set('memory_limit', '64M');
+
 	if (!isset($p['file']) || empty($p['file'])) {
 		// Upload failed
 		$output['code'] = 400;
