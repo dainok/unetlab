@@ -888,11 +888,11 @@ class Node {
 	 */
 	public function getConsoleUrl() {
 		if ($this -> type == 'docker') {
-			return 'docker://'.$_SERVER['HTTP_HOST'].':4243/'.$this -> lab_id.'-'.$this -> tenant.'-'.$this -> id.'?'.$this -> name;
+			return 'docker://'.$_SERVER['SERVER_NAME'].':4243/'.$this -> lab_id.'-'.$this -> tenant.'-'.$this -> id.'?'.$this -> name;
 		} else if (isset($this -> console)) {
-			return $this -> console.'://'.$_SERVER['HTTP_HOST'].':'.$this -> port;
+			return $this -> console.'://'.$_SERVER['SERVER_NAME'].':'.$this -> port;
 		} else {
-			return 'telnet://'.$_SERVER['HTTP_HOST'].':'.$this -> port;
+			return 'telnet://'.$_SERVER['SERVER_NAME'].':'.$this -> port;
 		}
 	}
 
