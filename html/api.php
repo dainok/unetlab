@@ -123,7 +123,7 @@ $app -> post('/api/auth/login', function() use ($app, $db) {
 	$output = apiLogin($db, $p, $cookie);
 	if ($output['code'] == 200) {
 		// User is authenticated, need to set the cookie
-		$app -> setCookie('unetlab_session', $cookie, SESSION, '/api/', $_SERVER['HTTP_HOST'], False, False);
+		$app -> setCookie('unetlab_session', $cookie, SESSION, '/api/', $_SERVER['SERVER_NAME'], False, False);
 	}
 	$app -> response -> setStatus($output['code']);
 	$app -> response -> setBody(json_encode($output));
