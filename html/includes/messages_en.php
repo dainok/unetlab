@@ -24,10 +24,10 @@
  * along with UNetLab. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
- * @copyright 2014-2015 Andrea Dainese
+ * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150910
+ * @version 20160125
  */
 
 /***************************************************************************
@@ -48,6 +48,9 @@ $messages[12] = 'Failed to start node (12).';
 $messages[13] = 'Unable to wipe node(s) (13).';
 $messages[14] = 'Cannot create username (14).';
 $messages[15] = 'Cannot remove UUID from exported labs (15).';
+$messages[16] = 'Failed to export config (16).';
+$messages[17] = 'Failed to upgrade UNetLab (17).';
+$messages[18] = 'Unable to connect to Internet (18).';
 
 /***************************************************************************
  * Classes
@@ -105,6 +108,10 @@ $messages[20037] = 'Config ignored, cannot load it (20037).';
 $messages[20038] = 'Attribute ignored, invalid lab_name (20038).';
 $messages[20039] = 'Lab already exists (20039).';
 $messages[20040] = 'Attribute ignored, invalid lab_body (20040).';
+$messages[20041] = 'cwObjectPicture ignored, invalid object (20041).';
+$messages[20042] = 'Cannot add object to the lab (20042).';
+$messages[20043] = 'Cannot find object in the selected lab (20043).';
+$messages[20044] = 'Cannot edit object in the selected lab (20044).';
 
 // __network.php (30000-39999)
 $messages[30000] = 'Cannot create network, invalid or missing mandatory parameters (30000).';
@@ -147,13 +154,19 @@ $messages[40025] = 'Node has no valid image (40025).';
 $messages[40026] = 'Attribute ignored, invalid node_uuid (40026).';
 $messages[40027] = 'Attribute ignored, invalid node_console (40027).';
 
-// __picture.php (50000-59999)
+// __picture.php (50000-50999)
 $messages[50000] = 'Cannot create picture, invalid or missing mandatory parameters (50000).';
 $messages[50002] = 'Cannot create picture, invalid picture_data (50002).';
 $messages[50003] = 'Attribute ignored, invalid picture_name (50003).';
 $messages[50004] = 'Cannot create picture, invalid picture_type (50004).';
 $messages[50005] = 'Attribute ignored, invalid picture_map (50005).';
 $messages[50006] = 'Picture has not been modified (50006).';
+
+// __object.php (51000-51999)
+$messages[51000] = 'Cannot create object, invalid or missing mandatory parameters (51000).';
+$messages[51001] = 'Cannot create object, invalid object_type (51001).';
+$messages[51002] = 'Attribute ignored, invalid object_name (51002).';
+$messages[51003] = 'Attribute ignored, invalid object_data (51003).';
 
 /***************************************************************************
  * Functions and others
@@ -219,6 +232,10 @@ $messages[60055] = 'Successfully listed startup-configs (60055).';
 $messages[60056] = 'Cannot load lab (60056).';
 $messages[60057] = 'Got startup-config (60057).';
 $messages[60058] = 'Startup config not available (60058).';
+$messages[60059] = 'Failed to update UNetLab (60059).';
+$messages[60060] = 'UNetLab is updated (60060).';
+$messages[60061] = 'Failed to lock the lab (60061).';
+$messages[60062] = 'Successfully listed textobjects (60062).';
 
 // Text (70000-79999)
 $messages[70000] = 'Name/prefix';
@@ -240,8 +257,8 @@ $messages[70015] = 'Console';
 $messages[70016] = 'Slot';
 $messages[70017] = 'Serial portgroups (4 int each)';
 $messages[70018] = 'Ethernet portgroups (4 int each)';
-$messages[70019] = 'Saved';
-$messages[70020] = 'Unconfigured';
+$messages[70019] = 'Exported';
+$messages[70020] = 'None';
 
 // CLI (80000-89999)
 $messages[80009] = 'Failed to add the username (80009).';
@@ -294,7 +311,7 @@ $messages[80056] = 'Cloud interface does not exist (80056).';
 $messages[80057] = 'Nodes exported (80057).';
 $messages[80058] = 'Node exported (80058).';
 $messages[80059] = 'Cannot delete tmp file (80059).';
-$messages[80060] = 'Failed to run iou_export (80060).';
+$messages[80060] = 'Failed to export (80060).';
 $messages[80061] = 'Node not supported for config export (80061).';
 $messages[80062] = 'Config file not found (80062).';
 $messages[80063] = 'Failed to save startup-config (80063).';
@@ -313,11 +330,15 @@ $messages[80075] = 'Export is ready (80075).';
 $messages[80076] = 'Import path is not set (80076).';
 $messages[80077] = 'Import path is not valid (80077).';
 $messages[80078] = 'Import file must be a Zip file (80078).';
-$messages[80079] = 'Cannot import file (80079).';
-$messages[80080] = 'File imported (80080).';
+$messages[80079] = 'Cannot import UNeTLab file (80079).';
+$messages[80080] = 'UNetLab file imported (80080).';
 $messages[80081] = 'Failed to upload file, check file size (80081).';
 $messages[80082] = 'Cannot find docker.io installation (80082).';
 $messages[80083] = 'Cannot create docket container (80083).';
+$messages[80084] = 'Skipping powered off and unsupported nodes (80084).';
+$messages[80085] = 'Failed to set MTU 9000 on interface (80085).';
+$messages[80086] = 'Cannot import iou-web file (80086).';
+$messages[80087] = 'iou-web file imported (80087).';
 
 // Authentication (90000-99999)
 $messages[90001] = 'User is not authenticated or session timed out (90001).';

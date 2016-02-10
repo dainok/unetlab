@@ -3,7 +3,7 @@
 # vim: syntax=php tabstop=4 softtabstop=0 noexpandtab laststatus=1 ruler
 
 /**
- * wrappers/unl_wrapper
+ * wrappers/unl_wrapper.php
  *
  * CLI handler for UNetLab
  *
@@ -25,10 +25,10 @@
  * along with Foobar. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
- * @copyright 2014-2015 Andrea Dainese
+ * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150828
+ * @version 20160125
  */
 
 require_once('/opt/unetlab/html/includes/init.php');
@@ -127,7 +127,12 @@ switch ($action) {
 		// Exporting node(s) running-config
 		if (isset($node_id)) {
 			// Node ID is set, export a single node
-			export($node_id, $lab -> getNodes()[$node_id], $lab);
+			$rc = export($node_id, $lab -> getNodes()[$node_id], $lab);
+			if ($rc !== 0) {
+				// Failed to export config
+				error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][16]);
+				exit(16);
+			}
 		} else {
 			// Node ID is not set, export all nodes
 			foreach ($lab -> getNodes() as $node_id => $node) {
@@ -167,7 +172,7 @@ switch ($action) {
 		exec($cmd, $o, $rc);
 
 		// Wrappers
-		$cmd = '/bin/chmod 755 /opt/unetlab/wrappers/*_wrapper* > /dev/null 2>&1';
+		$cmd = '/bin/chmod 755 /opt/unetlab/wrappers/nsenter /opt/unetlab/wrappers/*_wrapper* > /dev/null 2>&1';
 		exec($cmd, $o, $rc);
 
 		// /tmp
@@ -189,6 +194,8 @@ switch ($action) {
 		$cmd = 'ovs-vsctl list-br | while read line; do ovs-vsctl del-br $line; done';
 		exec($cmd, $o, $rc);
 		$cmd = 'ifconfig | grep vunl | cut -d\' \' -f1 | while read line; do tunctl -d $line; done';
+		exec($cmd, $o, $rc);
+		$cmd = 'find /opt/unetlab/labs/ -name "*.lock" -exec rm -f {} \;';
 		exec($cmd, $o, $rc);
 		break;
 	case 'platform':
@@ -292,6 +299,49 @@ switch ($action) {
 			// Node ID is not set, stop and wipe all nodes
 			foreach ($lab -> getNodes() as $node) {
 				stop($node);
+			}
+		}
+		break;
+	case 'update':
+		// Check Internet connection
+		$cmd = 'curl -s http://www.google.com > /dev/null 2>&1';
+		exec($cmd, $o, $rc);
+		if ($rc !== 0) {
+			error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][13]);
+			exit(18);
+		}
+
+		// Update repos
+		$cmd = 'apt-get -o APT::List-Cleanup=0 -o Dir::Etc::sourcelist="/etc/apt/sources.list.d/unetlab.list" -o Dir::Etc::sourceparts="/var/tmp/" update > /dev/null 2>&1';
+		exec($cmd, $o, $rc);
+		if ($rc !== 0) {
+			error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][13]);
+			exit(17);
+		}
+
+		// Compare versions
+		$cmd = 'dpkg -s unetlab | grep Version | sed "s/Version: //"';
+		exec($cmd, $o, $rc);
+		if ($rc !== 0) {
+			error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][13]);
+			exit(17);
+		}
+		$installed_version = $o[0];
+		$cmd = 'apt-cache show unetlab | grep Version | head -n1 | sed "s/Version: //"';
+		exec($cmd, $o, $rc);
+		if ($rc !== 0) {
+			error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][13]);
+			exit(17);
+		}
+		$available_version = $o[0];
+
+		// Update UNetLab
+		if ($installed_version != $available_version) {
+			$cmd = 'apt-get -y install unetlab';
+			exec($cmd, $o, $rc);
+			if ($rc !== 0) {
+				error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][13]);
+				exit(17);
 			}
 		}
 		break;

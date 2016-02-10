@@ -24,10 +24,10 @@
  * along with UNetLab. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
- * @copyright 2014-2015 Andrea Dainese
+ * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150910
+ * @version 20160125
  */
 
 require_once('/opt/unetlab/html/includes/init.php');
@@ -41,6 +41,7 @@ require_once(BASE_DIR.'/html/includes/api_networks.php');
 require_once(BASE_DIR.'/html/includes/api_nodes.php');
 require_once(BASE_DIR.'/html/includes/api_pictures.php');
 require_once(BASE_DIR.'/html/includes/api_status.php');
+require_once(BASE_DIR.'/html/includes/api_textobjects.php');
 require_once(BASE_DIR.'/html/includes/api_topology.php');
 require_once(BASE_DIR.'/html/includes/api_uusers.php');
 \Slim\Slim::registerAutoloader();
@@ -122,7 +123,7 @@ $app -> post('/api/auth/login', function() use ($app, $db) {
 	$output = apiLogin($db, $p, $cookie);
 	if ($output['code'] == 200) {
 		// User is authenticated, need to set the cookie
-		$app -> setCookie('unetlab_session', $cookie, SESSION, '/api/', $_SERVER['HTTP_HOST'], False, False);
+		$app -> setCookie('unetlab_session', $cookie, SESSION, '/api/', $_SERVER['SERVER_NAME'], False, False);
 	}
 	$app -> response -> setStatus($output['code']);
 	$app -> response -> setBody(json_encode($output));
@@ -485,7 +486,19 @@ $app -> get('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 			$app -> response -> setBody(json_encode($output));
 			return;
 		}
+
+		// Locking to avoid "device vnet12_20 already exists; can't create bridge with the same name"
+		if (!lockFile(BASE_LAB.$lab_file)) {
+			// Failed to lockFile within the time
+			$output['code'] = 400;
+			$output['status'] = 'fail';
+			$output['message'] = $GLOBALS['messages'][60061];
+			$app -> response -> setStatus($output['code']);
+			$app -> response -> setBody(json_encode($output));
+			return;
+		}
 		$output = apiStartLabNodes($lab, $tenant);
+		unlockFile(BASE_LAB.$lab_file);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/stop$/', $s)) {
 		if ($tenant < 0) {
 			// User does not have an assigned tenant
@@ -508,22 +521,6 @@ $app -> get('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 			return;
 		}
 		$output = apiWipeLabNodes($lab, $tenant);
-	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/export$/', $s)) {
-		if (!in_array($user['role'], Array('admin', 'editor'))) {
-			$app -> response -> setStatus($GLOBALS['forbidden']['code']);
-			$app -> response -> setBody(json_encode($GLOBALS['forbidden']));
-			return;
-		}
-		if ($tenant < 0) {
-			// User does not have an assigned tenant
-			$output['code'] = 400;
-			$output['status'] = 'fail';
-			$output['message'] = $GLOBALS['messages']['60052'];
-			$app -> response -> setStatus($output['code']);
-			$app -> response -> setBody(json_encode($output));
-			return;
-		}
-		$output = apiExportLabNodes($lab, $tenant);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/[0-9]+$/', $s)) {
 		$output = apiGetLabNode($lab, $id);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/[0-9]+\/interfaces$/', $s)) {
@@ -561,22 +558,6 @@ $app -> get('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 			return;
 		}
 		$output = apiWipeLabNode($lab, $id, $tenant);
-	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/[0-9]+\/export$/', $s)) {
-		if (!in_array($user['role'], Array('admin', 'editor'))) {
-			$app -> response -> setStatus($GLOBALS['forbidden']['code']);
-			$app -> response -> setBody(json_encode($GLOBALS['forbidden']));
-			return;
-		}
-		if ($tenant < 0) {
-			// User does not have an assigned tenant
-			$output['code'] = 400;
-			$output['status'] = 'fail';
-			$output['message'] = $GLOBALS['messages']['60052'];
-			$app -> response -> setStatus($output['code']);
-			$app -> response -> setBody(json_encode($output));
-			return;
-		}
-		$output = apiExportLabNode($lab, $id, $tenant);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/topology$/', $s)) {
 		if ($tenant < 0) {
 			// User does not have an assigned tenant
@@ -597,6 +578,10 @@ $app -> get('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 		} else {
 			$output = apiGetLabTopology($lab);
 		}
+	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/textobjects$/', $s)) {
+		$output = apiGetLabTextObjects($lab, $id);
+	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/textobjects\/[0-9]+$/', $s)) {
+		$output = apiGetLabTextObject($lab, $id);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/pictures$/', $s)) {
 		$output = apiGetLabPictures($lab, $id);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/pictures\/[0-9]+$/', $s)) {
@@ -671,6 +656,17 @@ $app -> put('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 		return;
 	}
 
+	// Locking
+	if (!lockFile(BASE_LAB.$lab_file)) {
+		// Failed to lockFile within the time
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][60061];
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+
 	try {
 		$lab = new Lab(BASE_LAB.$lab_file, $tenant);
 	} catch(Exception $e) {
@@ -680,6 +676,7 @@ $app -> put('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 		$output['message'] = $GLOBALS['messages'][$e -> getMessage()];
 		$app -> response -> setStatus($output['code']);
 		$app -> response -> setBody(json_encode($output));
+		unlockFile(BASE_LAB.$lab_file);
 		return;
 	}
 
@@ -693,11 +690,41 @@ $app -> put('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/configs\/[0-9]+$/', $s)) {
 		$p['id'] = $id;
 		$output = apiEditLabConfig($lab, $p);
+	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/export$/', $s)) {
+		if (!in_array($user['role'], Array('admin', 'editor'))) {
+			$app -> response -> setStatus($GLOBALS['forbidden']['code']);
+			$app -> response -> setBody(json_encode($GLOBALS['forbidden']));
+			return;
+		}
+		if ($tenant < 0) {
+			// User does not have an assigned tenant
+			$output['code'] = 400;
+			$output['status'] = 'fail';
+			$output['message'] = $GLOBALS['messages']['60052'];
+			$app -> response -> setStatus($output['code']);
+			$app -> response -> setBody(json_encode($output));
+			return;
+		}
+		$output = apiExportLabNodes($lab, $tenant);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/[0-9]+$/', $s)) {
 		$p['id'] = $id;
 		$output = apiEditLabNode($lab, $p);
+	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/[0-9]+\/export$/', $s)) {
+		if ($tenant < 0) {
+			// User does not have an assigned tenant
+			$output['code'] = 400;
+			$output['status'] = 'fail';
+			$output['message'] = $GLOBALS['messages']['60052'];
+			$app -> response -> setStatus($output['code']);
+			$app -> response -> setBody(json_encode($output));
+			return;
+		}
+		$output = apiExportLabNode($lab, $id, $tenant);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/[0-9]+\/interfaces$/', $s)) {
 		$output = apiEditLabNodeInterfaces($lab, $id, $p);
+	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/textobjects\/[0-9]+$/', $s)) {
+		$p['id'] = $id;
+		$output = apiEditLabTextObject($lab, $p);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/pictures\/[0-9]+$/', $s)) {
 		$p['id'] = $id;
 		$output = apiEditLabPicture($lab, $p);
@@ -713,6 +740,7 @@ $app -> put('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 
 	$app -> response -> setStatus($output['code']);
 	$app -> response -> setBody(json_encode($output));
+	unlockFile(BASE_LAB.$lab_file);
 });
 
 // Add new lab
@@ -782,6 +810,17 @@ $app -> post('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 		return;
 	}
 
+	// Locking
+	if (!lockFile(BASE_LAB.$lab_file)) {
+		// Failed to lockFile within the time
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages'][60061];
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+
 	try {
 		$lab = new Lab(BASE_LAB.$lab_file, $tenant);
 	} catch(Exception $e) {
@@ -791,6 +830,7 @@ $app -> post('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 		$output['message'] = $GLOBALS['messages'][$e -> getMessage()];
 		$app -> response -> setStatus($output['code']);
 		$app -> response -> setBody(json_encode($output));
+		unlockFile(BASE_LAB.$lab_file);
 		return;
 	}
 
@@ -802,6 +842,8 @@ $app -> post('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 			unset($p['count']);
 		}
 		$output = apiAddLabNode($lab, $p, $o);
+	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/textobjects$/', $s)) {
+		$output = apiAddLabTextObject($lab, $p, $o);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/pictures$/', $s)) {
 		// Cannot use $app -> request() -> getBody()
 		$p = $_POST;
@@ -827,6 +869,7 @@ $app -> post('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 
 	$app -> response -> setStatus($output['code']);
 	$app -> response -> setBody(json_encode($output));
+	unlockFile(BASE_LAB.$lab_file);
 });
 
 // Close a lab
@@ -928,6 +971,8 @@ $app -> delete('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 		$output = apiDeleteLabNetwork($lab, $id);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/[0-9]+$/', $s)) {
 		$output = apiDeleteLabNode($lab, $id);
+	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/textobjects\/[0-9]+$/', $s)) {
+		$output = apiDeleteLabTextObject($lab, $id);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/pictures\/[0-9]+$/', $s)) {
 		$output = apiDeleteLabPicture($lab, $id);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl$/', $s)) {
@@ -1083,6 +1128,39 @@ $app -> post('/api/export', function() use ($app, $db) {
 	$app -> response -> setStatus($output['code']);
 	$app -> response -> setBody(json_encode($output));
  });
+
+/***************************************************************************
+ * Update
+ **************************************************************************/
+$app -> get('/api/update', function() use ($app, $db) {
+	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($user === False) {
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+	if (!in_array($user['role'], Array('admin'))) {
+		$app -> response -> setStatus($GLOBALS['forbidden']['code']);
+		$app -> response -> setBody(json_encode($GLOBALS['forbidden']));
+		return;
+	}
+
+	$cmd = 'sudo /opt/unetlab/wrappers/unl_wrapper -a update';
+	exec($cmd, $o, $rc);
+	if ($rc != 0) {
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][60059]);
+		$output['code'] = 400;
+		$output['status'] = 'fail';
+		$output['message'] = $GLOBALS['messages']['60059'];
+	} else {
+		$output['code'] = 200;
+		$output['status'] = 'success';
+		$output['message'] = $GLOBALS['messages']['60060'];
+	}
+
+	$app -> response -> setStatus($output['code']);
+	$app -> response -> setBody(json_encode($output));
+});
 
 /***************************************************************************
  * Run

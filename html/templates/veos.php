@@ -24,17 +24,17 @@
  * along with UNetLab. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
- * @copyright 2014-2015 Andrea Dainese
+ * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150826
+ * @version 20151214
  */
 
 $p['type'] = 'qemu';
 $p['name'] = 'vEOS';
 $p['icon'] = 'Switch L3.png';
 $p['cpu'] = 1;
-$p['ram'] = 1024;
+$p['ram'] = 2048;
 $p['ethernet'] = 4;
 $p['console'] = 'telnet';
 $p['qemu_arch'] = 'x86_64';

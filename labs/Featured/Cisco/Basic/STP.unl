@@ -1,0 +1,590 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<lab name="STP" id="d35a1ed1-ba38-4be2-88c2-7fda3c22ba6c" version="1" author="Andrea Dainese">
+  <description>A very simple lab about STP protocol. Students will discover how STP works, features, critical issues and how to enforce spanning tree topology to make a robust, resilient architecture.</description>
+  <body>## System requirements
+
+* RAM: 4GB
+* vCPU: 2
+* Image: vios_l2-ADVENTERPRISEK9-M 15.2(4.0.55)E
+
+## Acronyms
+
+* BID: Bridge ID
+* BPDU: Bridge Protocol Data Unit
+* CST: Common Spanning Tree (802.1q)
+* DHCP: Dynamic Host Configuration Protocol
+* MIST: Multiple Instance Spanning Tree (802.1s)
+* MST: Multiple Spanning Tree (Cisco)
+* PVST: Per VLAN Spanning Tree (Cisco)
+* PVST+: Per VLAN Spanning Tree Plus (Cisco)
+* RPVST+: Rapid Per VLAN Spanning Tree Plus (Cisco)
+* RSTP: Rapid Spanning Tree (802.1w)
+* STP: Spanning Tree Protocol (802.1d)
+* VLAN: Virtual LAN
+
+## Task 1: understading the STP topology
+
+The Spanning Tree Protocol (STP) allows a redundant L2 topology to be stable and fault tolerance. When two L2 devices are interconnected, the STP is responsabile to build a tree with one and only one active path. Other paths can be disabled or in a stand-by state, depending by STP version used. There are many STP protocols:
+
+* STP: Spanning Tree Protocol (802.1d), defined for simple networks with only one VLAN (802.1q was not developed yet). STP is also known as MST or Mono Spanning Tree (rarely used).
+* PVST: Per VLAN Spanning Tree (Cisco), defined by Cisco to enhance 802.1d and support multiple VLANs on ISL trunks.
+* CST: Common Spanning Tree (802.1q), defined for networks with more than one VLAN (and with 802.1q trunks), a single (common) instance configure just one topology for all VLANs.
+* PVST+: Per VLAN Spanning Tree Plus (Cisco), enhance PVST to support 802.1q trunks. PVST is the default STP on Cisco Catalyst switches and it is compatible with CST.
+* RSTP: Rapid Spanning Tree (802.1w), enhance STP reducing convergence time. It is compatible with STP.
+* RPVST+: Rapid Per VLAN Spanning Tree Plus (Cisco), enhance PVST+ reducing convergence time. It is compatible with RSTP and it is a default on Cisco Nexus switches.
+* MST: Multiple Spanning Tree (Cisco), is a 802.1s pre-standard.
+* MIST: Multiple Instance Spanning Tree (802.1s), uses RSTP.
+
+Cisco Catalyst switches allows only 3 out of 7 discussed protocols:
+
+* pvst: it configures PVST+ (with 802.1q support), compatible with PVST, STP e CST.
+* rapid-pvst: compatible with RSTP.
+* mst: standard and pre-standard.
+
+The first step regarding STP process is the root bridge election. A single root bridge is elected using:
+
+* priority (lower value)
+* bridge ID (lower value)
+
+The bridge ID (BID) is usually the base MAC address of the switch.
+
+### Q: find the root bridges for both VLANs.
+
+From SW1 we can check how STP is configured:
+
+~~~
+SW1#show spanning-tree vlan 1
+
+VLAN0001
+  Spanning tree enabled protocol rstp
+  Root ID    Priority    32769
+             Address     500b.0001.0000
+             Cost        8
+             Port        4 (GigabitEthernet0/3)
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+
+  Bridge ID  Priority    32769  (priority 32768 sys-id-ext 1)
+             Address     500b.0005.0000
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+             Aging Time  300 sec
+
+Interface           Role Sts Cost      Prio.Nbr Type
+------------------- ---- --- --------- -------- --------------------------------
+Gi0/0               Altn BLK 4         128.1    Shr
+Gi0/1               Altn BLK 4         128.2    Shr
+Gi0/2               Altn BLK 4         128.3    Shr
+Gi0/3               Root FWD 4         128.4    Shr
+Gi1/0               Altn BLK 4         128.5    Shr
+Gi1/1               Altn BLK 4         128.6    Shr
+Gi1/2               Desg FWD 4         128.7    Shr
+Gi1/3               Desg FWD 4         128.8    Shr
+~~~
+
+SW1 is not the root bridge because a lower BID exists. The path for the root bridge is via g0/3 (SW3).
+
+~~~
+SW3#show spanning-tree vlan 1
+
+VLAN0001
+  Spanning tree enabled protocol rstp
+  Root ID    Priority    32769
+             Address     500b.0001.0000
+             Cost        4
+             Port        5 (GigabitEthernet1/0)
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+
+  Bridge ID  Priority    32769  (priority 32768 sys-id-ext 1)
+             Address     500b.0003.0000
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+             Aging Time  300 sec
+
+Interface           Role Sts Cost      Prio.Nbr Type
+------------------- ---- --- --------- -------- --------------------------------
+Gi0/0               Desg FWD 4         128.1    Shr
+Gi0/1               Desg FWD 4         128.2    Shr
+Gi0/2               Desg FWD 4         128.3    Shr
+Gi0/3               Desg FWD 4         128.4    Shr
+Gi1/0               Root FWD 4         128.5    Shr
+Gi1/1               Altn BLK 4         128.6    Shr
+Gi1/2               Desg FWD 4         128.7    Shr
+Gi1/3               Desg FWD 4         128.8    Shr
+~~~
+
+SW3 can reach the root bridge via g1/1, thorough the "Hub" network. The root is SW5 because has the lowest BID.
+
+~~~
+SW5#show spanning-tree vlan 1
+
+VLAN0001
+  Spanning tree enabled protocol rstp
+  Root ID    Priority    32769
+             Address     500b.0001.0000
+             This bridge is the root
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+
+  Bridge ID  Priority    32769  (priority 32768 sys-id-ext 1)
+             Address     500b.0001.0000
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+             Aging Time  300 sec
+
+Interface           Role Sts Cost      Prio.Nbr Type
+------------------- ---- --- --------- -------- --------------------------------
+Gi0/0               Desg FWD 4         128.1    Shr
+Gi0/1               Back BLK 4         128.2    Shr
+Gi0/2               Desg FWD 4         128.3    Shr
+Gi0/3               Desg FWD 4         128.4    Shr
+Gi1/0               Desg FWD 4         128.5    Shr
+Gi1/1               Desg FWD 4         128.6    Shr
+Gi1/2               Desg FWD 4         128.7    Shr
+Gi1/3               Desg FWD 4         128.8    Shr
+~~~
+
+### Q: force SW1 to be primary root bridge for VLAN1 and secondary root bridge for VLAN2.
+
+The best practice for a L2 network requires to enforce the root bridge placement so a new attached bridge does not cause a new bridge election. Setting a lower priority value is the key to achieve that:
+
+~~~
+SW1(config)#spanning-tree vlan 1 root primary
+SW1(config)#spanning-tree vlan 2 root secondary
+~~~
+
+The above commands are aliases for:
+
+~~~
+SW1(config)#spanning-tree vlan 1 priority 24576
+SW1(config)#spanning-tree vlan 2 priority 28672
+~~~
+
+The above commands alter the STP topology, because root bridge changes from SW5 to SW1. Ten lost BPDUs meaning connectivity issue with direct connected switch: this value is called Max-Age and is 10 * Hello timer = 20 seconds. Hello timer is the interval between 2 BPDUs, and is 2 seconds by default. MAx age of 20 seconds is reccomended for STP diameter up to 7. The diameter is the maximum number of switches crossed in order to link any two switches in the bridged network.
+
+Each switches put every port goes through the following states:
+
+* Blocking: blocked ports will process reveived BPDU (Bridge Protocol Data Unit) and will discard every other received frame. In this state every switch will look for the best path to the root bridge. In this phase root bridge election occurs.
+* Listening: after 20 seconds, all root ports or designated ports will move to the listening state for 15 seconds. In this state BPDU will be forwarded thorough the switch (from root port, to designated port). Every other ports will remain in the blocking state.
+* Learning: after 15 seconds, listening ports will move to the learning state for 15 seconds. In this state non BPDU frames are processes and the switch starts to learn MAC addresses. Frames are still not forwarded.
+* Forwarding: after 15 seconds, learning ports will move to the forwarding state.
+
+The Root port is the port that brings to the root bridge thorugh the best path. The root bridge does not have root ports. SW3 root port is g0/1.
+The designated port for a segment is the port that can forward the best BPDU thourgh that segment. The designated port for the SW1:g0/2 - SW3:g0/1 segment is SW1:g0/2. The root bridge only has designated ports.
+If the root bridge changes (the previous one stops respoding or a new better root bridge becames available), STP topology must converge and every port of every switch needs to start the STP process from the beginning.
+
+### Q: force SW2 to be primary root bridge for VLAN2 and secondary root bridge for VLAN1.
+
+We can configure SW2 as we did on SW1:
+
+~~~
+SW2(config)#spanning-tree vlan 1 root secondary
+SW2(config)#spanning-tree vlan 2 root primary
+~~~
+
+This causes a new election of the root bridge for VLAN 2.
+
+### Q: how does every switch select the best path for VLAN 1?
+
+Once the root bridge has been elected, each switch need to select the path through it. PAth selection is done thourgh the following steps:
+
+* Cost: choose the lowest cost to the root bridge.
+* Designated (sender) BID: in case of multiple paths, choose the bridge that has the lowest BID.
+* Designated (sender) Port ID: in case of multiple paths, choose the sender port that has the lowest ID.
+* Local Port ID: in case of multiple paths, choose the local port that has the lowest ID.
+
+The term "cost" refers to how good/bad is the path. The first formula used to calculate the cost was `1 Gbps / Bandwidth`. High bandwidth links will get always the same cost. In the following years, the formula has been adapted to faster links (802.1d-1998 and the current 802.1w-2004):
+
+Bandwith | Cost (802.1d-1990) | Cost (802.1d-1998) | Cost (802.1w-2004) |
+|:--|:--|:--|:--|
+| 10 Mbps | 100 | 100 | 2000000 |
+| 100 Mbps | 10 | 19 | 200000 |
+| 1 Gbps | 1 | 4 | 20000 |
+| 10 Gbps | 1 | 2 | 2000 |
+{: rules="groups"}
+
+From 802.1w-2004, the current formula used to calculate the cost is `20 Tbps / Bandwidth`:
+
+All switches on the same STP domain must use the same standard. Sometimes old switches must be manually configured.
+
+Switches select the following paths:
+
+* SW2 is connected to SW1 using 2 path: g0/0 and g0/1. Path selection goes through the following steps:
+  * Both links cost 4;
+  * Designated BID is 500b.0005.0000 for both links.
+  * Designated Port ID is 128.2 for local g0/0 and 128.1 for local g0/1. Port g0/1 is the root port for SW2.
+* SW3 is connected to SW1 using 2 path: g0/0 and g0/1. Path selection goes through the following steps:
+  * Both links cost 4;
+  * Designated BID is 500b.0005.0000 for both links.
+  * Designated Port ID is 128.4 for local g0/0 and 128.3 for local g0/1. Port g0/1 is the root port for SW3.
+* SW4 is connected to SW1 using 2 path: g0/0 and g0/1. Path selection goes through the following steps:
+  * Both links cost 4;
+  * Designated BID is 500b.0005.0000 for both links.
+  * Designated Port ID is 128.6 for local g0/0 and 128.6 for local g0/1. Port g0/1 is the root port for SW4.
+* SW5 is connected to SW3 and SW4 using 2 path: g0/0 and g0/1. Path selection goes through the following steps:
+  * Both links cost 8;
+  * Designated BID is 500b.0003.0000 for both links;
+  * Designated Port ID is 128.5 for both links;
+  * Local Port ID is 128.1 for g0/0 and 128.2 for g0/1. Port g0/0 is the root port for SW5, then goes through SW3 and finally SW1.
+  
+~~~
+SW5#show spanning-tree vlan 1 detail
+
+ VLAN0001 is executing the rstp compatible Spanning Tree protocol
+  Bridge Identifier has priority 32768, sysid 1, address 500b.0001.0000
+  Configured hello time 2, max age 20, forward delay 15, transmit hold-count 6
+  Current root has priority 24577, address 500b.0005.0000
+  Root port is 1 (GigabitEthernet0/0), cost of root path is 8
+  Topology change flag not set, detected flag not set
+  Number of topology changes 16 last change occurred 01:44:08 ago
+          from GigabitEthernet0/0
+  Times:  hold 1, topology change 35, notification 2
+          hello 2, max age 20, forward delay 15
+  Timers: hello 0, topology change 0, notification 0, aging 300
+
+ Port 1 (GigabitEthernet0/0) of VLAN0001 is root forwarding
+   Port path cost 4, Port priority 128, Port Identifier 128.1.
+   Designated root has priority 24577, address 500b.0005.0000
+   Designated bridge has priority 32769, address 500b.0003.0000
+   Designated port id is 128.5, designated path cost 4
+   Timers: message age 15, forward delay 0, hold 0
+   Number of transitions to forwarding state: 1
+   Link type is shared by default
+   BPDU: sent 407, received 3970
+
+ Port 2 (GigabitEthernet0/1) of VLAN0001 is alternate blocking
+   Port path cost 4, Port priority 128, Port Identifier 128.2.
+   Designated root has priority 24577, address 500b.0005.0000
+   Designated bridge has priority 32769, address 500b.0003.0000
+   Designated port id is 128.5, designated path cost 4
+   Timers: message age 15, forward delay 0, hold 0
+   Number of transitions to forwarding state: 0
+   Link type is shared by default
+   BPDU: sent 7, received 4366
+[...]
+~~~
+
+### Q: adjust port cost on all swithing using the latest standard.
+
+All switches have gigabit links only, so cost for every port is 20000. Changing cost will make STP topology to converge.
+
+~~~
+SW1(config)#int range g0/0 - 3, g1/0 - 3
+SW1(config-if-range)#spanning-tree cost 20000
+~~~
+
+Mind that "cost" meaning what is locally declared, not remote. After changing SW1 cost, SW2 still use the local value (4):
+
+~~~
+SW2#show spanning-tree vlan 1
+
+VLAN0001
+  Spanning tree enabled protocol rstp
+  Root ID    Priority    24577
+             Address     500b.0005.0000
+             Cost        4
+             Port        2 (GigabitEthernet0/1)
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+
+  Bridge ID  Priority    28673  (priority 28672 sys-id-ext 1)
+             Address     500b.0002.0000
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+             Aging Time  300 sec
+
+Interface           Role Sts Cost      Prio.Nbr Type
+------------------- ---- --- --------- -------- --------------------------------
+Gi0/0               Altn BLK 4         128.1    Shr
+Gi0/1               Root FWD 4         128.2    Shr
+Gi0/2               Desg FWD 4         128.3    Shr
+Gi0/3               Desg FWD 4         128.4    Shr
+Gi1/0               Desg FWD 4         128.5    Shr
+Gi1/1               Desg FWD 4         128.6    Shr
+Gi1/2               Desg FWD 4         128.7    Shr
+Gi1/3               Desg FWD 4         128.8    Shr
+~~~
+
+In other words SW2 add the cost to SW1, using the local defined value.
+
+Finally fix all remaing switches:
+
+~~~
+SW2(config)#int range g0/0 - 3, g1/0 - 3
+SW2(config-if-range)#spanning-tree cost 20000
+SW3(config)#int range g0/0 - 3, g1/0 - 3
+SW3(config-if-range)#spanning-tree cost 20000
+SW4(config)#int range g0/0 - 3, g1/0 - 3
+SW4(config-if-range)#spanning-tree cost 20000
+SW5(config)#int range g0/0 - 3, g1/0 - 3
+SW5(config-if-range)#spanning-tree cost 20000
+~~~
+
+### Q: Force edge ports in forwarding state.
+
+Edge ports are port where an end user device is connected to. Examples of end user devices are: desktop, routers, printers, firewalls, IP phones, servers... Every device with a single interface could be considered as an end user device.
+That devices might want a forwarding port as soon as possibile, to avoid issues during boot phase caused by a delayed DHCP request.
+
+SW1(config)#interface range g1/2 - 3
+SW1(config-if-range)#spanning-tree portfast
+SW2(config)#interface range g1/2 - 3
+SW2(config-if-range)#spanning-tree portfast
+SW3(config)#interface range g1/2 - 3
+SW3(config-if-range)#spanning-tree portfast
+SW4(config)#interface range g1/2 - 3
+SW4(config-if-range)#spanning-tree portfast
+SW5(config)#int range g0/2 - 3, g1/0 - 3
+SW5(config-if-range)#spanning-tree portfast
+
+If a BPDU is received on a portfast port, that port goes again to blocking -&gt; listening -&gt; learning -&gt; forwarding process, so portfast can lead to temporary bridging loops.
+
+There is also a global "portfast" command, that configure all ports where no BPDU are received from, as edge ports:
+
+~~~
+SW1(config)#spanning-tree portfast edge
+SW2(config)#spanning-tree portfast edge
+SW3(config)#spanning-tree portfast edge
+SW4(config)#spanning-tree portfast edge
+SW5(config)#spanning-tree portfast edge
+~~~
+
+### Q: Make STP to converge faster.
+
+The default STP used on Cisco Catalyst switches is PVST. PVST is timer based and need 50 seconds to bring a port in the active state. We can make STP converge faster using rapid-pvst on all switches:
+
+~~~
+SW1(config)#spanning-tree mode rapid-pvst
+SW2(config)#spanning-tree mode rapid-pvst
+SW3(config)#spanning-tree mode rapid-pvst
+SW4(config)#spanning-tree mode rapid-pvst
+SW5(config)#spanning-tree mode rapid-pvst
+~~~
+
+Changing STP protocol makes STP topology converge. While the old STP is time-based, RSTP uses "Proposal/Agreement Sequence". Moreover BPDUs are now used as a keep-alive mechanism between bridges: on STP BPDUs were sent from Root bridge only and realayed by other switches, on RSTP BPDUs are sent from every switch and not relayed anymore. Three lost BPDUs meaning connectivity issue with direct connected switch.
+
+Port status is configured from its link type:
+
+* Full duplex ports are called point-to-point or edge.
+* Half duplex ports are called shared.
+
+RSTP can achieve rapid transition to the forwarding state on edge ports and point-to-point links only. Shared ports must pass beween all the following states:
+
+* Discarding, replaces disabled, blocking and listening STP states.
+* Learning.
+* Forwarding.
+
+RSTP ports connected to STP switches, run in 802.1d compatible mode, and follows the 802.1d process.
+
+Port roles are now:
+
+* Root Port: the port leading to the root bridge using the best path.
+* Designated Port: the port that can forward the best BPDU thourgh that segment. 
+* Alternate Port: a discarding port leading to the root bridge using a non optimal path.
+* Backup Port: a discarding port leading to a bridge already directly connected using a better path.
+
+## Task 2: protect the STP topology
+
+STP is the most sensitive part of a L2 topology: any non authorized device can make STP to converge disrupting network activity.
+
+### Q: Enforce the STP boundaries.
+
+Suppose SW3 and SW4 are access switches, and SW5 is a non autorhized device connected by a user. Edge ports can be enforced and protected:
+
+~~~
+SW3(config)#int range g1/0 - 3
+SW3(config-if-range)#description Access
+SW3(config-if-range)#switchport port-security maximum 5
+SW3(config-if-range)#switchport port-security violation shutdown
+SW3(config-if-range)#spanning-tree portfast
+SW3(config-if-range)#spanning-tree bpduguard enable
+SW4(config)#int range g1/0 - 3
+SW4(config-if-range)#description Access
+SW4(config-if-range)#switchport port-security maximum 5
+SW4(config-if-range)#switchport port-security violation shutdown
+SW4(config-if-range)#spanning-tree portfast
+SW4(config-if-range)#spanning-tree bpduguard enable
+~~~
+
+Immediately ports receiving BPDUs are disabled:
+
+~~~
+*Dec  3 13:52:22.291: %SPANTREE-2-BLOCK_BPDUGUARD: Received BPDU on port Gi1/0 with BPDU Guard enabled. Disabling port.
+*Dec  3 13:52:22.291: %PM-4-ERR_DISABLE: bpduguard error detected on Gi1/0, putting Gi1/0 in err-disable state
+~~~
+
+~~~
+SW3#show int status err-disabled
+
+Port      Name               Status       Reason               Err-disabled Vlans
+Gi1/0     Access             err-disabled bpduguard
+Gi1/1     Access             err-disabled bpduguard
+~~~
+
+The port-security options help to protect the STP boundaries. Suppone a loop is created between SW3 and SW4 by a user, using a broken device that filter out BPDUs. In that case both SW3 and SW4 do not receive BPDUs and ports remain in forwarding state. But because a loop exists, a lot of MAC addresses are presented on both SW3 and SW$ edge ports. PortSecurity shutdown that ports protecting STP topology.
+
+### Q: Protect path to the root switches.
+
+The rootguard feature is enabled on designated ports of root switches, so better BPDUs are discarded if coming from unexpected ports:
+
+SW1 and SW2 are both root and secondary root for a VLAN. So from their perspective, root ports can be g0/0 and g0/1 interfaces only:
+
+~~~
+SW1(config)#int range g0/3 - 3, g1/0 - 1
+SW1(config-if-range)#spanning-tree guard root
+SW2(config)#int range g0/3 - 3, g1/0 - 1
+SW2(config-if-range)#spanning-tree guard root
+~~~
+
+If SW1 receive better BPDUs from a non authorized port, that port will be disabled:
+
+~~~
+*Dec  3 14:43:27.955: %SPANTREE-2-ROOTGUARD_BLOCK: Root guard blocking port GigabitEthernet0/2 on VLAN0002.
+*Dec  3 14:43:27.957: %SPANTREE-2-ROOTGUARD_BLOCK: Root guard blocking port GigabitEthernet0/3 on VLAN0002.
+~~~
+
+~~~
+SW1#show spanning-tree vlan 2
+
+VLAN0002
+  Spanning tree enabled protocol ieee
+  Root ID    Priority    24578
+             Address     500b.0002.0000
+             Cost        200000
+             Port        2 (GigabitEthernet0/1)
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+
+  Bridge ID  Priority    28674  (priority 28672 sys-id-ext 2)
+             Address     500b.0005.0000
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+             Aging Time  15  sec
+
+Interface           Role Sts Cost      Prio.Nbr Type
+------------------- ---- --- --------- -------- --------------------------------
+Gi0/0               Altn BLK 200000    128.1    Shr
+Gi0/1               Root FWD 200000    128.2    Shr
+Gi0/2               Desg BKN*1         128.3    Shr *ROOT_Inc
+Gi0/3               Desg BKN*1         128.4    Shr *ROOT_Inc
+Gi1/0               Desg FWD 200000    128.5    Shr
+Gi1/1               Desg FWD 200000    128.6    Shr
+~~~
+
+BKN means broken.
+
+### Q: Protect inter switch links between core and access switches.
+
+Inter switch links always brings BPDUs. If a switch stop receiving BPDUs on that links, then something bad happened. A unidirectional link brings data on one direction only; that can lead to loop because one switch does not see BPDUs from a port, putting it into forwardin state.
+Port cannot be both root and loop guard.
+
+~~~
+SW1(config)#int range g0/0 - 1
+SW1(config-if-range)#spanning-tree guard loop
+SW2(config)#int range g0/0 - 1
+SW2(config-if-range)#spanning-tree guard loop
+SW3(config)#int range g0/0 - 3
+SW3(config-if-range)#spanning-tree guard loop
+SW4(config)#int range g0/0 - 3
+SW4(config-if-range)#spanning-tree guard loop
+~~~
+
+Port SW3:g0/2 (leading to SW2:g0/3)is an alternate port. Suppose that SW3 stops receiving BPDUs from that port:
+
+~~~
+SW2(config-if)#int g0/3
+SW2(config-if)#spanning-tree bpdufilter enable
+~~~
+
+SW3 disables that port:
+
+~~~
+*Dec  3 15:00:46.620: %SPANTREE-2-LOOPGUARD_BLOCK: Loop guard blocking port GigabitEthernet0/2 on VLAN0001.
+~~~
+
+~~~
+SW3#show spanning-tree vlan 1
+
+VLAN0001
+  Spanning tree enabled protocol ieee
+  Root ID    Priority    28673
+             Address     500b.0002.0000
+             Cost        200000
+             Port        4 (GigabitEthernet0/3)
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+
+  Bridge ID  Priority    32769  (priority 32768 sys-id-ext 1)
+             Address     500b.0003.0000
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+             Aging Time  300 sec
+
+Interface           Role Sts Cost      Prio.Nbr Type
+------------------- ---- --- --------- -------- --------------------------------
+Gi0/0               Desg FWD 200000    128.1    Shr
+Gi0/1               Desg FWD 200000    128.2    Shr
+Gi0/2               Desg BKN*200000    128.3    Shr *LOOP_Inc
+Gi0/3               Root FWD 200000    128.4    Shr
+Gi1/2               Desg FWD 200000    128.7    Shr Edge
+Gi1/3               Desg FWD 200000    128.8    Shr Edge
+~~~
+
+BKN means broken.
+
+## References
+
+* [Rapid Spanning Tree Protocol](http://www.cisco.com/c/en/us/support/docs/lan-switching/spanning-tree-protocol/19120-122.html#calculate "Rapid Spanning Tree Protocol")
+* [RSTP state machines](http://www.ieee802.org/1/files/public/docs2000/1wProposedStateDiagrams041.pdf "RSTP state machines")
+* [Understanding Rapid Spanning Tree Protocol (802.1w)](http://www.cisco.com/c/en/us/support/docs/lan-switching/spanning-tree-protocol/24062-146.html "Understanding Rapid Spanning Tree Protocol (802.1w)")</body>
+  <topology>
+    <nodes>
+      <node id="1" name="SW5" type="qemu" template="viosl2" image="viosl2-adventerprisek9-m-15.0-20140605" console="telnet" cpu="1" ram="768" ethernet="8" uuid="ebf00c7e-f096-4a20-9140-5bb8e711a45b" delay="0" icon="Switch.png" config="1" left="177" top="462">
+        <interface id="0" name="Gi0/0" type="ethernet" network_id="11"/>
+        <interface id="1" name="Gi0/1" type="ethernet" network_id="11"/>
+      </node>
+      <node id="2" name="SW2" type="qemu" template="viosl2" image="viosl2-adventerprisek9-m-15.0-20140605" console="telnet" cpu="1" ram="768" ethernet="8" uuid="ebf00c7e-f096-4a20-9140-5bb8e711a45b" delay="0" icon="Switch.png" config="1" left="317" top="62">
+        <interface id="0" name="Gi0/0" type="ethernet" network_id="2"/>
+        <interface id="1" name="Gi0/1" type="ethernet" network_id="1"/>
+        <interface id="2" name="Gi0/2" type="ethernet" network_id="7"/>
+        <interface id="3" name="Gi0/3" type="ethernet" network_id="8"/>
+        <interface id="4" name="Gi1/0" type="ethernet" network_id="9"/>
+        <interface id="5" name="Gi1/1" type="ethernet" network_id="10"/>
+      </node>
+      <node id="3" name="SW3" type="qemu" template="viosl2" image="viosl2-adventerprisek9-m-15.0-20140605" console="telnet" cpu="1" ram="768" ethernet="8" uuid="ebf00c7e-f096-4a20-9140-5bb8e711a45b" delay="0" icon="Switch.png" config="1" left="57" top="242">
+        <interface id="0" name="Gi0/0" type="ethernet" network_id="4"/>
+        <interface id="1" name="Gi0/1" type="ethernet" network_id="3"/>
+        <interface id="2" name="Gi0/2" type="ethernet" network_id="8"/>
+        <interface id="3" name="Gi0/3" type="ethernet" network_id="7"/>
+        <interface id="4" name="Gi1/0" type="ethernet" network_id="11"/>
+        <interface id="5" name="Gi1/1" type="ethernet" network_id="11"/>
+      </node>
+      <node id="4" name="SW4" type="qemu" template="viosl2" image="viosl2-adventerprisek9-m-15.0-20140605" console="telnet" cpu="1" ram="768" ethernet="8" uuid="ebf00c7e-f096-4a20-9140-5bb8e711a45b" delay="0" icon="Switch.png" config="1" left="307" top="252">
+        <interface id="0" name="Gi0/0" type="ethernet" network_id="6"/>
+        <interface id="1" name="Gi0/1" type="ethernet" network_id="5"/>
+        <interface id="2" name="Gi0/2" type="ethernet" network_id="10"/>
+        <interface id="3" name="Gi0/3" type="ethernet" network_id="9"/>
+        <interface id="4" name="Gi1/0" type="ethernet" network_id="11"/>
+        <interface id="5" name="Gi1/1" type="ethernet" network_id="11"/>
+      </node>
+      <node id="5" name="SW1" type="qemu" template="viosl2" image="viosl2-adventerprisek9-m-15.0-20140605" console="telnet" cpu="1" ram="768" ethernet="8" uuid="ebf00c7e-f096-4a20-9140-5bb8e711a45b" delay="0" icon="Switch.png" config="1" left="67" top="62">
+        <interface id="0" name="Gi0/0" type="ethernet" network_id="1"/>
+        <interface id="1" name="Gi0/1" type="ethernet" network_id="2"/>
+        <interface id="2" name="Gi0/2" type="ethernet" network_id="3"/>
+        <interface id="3" name="Gi0/3" type="ethernet" network_id="4"/>
+        <interface id="4" name="Gi1/0" type="ethernet" network_id="5"/>
+        <interface id="5" name="Gi1/1" type="ethernet" network_id="6"/>
+      </node>
+    </nodes>
+    <networks>
+      <network id="1" type="bridge" name="SW1 to SW2 (1)" left="162" top="56"/>
+      <network id="2" type="bridge" name="SW1 to SW2 (2)" left="162" top="86"/>
+      <network id="3" type="bridge" name="SW1 to SW3 (1)" left="12" top="146"/>
+      <network id="4" type="bridge" name="SW1 to SW3 (2)" left="12" top="176"/>
+      <network id="5" type="bridge" name="SW1 to SW4 (1)" left="162" top="146"/>
+      <network id="6" type="bridge" name="SW1 to SW4 (2)" left="162" top="176"/>
+      <network id="7" type="bridge" name="SW2 to SW3 (1)" left="312" top="146"/>
+      <network id="8" type="bridge" name="SW2 to SW3 (2)" left="312" top="176"/>
+      <network id="9" type="bridge" name="SW2 to SW4 (1)" left="162" top="206"/>
+      <network id="10" type="bridge" name="SW2 to SW4 (2)" left="162" top="236"/>
+      <network id="11" type="bridge" name="Hub" left="157" top="340"/>
+    </networks>
+  </topology>
+  <objects>
+    <configs>
+      <config id="1">aG9zdG5hbWUgU1c1CnZ0cCBtb2RlIHRyYW5zcGFyZW50Cm5vIGlwIGRvbWFpbi1sb29rdXAKIQppbnRlcmZhY2UgR2lnYWJpdEV0aGVybmV0MC8wCiBkZXNjcmlwdGlvbiBBY2Nlc3MgSHViCiBzd2l0Y2hwb3J0IG1vZGUgYWNjZXNzCiBubyBzaHV0ZG93bgohCmludGVyZmFjZSBHaWdhYml0RXRoZXJuZXQwLzEKIGRlc2NyaXB0aW9uIEFjY2VzcyBIdWIKIHN3aXRjaHBvcnQgbW9kZSBhY2Nlc3MKIG5vIHNodXRkb3duCiEKaW50ZXJmYWNlIFZsYW4xCiBpcCBhZGRyZXNzIDEwLjAuMS41IDI1NS4yNTUuMjU1LjAKIG5vIHNodXRkb3duCiEKbm8gYmFubmVyIGV4ZWMKbm8gYmFubmVyIGluY29taW5nCm5vIGJhbm5lciBsb2dpbgplbmQK</config>
+      <config id="2">aG9zdG5hbWUgU1cyCnZ0cCBtb2RlIHRyYW5zcGFyZW50Cm5vIGlwIGRvbWFpbi1sb29rdXAKdmxhbiAyIAohCmludGVyZmFjZSBHaWdhYml0RXRoZXJuZXQwLzAKIGRlc2NyaXB0aW9uIFRydW5rIFNXMTpnMC8xCiBzd2l0Y2hwb3J0IHRydW5rIGVuY2Fwc3VsYXRpb24gZG90MXEKIHN3aXRjaHBvcnQgbW9kZSB0cnVuawogbm8gc2h1dGRvd24KIQppbnRlcmZhY2UgR2lnYWJpdEV0aGVybmV0MC8xCiBkZXNjcmlwdGlvbiBUcnVuayBTVzE6ZzAvMAogc3dpdGNocG9ydCB0cnVuayBlbmNhcHN1bGF0aW9uIGRvdDFxCiBzd2l0Y2hwb3J0IG1vZGUgdHJ1bmsKIG5vIHNodXRkb3duCiEKaW50ZXJmYWNlIEdpZ2FiaXRFdGhlcm5ldDAvMgogZGVzY3JpcHRpb24gVHJ1bmsgU1czOmcwLzMKIHN3aXRjaHBvcnQgdHJ1bmsgZW5jYXBzdWxhdGlvbiBkb3QxcQogc3dpdGNocG9ydCBtb2RlIHRydW5rCiBubyBzaHV0ZG93bgohCmludGVyZmFjZSBHaWdhYml0RXRoZXJuZXQwLzMKIGRlc2NyaXB0aW9uIFRydW5rIFNXMzpnMC8yCiBzd2l0Y2hwb3J0IHRydW5rIGVuY2Fwc3VsYXRpb24gZG90MXEKIHN3aXRjaHBvcnQgbW9kZSB0cnVuawogbm8gc2h1dGRvd24KIQppbnRlcmZhY2UgR2lnYWJpdEV0aGVybmV0MS8wCiBkZXNjcmlwdGlvbiBUcnVuayBTVzQ6ZzAvMwogc3dpdGNocG9ydCB0cnVuayBlbmNhcHN1bGF0aW9uIGRvdDFxCiBzd2l0Y2hwb3J0IG1vZGUgdHJ1bmsKIG5vIHNodXRkb3duCiEKaW50ZXJmYWNlIEdpZ2FiaXRFdGhlcm5ldDEvMQogZGVzY3JpcHRpb24gVHJ1bmsgU1c0OmcwLzIKIHN3aXRjaHBvcnQgdHJ1bmsgZW5jYXBzdWxhdGlvbiBkb3QxcQogc3dpdGNocG9ydCBtb2RlIHRydW5rCiBubyBzaHV0ZG93bgohCmludGVyZmFjZSBWbGFuMQogaXAgYWRkcmVzcyAxMC4wLjEuMiAyNTUuMjU1LjI1NS4wCiBubyBzaHV0ZG93bgohCmludGVyZmFjZSBWbGFuMgogaXAgYWRkcmVzcyAxMC4wLjIuMiAyNTUuMjU1LjI1NS4wCiBubyBzaHV0ZG93bgohCm5vIGJhbm5lciBleGVjCm5vIGJhbm5lciBpbmNvbWluZwpubyBiYW5uZXIgbG9naW4KZW5kCg==</config>
+      <config id="3">aG9zdG5hbWUgU1czCnZ0cCBtb2RlIHRyYW5zcGFyZW50Cm5vIGlwIGRvbWFpbi1sb29rdXAKdmxhbiAyIAohCmludGVyZmFjZSBHaWdhYml0RXRoZXJuZXQwLzAKIGRlc2NyaXB0aW9uIFRydW5rIFNXMTpnMC8zCiBzd2l0Y2hwb3J0IHRydW5rIGVuY2Fwc3VsYXRpb24gZG90MXEKIHN3aXRjaHBvcnQgbW9kZSB0cnVuawogbm8gc2h1dGRvd24KIQppbnRlcmZhY2UgR2lnYWJpdEV0aGVybmV0MC8xCiBkZXNjcmlwdGlvbiBUcnVuayBTVzE6ZzAvMgogc3dpdGNocG9ydCB0cnVuayBlbmNhcHN1bGF0aW9uIGRvdDFxCiBzd2l0Y2hwb3J0IG1vZGUgdHJ1bmsKIG5vIHNodXRkb3duCiEKaW50ZXJmYWNlIEdpZ2FiaXRFdGhlcm5ldDAvMgogZGVzY3JpcHRpb24gVHJ1bmsgU1cyOmcwLzMKIHN3aXRjaHBvcnQgdHJ1bmsgZW5jYXBzdWxhdGlvbiBkb3QxcQogc3dpdGNocG9ydCBtb2RlIHRydW5rCiBubyBzaHV0ZG93bgohCmludGVyZmFjZSBHaWdhYml0RXRoZXJuZXQwLzMKIGRlc2NyaXB0aW9uIFRydW5rIFNXMjpnMC8yCiBzd2l0Y2hwb3J0IHRydW5rIGVuY2Fwc3VsYXRpb24gZG90MXEKIHN3aXRjaHBvcnQgbW9kZSB0cnVuawogbm8gc2h1dGRvd24KIQppbnRlcmZhY2UgR2lnYWJpdEV0aGVybmV0MS8wCiBkZXNjcmlwdGlvbiBBY2Nlc3MgSHViCiBzd2l0Y2hwb3J0IG1vZGUgYWNjZXNzCiBubyBzaHV0ZG93bgohCmludGVyZmFjZSBHaWdhYml0RXRoZXJuZXQxLzEKIGRlc2NyaXB0aW9uIEFjY2VzcyBIdWIKIHN3aXRjaHBvcnQgbW9kZSBhY2Nlc3MKIG5vIHNodXRkb3duCiEKaW50ZXJmYWNlIFZsYW4xCiBpcCBhZGRyZXNzIDEwLjAuMS4zIDI1NS4yNTUuMjU1LjAKIG5vIHNodXRkb3duCiEKaW50ZXJmYWNlIFZsYW4yCiBpcCBhZGRyZXNzIDEwLjAuMi4zIDI1NS4yNTUuMjU1LjAKIG5vIHNodXRkb3duCiEKbm8gYmFubmVyIGV4ZWMKbm8gYmFubmVyIGluY29taW5nCm5vIGJhbm5lciBsb2dpbgplbmQK</config>
+      <config id="4">aG9zdG5hbWUgU1c0CnZ0cCBtb2RlIHRyYW5zcGFyZW50Cm5vIGlwIGRvbWFpbi1sb29rdXAKdmxhbiAyIAohCmludGVyZmFjZSBHaWdhYml0RXRoZXJuZXQwLzAKIGRlc2NyaXB0aW9uIFRydW5rIFNXMTpnMS8xCiBzd2l0Y2hwb3J0IHRydW5rIGVuY2Fwc3VsYXRpb24gZG90MXEKIHN3aXRjaHBvcnQgbW9kZSB0cnVuawogbm8gc2h1dGRvd24KIQppbnRlcmZhY2UgR2lnYWJpdEV0aGVybmV0MC8xCiBkZXNjcmlwdGlvbiBUcnVuayBTVzE6ZzEvMAogc3dpdGNocG9ydCB0cnVuayBlbmNhcHN1bGF0aW9uIGRvdDFxCiBzd2l0Y2hwb3J0IG1vZGUgdHJ1bmsKIG5vIHNodXRkb3duCiEKaW50ZXJmYWNlIEdpZ2FiaXRFdGhlcm5ldDAvMgogZGVzY3JpcHRpb24gVHJ1bmsgU1cyOmcxLzEKIHN3aXRjaHBvcnQgdHJ1bmsgZW5jYXBzdWxhdGlvbiBkb3QxcQogc3dpdGNocG9ydCBtb2RlIHRydW5rCiBubyBzaHV0ZG93bgohCmludGVyZmFjZSBHaWdhYml0RXRoZXJuZXQwLzMKIGRlc2NyaXB0aW9uIFRydW5rIFNXMjpnMS8wCiBzd2l0Y2hwb3J0IHRydW5rIGVuY2Fwc3VsYXRpb24gZG90MXEKIHN3aXRjaHBvcnQgbW9kZSB0cnVuawogbm8gc2h1dGRvd24KIQppbnRlcmZhY2UgR2lnYWJpdEV0aGVybmV0MS8wCiBkZXNjcmlwdGlvbiBBY2Nlc3MgSHViCiBzd2l0Y2hwb3J0IG1vZGUgYWNjZXNzCiBubyBzaHV0ZG93bgohCmludGVyZmFjZSBHaWdhYml0RXRoZXJuZXQxLzEKIGRlc2NyaXB0aW9uIEFjY2VzcyBIdWIKIHN3aXRjaHBvcnQgbW9kZSBhY2Nlc3MKIG5vIHNodXRkb3duCiEKaW50ZXJmYWNlIFZsYW4xCiBpcCBhZGRyZXNzIDEwLjAuMS40IDI1NS4yNTUuMjU1LjAKIG5vIHNodXRkb3duCiEKaW50ZXJmYWNlIFZsYW4yCiBpcCBhZGRyZXNzIDEwLjAuMi40IDI1NS4yNTUuMjU1LjAKIG5vIHNodXRkb3duCiEKbm8gYmFubmVyIGV4ZWMKbm8gYmFubmVyIGluY29taW5nCm5vIGJhbm5lciBsb2dpbgplbmQK</config>
+      <config id="5">aG9zdG5hbWUgU1cxCnZ0cCBtb2RlIHRyYW5zcGFyZW50Cm5vIGlwIGRvbWFpbi1sb29rdXAKdmxhbiAyIAohCmludGVyZmFjZSBHaWdhYml0RXRoZXJuZXQwLzAKIGRlc2NyaXB0aW9uIFRydW5rIFNXMjpnMC8xCiBzd2l0Y2hwb3J0IHRydW5rIGVuY2Fwc3VsYXRpb24gZG90MXEKIHN3aXRjaHBvcnQgbW9kZSB0cnVuawogbm8gc2h1dGRvd24KIQppbnRlcmZhY2UgR2lnYWJpdEV0aGVybmV0MC8xCiBkZXNjcmlwdGlvbiBUcnVuayBTVzI6ZzAvMAogc3dpdGNocG9ydCB0cnVuayBlbmNhcHN1bGF0aW9uIGRvdDFxCiBzd2l0Y2hwb3J0IG1vZGUgdHJ1bmsKIG5vIHNodXRkb3duCiEKaW50ZXJmYWNlIEdpZ2FiaXRFdGhlcm5ldDAvMgogZGVzY3JpcHRpb24gVHJ1bmsgU1czOmcwLzEKIHN3aXRjaHBvcnQgdHJ1bmsgZW5jYXBzdWxhdGlvbiBkb3QxcQogc3dpdGNocG9ydCBtb2RlIHRydW5rCiBubyBzaHV0ZG93bgohCmludGVyZmFjZSBHaWdhYml0RXRoZXJuZXQwLzMKIGRlc2NyaXB0aW9uIFRydW5rIFNXMzpnMC8wCiBzd2l0Y2hwb3J0IHRydW5rIGVuY2Fwc3VsYXRpb24gZG90MXEKIHN3aXRjaHBvcnQgbW9kZSB0cnVuawogbm8gc2h1dGRvd24KIQppbnRlcmZhY2UgR2lnYWJpdEV0aGVybmV0MS8wCiBkZXNjcmlwdGlvbiBUcnVuayBTVzQ6ZzAvMQogc3dpdGNocG9ydCB0cnVuayBlbmNhcHN1bGF0aW9uIGRvdDFxCiBzd2l0Y2hwb3J0IG1vZGUgdHJ1bmsKIG5vIHNodXRkb3duCiEKaW50ZXJmYWNlIEdpZ2FiaXRFdGhlcm5ldDEvMQogZGVzY3JpcHRpb24gVHJ1bmsgU1c0OmcwLzAKIHN3aXRjaHBvcnQgdHJ1bmsgZW5jYXBzdWxhdGlvbiBkb3QxcQogc3dpdGNocG9ydCBtb2RlIHRydW5rCiBubyBzaHV0ZG93bgohCmludGVyZmFjZSBWbGFuMQogaXAgYWRkcmVzcyAxMC4wLjEuMSAyNTUuMjU1LjI1NS4wCiBubyBzaHV0ZG93bgohCmludGVyZmFjZSBWbGFuMgogaXAgYWRkcmVzcyAxMC4wLjIuMSAyNTUuMjU1LjI1NS4wCiBubyBzaHV0ZG93bgohCm5vIGJhbm5lciBleGVjCm5vIGJhbm5lciBpbmNvbWluZwpubyBiYW5uZXIgbG9naW4KZW5kCg==</config>
+    </configs>
+  </objects>
+</lab>

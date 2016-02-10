@@ -24,10 +24,10 @@
  * along with UNetLab. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
- * @copyright 2014-2015 Andrea Dainese
+ * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150910
+ * @version 20160125
  */
 
 /**
@@ -228,6 +228,30 @@ function checkNodeName($s) {
  */
 function checkNodeType($s) {
 	if (in_array($s, listNodeTypes())) {
+		return True;
+	} else {
+		return False;
+	}
+}
+
+/**
+ * Function to check if a string is valid as object_name.
+ *
+ * @param	string	$s					String to check
+ * @return	bool						True if valid
+ */
+function checkTextObjectName($s) {
+	return True;
+}
+
+/**
+ * Function to check if a string is valid as object_type.
+ *
+ * @param	string	$s					String to check
+ * @return	bool						True if valid
+ */
+function checkTextObjectType($s) {
+	if (preg_match('/^[a-z0-9]+$/', $s)) {
 		return True;
 	} else {
 		return False;
@@ -652,7 +676,7 @@ function listNodeImages($t, $p) {
 			}
 			break;
 		case 'docker':
-			$cmd = '/usr/bin/docker images | sed \'s/^\([^[:space:]]\+\)[[:space:]]\+\([^[:space:]]\+\).\+/\1:\2/g\'';
+			$cmd = '/usr/bin/docker -H=tcp://127.0.0.1:4243 images | sed \'s/^\([^[:space:]]\+\)[[:space:]]\+\([^[:space:]]\+\).\+/\1:\2/g\'';
 			exec($cmd, $o, $rc);
 			if (!empty($o) && sizeof($o) > 1) {
 				unset($o[0]);	// Removing header
@@ -715,6 +739,41 @@ function resizeImage($image, $width, $height) {
 		// No need to resize, return the original image
 		return $image;
 	}
+}
+
+/**
+ * Function to lock a file.
+ *
+ * @param   string  $file               File to lock
+ * @return  bool                        True if locked
+ */
+function lockFile($file) {
+	$timeout = TIMEOUT * 1000000;
+	$locked = False;
+
+	while ($timeout > 0) {
+		if (file_exists($file.'.lock')) {
+			// File is locked, wait for a random interval
+			$wait = 1000 * rand(0, 500);
+			$timeout = $timeout - $wait;
+			usleep($wait);
+		} else {
+			$locked = True;
+			touch($file.'.lock');
+			break;
+		}
+	}
+	return $locked;
+}
+
+/**
+ * Function to unlock a file.
+ *
+ * @param   string  $file               File to lock
+ * @return  bool                        True if unlocked
+ */
+function unlockFile($file) {
+	return unlink($file.'.lock');
 }
 
 /**

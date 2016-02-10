@@ -23,10 +23,10 @@
  * along with UNetLab.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
- * @copyright 2014-2015 Andrea Dainese
+ * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150907
+ * @version 20160113
  */
  
 var MESSAGES = [];
@@ -159,3 +159,17 @@ MESSAGES[127] = 'Stop all nodes';
 MESSAGES[128] = 'Wipe all nodes';
 MESSAGES[129] = 'Export all CFGs';
 MESSAGES[130] = 'All nodes';
+MESSAGES[131] = 'There are running nodes, you need to power off them before closing the lab.';
+MESSAGES[132] = 'Update UNetLab';
+MESSAGES[133] = 'Starting update, please wait';
+MESSAGES[134] = 'No pictures in this lab.';
+MESSAGES[135] = 'Add picture';
+MESSAGES[136] = 'Edit picture';
+MESSAGES[137] = 'Image MAP';
+MESSAGES[138] = 'Starting export, please wait';
+MESSAGES[139] = 'Set all startup-cfg to exported';
+MESSAGES[140] = 'Set all startup-cfg to none';
+MESSAGES[141] = 'Delete all startup-cfg';
+MESSAGES[142] = 'Deleted all startup-cfg';
+MESSAGES[143] = 'after wipe, node will boot from to export-cfg';
+MESSAGES[144] = 'after wipe, node will boot with default/no config';

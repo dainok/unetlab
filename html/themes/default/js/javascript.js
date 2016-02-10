@@ -23,15 +23,16 @@
  * along with UNetLab.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
- * @copyright 2014-2015 Andrea Dainese
+ * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150907
+ * @version 20160115
  */
 
 // Custom vars
 var DEBUG = 5;
-var TIMEOUT = 3000;
+var TIMEOUT = 30000;
+var STATUSINTERVAL = 5000;
 
 // Global vars
 var EMAIL;
@@ -44,6 +45,7 @@ var TENANT;
 var USERNAME;
 var ATTACHMENTS;
 var UPDATEID;
+
 
 $(document).ready(function() {
 	if ($.cookie('privacy') != 'true') {

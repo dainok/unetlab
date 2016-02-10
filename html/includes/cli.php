@@ -24,10 +24,10 @@
  * along with UNetLab.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
- * @copyright 2014-2015 Andrea Dainese
+ * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150925
+ * @version 20160113
  */
 
 /**
@@ -208,6 +208,15 @@ function addTap($s, $u) {
 		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80033]);
 		error_log(date('M d H:i:s ').implode("\n", $o));
 		return 80033;
+	}
+
+	$cmd = 'ip link set dev '.$s.' mtu 9000';
+	exec($cmd, $o, $rc); 
+	if ($rc != 0) {
+		// Failed to activate the TAP interface
+		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80085]);
+		error_log(date('M d H:i:s ').implode("\n", $o));
+		return 80085;
 	}
 
 	return 0;
@@ -472,12 +481,16 @@ function export($node_id, $n, $lab) {
 			error_log(date('M d H:i:s ').'INFO: exporting '.$cmd);
 			if ($rc != 0) {
 				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80060]);
-				error_log(date('M d H:i:s ').(string) $o);
+				error_log(date('M d H:i:s ').implode("\n", $o));
 				return 80060;
 			}
 			break;
 		case 'qemu':
-			if (!isset($GLOBALS['node_config'][$n -> getTemplate()])) {
+			if ($n -> getStatus() < 2 || !isset($GLOBALS['node_config'][$n -> getTemplate()])) {
+				// Skipping powered off nodes or unsupported nodes
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][80084]);
+				return 80084;
+			} else {
 				$cmd = '/opt/unetlab/scripts/'.$GLOBALS['node_config'][$n -> getTemplate()].' -a get -p '.$n -> getPort().' -f '.$tmp.' -t 15';
 				exec($cmd, $o, $rc);
 				error_log(date('M d H:i:s ').'INFO: exporting '.$cmd);
@@ -713,11 +726,11 @@ function prepareNode($n, $id, $t, $nets) {
 					return 80082;
 				}
 
-				$cmd = 'docker inspect --format="{{ .State.Running }}" '.$n -> getUuid();
+				$cmd = 'docker -H=tcp://127.0.0.1:4243 inspect --format="{{ .State.Running }}" '.$n -> getUuid();
 				exec($cmd, $o, $rc);
 				if ($rc != 0) {
 					// Must create docker.io container
-					$cmd = 'docker create -ti --net=none --name='.$n -> getUuid().' -h '.$n -> getName().' '.$n -> getImage();
+					$cmd = 'docker -H=tcp://127.0.0.1:4243 create -ti --net=none --name='.$n -> getUuid().' -h '.$n -> getName().' '.$n -> getImage();
 					exec($cmd, $o, $rc);
 					if ($rc != 0) {
 						// Failed to create container
@@ -826,7 +839,7 @@ function start($n, $id, $t, $nets) {
 			$cmd .= ' -- '.$flags.' > '.$n -> getRunningPath().'/wrapper.txt 2>&1 &';
 			break;
 		case 'docker':
-			$cmd = 'docker start -ai '.$n -> getUuid();
+			$cmd = 'docker -H=tcp://127.0.0.1:4243 start -ai '.$n -> getUuid();
 			break;
 		case 'dynamips':
 			$cmd = '/opt/unetlab/wrappers/dynamips_wrapper -T '.$t.' -D '.$id.' -t "'.$n -> getName().'" -F /opt/unetlab/addons/dynamips/'.$n -> getImage().' -d '.$n -> getDelay();
@@ -846,10 +859,10 @@ function start($n, $id, $t, $nets) {
 	error_log(date('M d H:i:s ').'INFO: starting '.$cmd);
 	exec($cmd, $o, $rc);
 
-	if ($rc == 0 && $n -> getNType() == 'qemu' && is_file($n -> getRunningPath().'/startup-config') && !is_file(is_file($n -> getRunningPath().'/.configured'))) {
+	if ($rc == 0 && $n -> getNType() == 'qemu' && is_file($n -> getRunningPath().'/startup-config') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0) {
 		// Start configuration process
 		touch($n -> getRunningPath().'/.lock');
-		$cmd = 'nohup /opt/unetlab/scripts/config_'.$n -> getTemplate().'.py -a put -p '.$n -> getPort().' -f '.$n -> getRunningPath().'/startup-config -t '.($n -> getDelay() + 300).' &';
+		$cmd = 'nohup /opt/unetlab/scripts/config_'.$n -> getTemplate().'.py -a put -p '.$n -> getPort().' -f '.$n -> getRunningPath().'/startup-config -t '.($n -> getDelay() + 300).' > /dev/null 2>&1 &';
 		exec($cmd, $o, $rc);
 		error_log(date('M d H:i:s ').'INFO: importing '.$cmd);
 	}
@@ -871,7 +884,7 @@ function start($n, $id, $t, $nets) {
 			error_log(date('M d H:i:s ').'INFO: starting '.$cmd);
 			exec($cmd, $o, $rc);
 			// PID=$(docker inspect --format '{{ .State.Pid }}' docker3_4) # Must be greater than 0
-			$cmd = 'docker inspect --format "{{ .State.Pid }}" '.$n -> getUuid();
+			$cmd = 'docker -H=tcp://127.0.0.1:4243 inspect --format "{{ .State.Pid }}" '.$n -> getUuid();
 			error_log(date('M d H:i:s ').'INFO: starting '.$cmd);
 			exec($cmd, $o, $rc);
 			// ip link set netns ${PID} docker3_4_5 name eth0 address 22:ce:e0:99:04:05 up
@@ -881,6 +894,12 @@ function start($n, $id, $t, $nets) {
 			// /opt/unetlab/wrappers/nsenter -t ${PID} -n ip addr add 1.1.1.1/24 dev eth0
 			// /opt/unetlab/wrappers/nsenter -t ${PID} -n ip route add default via 1.1.1.254
 		}
+
+		// Start configuration process
+		touch($n -> getRunningPath().'/.lock');
+		$cmd = 'nohup /opt/unetlab/scripts/config_'.$n -> getTemplate().'.py -a put -i '.$n -> getUuid().' -f '.$n -> getRunningPath().'/startup-config -t '.($n -> getDelay() + 300).' > /dev/null 2>&1 &';
+		exec($cmd, $o, $rc);
+		error_log(date('M d H:i:s ').'INFO: importing '.$cmd);
 	}
 
 	return 0;
@@ -895,7 +914,7 @@ function start($n, $id, $t, $nets) {
 function stop($n) {
 	if ($n -> getStatus() != 0) {
 		if ($n -> getNType() == 'docker') {
-			$cmd = 'docker stop '.$n -> getUuid();
+			$cmd = 'docker -H=tcp://127.0.0.1:4243 stop '.$n -> getUuid();
 		} else {
 			$cmd = 'fuser -n tcp -k -TERM '.$n -> getPort().' > /dev/null 2>&1';
 		}

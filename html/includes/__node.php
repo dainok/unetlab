@@ -24,10 +24,10 @@
  * along with UNetLab.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
- * @copyright 2014-2015 Andrea Dainese
+ * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150925
+ * @version 20160119
  * @property type $flags_eth CMD flags related to Ethernet interfaces. It's mandatory and automatically set.
  * @property type $flags_ser CMD flags related to Serial interfaces. It's mandatory and automatically set.
  * @property type $console protocol. It's optional.
@@ -305,7 +305,7 @@ class Node {
 		$this -> tenant = (int) $tenant;
 		$this -> type = $p['type'];
 		$this -> image = $p['image'];
-		if (isset($p['config'])) $this -> config = htmlentities($p['config']);		// TODO it's a template and must exists or set to saved
+		if (isset($p['config'])) $this -> config = $p['config'];	// TODO it's a template and must exists or set to saved
 		if (isset($p['delay'])) $this -> delay = (int) $p['delay'];
 		if (isset($p['icon'])) $this -> icon = $p['icon'];
 		if (isset($p['left'])) $this -> left = (int) $p['left'];
@@ -829,20 +829,10 @@ class Node {
 
 		if ($this -> type == 'docker') {
 			// Docker.io node
-			$bin .= '/usr/bin/docker';
+			$bin .= '/usr/bin/docker -H=tcp://127.0.0.1:4243';
 			$flags .= 'run -dti --net=none --rm=false -n INSTANCENAME -h HOSTNAME';
 			$flags .= ' -m '.$this -> getRam();		// Maximum RAM
 			$flags .= ' '.$this -> getImage();		// Docker image
-			// docker run -dti --net=none --rm=false --name=ae89c614-dc96-4019-b713-22b251ab4704 -h docker -m 64MB wataru/quagga:latest
-			// TODO
-			// --dns=[]                        Set custom DNS servers
-			// --dns-search=[]                 Set custom DNS search domains
-			// -e, --env=[]                    Set environment variables
-			// --env-file=[]                   Read in a file of environment variables
-			// -h, --hostname=                 Container host name
-			// --lxc-conf=[]                   Add custom lxc options
-			// --add-host=[]                   Add a custom host-to-IP mapping (host:ip)
-			//
 		}
 
 		return Array($bin, $flags);
@@ -857,7 +847,7 @@ class Node {
 		if (isset($this -> config)) {
 			return $this -> config;
 		} else {
-			// By default return 'Unconfigured'
+			// By default return 'None'
 			return '0';
 		}
 	}
@@ -897,10 +887,12 @@ class Node {
 	 * @return	string                      Node console URL
 	 */
 	public function getConsoleUrl() {
-		if (isset($this -> console)) {
-			return $this -> console.'://'.$_SERVER['HTTP_HOST'].':'.$this -> port;
+		if ($this -> type == 'docker') {
+			return 'docker://'.$_SERVER['SERVER_NAME'].':4243/'.$this -> lab_id.'-'.$this -> tenant.'-'.$this -> id.'?'.$this -> name;
+		} else if (isset($this -> console)) {
+			return $this -> console.'://'.$_SERVER['SERVER_NAME'].':'.$this -> port;
 		} else {
-			return 'telnet://'.$_SERVER['HTTP_HOST'].':'.$this -> port;
+			return 'telnet://'.$_SERVER['SERVER_NAME'].':'.$this -> port;
 		}
 	}
 
@@ -1125,13 +1117,24 @@ class Node {
 	 */
 	public function getStatus() {
 		if ($this -> type == 'docker') {
-			$cmd = 'docker inspect --format="{{ .State.Running }}" '.$this -> getUuid();
+			$cmd = 'docker -H=tcp://127.0.0.1:4243 inspect --format="{{ .State.Running }}" '.$this -> getUuid();
 			exec($cmd, $o, $rc);
 			if ($rc == 0) {
 				if ($o[0] == 'true') {
-					return 1;
+					// Node is running
+					if (is_file(BASE_TMP.'/'.$this -> tenant.'/'.$this -> lab_id.'/'.$this -> id.'/.lock')) {
+						// Node is running and locked
+						return 3;
+					} else {
+						return 2;
+					}
 				} else {
-					return 0;
+					if (is_file(BASE_TMP.'/'.$this -> tenant.'/'.$this -> lab_id.'/'.$this -> id.'/.lock')) {
+						// Node is stopped and locked
+						return 1;
+					} else {
+						return 0;
+					}
 				}
 			} else {
 				// Instance does not exist
@@ -1147,13 +1150,13 @@ class Node {
 					// Node is running and locked
 					return 3;
 				} else {
-					return 1;
+					return 2;
 				}
 			} else {
 				// No console available -> node is stopped
 				if (is_file(BASE_TMP.'/'.$this -> tenant.'/'.$this -> lab_id.'/'.$this -> id.'/.lock')) {
-					// Node is running and locked
-					return 2;
+					// Node is stopped and locked
+					return 1;
 				} else {
 					return 0;
 				}
@@ -1668,6 +1671,30 @@ class Node {
 							$this -> flags_eth .= ' -netdev tap,id=net'.$i.',ifname=vunl'.$this -> tenant.'_'.$this -> id.'_'.$i.',script=no';
 						}
 						break;
+						case 'cumulus':
+						for ($i = 0; $i < $this -> ethernet; $i++) {
+ 							if (isset($old_ethernets[$i])) {
+								// Previous interface found, copy from old one
+								$this -> ethernets[$i] = $old_ethernets[$i];
+							} else {
+								if ($i == 0) {
+									$n = 'eth0';            // Interface name
+								} else {
+									$n = 'swp'.$i;          // Interface name
+								}
+								try {
+									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
+								} catch (Exception $e) {
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
+									return 40020;
+								}
+							}
+ 							// Setting CMD flags (virtual device and map to TAP device)
+ 							$this -> flags_eth .= ' -device %NICDRIVER%,netdev=net'.$i.',mac=50:'.sprintf('%02x', $this -> tenant).':'.sprintf('%02x', $this -> id / 512).':'.sprintf('%02x', $this -> id % 512).':00:'.sprintf('%02x', $i);
+ 							$this -> flags_eth .= ' -netdev tap,id=net'.$i.',ifname=vunl'.$this -> tenant.'_'.$this -> id.'_'.$i.',script=no';
+ 						}
+						break;
 					case 'extremexos':
 						for ($i = 0; $i < $this -> ethernet; $i++) {
 							if (isset($old_ethernets[$i])) {
@@ -1921,6 +1948,30 @@ class Node {
 								$this -> ethernets[$i] = $old_ethernets[$i];
 							} else {
 								$n = 'ge-0/0/'.$i;          // Interface name
+								try {
+									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
+								} catch (Exception $e) {
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
+									return 40020;
+								}
+							}
+							// Setting CMD flags (virtual device and map to TAP device)
+							$this -> flags_eth .= ' -device %NICDRIVER%,netdev=net'.$i.',mac=50:'.sprintf('%02x', $this -> tenant).':'.sprintf('%02x', $this -> id / 512).':'.sprintf('%02x', $this -> id % 512).':00:'.sprintf('%02x', $i);
+							$this -> flags_eth .= ' -netdev tap,id=net'.$i.',ifname=vunl'.$this -> tenant.'_'.$this -> id.'_'.$i.',script=no';
+						}
+						break;
+						case 'vsrxng':
+						for ($i = 0; $i < $this -> ethernet; $i++) {
+							if (isset($old_ethernets[$i])) {
+								// Previous interface found, copy from old one
+								$this -> ethernets[$i] = $old_ethernets[$i];
+							} else {
+								if ($i == 0) {
+									$n = 'fxp0';         // Interface name
+								} else {
+									$n = 'ge-0/0/'.($i - 1);   // Interface name
+								}
 								try {
 									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
 								} catch (Exception $e) {

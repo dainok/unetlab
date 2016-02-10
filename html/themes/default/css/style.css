@@ -23,6 +23,15 @@ code, pre {
 	font-family: 'Courier New', Courier, monospace;
 }
 
+p code {
+	background-color: transparent;
+	color: #46a6b6;
+	font-size: 1em;
+	font-weight: bold;
+	margin: 0px;
+	padding: 0px;
+}
+
 pre {
 	margin: 10px;
 	overflow: auto;
@@ -145,6 +154,10 @@ tbody td {
 tbody td .glyphicon {
 	border: 0px;
 	color: #8b8c90;
+}
+
+tbody td .glyphicon-trash {
+	margin-left: 30px;
 }
 
 #navbar-top, #navbar-top > div {
@@ -443,10 +456,22 @@ tbody td .glyphicon {
 	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
 }
 
+.modal-body .error.valid {
+	display: none !important;
+}
+
 .modal-title {
 	border-bottom: 2px solid #46a6b6;
 	color: #46a6b6;
 	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+}
+
+.modal-header .glyphicon{
+    margin-right: 10px;
+    margin-top: 2px;
+}
+.modal-header .glyphicon:hover{
+	cursor: pointer;
 }
 
 .modal .btn-aqua {

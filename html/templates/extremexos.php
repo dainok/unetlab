@@ -24,10 +24,10 @@
  * along with UNetLab.If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
- * @copyright 2014-2015 Andrea Dainese
+ * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150826
+ * @version 20151214
  */
 
 $p['type'] = 'qemu';
@@ -38,5 +38,5 @@ $p['ram'] = 2048;
 $p['ethernet'] = 3; 
 $p['console'] = 'telnet'; 
 $p['qemu_arch'] = 'x86_64';
-$p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -nographic -rtc base=utc';
+$p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -cpu Nehalem -nographic -rtc base=utc';
 ?>

@@ -15,6 +15,15 @@
 	background-color: #8b8c90;
 }
 
+#alert_container {
+	bottom: 0px;
+	left: auto;
+	position: fixed;
+	right: 1%;
+	top: auto;
+	width: 30%;
+}
+
 #context-menu {
 	display: block !important;
 	position: absolute;
@@ -98,15 +107,6 @@
     font-size: 0.8em;
     font-weight: bold;
     padding: 0px 2px 0px 2px;
-}
-
-#lab-viewport #alert_container {
-	bottom: 0px;
-	left: auto;
-	position: fixed;
-	right: 1%;
-	top: auto;
-	width: 30%;
 }
 
 #list-title-folders {
@@ -225,15 +225,6 @@
 
 #list-info p {
 	margin: 5px 0px 10px 0px;
-	padding: 0px;
-}
-
-#list-info  code {
-	background-color: transparent;
-	color: #46a6b6;
-	font-size: 1em;
-	font-weight: bold;
-	margin: 0px;
 	padding: 0px;
 }
 
@@ -480,8 +471,58 @@
 	width: 100%;
 }
 
-.modal.modal-wide .modal-dialog {
-	width: 90%;
+.modal-body  table {
+	margin: 10px;
+	padding: 0px;
+	width: 98%;
+}
+
+.modal-body thead th {
+	border: 0px;
+	color: #ffffff;
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+	font-size: 0.8em;
+	padding: 2px;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+
+.modal-body tbody td {
+	border: 0px;
+	padding: 2px;
+	font-size: 0.8em;
+}
+
+.modal-body > ul > li {
+	margin-left: -40px;
+}
+
+.modal-body  .config-list, .modal-body  .picture-list  {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.modal-body  .config-list  ul, .modal-body  .picture-list  ul {
+	line-height: 3em;
+	list-style-type: none;
+	margin-left: 0px;
+}
+
+.modal-body  .config-list li, .modal-body  .picture-list li {
+	margin-left: -30px;
+}
+
+.modal-body  .config-list li .glyphicon, .modal-body  .picture-list li .glyphicon {
+	margin-left: 5px;
+}
+
+.modal-body  .config-list a, .modal-body  .config-list a:link, .modal-body  .config-list a:visited, .modal-body  .picture-list a, .modal-body  .picture-list a:link, .modal-body  .picture-list a:visited {
+	color: #8b8c90;
+}
+
+.modal-body  .config-list a:active, .modal-body  .config-list a:hover, .modal-body  .picture-list a:active, .modal-body  .picture-list a:hover {
+	text-decoration: none;
 }
 
 .modal-title {
@@ -492,44 +533,17 @@
 	text-transform: uppercase;
 }
 
+.modal.modal-wide .modal-dialog {
+	width: 90%;
+}
+
+.modal.modal-ultra-wide .modal-dialog{
+	width: 99%;
+}
+
 .selectpicker-button {
 	width: 100%;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* TODO */
 
 img, input[type='image'] {
 	display: block;
@@ -639,9 +653,6 @@ input[name='login[username]'], input[name='login[password]']{
 	font-size: 1.8vmin;
 	line-height: 180%;
 }
-
-
-
 
 .btn-aqua {
 	/* http://charliepark.org/bootstrap_buttons/ */
@@ -758,8 +769,6 @@ input[name='login[username]'], input[name='login[password]']{
 	width: 25%;
 }
 
-
-
 .selected, .selected:visited, .selected:active, .selected:hover {
 	background: rgba(60, 153, 171, 0.75);
 	text-decoration: underline;
@@ -769,8 +778,6 @@ input[name='login[username]'], input[name='login[password]']{
 	color: red;
 }
 
-
-
 .middle {
 	/* parent must use: "display: table; table-layout: fixed;" */
 	display: table-cell;
@@ -778,6 +785,28 @@ input[name='login[username]'], input[name='login[password]']{
 	vertical-align: middle;
 }
 
+#follower{
+    position : absolute;
+    background-color : rgba(0, 0, 0, 0.5);
+    display:none;
+    width:60px;
+    height:60px;
+    margin-left:-30px;
+    margin-top:-30px;
+    border-radius:50%;
+}
 
+.follower-wrapper{
+    position:relative;
+}
 
+.follower-wrapper:hover #follower {
+    display:block;
+}
 
+map area,
+map area:active,
+map area:focus,
+map area:visited {
+    outline: none;
+}

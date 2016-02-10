@@ -35,10 +35,10 @@
  * along with UNetLab. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
- * @copyright 2014-2015 Andrea Dainese
+ * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150918
+ * @version 20160126
  */
 
 // Include custom configuration
@@ -51,19 +51,25 @@ if (!defined('FORCE_VM')) define('FORCE_VM', 'auto');
 if (!defined('MODE')) define('MODE', 'multi-user');
 if (!defined('SESSION')) define('SESSION', '3600');
 if (!defined('THEME')) define('THEME', 'default');
+if (!defined('TIMEOUT')) define('TIMEOUT', 25);
 if (!defined('TIMEZONE')) define('TIMEZONE', 'Europe/Rome');
 
 if (!isset($node_config)) {
 	$node_config = Array(
 		'iol'			=>	'embedded',
-		'dynamips'		=>	'embedded',
+		'c1710'			=>	'embedded',
+		'c3725'			=>	'embedded',
+		'c7200'			=>	'embedded',
 		'asa'			=>	'config_asa.py',
 		'asav'			=>	'config_asav.py',
 		'csr1000v'		=>	'config_csr1000v.py',
+		'docker'		=>	'config_docker.py',
 		'titanium'		=>	'config_titanium.py',
 		'veos'			=>	'config_veos.py',
 		'viosl2'		=>	'config_viosl2.py',
 		'vios'			=>	'config_vios.py',
+		'vsrx'			=>	'config_vsrx.py',
+		'vmx'			=>	'config_vmx.py',
 		'xrv'			=>	'config_xrv.py'
 	);
 }
@@ -74,9 +80,9 @@ if (!isset($node_templates)) {
 		'clearpass'		=>	'Aruba ClearPass',
 		'timos'			=>	'Alcatel 7750 SR',
 		'veos'			=>	'Arista vEOS',
-		'brocadevadx'	=>	'Brocade vADX',
+		'brocadevadx'		=>	'Brocade vADX',
 		'cpsg'			=>	'CheckPoint Security Gateway VE',
-		//'docker'		=>	'Docker.io',
+		'docker'		=>	'Docker.io',
 		'acs'			=>	'Cisco ACS',
 		'asa'			=>	'Cisco ASA',
 		'asav'			=>	'Cisco ASAv',
@@ -89,7 +95,7 @@ if (!isset($node_templates)) {
 		'c7200'			=>	'Cisco IOS 7206VXR (Dynamips)',
 		'iol'			=>	'Cisco IOL',
 		'titanium'		=>	'Cisco NX-OSv (Titanium)',
-		'sourcefire'	=>	'Cisco Sourcefire',
+		'sourcefire'		=>	'Cisco Sourcefire',
 		'ucspe'			=>	'Cisco UCS-PE',
 		'vios'			=>	'Cisco vIOS',
 		'viosl2'		=>	'Cisco vIOS L2',
@@ -100,9 +106,10 @@ if (!isset($node_templates)) {
 		'xrv'			=>	'Cisco XRv',
 		'nsvpx'			=>	'Citrix Netscaler',
 		'cumulus'		=>	'Cumulus VX',
-		'extremexos'	=>	'ExtremeXOS',
+		'extremexos'		=>	'ExtremeXOS',
 		'bigip'			=>	'F5 BIG-IP LTM VE',
 		'fortinet'		=>	'Fortinet FortiGate',
+		//'radware'		=>	'Radware Alteon',
 		'hpvsr'			=>	'HP VSR1000',
 		'olive'			=>	'Juniper Olive',
 		'vmx'			=>	'Juniper vMX',
@@ -112,7 +119,7 @@ if (!isset($node_templates)) {
 		'mikrotik'		=>	'MikroTik RouterOS',
 		'ostinato'		=>	'Ostinato',
 		'paloalto'		=>	'Palo Alto VM-100 Firewall',
-		//'riverbed'	=>	'Riverbed',
+		//'riverbed'		=>	'Riverbed',
 		'sterra'		=>	'S-Terra',
 		'vyos'			=>	'VyOS',
 		//'esxi'		=>	'VMware ESXi',
@@ -135,6 +142,7 @@ require_once(BASE_DIR.'/html/includes/__interfc.php');
 require_once(BASE_DIR.'/html/includes/__lab.php');
 require_once(BASE_DIR.'/html/includes/__network.php');
 require_once(BASE_DIR.'/html/includes/__node.php');
+require_once(BASE_DIR.'/html/includes/__textobject.php');
 require_once(BASE_DIR.'/html/includes/__picture.php');
 require_once(BASE_DIR.'/html/includes/functions.php');
 require_once(BASE_DIR.'/html/includes/messages_en.php');

@@ -24,10 +24,10 @@
  * along with UNetLab.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
- * @copyright 2014-2015 Andrea Dainese
+ * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150806
+ * @version 20151030
  */
 
 /*
@@ -37,10 +37,10 @@
  */
 function apiGetCPUUsage() {
 	// Checking CPU usage
-	$cmd = 'top -b -n1 -p1';
+	$cmd = 'top -b -n2 -p1 -d1';
 	exec($cmd, $o, $rc);
 	if ($rc == 0) {
-		return 100 - (int) round(preg_replace('/^.+ni[, ]+([0-9\.]+) id,.+/', '$1', $o[2]));
+		return 100 - (int) round(preg_replace('/^.+ni[, ]+([0-9\.]+) id,.+/', '$1', $o[11]));
 	} else {
 		return -1;
 	}

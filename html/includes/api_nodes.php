@@ -24,10 +24,10 @@
  * along with UNetLab.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
- * @copyright 2014-2015 Andrea Dainese
+ * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150910
+ * @version 20160113
  */
 
 /**
@@ -412,9 +412,13 @@ function apiGetLabNodeTemplate($p) {
 		$output['data']['options']['image'] = Array(
 			'name' => $GLOBALS['messages'][70002],
 			'type' => 'list',
-			'value' => end($node_images),
 			'list' => $node_images
 		);
+		if (isset($p['image'])) {
+			$output['data']['options']['image']['value'] =  $p['image'];
+		} else {
+			$output['data']['options']['image']['value'] =  end($node_images);
+		}
 	}
 
 	// Node Name/Prefix
@@ -503,15 +507,15 @@ function apiGetLabNodeTemplate($p) {
 	);
 
 	// Startup configs
-	if (in_array($p['type'], Array('dynamips', 'iol', 'qemu'))) {
+	if (in_array($p['type'], Array('dynamips', 'iol', 'qemu', 'docker'))) {
 		$output['data']['options']['config'] = Array(
 			'name' => $GLOBALS['messages'][70013],
 			'type' => 'list',
-			'value' => '0',	// Unconfigured
+			'value' => '0',	// None
 			'list' => listNodeConfigTemplates()
 		);
-		$output['data']['options']['config']['list'][0] = $GLOBALS['messages'][70020];	// Unconfigured
-		$output['data']['options']['config']['list'][1] = $GLOBALS['messages'][70019];	// Saved
+		$output['data']['options']['config']['list'][0] = $GLOBALS['messages'][70020];	// None
+		$output['data']['options']['config']['list'][1] = $GLOBALS['messages'][70019];	// Exported
 	}
 
 	// Delay

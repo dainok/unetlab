@@ -24,10 +24,10 @@
  * along with UNetLab.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
- * @copyright 2014-2015 Andrea Dainese
+ * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20150910
+ * @version 20160125
  * @property type $author Author name of the lab. It's optional.
  * @property type $body Long text for lab usage. It's optional.
  * @property type $description Description of the lab. It's optional
@@ -52,6 +52,7 @@ class Lab {
 	private $networks = array();
 	private $nodes = array();
 	private $path;
+	private $textobjects = array();
 	private $pictures = array();
 	private $tenant;
 	private $version;
@@ -207,8 +208,17 @@ class Lab {
 				if (isset($node -> attributes() -> type)) $n['type'] = (string) $node -> attributes() -> type;
 				if (isset($node -> attributes() -> uuid)) $n['uuid'] = (string) $node -> attributes() -> uuid;
 
-				$n['config'] == 'Saved' ? $n['config'] = '1' : $n['config'];	// Fix startup-config
-				$n['config'] == 'Unconfigured' ? $n['config'] = '0' : $n['config'];	// Fix startup-config
+				$n['config'] == 'Exported' ? $n['config'] = '1' : $n['config'];	// Fix startup-config
+				$n['config'] == 'None' ? $n['config'] = '0' : $n['config'];	// Fix startup-config
+
+				// If config is empty, force "None"
+				$result = (string) array_pop($xml -> xpath('//lab/objects/configs/config[@id="'.$n['id'].'"]'));
+				if (strlen($result) == 0) {
+					$n['config'] = 0;
+					$config_data = False;
+				} else {
+					$config_data = base64_decode($result);
+				}
 
 				try {
 					$this -> nodes[$n['id']] = new Node($n, $n['id'], $this -> tenant, $this -> id);
@@ -256,22 +266,16 @@ class Lab {
 							break;
 					}
 				}
-			}
 
-			// startup-config
-			foreach ($xml -> xpath('//lab/objects/configs/config') as $config) {
-				$node_id = 0;
-				$config_data = '';
-				if (isset($config -> attributes() -> id)) $node_id = (string) $config -> attributes() -> id;
-				$result = (string) array_pop($config -> xpath('.'));
-				if (strlen($result) > 0) $config_data = base64_decode($result);
-
-				$rc = $this -> nodes[$node_id] -> setConfigData($config_data);
-				if ($rc != 0) {
-					error_log(date('M d H:i:s ').'WARNING: '.$f.':cfg'.$node_id.' '.$GLOBALS['messages'][20037]);
-					continue;
+				// startup-config (read before)
+				if ($config_data !== False) {
+					$rc = $this -> nodes[$n['id']] -> setConfigData($config_data);
+					if ($rc != 0) {
+						error_log(date('M d H:i:s ').'WARNING: '.$f.':cfg'.$node_id.' '.$GLOBALS['messages'][20037]);
+					}
 				}
 			}
+
 
 			// Lab Pictures
 			foreach ($xml -> xpath('//lab/objects/pictures/picture') as $picture) {
@@ -289,6 +293,25 @@ class Lab {
 				} catch (Exception $e) {
 					// Invalid picture
 					error_log(date('M d H:i:s ').'WARNING: '.$f.':pic'.$p['id'].' '.$GLOBALS['messages'][20020]);
+					error_log(date('M d H:i:s ').(string) $e);
+					continue;
+				}
+			}
+
+			// Text Objects
+			foreach ($xml -> xpath('//lab/objects/textobjects/textobject') as $textobject) {
+				$p = Array();
+				if (isset($textobject -> attributes() -> id)) $p['id'] = (string) $textobject -> attributes() -> id;
+				if (isset($textobject -> attributes() -> name)) $p['name'] = (string) $textobject -> attributes() -> name;
+				if (isset($textobject -> attributes() -> type)) $p['type'] = (string) $textobject -> attributes() -> type;
+				$result = (string) array_pop($textobject -> xpath('./data'));
+				if (strlen($result) > 0) $p['data'] = $result;
+
+				try {
+					$this -> textobjects[$p['id']] = new TextObject($p, $p['id']);
+				} catch (Exception $e) {
+					// Invalid picture
+					error_log(date('M d H:i:s ').'WARNING: '.$f.':obj'.$p['id'].' '.$GLOBALS['messages'][20041]);
 					error_log(date('M d H:i:s ').(string) $e);
 					continue;
 				}
@@ -352,6 +375,37 @@ class Lab {
 			return 20022;
 		}
 	}
+
+	/**
+	 * Method to add a new text object.
+	 *
+	 * @param   Array   $p                  Parameters
+	 * @return	int	                        0 if OK
+	 */
+	public function addTextObject($p) {
+		$p['id'] = 1;
+
+		// Finding a free object ID
+		while (True) {
+			if (!isset($this -> textobjects[$p['id']])) {
+				break;
+			} else {
+				$p['id'] = $p['id'] + 1;
+			}
+		}
+
+		// Adding the object
+		try {
+			$this -> textobjects[$p['id']] = new TextObject($p, $p['id']);
+			return $this -> save();
+		} catch (Exception $e) {
+			// Failed to create the picture
+			error_log(date('M d H:i:s ').'ERROR: '.$this -> path .'/'.$this -> filename.'?pic='.$p['id'].' '.$GLOBALS['messages'][20042]);
+			error_log(date('M d H:i:s ').(string) $e);
+			return 20042;
+		}
+	}
+
 
 	/**
 	 * Method to add a new picture.
@@ -437,6 +491,21 @@ class Lab {
 	}
 
 	/**
+	 * Method to delete a text object.
+	 *
+	 * @param   int     $i                  Object ID
+	 * @return  int                         0 if OK
+	 */
+	public function deleteTextObject($i) {
+		if (isset($this -> textobjects[$i])) {
+			unset($this -> textobjects[$i]);
+		} else {
+			error_log(date('M d H:i:s ').'WARNING: '.$this -> path .'/'.$this -> filename.'?obj='.$i.' '.$GLOBALS['messages'][20043]);
+		}
+		return $this -> save();
+	}
+
+	/**
 	 * Method to delete a picture.
 	 *
 	 * @param   int     $i                  Picture ID
@@ -467,7 +536,7 @@ class Lab {
 	public function edit($p) {
 		$modified = False;
 
-		if (!isset($p['name']) && !checkLabFilename($p['name'].'.unl')) {
+		if (isset($p['name']) && !checkLabFilename($p['name'].'.unl')) {
 			// Name is not valid, ignored
 			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][20038]);
 		} else if (isset($p['name'])) {
@@ -559,6 +628,25 @@ class Lab {
 		} else {
 			error_log(date('M d H:i:s ').'ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$p['id'].' '.$GLOBALS['messages'][20026]);
 			return 20026;
+		}
+	}
+
+	/**
+	 * Method to edit a text object.
+	 *
+	 * @param   Array   $p                  Parameters
+	 * @return	int	                        0 if OK
+	 */
+	public function editTextObject($p) {
+		if (!isset($this -> textobjects[$p['id']])) {
+			// Picture not found
+			error_log(date('M d H:i:s ').'ERROR: '.$this -> path .'/'.$this -> filename.'?obj='.$p['id'].' '.$GLOBALS['messages'][20043]);
+			return 20043;
+		} else if ($this -> textobjects[$p['id']] -> edit($p) === 0) {
+			return $this -> save();
+		} else {
+			error_log(date('M d H:i:s ').'ERROR: '.$this -> path .'/'.$this -> filename.'?obj='.$p['id'].' '.$GLOBALS['messages'][20044]);
+			return False;
 		}
 	}
 
@@ -706,6 +794,20 @@ class Lab {
 	public function getNodes() {
 		if (!empty($this -> nodes)) {
 			return $this -> nodes;
+		} else {
+			// By default return an empty array
+			return Array();
+		}
+	}
+
+	/**
+	 * Method to get all lab objects.
+	 *
+	 * @return  Array                       Lab objects
+	 */
+	public function getTextObjects() {
+		if (!empty($this -> textobjects)) {
+			return $this -> textobjects;
 		} else {
 			// By default return an empty array
 			return Array();
@@ -974,10 +1076,23 @@ class Lab {
 			$this -> setNetworkCount();
 		}
 
-		// Add objects
+		// Add text objects
 		$objects = False;
+		if (!empty($this -> getTextObjects())) {
+			$objects = True;
+			$xml -> addChild('objects');
+			$xml -> objects -> addChild('textobjects');
+		}
+		foreach ($this -> getTextObjects() as $textobject_id => $textobject) {
+			$p = $xml -> objects -> textobjects -> addChild('textobject');
+			$p -> addAttribute('id', $textobject_id);
+			$p -> addAttribute('name', $textobject -> getName());
+			$p -> addAttribute('type', $textobject -> getNType());
+			$p -> addChild('data', $textobject -> getData());
+		}
 
 		// Add pictures
+		$objects = False;
 		if (!empty($this -> getPictures())) {
 			$objects = True;
 			$xml -> addChild('objects');
@@ -1096,7 +1211,6 @@ class Lab {
 			error_log(date('M d H:i:s ').'ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$node_id.' '.$GLOBALS['messages'][20024]);
 			return 20024;
 		} else if ($this -> nodes[$node_id] -> setConfigData($config_data) === 0) {
-			$this -> nodes[$node_id] -> edit(Array('config' => 'Saved'));
 			return $this -> save();
 		} else {
 			error_log(date('M d H:i:s ').'ERROR: '.$this -> path .'/'.$this -> filename.'?node='.$node_id.' '.$GLOBALS['messages'][20036]);
