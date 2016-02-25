@@ -1002,7 +1002,7 @@ class Node {
 			return $this -> left;
 		} else {
 			// By default return a random value between 240 and 560
-			return rand(240, 560);
+			return rand(100, 924);
 		}
 	}
 
@@ -1183,7 +1183,7 @@ class Node {
 			return $this -> top;
 		} else {
 			// By default return a random value between 180 and 420
-			return rand(180, 420);
+			return rand(100, 668);
 		}
 	}
 

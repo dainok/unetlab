@@ -515,7 +515,11 @@ function apiImportLabs($p) {
 						'data' => $result_pictures['img_content']
 					);
 					if (!empty($result_pictures['img_name'])) $p_picture['name'] =  $result_pictures['img_name'];
-					if (!empty($result_pictures['img_map'])) $p_picture['map'] =  preg_replace('/:20*([0-9]+)/', ':{{NODE$1}}', $result_pictures['img_map']);
+					if (!empty($result_pictures['img_map'])) {
+						$p_picture['map'] =  $result_pictures['img_map'];
+						$p_picture['map'] = preg_replace_callback('/:2*([0-9]+)/', function($m) { return ':{{NODE$'.((int) $m[1]).'}}'; }, $p_picture['map']);
+						//$p_picture['map'] = preg_replace_callback('/coords=\'([0-9]+),([0-9]+),/', function($m) { return 'coords=\''.((int) ($m[1] / 1.78)).','.((int) ($m[2] / 1.78).','); }, $p_picture['map']);
+					}
 					$rc = $lab -> addPicture($p_picture);
 					if ($rc !== 0) {
 						error_log('ERROR: skipping picture img_id = '.$result_pictures['img_id'].', error while creating picture.');
@@ -687,18 +691,10 @@ function apiImportLabs($p) {
 			error_log('INFO: lab "'.$result_labs['lab_name'].'" imported into "'.$lab_file.'".');
 		}
 
-
-
-
-
-
-
-		
-		
-		
 		$output['code'] = 200;
 		$output['status'] = 'success';
 		$output['message'] = $GLOBALS['messages'][80087];
+		unlink($tmp);
 		return $output;	
 	} else {
 		// File is not a Zip
