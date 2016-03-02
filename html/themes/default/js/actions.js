@@ -29,6 +29,15 @@
  * @version 20160125
  */
 
+var KEY_CODES = {
+    "tab": 9,
+    "enter": 13,
+    "shift": 16,
+    "ctrl":  17,
+    "alt": 18,
+    "escape": 27
+};
+
 // Attach files
 $('body').on('change', 'input[type=file]', function(e) {
 	ATTACHMENTS = e.target.files;
@@ -41,11 +50,27 @@ $('body').on('change', 'input[name="import[file]"]', function(e) {
 
 // On escape remove mouse_frame
 $(document).on('keydown', 'body', function(e){
-	if('27' == e.which){
-		$('.lab-viewport-click-catcher').unbind('click');
-		$('#mouse_frame').remove();
-		$('#lab-viewport').removeClass('lab-viewport-click-catcher');
-	};
+    var $labViewport = $("#lab-viewport")
+        , isFreeSelectMode = $labViewport.hasClass("freeSelectMode")
+        , isEditCustomShape = $labViewport.has(".edit-custom-shape-form").length > 0
+        , isEditText = $labViewport.has(".edit-custom-text-form").length > 0
+        ;
+
+    if(KEY_CODES.escape == e.which){
+        $('.lab-viewport-click-catcher').unbind('click');
+        $('#mouse_frame').remove();
+        $('#lab-viewport').removeClass('lab-viewport-click-catcher');
+    }
+
+    if (isFreeSelectMode && KEY_CODES.escape == e.which) {
+        $(".action-freeselect").click();    // it will handle all the stuff
+    }
+    if (isEditCustomShape && KEY_CODES.escape == e.which) {
+        $(".edit-custom-shape-form button.cancelForm").click(); // it will handle all the stuff
+    }
+    if (isEditText && KEY_CODES.escape == e.which) {
+        $(".edit-custom-text-form button.cancelForm").click();  // it will handle all the stuff
+    }
 });
 
 //Add picture MAP
@@ -141,11 +166,6 @@ $(document).on('mousedown', '*', function(e) {
 	}
 });
 
-// Prevent default context menu on viewport
-$(document).on('contextmenu', '*', function(e) {
-	e.preventDefault();  // Prevent default behaviour
-});
-
 // Open context menu block
 $(document).on('click', '.menu-collapse, .menu-collapse i', function(e) {
 	e.preventDefault();  // Prevent default behaviour
@@ -154,44 +174,187 @@ $(document).on('click', '.menu-collapse, .menu-collapse i', function(e) {
 	$('.' + item_class).slideToggle('slow');
 });
 
+$(document).on('contextmenu', '#lab-viewport', function(e) {
+    // Prevent default context menu on viewport
+    e.stopPropagation();
+    e.preventDefault();
+
+    logger(1, 'DEBUG: action = opencontextmenu');
+
+    if ($(this).hasClass("freeSelectMode")) {
+        // prevent 'contextmenu' on non Free Selected Elements
+
+        return;
+    }
+
+    var body = '';
+    body += '<li><a class="action-nodeplace" href="#"><i class="glyphicon glyphicon-hdd"></i> ' + MESSAGES[81] + '</a></li>';
+    body += '<li><a class="action-networkplace" href="#"><i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[82] + '</a></li>';
+    body += '<li><a class="action-pictureadd" href="#"><i class="glyphicon glyphicon-picture"></i> ' + MESSAGES[83] + '</a></li>';
+    body += '<li><a class="action-customshapeadd" href="#"><i class="glyphicon glyphicon-unchecked"></i> ' + MESSAGES[145] + '</a></li>';
+    body += '<li><a class="action-textadd" href="#"><i class="glyphicon glyphicon-font"></i> ' + MESSAGES[146] + '</a></li>';
+    printContextMenu(MESSAGES[80], body, e.pageX, e.pageY);
+});
+
 // Manage context menu
 $(document).on('contextmenu', '.context-menu', function(e) {
-	e.preventDefault();  // Prevent default behaviour
-	if ($(this).hasClass('node_frame') && !$(this).data("block-context-menu")) {
-		logger(1, 'DEBUG: opening node context menu');
-		var node_id = $(this).attr('data-path');
-		var title = $(this).attr('data-name') + ' (' + node_id + ')';
-		var body = '<li><a class="menu-collapse" data-path="menu-manage" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[75] + '</a></li><li><a class="action-nodestart context-collapsible menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-play"></i> ' + MESSAGES[66] + '</a></li><li><a class="action-nodestop context-collapsible menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[67] + '</a></li><li><a class="action-nodewipe context-collapsible menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-erase"></i> ' + MESSAGES[68] + '</a></li><li role="separator" class="divider"></li><li id="menu-node-interfaces"><a class="menu-collapse" data-path="menu-interface" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[70] + '</a></li>';
+    e.stopPropagation();
+    e.preventDefault();  // Prevent default behaviour
 
-		// Read privileges and set specific actions/elements
-		if (ROLE == 'admin' || ROLE == 'editor') {
-			body += '<li role="separator" class="divider"></li><li><a class="menu-collapse" data-path="menu-edit" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[73] + '</a></li><li><a class="action-nodeexport context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-save"></i> ' + MESSAGES[69] + '</a></li><li><a class="action-nodeinterfaces context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[72] + '</a></li><li><a class="action-nodeedit context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-edit"></i> ' + MESSAGES[71] + '</a></li><li><a class="action-nodedelete context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[65] + '</a></li>'
-		};
+    var isFreeSelectMode = $("#lab-viewport").hasClass("freeSelectMode");
 
-		// Adding interfaces
-		$.when(getNodeInterfaces(node_id)).done(function(values) {
-			var interfaces = '';
-			$.each(values['ethernet'], function(id, object) {
-				interfaces += '<li><a class="action-nodecapture context-collapsible menu-interface" href="capture://' + window.location.hostname  + '/vunl' + TENANT + '_' + node_id + '_' + id + '" style="display: none;"><i class="glyphicon glyphicon-search"></i> ' + object['name'] + '</a></li>';
-			});
-			$(interfaces).insertAfter('#menu-node-interfaces');
-		}).fail(function(message) {
-			// Error on getting node interfaces
-			addModalError(message);
-		});
-	} else if ($(this).hasClass('network_frame') && !$(this).data("block-context-menu")) {
-		if (ROLE == 'admin' || ROLE == 'editor') {
-			logger(1, 'DEBUG: opening network context menu');
-			var network_id = $(this).attr('data-path');
-			var title = $(this).attr('data-name');
-			var body = '<li><a class="context-collapsible  action-networkedit" data-path="' + network_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-edit"></i> ' + MESSAGES[71] + '</a></li><li><a class="context-collapsible  action-networkdelete" data-path="' + network_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[65] + '</a></li>';
-		}
-	} else {
-		// Context menu not defined for this object
-		return false;
-	}
+    if (isFreeSelectMode && !$(this).is(".node_frame.free-selected", ".node_frame.free-selected *")) {
+        // prevent 'contextmenu' on non Free Selected Elements
 
-	printContextMenu(title, body, e.pageX, e.pageY);
+        return;
+    }
+
+    if ($(this).hasClass('node_frame') ) {
+        logger(1, 'DEBUG: opening node context menu');
+
+        var node_id = $(this).attr('data-path')
+            , title = $(this).attr('data-name') + " (" + node_id + ")"
+            , body = '<li>' +
+                        '<a class="menu-collapse" data-path="menu-manage" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[75] + '</a>' +
+                      '</li>' +
+                      '<li>' +
+                        '<a class="action-nodestart context-collapsible menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#">' +
+                          '<i class="glyphicon glyphicon-play"></i> ' + MESSAGES[66] +
+                        '</a>' +
+                      '</li>' +
+                      '<li>' +
+                        '<a class="action-nodestop context-collapsible menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#">' +
+                          '<i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[67] +
+                        '</a>' +
+                      '</li>' +
+                      '<li>' +
+                        '<a class="action-nodewipe context-collapsible menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="#">' +
+                          '<i class="glyphicon glyphicon-erase"></i> ' + MESSAGES[68] +
+                        '</a>' +
+                      '</li>' +
+                      '<li role="separator" class="divider">' +
+                      '</li>' +
+                      '<li id="menu-node-interfaces">' +
+                        '<a class="menu-collapse" data-path="menu-interface" href="#">' +
+                          '<i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[70] +
+                        '</a>' +
+                      '</li>'
+            ;
+
+
+
+        // Read privileges and set specific actions/elements
+        if (ROLE == 'admin' || ROLE == 'editor') {
+            body += '<li role="separator" class="divider">' +
+                    '</li>' +
+                    '<li>' +
+                      '<a class="menu-collapse" data-path="menu-edit" href="#">' +
+                        '<i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[73] +
+                      '</a>' +
+                    '</li>' +
+                    '<li>' +
+                      '<a class="action-nodeexport context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#">' +
+                        '<i class="glyphicon glyphicon-save"></i> ' + MESSAGES[69] +
+                      '</a>' +
+                    '</li>' +
+                    '<li>' +
+                      '<a class="action-nodeinterfaces context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#">' +
+                        '<i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[72] +
+                      '</a>' +
+                    '</li>' +
+                    '<li>' +
+                      '<a class="action-nodeedit context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#">' +
+                        '<i class="glyphicon glyphicon-edit"></i> ' + MESSAGES[71] +
+                      '</a>' +
+                    '</li>' +
+                    '<li>' +
+                      '<a class="action-nodedelete context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="#">' +
+                        '<i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[65] +
+                      '</a>' +
+                    '</li>'
+             ;
+        };
+
+        // Adding interfaces
+        $.when(getNodeInterfaces(node_id)).done(function(values) {
+            var interfaces = '';
+            $.each(values['ethernet'], function(id, object) {
+                interfaces += '<li><a class="action-nodecapture context-collapsible menu-interface" href="capture://' + window.location.hostname  + '/vunl' + TENANT + '_' + node_id + '_' + id + '" style="display: none;"><i class="glyphicon glyphicon-search"></i> ' + object['name'] + '</a></li>';
+            });
+            $(interfaces).insertAfter('#menu-node-interfaces');
+        }).fail(function(message) {
+            // Error on getting node interfaces
+            addModalError(message);
+        });
+
+        if (isFreeSelectMode) {
+            body = '' +
+                '<li>' +
+                    '<a class="menu-collapse" data-path="menu-manage" href="#"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[75] + '</a>' +
+                '</li>' +
+                '<li>' +
+                    '<a class="action-nodestart-group context-collapsible menu-manage" href="#"><i class="glyphicon glyphicon-play"></i> ' + MESSAGES[153] + '</a>' +
+                '</li>' +
+                '<li>' +
+                    '<a class="action-nodestop-group context-collapsible menu-manage" href="#"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[154] + '</a>' +
+                '</li>' +
+                '<li>' +
+                    '<a class="action-nodewipe-group context-collapsible menu-manage" href="#"><i class="glyphicon glyphicon-erase"></i> ' + MESSAGES[155] + '</a>' +
+                '</li>' +
+                //'<li role="separator" class="divider"></li>' +
+                '';
+
+            title = 'Group of ' + window.freeSelectedNodes.map(function (node) {
+                    return node.name;
+                }).join(", ").slice(0, 16);
+            title += title.length > 24 ? "..." : "";
+        }
+
+    } else if ($(this).hasClass('network_frame')) {
+        if (ROLE == 'admin' || ROLE == 'editor') {
+            logger(1, 'DEBUG: opening network context menu');
+            var network_id = $(this).attr('data-path');
+            var title = $(this).attr('data-name');
+            var body = '<li><a class="context-collapsible  action-networkedit" data-path="' + network_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-edit"></i> ' + MESSAGES[71] + '</a></li><li><a class="context-collapsible  action-networkdelete" data-path="' + network_id + '" data-name="' + title + '" href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[65] + '</a></li>';
+        }
+    } else if ($(this).hasClass('customShape')) {
+        if (ROLE == 'admin' || ROLE == 'editor') {
+            logger(1, 'DEBUG: opening text object context menu');
+            var textObject_id = $(this).attr('data-path')
+                , title = 'Edit: ' +  $(this).attr('data-path')
+                , body =
+                    '<li>' +
+                      '<a class="context-collapsible  action-textobjectduplicate" href="#" data-path="' + textObject_id + '">' +
+                        '<i class="glyphicon glyphicon-duplicate"></i> ' + MESSAGES[149] +
+                      '</a>'+
+                    '</li>'+
+                    '<li>' +
+                      '<a class="context-collapsible  action-textobjecttoback" href="#" data-path="' + textObject_id + '">' +
+                        '<i class="glyphicon glyphicon-save"></i> ' + MESSAGES[147] +
+                      '</a>'+
+                    '</li>'+
+                    '<li>' +
+                      '<a class="context-collapsible  action-textobjecttofront" href="#" data-path="' + textObject_id + '">' +
+                        '<i class="glyphicon glyphicon-open"></i> ' + MESSAGES[148] +
+                      '</a>'+
+                    '</li>'+
+                    '<li>' +
+                      '<a class="context-collapsible  action-textobjectedit" href="#" data-path="' + textObject_id + '">' +
+                        '<i class="glyphicon glyphicon-edit"></i> ' + MESSAGES[71] +
+                      '</a>'+
+                    '</li>'+
+                    '<li>' +
+                      '<a class="context-collapsible  action-textobjectdelete" href="#" data-path="' + textObject_id + '">' +
+                        '<i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[65] +
+                      '</a>'+
+                    '</li>';
+        }
+    } else {
+        // Context menu not defined for this object
+        return false;
+    }
+
+    printContextMenu(title, body, e.pageX, e.pageY);
 });
 
 // Window resize
@@ -366,7 +529,6 @@ $(document).on('click', '.action-nodeinterfaces', function(e) {
 	$('#context-menu').remove();
 });
 
-
 // Edit/print lab node
 $(document).on('click', '.action-nodeedit', function(e) {
 	logger(1, 'DEBUG: action = action-nodeedit');
@@ -487,6 +649,8 @@ $(document).on('click', '.action-labobjectadd', function(e) {
 	body += '<li><a class="action-nodeplace" href="#"><i class="glyphicon glyphicon-hdd"></i> ' + MESSAGES[81] + '</a></li>';
 	body += '<li><a class="action-networkplace" href="#"><i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[82] + '</a></li>';
 	body += '<li><a class="action-pictureadd" href="#"><i class="glyphicon glyphicon-picture"></i> ' + MESSAGES[83] + '</a></li>';
+  body += '<li><a class="action-customshapeadd" href="#"><i class="glyphicon glyphicon-unchecked"></i> ' + MESSAGES[145] + '</a></li>';
+  body += '<li><a class="action-textadd" href="#"><i class="glyphicon glyphicon-font"></i> ' + MESSAGES[146] + '</a></li>';
 	printContextMenu(MESSAGES[80], body, e.pageX, e.pageY);
 });
 
@@ -497,30 +661,42 @@ $(document).on('click', '.action-networkadd', function(e) {
 });
 
 // Place an object
-$(document).on('click', '.action-nodeplace, .action-networkplace', function(e) {
-	logger(1, 'DEBUG: action = nodeplace');
+$(document).on('click', '.action-nodeplace, .action-networkplace, .action-customshapeadd, .action-textadd', function(e) {
 	var target = $(this);
 	var object, frame = '';
+
+  if(target.hasClass('action-customshapeadd')){
+    logger(1, 'DEBUG: action = customshapeadd');
+  } else {
+    logger(1, 'DEBUG: action = nodeplace');
+  }
+
 	$('#context-menu').remove();
 
-	if ($(this).hasClass('action-nodeplace')) {
+	if (target.hasClass('action-nodeplace')) {
 		object = 'node';
 		frame = '<div id="mouse_frame" class="context-menu node_frame"><img src="/images/icons/Router.png"/></div>';
 		$("#lab-viewport").addClass('lab-viewport-click-catcher');
-	} else if ($(this).hasClass('action-networkplace')) {
-		object = 'network';
-		frame = '<div id="mouse_frame" class="context-menu network_frame"><img src="/images/lan.png"/></div>';
-		$("#lab-viewport").addClass('lab-viewport-click-catcher');
-	} else {
+	} else if (target.hasClass('action-networkplace')) {
+    object = 'network';
+    frame = '<div id="mouse_frame" class="context-menu network_frame"><img src="/images/lan.png"/></div>';
+    $("#lab-viewport").addClass('lab-viewport-click-catcher');
+  } else if (target.hasClass('action-customshapeadd')) {
+    object = 'shape';
+    frame = '<div id="mouse_frame" class="context-menu network_frame"><img src="/images/icons/CustomShape.png"/></div>';
+    $("#lab-viewport").addClass('lab-viewport-click-catcher');
+  } else if (target.hasClass('action-textadd')) {
+      object = 'text';
+      frame = '<div id="mouse_frame" class="context-menu network_frame"><img src="/images/icons/CustomShape.png"/></div>';
+      $("#lab-viewport").addClass('lab-viewport-click-catcher');
+    } else {
 		return false;
 	}
 
-	addMessage('info', MESSAGES[100])
+	addMessage('info', MESSAGES[100]);
 	if (!$('#mouse_frame').length) {
 		// Add the frame container if not exists
 		$('#lab-viewport').append(frame);
-		$(".context-menu.node_frame").data("block-context-menu", true);
-		$(".context-menu.network_frame").data("block-context-menu", true);
 	} else {
 		$('#mouse_frame').remove();
 		$('#lab-viewport').append(frame);
@@ -534,31 +710,34 @@ $(document).on('click', '.action-nodeplace, .action-networkplace', function(e) {
 		});
 	});
 
-	// On click open the form
-	$('.lab-viewport-click-catcher').click(function(e2) {
-		if ($(e2.target).is('#lab-viewport, #lab-viewport *')) {
-			// Click is within viewport
-			if ($('#mouse_frame').length > 0) {
-				// ESC not pressed
-				var values = {};
-				values['left'] = e2.pageX - 30;
-				values['top'] = e2.pageY;
-				if (object == 'node') {
-					printFormNode('add', values);
-				} else if (object == 'network') {
-					printFormNetwork('add', values);
-				}
-				$('#mouse_frame').remove();
-			}
-			$('#mouse_frame').remove();
-			$('.lab-viewport-click-catcher').off();
-		} else {
-			addMessage('warning', MESSAGES[101])
-			$('#mouse_frame').remove();
-			$('.lab-viewport-click-catcher').off();
-		}
-
-	});
+  // On click open the form
+  $('.lab-viewport-click-catcher').click(function(e2) {
+    if ($(e2.target).is('#lab-viewport, #lab-viewport *')) {
+      // Click is within viewport
+      if ($('#mouse_frame').length > 0) {
+        // ESC not pressed
+        var values = {};
+        values['left'] = e2.pageX - 30;
+        values['top'] = e2.pageY;
+        if (object == 'node') {
+          printFormNode('add', values);
+        } else if (object == 'network') {
+          printFormNetwork('add', values);
+        } else if (object == 'shape'){
+          printFormCustomShape(values);
+        } else if (object == 'text'){
+          printFormText(values);
+        }
+        $('#mouse_frame').remove();
+      }
+      $('#mouse_frame').remove();
+      $('.lab-viewport-click-catcher').off();
+    } else {
+      addMessage('warning', MESSAGES[101]);
+      $('#mouse_frame').remove();
+      $('.lab-viewport-click-catcher').off();
+    }
+  });
 });
 
 // Add picture
@@ -645,7 +824,6 @@ $(document).on('click', '.action-pictureget', function(e) {
 
 });
 
-
 //Show circle under cursor
 $(document).on('mousemove', '.follower-wrapper', function(e){
   var offset = $('.follower-wrapper img').offset()
@@ -669,8 +847,6 @@ $(document).on('click', '#follower', function(e){
     top: parseFloat($("#follower").css("top")) + 30
   };
 });
-
-
 
 // Get pictures list
 $(document).on('click', '.action-picturesget', function(e) {
@@ -899,7 +1075,7 @@ $(document).on('click', '.action-nodeexport, .action-nodesexport', function(e) {
 			addMessage('info', nodes[node_id]['name'] + ': ' + MESSAGES[138])
 			$.when(cfg_export(node_id)).done(function() {
 				// Node exported -> print a small green message
-				setNodeBoot(node_id, '1');	
+				setNodeBoot(node_id, '1');
 				addMessage('success', nodes[node_id]['name'] + ': ' + MESSAGES[79])
 			}).fail(function(message) {
 				// Cannot export
@@ -920,7 +1096,7 @@ $(document).on('click', '.action-nodeexport, .action-nodesexport', function(e) {
 					addMessage('danger', values['name'] + ': ' + message);
 				});
 			});
-			
+
 			/*
 			 * Single call
 			addMessage('info', MESSAGES[138])
@@ -941,131 +1117,204 @@ $(document).on('click', '.action-nodeexport, .action-nodesexport', function(e) {
 });
 
 // Start a node
-$(document).on('click', '.action-nodestart, .action-nodesstart', function(e) {
-	$('#context-menu').remove();
-	if ($(this).hasClass('action-nodestart')) {
-		logger(1, 'DEBUG: action = nodestart');
-		var node_id = $(this).attr('data-path');
-	} else {
-		logger(1, 'DEBUG: action = nodesstart');
-		var node_id = null;
-	}
+$(document).on('click', '.action-nodestart, .action-nodesstart, .action-nodestart-group', function(e) {
+    $('#context-menu').remove();
+    var node_id
+        , startAll
+        , isFreeSelectMode = $("#lab-viewport").hasClass("freeSelectMode")
+        , nodeLenght
+        ;
 
-	$.when(getNodes(null)).done(function(nodes) {
-		if (node_id != null) {
-			$.when(start(node_id)).done(function() {
-				// Node started -> print a small green message
-				addMessage('success', nodes[node_id]['name'] + ': ' + MESSAGES[76])
-				printLabStatus();
-			}).fail(function(message) {
-				// Cannot start
-				addMessage('danger', nodes[node_id]['name'] + ': ' + message);
-			});
-		} else {
-			var nodeLenght = Object.keys(nodes).length;
-			$.each(nodes, function(key, values) {
-				$.when(start(key)).done(function() {
-					// Node started -> print a small green message
-					addMessage('success', values['name'] + ': ' + MESSAGES[76])
-					nodeLenght--;
-					if(nodeLenght < 1){
-						printLabStatus();
-					};
-				}).fail(function(message) {
-					// Cannot start
-					addMessage('danger', values['name'] + ': ' + message);
-					nodeLenght--;
-					if(nodeLenght < 1){
-						printLabStatus();
-					};
-				});
-			});
-		}
-	}).fail(function(message) {
-		addModalError(message);
-	});
+    if ($(this).hasClass('action-nodestart')) {
+        logger(1, 'DEBUG: action = nodestart');
+        node_id = $(this).attr('data-path');
+    } else {
+        logger(1, 'DEBUG: action = nodesstart');
+        startAll = true;
+    }
+
+    $.when(getNodes(null)).done(function(nodes) {
+        if (isFreeSelectMode) {
+            nodeLenght = window.freeSelectedNodes.length;
+            $.each(window.freeSelectedNodes, function(i, node) {
+                $.when(start(node.path)).done(function() {
+                    // Node started -> print a small green message
+                    addMessage('success', node.name + ': ' + MESSAGES[76]);
+                    nodeLenght--;
+                    if(nodeLenght < 1){
+                        printLabStatus();
+                    }
+                }).fail(function(message) {
+                    // Cannot start
+                    addMessage('danger', node.name + ': ' + message);
+                    nodeLenght--;
+                    if(nodeLenght < 1){
+                        printLabStatus();
+                    }
+                });
+            });
+        }
+        else if (node_id != null) {
+            $.when(start(node_id)).done(function() {
+                // Node started -> print a small green message
+                addMessage('success', nodes[node_id]['name'] + ': ' + MESSAGES[76]);
+                printLabStatus();
+            }).fail(function(message) {
+                // Cannot start
+                addMessage('danger', nodes[node_id]['name'] + ': ' + message);
+            });
+        }
+        else if (startAll) {
+            nodeLenght = Object.keys(nodes).length;
+            $.each(nodes, function(key, values) {
+                $.when(start(key)).done(function() {
+                    // Node started -> print a small green message
+                    addMessage('success', values['name'] + ': ' + MESSAGES[76]);
+                    nodeLenght--;
+                    if(nodeLenght < 1){
+                        printLabStatus();
+                    }
+                }).fail(function(message) {
+                    // Cannot start
+                    addMessage('danger', values['name'] + ': ' + message);
+                    nodeLenght--;
+                    if(nodeLenght < 1){
+                        printLabStatus();
+                    }
+                });
+            });
+        }
+    }).fail(function(message) {
+        addModalError(message);
+    });
 });
 
 // Stop a node
-$(document).on('click', '.action-nodestop, .action-nodesstop', function(e) {
-	$('#context-menu').remove();
-	if ($(this).hasClass('action-nodestop')) {
-		logger(1, 'DEBUG: action = nodestop');
-		var node_id = $(this).attr('data-path');
-	} else {
-		logger(1, 'DEBUG: action = nodesstop');
-		var node_id = null;
-	}
+$(document).on('click', '.action-nodestop, .action-nodesstop, .action-nodestop-group', function(e) {
+    $('#context-menu').remove();
 
-	$.when(getNodes(null)).done(function(nodes) {
-		if (node_id != null) {
-			$.when(stop(node_id)).done(function() {
-				// Node stopped -> print a small green message
-				addMessage('success', nodes[node_id]['name'] + ': ' + MESSAGES[77])
-				printLabStatus();
-			}).fail(function(message) {
-				// Cannot stop
-				addMessage('danger', nodes[node_id]['name'] + ': ' + message);
-			});
-		} else {
-			var nodeLenght = Object.keys(nodes).length;
-			$.each(nodes, function(key, values) {
-				$.when(stop(key)).done(function() {
-					// Node stopped -> print a small green message
-					addMessage('success', values['name'] + ': ' + MESSAGES[77])
-					nodeLenght--;
-					if(nodeLenght < 1){
-						setTimeout(printLabStatus, 1000);
-					};
-				}).fail(function(message) {
-					// Cannot stopped
-					addMessage('danger', values['name'] + ': ' + message);
-					nodeLenght--;
-					if(nodeLenght < 1){
-						setTimeout(printLabStatus, 1000);
-					};
-				});
-			});
-		}
-	}).fail(function(message) {
-		addModalError(message);
-	});
+    var node_id
+        , nodeLenght
+        , isFreeSelectMode = $("#lab-viewport").hasClass("freeSelectMode")
+        , stopAll
+        ;
+
+    if ($(this).hasClass('action-nodestop')) {
+        logger(1, 'DEBUG: action = nodestop');
+        node_id = $(this).attr('data-path');
+    } else {
+        logger(1, 'DEBUG: action = nodesstop');
+        stopAll = true;
+    }
+
+    $.when(getNodes(null)).done(function(nodes) {
+        if (isFreeSelectMode) {
+            nodeLenght = window.freeSelectedNodes.length;
+            $.each(window.freeSelectedNodes, function (i, node) {
+                $.when(stop(node.path)).done(function() {
+                    // Node stopped -> print a small green message
+                    addMessage('success', node.name + ': ' + MESSAGES[77]);
+                    nodeLenght--;
+                    if(nodeLenght < 1){
+                        setTimeout(printLabStatus, 3000);
+                    }
+                }).fail(function(message) {
+                    // Cannot stopped
+                    addMessage('danger', node.name + ': ' + message);
+                    nodeLenght--;
+                    if(nodeLenght < 1){
+                        setTimeout(printLabStatus, 3000);
+                    }
+                });
+            });
+        }
+        else if (node_id != null) {
+            $.when(stop(node_id)).done(function() {
+                // Node stopped -> print a small green message
+                addMessage('success', nodes[node_id]['name'] + ': ' + MESSAGES[77])
+                printLabStatus();
+            }).fail(function(message) {
+                // Cannot stop
+                addMessage('danger', nodes[node_id]['name'] + ': ' + message);
+            });
+        }
+        else if (stopAll) {
+            nodeLenght = Object.keys(nodes).length;
+            $.each(nodes, function(key, values) {
+                $.when(stop(key)).done(function() {
+                    // Node stopped -> print a small green message
+                    addMessage('success', values['name'] + ': ' + MESSAGES[77]);
+                    nodeLenght--;
+                    if(nodeLenght < 1){
+                        setTimeout(printLabStatus, 3000);
+                    }
+                }).fail(function(message) {
+                    // Cannot stopped
+                    addMessage('danger', values['name'] + ': ' + message);
+                    nodeLenght--;
+                    if(nodeLenght < 1){
+                        setTimeout(printLabStatus, 3000);
+                    }
+                });
+            });
+        }
+    }).fail(function(message) {
+        addModalError(message);
+    });
 });
 
 // Wipe a node
-$(document).on('click', '.action-nodewipe, .action-nodeswipe', function(e) {
-	$('#context-menu').remove();
-	if ($(this).hasClass('action-nodewipe')) {
-		logger(1, 'DEBUG: action = nodewipe');
-		var node_id = $(this).attr('data-path');
-	} else {
-		logger(1, 'DEBUG: action = nodeswipe');
-		var node_id = null;
-	}
+$(document).on('click', '.action-nodewipe, .action-nodeswipe, .action-nodewipe-group', function(e) {
+    $('#context-menu').remove();
 
-	$.when(getNodes(null)).done(function(nodes) {
-		if (node_id != null) {
-			$.when(wipe(node_id)).done(function() {
-				// Node wiped -> print a small green message
-				addMessage('success', nodes[node_id]['name'] + ': ' + MESSAGES[78])
-			}).fail(function(message) {
-				// Cannot wipe
-				addMessage('danger', nodes[node_id]['name'] + ': ' + message);
-			});
-		} else {
-			$.each(nodes, function(key, values) {
-				$.when(setTimeout(function() { wipe(key); }, values['delay'] * 10)).done(function() {
-					// Node wiped -> print a small green message
-					addMessage('success', values['name'] + ': ' + MESSAGES[78])
-				}).fail(function(message) {
-					// Cannot wiped
-					addMessage('danger', values['name'] + ': ' + message);
-				});
-			});
-		}
-	}).fail(function(message) {
-		addModalError(message);
-	});
+    var node_id
+        , isFreeSelectMode = $("#lab-viewport").hasClass("freeSelectMode")
+        , wipeAll
+        ;
+
+    if ($(this).hasClass('action-nodewipe')) {
+        logger(1, 'DEBUG: action = nodewipe');
+        node_id = $(this).attr('data-path');
+    } else {
+        logger(1, 'DEBUG: action = nodeswipe');
+        wipeAll = true;
+    }
+
+    $.when(getNodes(null)).done(function(nodes) {
+        if (isFreeSelectMode) {
+            $.each(window.freeSelectedNodes, function (i, node) {
+                $.when(setTimeout(function() { wipe(node.path); }, nodes[node.path]['delay'] * 10)).done(function() {
+                    // Node wiped -> print a small green message
+                    addMessage('success', node.name + ': ' + MESSAGES[78])
+                }).fail(function(message) {
+                    // Cannot wiped
+                    addMessage('danger', node.name + ': ' + message);
+                });
+            });
+        }
+        else if (node_id != null) {
+            $.when(wipe(node_id)).done(function() {
+                // Node wiped -> print a small green message
+                addMessage('success', nodes[node_id]['name'] + ': ' + MESSAGES[78])
+            }).fail(function(message) {
+                // Cannot wipe
+                addMessage('danger', nodes[node_id]['name'] + ': ' + message);
+            });
+        }
+        else if (wipeAll) {
+            $.each(nodes, function(key, values) {
+                $.when(setTimeout(function() { wipe(key); }, values['delay'] * 10)).done(function() {
+                    // Node wiped -> print a small green message
+                    addMessage('success', values['name'] + ': ' + MESSAGES[78])
+                }).fail(function(message) {
+                    // Cannot wiped
+                    addMessage('danger', values['name'] + ': ' + message);
+                });
+            });
+        }
+    }).fail(function(message) {
+        addModalError(message);
+    });
 });
 
 // Stop all nodes
@@ -1082,8 +1331,57 @@ $(document).on('click', '.action-stopall', function(e) {
 
 // Load system status page
 $(document).on('click', '.action-sysstatus', function(e) {
-	logger(1, 'DEBUG: action = sysstatus');
-	printSystemStats();
+    logger(1, 'DEBUG: action = sysstatus');
+
+    //printSystemStats();
+    $.when(getSystemStats()).done(function(data) {
+        // Main: title
+        var html_title = '' +
+            '<div class="row row-eq-height"><div id="list-title-folders" class="col-md-3 col-lg-3">' +
+                '<span title="' + MESSAGES[13] + '">' + MESSAGES[13] + '</span>' +
+            '</div>' +
+            '<div id="list-title-labs" class="col-md-3 col-lg-3">' +
+                '<span></span>' +
+            '</div>' +
+            '<div id="list-title-info" class="col-md-6 col-lg-6">' +
+                '<span></span>' +
+            '</div>' +
+            '</div>';
+
+        // Main
+        var html = '' +
+            '<div id="systemStats" class="container col-md-12 col-lg-12">' +
+                '<div class="fill-height row row-eq-height">' +
+                    '<div id="stats-text" class="col-md-3 col-lg-3">' +
+                        '<ul></ul>' +
+                    '</div>' +
+                    '<div id="stats-graph" class="col-md-9 col-lg-9">' +
+                        '<ul></ul>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+
+        // Footer
+        html += '</div>';
+
+        $('#main-title').html(html_title);
+        $('#main-title').show();
+        $('#main').html(html);
+
+        printSystemStats(data);
+
+        var statusIntervalID = setInterval(function () {
+            $.when(getSystemStats()).done(function (data) {
+                updateStatus(statusIntervalID, data);
+            }).fail(function (message) {
+                // Cannot get status
+                addModalError(message);
+                clearInterval(statusIntervalID);
+            });
+        }, 5000);
+    }).fail(function(message) {
+        addModalError(message);
+    });
 });
 
 // Add a user
@@ -1125,19 +1423,38 @@ $(document).on('click', '.action-usermgmt', function(e) {
 
 // Show status
 $(document).on('click', '.action-status', function(e) {
-  logger(1, 'DEBUG: action = show status');
-  $.when(getSystemStats()).done(function(data){
+    logger(1, 'DEBUG: action = show status');
+    $.when(getSystemStats()).done(function(data){
 
-    // Body
-    var html = '<div id="main" class="container col-md-12 col-lg-12"><div class="fill-height row row-eq-height"><div id="stats-text" class="col-md-3 col-lg-3"><ul></ul></div><div id="stats-graph" class="col-md-9 col-lg-9"><ul></ul></div></div></div>';
+        // Body
+        var html = '<div id="statusModal" class="container col-md-12 col-lg-12">' +
+                '<div class="fill-height row row-eq-height">' +
+                    '<div id="stats-text" class="col-md-3 col-lg-3">' +
+                        '<ul></ul>' +
+                    '</div>' +
+                    '<div id="stats-graph" class="col-md-9 col-lg-9">' +
+                        '<ul></ul>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
 
-    addModalWide("STATUS", html, '');
-    drawStatusInModal(data);
+        addModalWide("STATUS", html, '');
+        drawStatusInModal(data);
 
-  }).fail(function(message) {
-    // Cannot get status
-    addModalError(message);
-  });
+    }).fail(function(message) {
+        // Cannot get status
+        addModalError(message);
+    });
+
+    var statusModalIntervalID = setInterval(function () {
+        $.when(getSystemStats()).done(function (data) {
+            updateStatusInModal(statusModalIntervalID, data);
+        }).fail(function (message) {
+            // Cannot get status
+            addModalError(message);
+            clearInterval(statusModalIntervalID);
+        });
+    }, 5000);
 });
 
 /***************************************************************************
@@ -1617,7 +1934,7 @@ $('body').on('submit', '#form-picture-edit', function(e) {
         var field_name = $(this).attr('name').replace(/^picture\[([a-z]+)\]$/, '$1');
         form_data[field_name] = $(this).val();
     });
-    
+
     // Get action URL
     var url = '/api/labs' + lab_file + '/pictures/' + picture_id;//form_data['id'];
     $.ajax({
@@ -1666,7 +1983,6 @@ $('body').on('submit', '#form-picture-delete', function(e) {
 	}).fail(function(message) {
 		addModalError(message);
 	});
-    
 
     // Hide and delete the modal (or will be posted twice)
     $('body').children('.modal.second-win').modal('hide');
@@ -1674,3 +1990,995 @@ $('body').on('submit', '#form-picture-delete', function(e) {
     // Stop or form will follow the action link
     return false;
 });
+
+/*******************************************************************************
+* Custom Shape/Text Functions
+* *****************************************************************************/
+// Add Custom Shape
+$('body').on('submit', '.custom-shape-form', function(e) {
+    var shape_options = {}
+        , shape_html
+        , dashed = ''
+        , dash_spase_length = '10'
+        , dash_line_length = '10'
+        , z_index = 999
+        , radius
+        , coordinates
+        , current_lab
+        , customShape_id = ''
+        ;
+
+    shape_options['id'] = new Date().getTime();
+    shape_options['shape_type'] = $('.custom-shape-form .shape-type-select').val();
+    shape_options['shape_name'] = $('.custom-shape-form .shape_name').val();
+    shape_options['shape_border_type'] = $('.custom-shape-form .border-type-select').val();
+    shape_options['shape_border_color'] = $('.custom-shape-form .shape_border_color').val();
+    shape_options['shape_background_color'] = $('.custom-shape-form .shape_background_color').val();
+    shape_options['shape_width/height'] = 120;
+    shape_options['shape_border_width'] = $('.custom-shape-form .shape_border_width').val();
+    shape_options['shape_left_coordinate'] = $('.custom-shape-form .left-coordinate').val();
+    shape_options['shape_top_coordinate'] = $('.custom-shape-form .top-coordinate').val();
+
+    coordinates = 'position:absolute;left:'+ shape_options['shape_left_coordinate'] + 'px;top:' + shape_options['shape_top_coordinate'] + 'px;';
+
+    if ( shape_options['shape_border_type'] == 'dashed'){
+        dashed = ' stroke-dasharray = "' + dash_line_length + ',' + dash_spase_length + '" '
+    } else {
+        dashed = ''
+    }
+
+    if (shape_options['shape_type'] == 'square'){
+        shape_html =
+            '<div id="customShape' + shape_options['id'] +'" class="customShape context-menu" data-path="' + customShape_id + '" ' +
+            'style="display:inline;z-index:'+ z_index +';' + coordinates + '" ' +
+            'width="' + shape_options['shape_width/height'] + 'px" height="' + shape_options['shape_width/height'] + 'px" >'+
+            '<svg width="'+ shape_options['shape_width/height'] +'" height="'+ shape_options['shape_width/height'] +'">'+
+            '<rect width="'+ shape_options['shape_width/height'] +'" ' +
+            'height="' + shape_options['shape_width/height'] + '" ' +
+            'fill ="' + shape_options['shape_background_color'] + '" ' +
+            'stroke-width ="' + shape_options['shape_border_width'] + '" ' +
+            'stroke ="' + shape_options['shape_border_color'] + '" ' + dashed +
+            '"/>'+
+            'Sorry, your browser does not support inline SVG.'+
+            '</svg>'+
+            '</div>';
+    } else if(shape_options['shape_type'] == 'circle'){
+        radius = shape_options['shape_width/height']/2 - shape_options['shape_border_width']/2;
+
+        shape_html =
+            '<div id="customShape' + shape_options['id'] +'" class="customShape context-menu" data-path="' + customShape_id + '" ' +
+            'style="display:inline;z-index:'+ z_index +';' + coordinates + '"' +
+            'width="' + shape_options['shape_width/height'] + 'px" height="' + shape_options['shape_width/height'] + 'px" >'+
+            '<svg width="'+ shape_options['shape_width/height'] +'" height="'+ shape_options['shape_width/height'] +'">'+
+            '<ellipse cx="' + (radius + shape_options['shape_border_width']/2 ) + '" ' +
+            'cy="' + (radius + shape_options['shape_border_width']/2 ) + '" ' +
+            'rx="' + radius + '" ' +
+            'ry="' + radius + '" ' +
+            'stroke ="' + shape_options['shape_border_color'] + '" ' +
+            'stroke-width="' + shape_options['shape_border_width']/2 + '" ' + dashed +
+            'fill ="' + shape_options['shape_background_color'] + '" ' +
+            '/>'+
+            'Sorry, your browser does not support inline SVG.'+
+            '</svg>'+
+            '</div>';
+    }
+
+    current_lab = $('#lab-viewport').attr('data-path');
+
+    // Get action URL
+    var url = '/api/labs'+ current_lab +'/textobjects';
+    var form_data = {};
+
+    form_data['data'] = shape_html;
+    form_data['name'] = shape_options["shape_name"];
+    form_data['type'] = shape_options["shape_type"];
+
+    createTextObject(form_data).done(function(data) {
+        $('#lab-viewport').prepend(shape_html);
+
+        var $added_shape = $("#customShape"+shape_options['id']);
+        $added_shape
+            .draggable({
+                stop: textObjectDragStop
+            })
+            .resizable({
+                autoHide: true,
+                resize: function (event, ui) {
+                    textObjectResize(event, ui, shape_options);
+                },
+                stop: textObjectDragStop
+            });
+
+        getTextObjects().done(function(textObjects) {
+            $added_shape.attr("id", "customShape"+textObjects[Object.keys(textObjects).length].id);
+            $added_shape.attr("data-path", textObjects[Object.keys(textObjects).length].id);
+
+            if ($("customShape"+textObjects[Object.keys(textObjects).length].id).length > 1) {
+                // reload lab
+                addMessage('warning', MESSAGES[156]);
+                printLabTopology();
+            }
+
+            // Hide and delete the modal (or will be posted twice)
+            $('body').children('.modal').modal('hide');
+        }).fail(function (message) {
+            addMessage('DANGER', getJsonMessage(message));
+        });
+    }).done(function(){
+        addMessage('SUCCESS', 'Lab has been saved (60023).');
+    }).fail(function(message) {
+        addMessage('DANGER', getJsonMessage(message));
+    });
+
+    // Stop or form will follow the action link
+    return false;
+});
+
+// Add Text
+$('body').on('submit', '.add-text-form', function(e) {
+    var text_options = {}
+        , text_html
+        , coordinates
+        , z_index = 1001
+        , text_style = ''
+        , customShape_id = ''
+        , form_data = {}
+        ;
+
+    text_options['id'] = new Date().getTime();
+    text_options['text_left_coordinate'] = $('.add-text-form .left-coordinate').val();
+    text_options['text_top_coordinate'] = $('.add-text-form .top-coordinate').val();
+    text_options['text'] =  $('.add-text-form .main-text').val().replace(/\n/g, '<br>');
+    text_options['alignment'] = 'center';
+    text_options['vertical-alignment'] = 'top';
+    text_options['color'] = $('.add-text-form .text_font_color').val();
+    text_options['background-color'] = $('.add-text-form .text_background_color').val();
+    text_options['text-size'] = $('.add-text-form .text_font_size').val();
+    text_options['text-style'] = $('.add-text-form .text-font-style-select').val();
+
+    if(text_options['text-style'] == 'normal'){
+        text_style = 'font-weight: normal;';
+    }else if( text_options['text-style'] == 'bold'){
+        text_style = 'font-weight: bold;';
+    } else if(text_options['text-style'] == 'italic'){
+        text_style = 'font-style: italic;';
+    } else {
+        text_style = '';
+    }
+
+    coordinates = 'position:absolute;left:'+ text_options['text_left_coordinate'] + 'px;top:' + text_options['text_top_coordinate'] + 'px;';
+
+    text_html =
+        '<div id="customText' + text_options['id'] +'" class="customShape customText context-menu" data-path="' + customShape_id + '" ' +
+        'style="display:inline;' + coordinates + ' cursor:move; ;z-index:'+ z_index +';" >'+
+        '<p align="' + text_options['alignment'] + '" style="' +
+        'vertical-align:'+ text_options['vertical-alignment'] + ';' +
+        'color:'+ text_options['color'] + ';' +
+        'background-color:'+ text_options['background-color'] + ';' +
+        'font-size:' + text_options['text-size'] + 'px;' +
+        text_style +'">' +
+        text_options['text'] +
+        '</p>'+
+        '</div>';
+
+    form_data['data'] = text_html;
+    form_data['name'] = "txt " + ($(".customShape").length+1);
+    form_data['type'] = "text";
+
+    createTextObject(form_data).done(function(data) {
+        $('#lab-viewport').prepend(text_html);
+
+        var $added_shape = $("#customText"+text_options['id']);
+        $added_shape
+            .draggable({
+                stop: textObjectDragStop
+            })
+            .resizable({
+                autoHide: true,
+                resize: function (event, ui) {
+                    textObjectResize(event, ui, text_options);
+                },
+                stop: textObjectDragStop
+            });
+
+        getTextObjects().done(function(textObjects) {
+            var id = textObjects[Object.keys(textObjects).length].id;
+            $added_shape.attr("id", "customText"+id);
+            $added_shape.attr("data-path", id);
+
+            if ($("customText"+id).length > 1) {
+                addMessage('warning', MESSAGES[156]);
+                printLabTopology();
+            }
+
+            // Hide and delete the modal (or will be posted twice)
+            $('body').children('.modal').modal('hide');
+        }).fail(function (message) {
+            addMessage('DANGER', getJsonMessage(message));
+        });
+    }).done(function(){
+        addMessage('SUCCESS', 'Lab has been saved (60023).');
+    }).fail(function(message) {
+        addMessage('DANGER', getJsonMessage(message));
+    });
+
+    return false;
+});
+
+// Edit Custom Shape/Edit Text
+
+$('body').on('click', '.action-textobjectduplicate', function(e){
+  logger(1, 'DEBUG: action = action-textobjectduplicate');
+  var id = $(this).attr('data-path')
+    , $selected_shape
+    , $duplicated_shape
+    , new_id
+    , textObjectsLength
+    ,shape_border_width
+    , form_data = {}
+    , new_data_html;
+
+  $selected_shape = $("#customShape" + id + " svg").children();
+  shape_border_width = $("#customShape" + id + " svg").children().attr('stroke-width');
+
+  function getSizeObj(obj){
+    var size = 0, key;
+    for (key in obj) {
+      if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+  }
+
+  if($("#customShape"+id).length){
+    $selected_shape = $("#customShape"+id);
+    $selected_shape.resizable( "destroy" );
+    $selected_shape.draggable( "destroy" );
+    $duplicated_shape = $selected_shape.clone();
+
+    $selected_shape .draggable({
+      stop: textObjectDragStop
+    }).resizable({
+      autoHide: true,
+      resize: function (event, ui) {
+        textObjectResize(event, ui, {"shape_border_width": shape_border_width});
+      },
+      stop: textObjectDragStop
+    });
+
+    getTextObjects().done(function(textObjects) {
+
+      textObjectsLength = getSizeObj(textObjects);
+
+      for(var i=1; i <= textObjectsLength; i++){
+        if (textObjects[''+i+''] == undefined){
+          new_id = i;
+          break
+        }
+        if(textObjectsLength == i){
+          new_id = i +1;
+        }
+      }
+
+      $duplicated_shape.css('top', parseInt($selected_shape.css('top')) + parseInt($selected_shape.css('width'))/2);
+      $duplicated_shape.css('left', parseInt($selected_shape.css('left'))+ parseInt($selected_shape.css('height'))/2);
+      $duplicated_shape.attr("id", "customShape" + new_id);
+      $duplicated_shape.attr("data-path", new_id);
+
+      new_data_html = $duplicated_shape[0].outerHTML;
+      form_data['data'] = new_data_html;
+      form_data['name'] = textObjects[id]["name"];
+      form_data['type'] = textObjects[id]["type"];
+
+      createTextObject(form_data).done(function(){
+        $('#lab-viewport').prepend(new_data_html);
+
+        $('#customShape' + new_id).draggable({
+          stop: textObjectDragStop
+        }).resizable({
+          autoHide: true,
+          resize: function (event, ui) {
+            textObjectResize(event, ui, {"shape_border_width": shape_border_width});
+          },
+          stop: textObjectDragStop
+        });
+        addMessage('SUCCESS', 'Lab has been saved (60023).');
+        }).fail(function(message){
+        addMessage('DANGER', getJsonMessage(message));
+      })
+    }).fail(function (message) {
+      addMessage('DANGER', getJsonMessage(message));
+    });
+  } else if($("#customText"+id).length){
+    $selected_shape = $("#customText"+id);
+    $selected_shape.resizable( "destroy" );
+    $selected_shape.draggable( "destroy" );
+    $duplicated_shape = $selected_shape.clone();
+
+    $selected_shape .draggable({
+      stop: textObjectDragStop
+    }).resizable({
+      autoHide: true,
+      resize: function (event, ui) {
+        textObjectResize(event, ui, {"shape_border_width": shape_border_width});
+      },
+      stop: textObjectDragStop
+    });
+
+    getTextObjects().done(function(textObjects) {
+
+      textObjectsLength = getSizeObj(textObjects);
+
+      for(var i=1; i <= textObjectsLength; i++){
+        if (textObjects[''+i+''] == undefined){
+          new_id = i;
+          break
+        }
+        if(textObjectsLength == i){
+          new_id = i +1;
+        }
+      }
+
+      $duplicated_shape.css('top', parseInt($selected_shape.css('top')) + parseInt($selected_shape.css('width'))/2);
+      $duplicated_shape.css('left', parseInt($selected_shape.css('left'))+ parseInt($selected_shape.css('height'))/2);
+      $duplicated_shape.attr("id", "customText" + new_id);
+      $duplicated_shape.attr("data-path", new_id);
+
+      new_data_html = $duplicated_shape[0].outerHTML;
+      form_data['data'] = new_data_html;
+      form_data['name'] = 'txt ' + new_id;
+      form_data['type'] = textObjects[id]["type"];
+
+      createTextObject(form_data).done(function(){
+        $('#lab-viewport').prepend(new_data_html);
+
+        $('#customText' + new_id).draggable({
+          stop: textObjectDragStop
+        }).resizable({
+          autoHide: true,
+          resize: function (event, ui) {
+            textObjectResize(event, ui, {"shape_border_width": shape_border_width});
+          },
+          stop: textObjectDragStop
+        });
+        addMessage('SUCCESS', 'Lab has been saved (60023).');
+      }).fail(function(message){
+        addMessage('DANGER', getJsonMessage(message));
+      })
+    }).fail(function (message) {
+      addMessage('DANGER', getJsonMessage(message));
+    });
+  }
+  $('#context-menu').remove();
+});
+
+$('body').on('click', '.action-textobjecttoback', function(e){
+  logger(1, 'DEBUG: action = action-textobjecttoback');
+  var id = $(this).attr('data-path')
+    ,old_z_index
+    ,shape_border_width
+    ,new_data
+    ,$selected_shape = '';
+
+  shape_border_width =  $("#customShape" + id + " svg").children().attr('stroke-width');
+  if($("#customShape"+id).length){
+    $selected_shape = $("#customShape"+id);
+    old_z_index = $selected_shape.css('z-index');
+    $selected_shape.css('z-index', parseInt(old_z_index) - 1);
+    $selected_shape.resizable( "destroy" );
+    new_data = document.getElementById("customShape"+id).outerHTML;
+    $selected_shape.resizable({
+      autoHide: true,
+      resize: function (event, ui) {
+        textObjectResize(event, ui, {"shape_border_width": shape_border_width});
+      },
+      stop: textObjectDragStop
+    });
+  } else if($("#customText"+id).length){
+    $selected_shape = $("#customText"+id);
+    old_z_index = $selected_shape.css('z-index');
+    $selected_shape.css('z-index', parseInt(old_z_index) - 1);
+    $selected_shape.resizable( "destroy" );
+    new_data = document.getElementById("customText"+id).outerHTML;
+    $selected_shape.resizable({
+      autoHide: true,
+      resize: function (event, ui) {
+        textObjectResize(event, ui, {"shape_border_width": 5});
+      },
+      stop: textObjectDragStop
+    });
+  }
+  editTextObject(id, { data: new_data }).done(function() {
+
+  }).fail(function() {
+    addMessage('DANGER', getJsonMessage(message));
+  });
+  $('#context-menu').remove();
+});
+
+$('body').on('click', '.action-textobjecttofront', function(e){
+  logger(1, 'DEBUG: action = action-textobjecttofront');
+  var id = $(this).attr('data-path')
+    ,old_z_index
+    ,shape_border_width
+    ,new_data
+    ,$selected_shape = '';
+
+  shape_border_width =  $("#customShape" + id + " svg").children().attr('stroke-width');
+  if($("#customShape"+id).length){
+    $selected_shape = $("#customShape"+id);
+    old_z_index = $selected_shape.css('z-index');
+    $selected_shape.css('z-index', parseInt(old_z_index) + 1);
+    $selected_shape.resizable( "destroy" );
+    new_data = document.getElementById("customShape"+id).outerHTML;
+    $('#context-menu').remove();
+    $selected_shape.resizable({
+      autoHide: true,
+      resize: function (event, ui) {
+        textObjectResize(event, ui, {"shape_border_width": shape_border_width});
+      },
+      stop: textObjectDragStop
+    });
+  } else if($("#customText"+id).length){
+    $selected_shape = $("#customText"+id);
+    old_z_index = $selected_shape.css('z-index');
+    $selected_shape.css('z-index', parseInt(old_z_index) + 1);
+    $selected_shape.resizable( "destroy" );
+    new_data = document.getElementById("customText"+id).outerHTML;
+    $selected_shape.resizable({
+      autoHide: true,
+      resize: function (event, ui) {
+        textObjectResize(event, ui, {"shape_border_width": 5});
+      },
+      stop: textObjectDragStop
+    });
+    $('#context-menu').remove();
+  }
+  editTextObject(id, { data: new_data }).done(function() {
+
+  }).fail(function() {
+    addMessage('DANGER', getJsonMessage(message));
+  });
+  $('#context-menu').remove();
+});
+
+$('body').on('click', '.action-textobjectedit', function(e){
+  logger(1, 'DEBUG: action = action-textobjectedit');
+  var id = $(this).attr('data-path');
+
+  if($("#customShape"+id).length){
+    printFormEditCustomShape(id);
+  } else if($("#customText"+id).length){
+    printFormEditText(id);
+  }
+  $('#context-menu').remove();
+});
+
+$('body').on('click', '.action-textobjectdelete', function(e){
+  logger(1, 'DEBUG: action = action-textobjectdelete');
+  var id = $(this).attr('data-path')
+    , $table = $(this).closest('table')
+    , $selected_shape = '';
+  if($("#customShape"+id).length){
+    $selected_shape = $("#customShape"+id);
+  } else if($("#customText"+id).length){
+    $selected_shape = $("#customText"+id);
+  }
+  deleteTextObject(id).done(function(){
+    if($(this).parent('tr')){
+      $('.textObject' + id, $table ).remove();
+    }
+    $('#context-menu').remove();
+    $selected_shape.remove();
+  }).fail(function(message){
+    addModalError(message);
+  });
+});
+
+$('body').on('contextmenu', '.edit-custom-shape-form, .edit-custom-text-form, #context-menu', function(e){
+  e.preventDefault();
+  e.stopPropagation();
+});
+
+/*******************************************************************************
+* Text Edit Form
+* *****************************************************************************/
+
+$('body').on('click', '.edit-custom-text-form .btn-align-left', function(e){
+  logger(1, 'DEBUG: action = action-set/delete left alignment');
+  var id = $(this).attr('data-path');
+
+  $("#customText" + id + " p").attr('align', 'left');
+
+  if($('.edit-custom-text-form .btn-align-left').hasClass('active')){
+    $('.edit-custom-text-form .btn-align-left').removeClass('active');
+  } else if($('.edit-custom-text-form .btn-align-center').hasClass('active')){
+    $('.edit-custom-text-form .btn-align-center').removeClass('active');
+  } else if ($('.edit-custom-text-form .btn-align-right').hasClass('active')){
+    $('.edit-custom-text-form .btn-align-right').removeClass('active');
+  }
+  $('.edit-custom-text-form .btn-align-left').addClass('active');
+});
+
+$('body').on('click', '.edit-custom-text-form .btn-align-center', function(e){
+  logger(1, 'DEBUG: action = action-set/delete center alignment');
+  var id = $(this).attr('data-path');
+  $("#customText" + id + " p").attr('align', 'center');
+
+  if($('.edit-custom-text-form .btn-align-left').hasClass('active')){
+    $('.edit-custom-text-form .btn-align-left').removeClass('active');
+  } else if($('.edit-custom-text-form .btn-align-center').hasClass('active')){
+    $('.edit-custom-text-form .btn-align-center').removeClass('active');
+  } else if ($('.edit-custom-text-form .btn-align-right').hasClass('active')){
+    $('.edit-custom-text-form .btn-align-right').removeClass('active');
+  }
+  $('.edit-custom-text-form .btn-align-center').addClass('active');
+});
+
+$('body').on('click', '.edit-custom-text-form .btn-align-right', function(e){
+  logger(1, 'DEBUG: action = action-set/delete left alignment');
+  var id = $(this).attr('data-path');
+  $("#customText" + id + " p").attr('align', 'right');
+
+  if($('.edit-custom-text-form .btn-align-left').hasClass('active')){
+    $('.edit-custom-text-form .btn-align-left').removeClass('active');
+  } else if($('.edit-custom-text-form .btn-align-center').hasClass('active')){
+    $('.edit-custom-text-form .btn-align-center').removeClass('active');
+  } else if ($('.edit-custom-text-form .btn-align-right').hasClass('active')){
+    $('.edit-custom-text-form .btn-align-right').removeClass('active');
+  }
+  $('.edit-custom-text-form .btn-align-right').addClass('active');
+});
+
+$('body').on('click', '.edit-custom-text-form .btn-text-italic', function(e){
+  logger(1, 'DEBUG: action = action-set/delete font style');
+  var id = $(this).attr('data-path');
+
+  if($('.edit-custom-text-form .btn-text-italic').hasClass('active')){
+    $('.edit-custom-text-form .btn-text-italic').removeClass('active');
+    $("#customText" + id + " p").css('font-style', 'normal');
+  } else if(!$('.edit-custom-text-form .btn-text-italic').hasClass('active')){
+    $('.edit-custom-text-form .btn-text-italic').addClass('active');
+    $("#customText" + id + " p").css('font-style', 'italic');
+  }
+});
+
+$('body').on('click', '.edit-custom-text-form .btn-text-bold', function(e){
+  logger(1, 'DEBUG: action = action-set/delete font weight');
+  var id = $(this).attr('data-path');
+
+  if($('.edit-custom-text-form .btn-text-bold').hasClass('active')){
+    $('.edit-custom-text-form .btn-text-bold').removeClass('active');
+    $("#customText" + id + " p").css('font-weight', 'normal');
+  } else if(!$('.edit-custom-text-form .btn-text-bold').hasClass('active')){
+    $('.edit-custom-text-form .btn-text-bold').addClass('active');
+    $("#customText" + id + " p").css('font-weight', 'bold');
+  }
+});
+
+$('body').on('change', '.edit-custom-text-form .text-z_index-input', function(e){
+  logger(1, 'DEBUG: action = action-change text z-index');
+  var id = $(this).attr('data-path');
+  $("#customText" + id).css('z-index', parseInt($(".edit-custom-text-form .text-z_index-input").val()) + 1000);
+});
+
+$('body').on('change', '.edit-custom-text-form .text_background_color', function(e){
+  logger(1, 'DEBUG: action = action-change text background color');
+  var id = $(this).attr('data-path');
+  $('.edit-custom-text-form .text_background_transparent').removeClass('active  btn-success').text('Off');
+  $("#customText" + id + " p").css('background-color', $(".edit-custom-text-form .text_background_color").val());
+});
+
+$('body').on('click', '.edit-custom-text-form .text_background_transparent', function(e){
+  logger(1, 'DEBUG: action = action-change text background color');
+  var id = $(this).attr('data-path');
+
+  if ($('.edit-custom-text-form .text_background_transparent').hasClass('active')) {
+    $('.edit-custom-text-form .text_background_transparent').removeClass('active  btn-success').text('Off');
+    $("#customText" + id + " p").css('background-color', $(".edit-custom-text-form .text_background_color").val());
+  } else {
+    $('.edit-custom-text-form .text_background_transparent').addClass('active  btn-success').text('On');
+    $("#customText" + id + " p").css('background-color',  hex2rgb($(".edit-custom-text-form .text_background_color").val(), 0));
+  }
+});
+
+$('body').on('change', '.edit-custom-text-form .text_color', function(e){
+  logger(1, 'DEBUG: action = action-change text color');
+  var id = $(this).attr('data-path');
+  $("#customText" + id + " p").css('color', $(".edit-custom-text-form .text_color").val());
+});
+
+$('body').on('change', '.edit-custom-text-form .text-rotation-input', function(e){
+  logger(1, 'DEBUG: action = action-rotate shape');
+  var id = $(this).attr('data-path')
+    , angle = parseInt(this.value);
+
+  $("#customText"+id).css("-ms-transform", "rotate("+angle+"deg)");
+  $("#customText"+id).css("-webkit-transform", "rotate("+angle+"deg)");
+  $("#customText"+id).css("transform", "rotate("+angle+"deg)");
+});
+
+$('body').on('click', '.edit-custom-text-form .cancelForm', function(e){
+  logger(1, 'DEBUG: action = action-return old text values');
+  var id = $(this).attr('data-path')
+    , angle = $('.edit-custom-text-form .firstTextValues-rotation').val();
+
+  //Return z-index value
+  $("#customText" + id).css('z-index', parseInt($('.edit-custom-text-form .firstTextValues-z_index').val()));
+
+  // Return alignment value
+  $('.edit-custom-text-form .btn-align-left').removeClass('active');
+  $('.edit-custom-text-form .btn-align-center').removeClass('active');
+  $('.edit-custom-text-form .btn-align-right').removeClass('active');
+
+  if($('.edit-custom-text-form .firstTextValues-align').val() == "left"){
+    $("#customText" + id + " p").attr('align', 'left');
+  } else if($('.edit-custom-text-form .firstTextValues-align').val() == "center"){
+    $("#customText" + id + " p").attr('align', 'center');
+  } else if ($('.edit-custom-text-form .firstTextValues-align').val() == "right"){
+    $("#customText" + id + " p").attr('align', 'right');
+  }
+
+  // Return text type value
+  $('.edit-custom-text-form .btn-text-bold').removeClass('active');
+  $('.edit-custom-text-form .btn-text-italic').removeClass('active');
+
+  if($('.edit-custom-text-form .firstTextValues-italic').val()){
+    $("#customText" + id + " p").css('font-style', 'italic');
+  } else if($('.edit-custom-text-form .firstTextValues-bold').val()){
+    $("#customText" + id + " p").css('font-weight', 'bold');
+  }
+
+  // Return text color value
+  $("#customText" + id + " p").css('color',  $('.edit-custom-text-form .firstTextValues-color').val());
+
+  // Return background color value
+  $("#customText" + id + " p").css('background-color', $(".edit-custom-text-form .firstTextValues-background-color").val());
+
+  // Return rotation angle
+  $("#customText"+id).css("-ms-transform", "rotate("+angle+"deg)");
+  $("#customText"+id).css("-webkit-transform", "rotate("+angle+"deg)");
+  $("#customText"+id).css("transform", "rotate("+angle+"deg)");
+
+  // Remove edit class
+  $("#customText" + id).removeClass('in-editing');
+
+  $('.edit-custom-text-form').remove();
+});
+
+$('body').on('submit', '.edit-custom-text-form', function(e){
+  logger(1, 'DEBUG: action = action-save new text values');
+  var id = $(this).attr('data-path')
+    , $selected_shape = $("#customText"+id)
+    , new_data;
+
+  $selected_shape.resizable( "destroy" );
+  $selected_shape.removeClass('in-editing');
+  new_data = document.getElementById("customText"+id).outerHTML;
+  $selected_shape.resizable({
+    autoHide: true,
+    resize: function (event, ui) {
+      textObjectResize(event, ui, {"shape_border_width": 5});
+    },
+    stop: textObjectDragStop
+  });
+
+  editTextObject(id, { data: new_data }).done(function(){
+    addMessage('SUCCESS', 'Lab has been saved (60023).');
+  }).fail(function(message){
+    addModalError(message);
+  });
+  $('.edit-custom-text-form').remove();
+});
+
+$(document).on('dblclick', '.customText', function(e) {
+  logger(1, 'DEBUG: action = action-edit text');
+  var id = $(this).attr('data-path')
+    , selectedCustomText = $("#customText" + id + " p");
+
+  selectedCustomText.attr('contenteditable', 'true').focus().addClass('editable');
+});
+
+$(document).on('focusout', '.editable' , function(e){
+    var new_data
+        , id = $(this).parent().attr('data-path')
+        , $selected_shape = $("#customText"+id)
+        , innerHtml = $("p", $selected_shape).html()
+        , textLines = 0
+        ;
+
+    $("#customText" + id + " p").removeClass('editable');
+    $("#customText" + id + " p").attr('contenteditable', 'false');
+    $selected_shape.resizable( "destroy" );
+
+    // trim whitespace in the start and end of string
+    innerHtml = innerHtml.replace(/^(<br>)+/, "").replace(/(<br>)+$/, "");
+    $("p", $selected_shape).html(innerHtml);
+
+    // Calculate and apply new Width / Height based lines count
+    textLines = $("br", $selected_shape).size();
+    if (textLines) {
+        // multilines text
+        $selected_shape.css("height", parseFloat($("p", $selected_shape).css("font-size"))* (textLines*1.5 + 1) + "px");
+    }
+    else {
+        // 1 line text
+        $selected_shape.css("height", parseFloat($("p", $selected_shape).css("font-size")) * 2 + "px");
+    }
+
+    new_data = document.getElementById("customText"+id).outerHTML;
+    $selected_shape.resizable({
+        autoHide: true,
+        resize: function (event, ui) {
+            textObjectResize(event, ui, {"shape_border_width": 5});
+        },
+        stop: textObjectDragStop
+    });
+
+    editTextObject(id, { data: new_data }).done(function(){
+        addMessage('SUCCESS', 'Lab has been saved (60023).');
+    }).fail(function(message){
+        addModalError(message);
+    });
+});
+
+// Fix "Enter" behaviour in contenteditable elements
+$(document).on('keydown', '.editable' , function(e){
+  var editableText = $('.editable')
+    ;
+
+    if(KEY_CODES.enter == e.which){
+      function brQuantity (){
+        if(parseInt(editableText.text().length) <= getCharacterOffsetWithin(window.getSelection().getRangeAt(0) , document.getElementsByClassName("editable")[0])){
+          return '<br><br>'
+        } else{
+          return '<br>'
+        }
+      };
+      document.execCommand('insertHTML', false, brQuantity());
+      return false;
+    }
+});
+
+//Get caret position
+// node - need to get by pure js
+function getCharacterOffsetWithin(range, node) {
+  var treeWalker = document.createTreeWalker(
+    node,
+    NodeFilter.SHOW_TEXT,
+    function(node) {
+      var nodeRange = document.createRange();
+      nodeRange.selectNodeContents(node);
+      return nodeRange.compareBoundaryPoints(Range.END_TO_END, range) < 1 ?
+        NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+    },
+    false
+  );
+
+  var charCount = 0;
+  while (treeWalker.nextNode()) {
+    charCount += treeWalker.currentNode.length;
+  }
+  if (range.startContainer.nodeType == 3) {
+    charCount += range.startOffset;
+  }
+  return charCount;
+}
+
+/*******************************************************************************
+* Custom Shape Edit Form
+* *****************************************************************************/
+
+$('body').on('click', '.edit-custom-shape-form .cancelForm', function(e){
+  logger(1, 'DEBUG: action = action-return old shape values');
+  var id = $(this).attr('data-path')
+    , angle = $(".edit-custom-shape-form .firstShapeValues-rotation").val();
+
+  //Return z-index value
+  $("#customShape" + id).css('z-index', parseInt($('.edit-custom-shape-form .firstShapeValues-z_index').val()));
+
+  //Return border width value
+  if($("#customShape" + id + " svg").children().attr('cx')){
+    $("#customShape" + id + " svg").children().attr('stroke-width', $('.edit-custom-shape-form .firstShapeValues-border-width').val()/2);
+  } else {
+    $("#customShape" + id + " svg").children().attr('stroke-width', $('.edit-custom-shape-form .firstShapeValues-border-width').val());
+  }
+
+  //Return border type value
+  if($('.edit-custom-shape-form .firstShapeValues-border-type').val() == 'solid'){
+    $("#customShape" + id + " svg").children().removeAttr('stroke-dasharray');
+  } else if($('.edit-custom-shape-form .firstShapeValues-border-type').val() == 'dashed'){
+    if(!$("#customShape" + id + " svg").children().attr('stroke-dasharray')){
+      $("#customShape" + id + " svg").children().attr('stroke-dasharray', '10,10');
+    }
+  }
+
+  //Return border color value
+  $("#customShape" + id + " svg").children().attr('stroke', $(".edit-custom-shape-form .firstShapeValues-border-color").val());
+
+  //Return background color value
+  $("#customShape" + id + " svg").children().attr('fill', $(".edit-custom-shape-form .firstShapeValues-background-color").val());
+
+  //Return rotation angle
+  $("#customShape"+id).css("-ms-transform", "rotate("+angle+"deg)");
+  $("#customShape"+id).css("-webkit-transform", "rotate("+angle+"deg)");
+  $("#customShape"+id).css("transform", "rotate("+angle+"deg)");
+
+  $("#customShape" + id).removeClass('in-editing');
+
+  $('.edit-custom-shape-form').remove();
+});
+
+$('body').on('change', '.edit-custom-shape-form .shape-z_index-input', function(e){
+  logger(1, 'DEBUG: action = action-change shape z-index');
+  var id = $(this).attr('data-path');
+  $("#customShape" + id).css('z-index', parseInt($(".edit-custom-shape-form .shape-z_index-input").val())+1000);
+});
+
+$('body').on('change', '.edit-custom-shape-form .shape_border_width', function(e){
+  logger(1, 'DEBUG: action = action-change shape border width');
+  var id = $(this).attr('data-path');
+
+  if($("#customShape" + id + " svg").children().attr('cx')){
+    $("#customShape" + id + " svg").children().attr('stroke-width', $(".edit-custom-shape-form .shape_border_width").val()/2);
+  } else {
+    $("#customShape" + id + " svg").children().attr('stroke-width', $(".edit-custom-shape-form .shape_border_width").val());
+  }
+});
+
+$('body').on('change', '.edit-custom-shape-form .border-type-select', function(e){
+  logger(1, 'DEBUG: action = action-change shape border type');
+  var id = $(this).attr('data-path');
+
+  if($(".edit-custom-shape-form .border-type-select").val() == 'solid'){
+    if($("#customShape" + id + " svg").children().attr('stroke-dasharray')){
+      $("#customShape" + id + " svg").children().removeAttr('stroke-dasharray');
+    }
+  } else if($(".edit-custom-shape-form .border-type-select").val() == 'dashed'){
+    if(!$("#customShape" + id + " svg").children().attr('stroke-dasharray')){
+      $("#customShape" + id + " svg").children().attr('stroke-dasharray', '10,10');
+    }
+  }
+});
+
+$('body').on('change', '.edit-custom-shape-form .shape_background_color', function(e){
+  logger(1, 'DEBUG: action = action-change shape background color');
+  var id = $(this).attr('data-path');
+  $("#customShape" + id + " svg").children().attr('fill', $(".edit-custom-shape-form .shape_background_color").val());
+  $('.edit-custom-shape-form .shape_background_transparent').removeClass('active  btn-success').text('Off');
+});
+
+$('body').on('click', '.edit-custom-shape-form .shape_background_transparent', function(e){
+  logger(1, 'DEBUG: action = action-change shape background color');
+  var id = $(this).closest('form').attr('data-path');
+
+  if ($('.edit-custom-shape-form .shape_background_transparent').hasClass('active')) {
+    $('.edit-custom-shape-form .shape_background_transparent').removeClass('active  btn-success').text('Off');
+    $("#customShape" + id + " svg").children().attr('fill', $(".edit-custom-shape-form .shape_background_color").val());
+  }
+  else {
+    $('.edit-custom-shape-form .shape_background_transparent').addClass('active  btn-success').text('On');
+    $("#customShape" + id + " svg").children().attr('fill', hex2rgb($(".edit-custom-shape-form .shape_background_color").val(), 0));
+  }
+});
+
+$('body').on('change', '.edit-custom-shape-form .shape_border_color', function(e){
+  logger(1, 'DEBUG: action = action-change shape border color');
+  var id = $(this).attr('data-path');
+  $("#customShape" + id + " svg").children().attr('stroke', $(".edit-custom-shape-form .shape_border_color").val());
+});
+
+$('body').on('change', '.edit-custom-shape-form .shape-rotation-input', function(e){
+  logger(1, 'DEBUG: action = action-rotate shape');
+  var id = $(this).attr('data-path')
+    , angle = parseInt(this.value);
+
+  $("#customShape"+id).css("-ms-transform", "rotate("+angle+"deg)");
+  $("#customShape"+id).css("-webkit-transform", "rotate("+angle+"deg)");
+  $("#customShape"+id).css("transform", "rotate("+angle+"deg)");
+});
+
+$('body').on('submit', '.edit-custom-shape-form', function(e){
+  logger(1, 'DEBUG: action = action-save new shape values');
+  var id = $(this).attr('data-path')
+    , $selected_shape = $("#customShape"+id)
+    , shape_border_width
+    , new_data
+    ;
+
+  $('.edit-custom-shape-form .firstShapeValues-background-color').val($(".edit-custom-shape-form .shape_background_color").val());
+  shape_border_width =  $("#customShape" + id + " svg").children().attr('stroke-width');
+  $selected_shape.resizable( "destroy" );
+  $("#customShape" + id).removeClass('in-editing');
+  new_data = document.getElementById("customShape"+id).outerHTML;
+  $('#context-menu').remove();
+  $selected_shape.resizable({
+    autoHide: true,
+    resize: function (event, ui) {
+      textObjectResize(event, ui, {"shape_border_width": shape_border_width});
+    },
+    stop: textObjectDragStop
+  });
+
+  editTextObject(id, { data: new_data }).done(function(){
+    addMessage('SUCCESS', 'Lab has been saved (60023).');
+  }).fail(function(message){
+    addModalError(message);
+  });
+  $('.edit-custom-shape-form').remove();
+});
+
+// Print lab textobjects
+$(document).on('click', '.action-textobjectsget', function(e) {
+  logger(1, 'DEBUG: action = textobjectsget');
+  $.when(getTextObjects()).done(function(textobjects) {
+    printListTextobjects(textobjects);
+  }).fail(function(message) {
+    addModalError(message);
+  });
+});
+
+
+/*******************************************************************************
+ * Free Select
+ * ****************************************************************************/
+window.freeSelectedNodes = [];
+$(document).on("click", ".action-freeselect", function (event) {
+    var self = this
+        , isFreeSelectMode = $(self).hasClass("active")
+        ;
+
+    if (isFreeSelectMode) {
+        // TODO: disable Free Select Mode
+        $(".node_frame").removeClass("free-selected");
+    }
+    else {
+        // TODO: activate Free Select Mode
+
+    }
+
+    window.freeSelectedNodes = [];
+    $(self).toggleClass("active", !isFreeSelectMode);
+    $("#lab-viewport").toggleClass("freeSelectMode", !isFreeSelectMode);
+});
+
+$(document).on("click", "#lab-viewport.freeSelectMode .node_frame", function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    var self = this
+        , isFreeSelected = $(self).hasClass("free-selected")
+        , name = $(self).data("name")
+        , path = $(self).data("path")
+        ;
+
+    if (isFreeSelected) {   // already present window.freeSelectedNodes = [];
+        window.freeSelectedNodes = window.freeSelectedNodes.filter(function(node) {
+            return node.name !== name && node.path !== path;
+        });
+    }
+    else {                  // add to window.freeSelectedNodes = [];
+        window.freeSelectedNodes.push({
+            name: name
+            , path: path
+        });
+    }
+
+    $(self).toggleClass("free-selected", !isFreeSelected);
+});
+
+
+/*******************************************************************************
+ * Loading lab Functions
+ * *****************************************************************************/
+//$(document).ajaxStart( function() {
+//  $('#body').append('<div id="loading-lab">Loading Lab<span>.</span><span>.</span><span>.</span></div>');
+//  $('#lab-vievport').css('display', 'none');
+//  console.log('LOADING LAB HERE - START');
+//});
+//
+//$(document).ajaxStop(function() {
+//    console.log('LOADING LAB HERE - STOP');
+//    $('#lab-vievport').css('display', 'block');
+//    $('#loading-lab').remove();
+//  }
+//);

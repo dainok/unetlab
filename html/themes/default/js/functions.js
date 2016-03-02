@@ -72,7 +72,7 @@ function addMessage(severity, message) {
 
 // Add Modal
 function addModal(title, body, footer, prop) {
-	var html = '<div aria-hidden="false" style="display: block;" class="modal ' + ' ' + prop + ' fade in" tabindex="-1" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">' + title + '</h4></div><div class="modal-body">' + body + '</div><div class="modal-footer">' + footer + '</div></div></div></div>';
+	var html = '<div aria-hidden="false" style="display: block;z-index: 10000;" class="modal ' + ' ' + prop + ' fade in" tabindex="-1" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">' + title + '</h4></div><div class="modal-body">' + body + '</div><div class="modal-footer">' + footer + '</div></div></div></div>';
 	$('body').append(html);
 	$('body > .modal').modal('show');
 }
@@ -88,8 +88,8 @@ function addModalError(message) {
 function addModalWide(title, body, footer, property) {
 	var prop = property || "";
 	var addittionalHeaderBtns = "";
-	if(title.toUpperCase() == "STARTUP-CONFIGS" || title.toUpperCase() == "CONFIGURED NODES") {
-		addittionalHeaderBtns = '<i class="glyphicon glyphicon-certificate pull-right action-changeopacity"></i>'
+	if(title.toUpperCase() == "STARTUP-CONFIGS" || title.toUpperCase() == "CONFIGURED NODES" || title.toUpperCase() == "CONFIGURED TEXT OBJECTS") {
+		addittionalHeaderBtns = '<i title="Make transparent" class="glyphicon glyphicon-certificate pull-right action-changeopacity"></i>'
 	} 
 	var html = '<div aria-hidden="false" style="display: block;" class="modal modal-wide ' + prop + ' fade in" tabindex="-1" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"></i><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' + addittionalHeaderBtns + '<h4 class="modal-title">' + title + '</h4></div><div class="modal-body">' + body + '</div><div class="modal-footer">' + footer + '</div></div></div></div>';
 	$('body').append(html);
@@ -1435,7 +1435,7 @@ function printContextMenu(title, body, pageX, pageY) {
 	$('#context-menu').css({
 		left: left + 'px',
 		maxHeight: max_height,
-		top: top + 'px',
+		top: top + 'px'
 	});
 	$('#context-menu > ul').css({
 		maxHeight: max_height - 5
@@ -1662,10 +1662,135 @@ function printFormNodeConfigs(values, cb) {
 	cb && cb();
 }
 
+// Custom Shape form
+function printFormCustomShape(values){
+  var shapeTypes = ['square', 'circle'],
+      borderTypes= ['solid','dashed'],
+      left = (values == null || values['left'] == null) ? null : values['left'],
+      top = (values == null || values['top'] == null) ? null : values['top'];
+
+  var html = '<form id="main" class="container col-md-12 col-lg-12 custom-shape-form">' +
+               '<div class="row">'+
+                  '<div class="col-md-8 col-md-offset-1 form-group">'+
+                   '<label class="col-md-3 control-label form-group-addon">Type</label>'+
+                   '<div class="col-md-5">'+
+                     '<select class="form-control shape-type-select">'+
+                     '</select>'+
+                   '</div>'+
+                 '</div> <br>'+
+                 '<div class="col-md-8 col-md-offset-1 form-group">'+
+                   '<label class="col-md-3 control-label form-group-addon">Name</label>'+
+                   '<div class="col-md-5">'+
+                     '<input type="text" class="form-control shape_name" placeholder="Name" required>'+
+                   '</div>'+
+                 '</div> <br>'+
+                 '<div class="col-md-8 col-md-offset-1 form-group">'+
+                   '<label class="col-md-3 control-label form-group-addon">Border-type</label>'+
+                   '<div class="col-md-5">'+
+                     '<select class="form-control border-type-select" >'+
+                     '</select>'+
+                   '</div>'+
+                 '</div> <br>'+
+                  '<div class="col-md-8 col-md-offset-1 form-group">'+
+                    '<label class="col-md-3 control-label form-group-addon">Border-width</label>'+
+                    '<div class="col-md-5">'+
+                      '<input type="number" min="0" value="5" class="form-control shape_border_width">'+
+                    '</div>'+
+                  '</div> <br>'+
+                 '<div class="col-md-8 col-md-offset-1 form-group">'+
+                   '<label class="col-md-3 control-label form-group-addon">Border-color</label>'+
+                   '<div class="col-md-5">'+
+                     '<input type="color" class="form-control shape_border_color">'+
+                   '</div>'+
+                 '</div> <br>'+
+                 '<div class="col-md-8 col-md-offset-1 form-group">'+
+                   '<label class="col-md-3 control-label form-group-addon">Background-color</label>'+
+                   '<div class="col-md-5">'+
+                     '<input type="color" class="form-control shape_background_color">'+
+                   '</div>'+
+                 '</div> <br>'+
+                  '<button type="submit" class="btn btn-aqua col-md-offset-7">' + MESSAGES[47] + '</button>' +
+                  '<button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button>'+
+               '</div>'+
+               '<input  type="text" class="hide left-coordinate" value="' + left + '">' +
+               '<input  type="text" class="hide top-coordinate" value="' + top + '">'+
+             '</form>';
+
+  addModal("ADD CUSTOM SHAPE", html, '');
+
+  $('.custom-shape-form .shape_background_color').val('#ffffff');
+
+  for (var i = 0; i < shapeTypes.length; i++){
+    $('.shape-type-select').append($('<option></option>').val(shapeTypes[i]).html(shapeTypes[i]));
+  }
+
+  for (var j = 0; j < borderTypes.length; j++){
+    $('.border-type-select').append($('<option></option>').val(borderTypes[j]).html(borderTypes[j]));
+  }
+
+};
+
+// Text form
+function printFormText(values){
+  var left = (values == null || values['left'] == null) ? null : values['left']
+    , top = (values == null || values['top'] == null) ? null : values['top']
+    , fontStyles = ['normal', 'bold', 'italic']
+    ;
+
+  var html = '<form id="main" class="container col-md-12 col-lg-12 add-text-form">' +
+                '<div class="row">'+
+                  '<div class="col-md-12 col-md-offset-0 form-group">'+
+                    '<label class="col-md-3 control-label form-group-addon">Text</label>'+
+                    '<div class="col-md-9">'+
+                      '<textarea class="form-control main-text">'+
+                      '</textarea>'+
+                    '</div>'+
+                  '</div> <br>'+
+                  '<div class="col-md-12 col-md-offset-0 form-group">'+
+                    '<label class="col-md-3 control-label form-group-addon">Font Size</label>'+
+                    '<div class="col-md-9">'+
+                    '<input type="number" min="0" class="form-control text_font_size" value="12">'+
+                    '</div>'+
+                  '</div> <br>'+
+                  '<div class="col-md-12 col-md-offset-0 form-group">'+
+                    '<label class="col-md-3 control-label form-group-addon">Font Style</label>'+
+                    '<div class="col-md-9">'+
+                      '<select class="form-control text-font-style-select" >'+
+                      '</select>'+
+                    '</div>'+
+                  '</div> <br>'+
+                  '<div class="col-md-12 col-md-offset-0 form-group">'+
+                    '<label class="col-md-3 control-label form-group-addon">Font Color</label>'+
+                    '<div class="col-md-9">'+
+                      '<input type="color" class="form-control text_font_color">'+
+                    '</div>'+
+                  '</div> <br>'+
+                  '<div class="col-md-12 col-md-offset-0 form-group">'+
+                    '<label class="col-md-3 control-label form-group-addon">Background Color</label>'+
+                    '<div class="col-md-9">'+
+                      '<input type="color" class="form-control text_background_color">'+
+                    '</div>'+
+                  '</div> <br>'+
+                  '<button type="submit" class="btn btn-aqua col-md-offset-7">' + MESSAGES[47] + '</button>' +
+                  '<button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button>'+
+                '</div>'+
+                '<input  type="text" class="hide left-coordinate" value="' + left + '">' +
+                '<input  type="text" class="hide top-coordinate" value="' + top + '">'+
+              '</form>';
+
+  addModal("ADD TEXT", html, '');
+
+  $('.add-text-form .text_background_color').val('#ffffff');
+
+  for (var i = 0; i < fontStyles.length; i++){
+    $('.text-font-style-select').append($('<option></option>').val(fontStyles[i]).html(fontStyles[i]));
+  }
+};
+
 // Map picture
 function printNodesMap(values, cb) {
 	var title = values['name'] + ': ' + MESSAGES[123];
-	var html = '<div class="col-md-12">' + values.body + '</div><div class="text-right">' + values.footer + '</div>'
+	var html = '<div class="col-md-12">' + values.body + '</div><div class="text-right">' + values.footer + '</div>';
 	$('#config-data').html(html);
 	cb && cb();
 }
@@ -1986,187 +2111,285 @@ function printLabPreview(lab_filename) {
 
 // Print lab topology
 function printLabTopology() {
-	var lab_filename = $('#lab-viewport').attr('data-path');
+    var lab_filename = $('#lab-viewport').attr('data-path')
+        , $labViewport = $('#lab-viewport')
+        , loadingLabHtml = ''+
+            '<div id="loading-lab" class="loading-lab">' +
+                '<div class="container">' +
+                    '<h3>Loading Lab</h3>' +
+                    '<img src="/themes/default/images/wait.gif"/>' +
+                    '<div class="progress">' +
+                        '<div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>'
+        , labNodesResolver = $.Deferred()
+        , labTextObjectsResolver = $.Deferred()
+        , progressbarValue = 0
+        , progressbarMax = 100
+        ;
 
-	if($('#lab-viewport').data("refreshing") ) {
-		return;
-	}
-	$('#lab-viewport').empty();
-	$('#lab-viewport').data('refreshing', true);
+    if($labViewport.data("refreshing") ) {
+        return;
+    }
+    $labViewport.empty();
+    $labViewport.data('refreshing', true);
+    $labViewport.after(loadingLabHtml);
 
-	$.when(getNetworks(null), getNodes(null), getTopology()).done(function(networks, nodes, topology) {
-		var networkImgs = [],
-			nodesImgs = [];
+    $.when(getNetworks(null), getNodes(null), getTopology(), getTextObjects()).done(function(networks, nodes, topology, textObjects) {
+        var networkImgs = [],
+            nodesImgs = [];
 
-		$.each(networks, function(key, value) {
-			var icon;
+        progressbarMax = Object.keys(networks).length + Object.keys(nodes).length + Object.keys(textObjects).length;
+        $(".progress-bar").attr("aria-valuemax", progressbarMax);
 
-			if (value['type'] == 'bridge') {
-				icon = 'lan.png';
-			} else if (value['type'] == 'ovs') {
-				icon = 'lan.png';
-			} else {
-				icon = 'cloud.png';
-			}
+        $.each(networks, function(key, value) {
+            var icon;
 
-			$('#lab-viewport').append(
-				'<div id="network' + value['id'] + '" ' +
-				'class="context-menu network network' + value['id'] + ' network_frame unused" ' +
-				'style="top: ' + value['top'] + 'px; left: ' + value['left'] + 'px" ' +
-				'data-path="' + value['id'] + '" ' +
-				'data-name="' + value['name'] + '">' +
-				'<div class="network_name">' + value['name'] + '</div>' +
-				'</div>');
+            if (value['type'] == 'bridge') {
+                icon = 'lan.png';
+            } else if (value['type'] == 'ovs') {
+                icon = 'lan.png';
+            } else {
+                icon = 'cloud.png';
+            }
 
-			networkImgs.push($.Deferred(function (defer) {
-				var img = new Image();
+            $labViewport.append(
+                '<div id="network' + value['id'] + '" ' +
+                     'class="context-menu network network' + value['id'] + ' network_frame unused" ' +
+                     'style="top: ' + value['top'] + 'px; left: ' + value['left'] + 'px" ' +
+                     'data-path="' + value['id'] + '" ' +
+                     'data-name="' + value['name'] + '">' +
+                    '<div class="network_name">' + value['name'] + '</div>' +
+                '</div>');
 
-				img.onload = resolve;
-				img.onerror = resolve;
-				img.onabort = resolve;
+            networkImgs.push($.Deferred(function (defer) {
+                var img = new Image();
 
-				img.src = "/images/" + icon;
+                img.onload = resolve;
+                img.onerror = resolve;
+                img.onabort = resolve;
 
-				$(img).prependTo("#network"+value['id']);
+                img.src = "/images/" + icon;
 
-				function resolve(image) {
-					img.onload = null;
-					img.onerror = null;
-					img.onabort = null;
-					defer.resolve(image);
-				}
-			}));
-		});
-		$.each(nodes, function(key, value) {
-			$('#lab-viewport').append(
-				'<div id="node' + value['id'] + '" ' +
-				'class="context-menu node node' + value['id'] + ' node_frame" ' +
-				'style="top: ' + value['top'] + 'px; left: ' + value['left'] + 'px;" ' +
-				'data-path="' + value['id'] + '" ' +
-				'data-name="' + value['name'] + '">' +
-				'<a href="' + value['url'] + '">' +
-				'</a>' +
-				'<div class="node_name"><i class="node' + value['id'] + '_status"></i> ' + value['name'] + '</div>' +
-				'</div>');
+                $(img).prependTo("#network"+value['id']);
 
-			nodesImgs.push($.Deferred(function(defer) {
-				var img = new Image();
+                function resolve(image) {
+                    img.onload = null;
+                    img.onerror = null;
+                    img.onabort = null;
+                    defer.resolve(image);
+                }
+            }));
 
-				img.onload = resolve;
-				img.onerror = resolve;
-				img.onabort = resolve;
+            $(".progress-bar").css("width", ++progressbarValue/progressbarMax*100 + "%");
+        });
+        $.each(nodes, function(key, value) {
+            $labViewport.append(
+                '<div id="node' + value['id'] + '" ' +
+                     'class="context-menu node node' + value['id'] + ' node_frame" ' +
+                     'style="top: ' + value['top'] + 'px; left: ' + value['left'] + 'px;" ' +
+                     'data-path="' + value['id'] + '" ' +
+                     'data-name="' + value['name'] + '">' +
+                    '<a href="' + value['url'] + '">' +
+                    '</a>' +
+                    '<div class="node_name"><i class="node' + value['id'] + '_status"></i> ' + value['name'] + '</div>' +
+                '</div>');
 
-				img.src = "/images/icons/" + value['icon'];
+            nodesImgs.push($.Deferred(function(defer) {
+                var img = new Image();
 
-				$(img).appendTo("#node"+value['id']+" a");
+                img.onload = resolve;
+                img.onerror = resolve;
+                img.onabort = resolve;
 
-				function resolve(image) {
-					img.onload = null;
-					img.onerror = null;
-					img.onabort = null;
-					defer.resolve(image);
-				}
-			}));
-		});
+                img.src = "/images/icons/" + value['icon'];
 
-		$.when.apply($, networkImgs.concat(nodesImgs)).done(function() {
-			// Drawing topology
-			jsPlumb.ready(function() {
-				// Defaults
-				jsPlumb.importDefaults({
-					Anchor: 'Continuous',
-					Connector: ['Straight'],
-					Endpoint: 'Blank',
-					PaintStyle: {lineWidth: 2, strokeStyle: '#58585a'},
-					cssClass: 'link'
-				});
+                $(img).appendTo("#node"+value['id']+" a");
 
-				// Create jsPlumb topology
-				var lab_topology = jsPlumb.getInstance();
-				lab_topology.setContainer($("#lab-viewport"));
-				lab_topology.importDefaults({
-					Anchor: 'Continuous',
-					Connector: ['Straight'],
-					Endpoint: 'Blank',
-					PaintStyle: {lineWidth: 2, strokeStyle: '#58585a'},
-					cssClass: 'link'
-				});
+                function resolve(image) {
+                    img.onload = null;
+                    img.onerror = null;
+                    img.onabort = null;
+                    defer.resolve(image);
+                }
+            }));
 
-				// Read privileges and set specific actions/elements
-				if (ROLE == 'admin' || ROLE == 'editor') {
-					// Nodes and networks are draggable within a grid
-					lab_topology.draggable($('.node_frame, .network_frame'), { grid: [10, 10] });
-				}
+            $(".progress-bar").css("width", ++progressbarValue/progressbarMax*100 + "%");
+        });
 
-				$.each(topology, function(id, link) {
-					var type = link['type'],
-						source = link['source'],
-						source_label = link['source_label'],
-						destination = link['destination'],
-						destination_label = link['destination_label'],
-						src_label = ["Label"],
-						dst_label = ["Label"];
+        //add shapes from server to viewport
+        $.each(textObjects, function(key, value) {
+            getTextObject(value['id']).done(function(textObject) {
+                $(".progress-bar").css("width", ++progressbarValue/progressbarMax*100 + "%");
 
-					if (type == 'ethernet') {
-						if (source_label != '') {
-							src_label.push({ label: source_label, location: 0.15, cssClass: 'node_interface ' + source + ' ' + destination });
-						} else {
-							src_label.push(Object());
-						}
-						if (destination_label != '') {
-							dst_label.push({ label: destination_label, location: 0.85, cssClass: 'node_interface ' + source + ' ' + destination });
-						} else {
-							dst_label.push(Object());
-						}
+                var $newTextObject = $(textObject['data']);
 
-						lab_topology.connect({
-							source: source,       // Must attach to the IMG's parent or not printed correctly
-							target: destination,  // Must attach to the IMG's parent or not printed correctly
-							cssClass: source + ' ' + destination + ' frame_ethernet',
-							overlays: [ src_label, dst_label ],
-						});
-					} else {
-						src_label.push({ label: source_label, location: 0.15, cssClass: 'node_interface ' + source + ' ' + destination });
-						dst_label.push({ label: destination_label, location: 0.85, cssClass: 'node_interface ' + source + ' ' + destination });
+                if ($newTextObject.attr("id").indexOf("customShape") !== -1) {
+                    $newTextObject.attr("id", "customShape"+textObject.id);
+                    $newTextObject.attr("data-path", textObject.id);
+                    $labViewport.prepend($newTextObject);
 
-						lab_topology.connect({
-							source: source,       // Must attach to the IMG's parent or not printed correctly
-							target: destination,  // Must attach to the IMG's parent or not printed correctly
-							cssClass: source + " " + destination + ' frame_serial',
-							paintStyle : { lineWidth : 2, strokeStyle : "#ffcc00" },
-							overlays: [ src_label, dst_label ]
-						});
-					}
+                    $newTextObject
+                        .draggable({
+                            stop: textObjectDragStop
+                        })
+                        .resizable().resizable("destroy")
+                        .resizable({
+                            autoHide: true,
+                            resize: function (event, ui) {
+                                textObjectResize(event, ui, {"shape_border_width": 5});
+                            },
+                            stop: textObjectDragStop
+                        });
+                }
+                else if ($newTextObject.attr("id").indexOf("customText") !== -1) {
+                    $newTextObject.attr("id", "customText"+textObject.id);
+                    $newTextObject.attr("data-path", textObject.id);
+                    $labViewport.prepend($newTextObject);
 
-					// If destination is a network, remove the 'unused' class
-					if (destination.substr(0, 7) == 'network') {
-						$('.' + destination).removeClass('unused');
-					}
-				});
+                    $newTextObject
+                        .draggable({
+                            stop: textObjectDragStop
+                        })
+                        .resizable().resizable('destroy')
+                        .resizable({
+                            autoHide: true,
+                            resize: function (event, ui) {
+                                textObjectResize(event, ui, {"shape_border_width": 5});
+                            },
+                            stop: textObjectDragStop
+                        });
+                }
+                else {
+                    return void 0;
+                }
 
-				// Remove unused elements
-				$('.unused').remove();
+                if (Object.keys(textObjects).length === $(".customShape").length) {
+                    labTextObjectsResolver.resolve();
+                }
+            }).fail(function(){
+                logger(1, 'DEBUG: Failed to load Text Object' + value['name'] + '!');
+            });
+        });
+        if (Object.keys(textObjects).length === 0) {
+            labTextObjectsResolver.resolve();
+        }
 
-				printLabStatus();
+        $.when.apply($, networkImgs.concat(nodesImgs)).done(function() {
+            // Drawing topology
+            jsPlumb.ready(function() {
+                // Defaults
+                jsPlumb.importDefaults({
+                    Anchor: 'Continuous',
+                    Connector: ['Straight'],
+                    Endpoint: 'Blank',
+                    PaintStyle: {lineWidth: 2, strokeStyle: '#58585a'},
+                    cssClass: 'link'
+                });
 
-				// Move elements under the topology node
-				$('._jsPlumb_connector, ._jsPlumb_overlay, ._jsPlumb_endpoint_anchor_').detach().appendTo('#lab-viewport');
-				$('#lab-viewport').data('refreshing', false);
-			});
-		}).fail(function() {
-			logger(1, "DEBUG: not all images of networks or nodes loaded");
-			$('#lab-viewport').data('refreshing', false);
-		});
-	}).fail(function(message1, message2, message3) {
-		if (message1 != null) {
-			addModalError(message1);
-		} else if (message2 != null) {
-			addModalError(message2)
-		} else {
-			addModalError(message3)
-		};
-		$('#lab-viewport').data('refreshing', false);
-	});
+                // Create jsPlumb topology
+                var lab_topology = jsPlumb.getInstance();
+                lab_topology.setContainer($("#lab-viewport"));
+                lab_topology.importDefaults({
+                    Anchor: 'Continuous',
+                    Connector: ['Straight'],
+                    Endpoint: 'Blank',
+                    PaintStyle: {lineWidth: 2, strokeStyle: '#58585a'},
+                    cssClass: 'link'
+                });
+
+                // Read privileges and set specific actions/elements
+                if (ROLE == 'admin' || ROLE == 'editor') {
+                    // Nodes and networks are draggable within a grid
+                    lab_topology.draggable($('.node_frame, .network_frame'), { grid: [10, 10] });
+                }
+
+                $.each(topology, function(id, link) {
+                    var type = link['type'],
+                        source = link['source'],
+                        source_label = link['source_label'],
+                        destination = link['destination'],
+                        destination_label = link['destination_label'],
+                        src_label = ["Label"],
+                        dst_label = ["Label"];
+
+                    if (type == 'ethernet') {
+                        if (source_label != '') {
+                            src_label.push({ label: source_label, location: 0.15, cssClass: 'node_interface ' + source + ' ' + destination });
+                        } else {
+                            src_label.push(Object());
+                        }
+                        if (destination_label != '') {
+                            dst_label.push({ label: destination_label, location: 0.85, cssClass: 'node_interface ' + source + ' ' + destination });
+                        } else {
+                            dst_label.push(Object());
+                        }
+
+                        lab_topology.connect({
+                            source: source,       // Must attach to the IMG's parent or not printed correctly
+                            target: destination,  // Must attach to the IMG's parent or not printed correctly
+                            cssClass: source + ' ' + destination + ' frame_ethernet',
+                            overlays: [ src_label, dst_label ]
+                        });
+                    } else {
+                        src_label.push({ label: source_label, location: 0.15, cssClass: 'node_interface ' + source + ' ' + destination });
+                        dst_label.push({ label: destination_label, location: 0.85, cssClass: 'node_interface ' + source + ' ' + destination });
+
+                        lab_topology.connect({
+                            source: source,       // Must attach to the IMG's parent or not printed correctly
+                            target: destination,  // Must attach to the IMG's parent or not printed correctly
+                            cssClass: source + " " + destination + ' frame_serial',
+                            paintStyle : { lineWidth : 2, strokeStyle : "#ffcc00" },
+                            overlays: [ src_label, dst_label ]
+                        });
+                    }
+
+                    // If destination is a network, remove the 'unused' class
+                    if (destination.substr(0, 7) == 'network') {
+                        $('.' + destination).removeClass('unused');
+                    }
+                });
+
+                // Remove unused elements
+                $('.unused').remove();
+
+                printLabStatus();
+
+                // Move elements under the topology node
+                $('._jsPlumb_connector, ._jsPlumb_overlay, ._jsPlumb_endpoint_anchor_').detach().appendTo('#lab-viewport');
+                $labViewport.data('refreshing', false);
+                labNodesResolver.resolve();
+            });
+        }).fail(function() {
+            logger(1, "DEBUG: not all images of networks or nodes loaded");
+            $('#lab-viewport').data('refreshing', false);
+            labNodesResolver.reject();
+            labTextObjectsResolver.reject();
+        });
+    }).fail(function(message1, message2, message3) {
+        if (message1 != null) {
+            addModalError(message1);
+        } else if (message2 != null) {
+            addModalError(message2)
+        } else {
+            addModalError(message3)
+        }
+        $('#lab-viewport').data('refreshing', false);
+        labNodesResolver.reject();
+        labTextObjectsResolver.reject();
+    });
+
+    $.when(labNodesResolver, labTextObjectsResolver).done(function () {
+        $("#loading-lab").remove();
+    }).fail(function (message1, message2) {
+        if (message1 != null) {
+            addModalError(message1);
+        } else if (message2 != null) {
+            addModalError(message2)
+        }
+        $("#loading-lab").remove();
+    });
 }
 
 // Display lab status
@@ -2228,6 +2451,51 @@ function printListNodes(nodes) {
 	});
 	body += '</tbody></table></div>';
 	addModalWide(MESSAGES[118], body, '');
+}
+
+// Display all text objects in a table
+function printListTextobjects(textobjects) {
+    logger(1, 'DEBUG: printing text objects list');
+    var text
+        , body = '<div class="table-responsive">' +
+            '<table class="table">' +
+                '<thead>' +
+                    '<tr>' +
+                        '<th>' + MESSAGES[92] + '</th>' +
+                        '<th>' + MESSAGES[19] + '</th>' +
+                        '<th>' + MESSAGES[95] + '</th>' +
+                        '<th style="width:69%">' + MESSAGES[146] + '</th>' +
+                        '<th style="width:9%">' + MESSAGES[99] + '</th>' +
+                    '</tr>' +
+                '</thead>' +
+            '<tbody>'
+        ;
+
+    $.each(textobjects, function(key, value) {
+        if(value['type'] == 'text'){
+            text = $('#customText' + value['id'] + ' p').html();
+        } else {
+            text = ''
+        }
+
+        body +=
+            '<tr class="textObject' + value['id'] + '">' +
+                '<td>' + value['id'] + '</td>' +
+                '<td>' + value['name'] + '</td>' +
+                '<td>' + value['type'] + '</td>' +
+                '<td>' + text + '</td>' +
+                '<td>' +
+                    '<a class="action-textobjectedit" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[71] + '">' +
+                        '<i class="glyphicon glyphicon-edit"></i>' +
+                    '</a>' +
+                    '<a class="action-textobjectdelete" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[65] + '">' +
+                        '<i class="glyphicon glyphicon-trash"></i>' +
+                    '</a>' +
+                '</td>' +
+            '</tr>';
+    });
+    body += '</tbody></table></div>';
+    addModalWide(MESSAGES[150], body, '');
 }
 
 // Print Authentication Page
@@ -2387,9 +2655,11 @@ function printPageLabOpen(lab) {
 	$('#lab-sidebar ul').append('<li><a class="action-networksget" href="#" title="' + MESSAGES[61] + '"><i class="glyphicon glyphicon-transfer"></i></a></li>');
 	$('#lab-sidebar ul').append('<li><a class="action-configsget" href="#" title="' + MESSAGES[58] + '"><i class="glyphicon glyphicon-align-left"></i></a></li>');
 	$('#lab-sidebar ul').append('<li><a class="action-picturesget" href="#" title="' + MESSAGES[59] + '"><i class="glyphicon glyphicon-picture"></i></a></li>');
+	$('#lab-sidebar ul').append('<li><a class="action-textobjectsget" href="#" title="' + MESSAGES[150] + '"><i class="glyphicon glyphicon-text-background"></i></a></li>');
 	$('#lab-sidebar ul').append('<li><a class="action-moreactions" href="#" title="' + MESSAGES[125] + '"><i class="glyphicon glyphicon-th"></i></a></li>');
 	$('#lab-sidebar ul').append('<li><a class="action-labtopologyrefresh" href="#" title="' + MESSAGES[57] + '"><i class="glyphicon glyphicon-refresh"></i></a></li>');
-  $('#lab-sidebar ul').append('<li><a class="action-status" href="#" title="' + MESSAGES[13] + '"><i class="glyphicon glyphicon-info-sign"></i></a></li>');
+	$('#lab-sidebar ul').append('<li><a class="action-freeselect" href="#" title="' + MESSAGES[151] + '"><i class="glyphicon glyphicon-check"></i></a></li>');
+	$('#lab-sidebar ul').append('<li><a class="action-status" href="#" title="' + MESSAGES[13] + '"><i class="glyphicon glyphicon-info-sign"></i></a></li>');
 	$('#lab-sidebar ul').append('<li><a class="action-labclose" href="#" title="' + MESSAGES[60] + '"><i class="glyphicon glyphicon-off"></i></a></li>');
 	$('#lab-sidebar ul').append('<li><a class="action-logout" href="#" title="' + MESSAGES[14] + '"><i class="glyphicon glyphicon-log-out"></i></a></li>');
 }
@@ -2459,209 +2729,748 @@ function printUserManagement() {
 
 // Print system status in modal
 function drawStatusInModal(data) {
-  // Main: title
-  var html_title = '<div class="row row-eq-height"><div id="list-title-folders" class="col-md-3 col-lg-3"><span title="' + MESSAGES[13] + '">' + MESSAGES[13] + '</span></div><div id="list-title-labs" class="col-md-3 col-lg-3"><span></span></div><div id="list-title-info" class="col-md-6 col-lg-6"><span></span></div></div>';
-  $('#main-title').html(html_title);
-  $('#main-title').show();
-  //$('#main').html(html);
+    var $statusModalBody = $("#statusModal");
 
-  // Read privileges and set specific actions/elements
-  $('#actions-menu').empty();
-  $('#actions-menu').append('<li><a class="action-sysstatus" href="#"><i class="glyphicon glyphicon-refresh"></i> ' + MESSAGES[40] + '</a></li>');
-  $('#actions-menu').append('<li><a class="action-stopall" href="#"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[50] + '</a></li>');
-  $('#actions-menu').append('<li><a class="action-update" href="#"><i class="glyphicon glyphicon-repeat"></i> ' + MESSAGES[132] + '</a></li>');
-
-  // Adding all stats
-
-  // Text
-  $('#stats-text ul').append('<li>' + MESSAGES[39] + ': <code>' + data['version'] + '</code></li>');
-  $('#stats-text ul').append('<li>' + MESSAGES[49] + ': <code>' + data['qemu_version'] + '</code></li>');
-  $('#stats-text ul').append('<li>' + MESSAGES[29] + ': <code>' + ROLE + '</code></li>');
-  $('#stats-text ul').append('<li>' + MESSAGES[32] + ': <code>' + ((TENANT == -1) ? 'none' : TENANT) + '</code></li>');
-
-  // CPU usage
-  $('#stats-graph ul').append('<li><div class="circle circle-cpu col-md-3 col-lg-3"><strong></strong><br/><span>' + MESSAGES[36] + '</span></div></li>');
-  $('.circle-cpu').circleProgress({
-    arcCoef: 0.7,
-    value: data['cpu'],
-    thickness: 10,
-    startAngle: -Math.PI / 2,
-    fill: {	gradient: ['#46a6b6'] }
-  }).on('circle-animation-progress', function(event, progress) {
-    if (progress > data['cpu']) {
-      $(this).find('strong').html(parseInt(100 * data['cpu']) + '%');
-    } else {
-      $(this).find('strong').html(parseInt(100 * progress) + '%');
+    if (!$statusModalBody.length) {
+        return void 0;
     }
-  });
 
-  // Memory usage
-  $('#stats-graph ul').append('<li><div class="circle circle-memory col-md-3 col-lg-3"><strong></strong><br/><span>' + MESSAGES[37] + '</span></div></li>');
-  $('.circle-memory').circleProgress({
-    arcCoef: 0.7,
-    value: data['mem'],
-    thickness: 10,
-    startAngle: -Math.PI / 2,
-    fill: {	gradient: ['#46a6b6'] }
-  }).on('circle-animation-progress', function(event, progress) {
-    if (progress > data['mem']) {
-      $(this).find('strong').html(parseInt(100 * data['mem']) + '%');
-    } else {
-      $(this).find('strong').html(parseInt(100 * progress) + '%');
+    // Read privileges and set specific actions/elements
+    $('#actions-menu', $statusModalBody).empty();
+    $('#actions-menu', $statusModalBody).append('<li><a class="action-sysstatus" href="#"><i class="glyphicon glyphicon-refresh"></i> ' + MESSAGES[40] + '</a></li>');
+    $('#actions-menu', $statusModalBody).append('<li><a class="action-stopall" href="#"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[50] + '</a></li>');
+    $('#actions-menu', $statusModalBody).append('<li><a class="action-update" href="#"><i class="glyphicon glyphicon-repeat"></i> ' + MESSAGES[132] + '</a></li>');
+
+    // Adding all stats
+
+    // Text
+    $('#stats-text ul', $statusModalBody).empty();
+    $('#stats-text ul', $statusModalBody).append('<li>' + MESSAGES[39] + ': <code>' + data['version'] + '</code></li>');
+    $('#stats-text ul', $statusModalBody).append('<li>' + MESSAGES[49] + ': <code>' + data['qemu_version'] + '</code></li>');
+    $('#stats-text ul', $statusModalBody).append('<li>' + MESSAGES[29] + ': <code>' + ROLE + '</code></li>');
+    $('#stats-text ul', $statusModalBody).append('<li>' + MESSAGES[32] + ': <code>' + ((TENANT == -1) ? 'none' : TENANT) + '</code></li>');
+
+    // use graphs
+    $('#stats-graph ul', $statusModalBody).empty();
+
+    // CPU usage
+    $('#stats-graph ul', $statusModalBody).append('<li><div class="circle circle-cpu col-md-3 col-lg-3"><strong></strong><br/><span>' + MESSAGES[36] + '</span></div></li>');
+    $('.circle-cpu').circleProgress({
+        arcCoef: 0.7,
+        value: data['cpu'],
+        thickness: 10,
+        startAngle: -Math.PI / 2,
+        fill: {	gradient: ['#46a6b6'] }
+    }).on('circle-animation-progress', function(event, progress) {
+        if (progress > data['cpu']) {
+            $(this).find('strong').html(parseInt(100 * data['cpu']) + '%');
+        } else {
+            $(this).find('strong').html(parseInt(100 * progress) + '%');
+        }
+    });
+
+    // Memory usage
+    $('#stats-graph ul', $statusModalBody).append('<li><div class="circle circle-memory col-md-3 col-lg-3"><strong></strong><br/><span>' + MESSAGES[37] + '</span></div></li>');
+    $('.circle-memory').circleProgress({
+        arcCoef: 0.7,
+        value: data['mem'],
+        thickness: 10,
+        startAngle: -Math.PI / 2,
+        fill: {	gradient: ['#46a6b6'] }
+    }).on('circle-animation-progress', function(event, progress) {
+        if (progress > data['mem']) {
+            $(this).find('strong').html(parseInt(100 * data['mem']) + '%');
+        } else {
+            $(this).find('strong').html(parseInt(100 * progress) + '%');
+        }
+    });
+
+    // Swap usage
+    $('#stats-graph ul', $statusModalBody).append('<li><div class="circle circle-swap col-md-3 col-lg-3"><strong></strong><br/><span>Swap usage</span></div></li>');
+    $('.circle-swap').circleProgress({
+        arcCoef: 0.7,
+        value: data['swap'],
+        thickness: 10,
+        startAngle: -Math.PI / 2,
+        fill: {	gradient: ['#46a6b6'] }
+    }).on('circle-animation-progress', function(event, progress) {
+        if (progress > data['swap']) {
+            $(this).find('strong').html(parseInt(100 * data['swap']) + '%');
+        } else {
+            $(this).find('strong').html(parseInt(100 * progress) + '%');
+        }
+    });
+
+    // Disk usage
+    $('#stats-graph ul', $statusModalBody).append('<li><div class="circle circle-disk col-md-3 col-lg-3"><strong></strong><br/><span>' + MESSAGES[38]+ '</span></div></li>');
+    $('.circle-disk').circleProgress({
+        arcCoef: 0.7,
+        value: data['disk'],
+        thickness: 10,
+        startAngle: -Math.PI / 2,
+        fill: {	gradient: ['#46a6b6'] }
+    }).on('circle-animation-progress', function(event, progress) {
+        if (progress > data['disk']) {
+            $(this).find('strong').html(parseInt(100 * data['disk']) + '%');
+        } else {
+            $(this).find('strong').html(parseInt(100 * progress) + '%');
+        }
+    });
+
+    // IOL running nodes
+    $('#stats-graph ul', $statusModalBody).append('<li><div class="count count-iol col-md-4 col-lg-4"></div>');
+    $('.count-iol', $statusModalBody).html('<strong>' + data['iol'] + '</strong><br/><span>' + MESSAGES[41] + '</span></li>');
+
+    // Dynamips running nodes
+    $('#stats-graph ul', $statusModalBody).append('<li><div class="count count-dynamips col-md-4 col-lg-4"></div></li>');
+    $('.count-dynamips', $statusModalBody).html('<strong>' + data['dynamips'] + '</strong><br/><span>' + MESSAGES[42] + '</span>');
+
+    // QEMU running nodes
+    $('#stats-graph ul', $statusModalBody).append('<li><div class="count count-qemu col-md-4 col-lg-4"></div></li>');
+    $('.count-qemu', $statusModalBody).html('<strong>' + data['qemu'] + '</strong><br/><span>' + MESSAGES[43] + '</span>');
+}
+
+// Update system status in modal
+function updateStatusInModal(intervalId, data) {
+    if (!intervalId) {
+        return null;
     }
-  });
 
-  // Swap usage
-  $('#stats-graph ul').append('<li><div class="circle circle-swap col-md-3 col-lg-3"><strong></strong><br/><span>Swap usage</span></div></li>');
-  $('.circle-swap').circleProgress({
-    arcCoef: 0.7,
-    value: data['swap'],
-    thickness: 10,
-    startAngle: -Math.PI / 2,
-    fill: {	gradient: ['#46a6b6'] }
-  }).on('circle-animation-progress', function(event, progress) {
-    if (progress > data['swap']) {
-      $(this).find('strong').html(parseInt(100 * data['swap']) + '%');
-    } else {
-      $(this).find('strong').html(parseInt(100 * progress) + '%');
+    if (!$("#statusModal").length) {
+        return clearInterval(intervalId);
     }
-  });
 
-  // Disk usage
-  $('#stats-graph ul').append('<li><div class="circle circle-disk col-md-3 col-lg-3"><strong></strong><br/><span>' + MESSAGES[38]+ '</span></div></li>');
-  $('.circle-disk').circleProgress({
-    arcCoef: 0.7,
-    value: data['disk'],
-    thickness: 10,
-    startAngle: -Math.PI / 2,
-    fill: {	gradient: ['#46a6b6'] }
-  }).on('circle-animation-progress', function(event, progress) {
-    if (progress > data['disk']) {
-      $(this).find('strong').html(parseInt(100 * data['disk']) + '%');
-    } else {
-      $(this).find('strong').html(parseInt(100 * progress) + '%');
-    }
-  });
+    drawStatusInModal(data);
+}
 
-  // IOL running nodes
-  $('#stats-graph ul').append('<li><div class="count count-iol col-md-4 col-lg-4"></div>');
-  $('.count-iol').html('<strong>' + data['iol'] + '</strong><br/><span>' + MESSAGES[41] + '</span></li>');
+// Update system status
+function updateStatus(intervalId, data) {
+  if (!intervalId) {
+    return null;
+  }
 
-  // Dynamips running nodes
-  $('#stats-graph ul').append('<li><div class="count count-dynamips col-md-4 col-lg-4"></div></li>');
-  $('.count-dynamips').html('<strong>' + data['dynamips'] + '</strong><br/><span>' + MESSAGES[42] + '</span>');
+  if (!$("#systemStats").length) {
+    return clearInterval(intervalId);
+  }
 
-  // QEMU running nodes
-  $('#stats-graph ul').append('<li><div class="count count-qemu col-md-4 col-lg-4"></div></li>');
-  $('.count-qemu').html('<strong>' + data['qemu'] + '</strong><br/><span>' + MESSAGES[43] + '</span>');
-};
+  printSystemStats(data);
+}
 
 // Print system status
-function printSystemStats() {
-	$.when(getSystemStats()).done(function(data) {
-		// Main: title
-		var html_title = '<div class="row row-eq-height"><div id="list-title-folders" class="col-md-3 col-lg-3"><span title="' + MESSAGES[13] + '">' + MESSAGES[13] + '</span></div><div id="list-title-labs" class="col-md-3 col-lg-3"><span></span></div><div id="list-title-info" class="col-md-6 col-lg-6"><span></span></div></div>';
+function printSystemStats(data) {
+    var $statusBody = $("#systemStats");
 
-		// Main
-		var html = '<div id="main" class="container col-md-12 col-lg-12"><div class="fill-height row row-eq-height"><div id="stats-text" class="col-md-3 col-lg-3"><ul></ul></div><div id="stats-graph" class="col-md-9 col-lg-9"><ul></ul></div></div></div>';
+    if (!$statusBody.length) {
+        return void 0;
+    }
+    // Read privileges and set specific actions/elements
+    $('#actions-menu').empty();
+    $('#actions-menu').append('<li><a class="action-sysstatus" href="#"><i class="glyphicon glyphicon-refresh"></i> ' + MESSAGES[40] + '</a></li>');
+    $('#actions-menu').append('<li><a class="action-stopall" href="#"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[50] + '</a></li>');
+    $('#actions-menu').append('<li><a class="action-update" href="#"><i class="glyphicon glyphicon-repeat"></i> ' + MESSAGES[132] + '</a></li>');
 
-		// Footer
-		html += '</div>';
+    // Adding all stats
 
-		$('#main-title').html(html_title);
-		$('#main-title').show();
-		$('#main').html(html);
+    // Text
+    $('#stats-text ul').empty();
+    $('#stats-text ul').append('<li>' + MESSAGES[39] + ': <code>' + data['version'] + '</code></li>');
+    $('#stats-text ul').append('<li>' + MESSAGES[49] + ': <code>' + data['qemu_version'] + '</code></li>');
+    $('#stats-text ul').append('<li>' + MESSAGES[29] + ': <code>' + ROLE + '</code></li>');
+    $('#stats-text ul').append('<li>' + MESSAGES[32] + ': <code>' + ((TENANT == -1) ? 'none' : TENANT) + '</code></li>');
 
-		// Read privileges and set specific actions/elements
-		$('#actions-menu').empty();
-		$('#actions-menu').append('<li><a class="action-sysstatus" href="#"><i class="glyphicon glyphicon-refresh"></i> ' + MESSAGES[40] + '</a></li>');
-		$('#actions-menu').append('<li><a class="action-stopall" href="#"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[50] + '</a></li>');
-		$('#actions-menu').append('<li><a class="action-update" href="#"><i class="glyphicon glyphicon-repeat"></i> ' + MESSAGES[132] + '</a></li>');
+    $('#stats-graph ul').empty();
 
-		// Adding all stats
+    // CPU usage
+    $('#stats-graph ul').append('<li><div class="circle circle-cpu col-md-3 col-lg-3"><strong></strong><br/><span>' + MESSAGES[36] + '</span></div></li>');
+    $('.circle-cpu').circleProgress({
+        arcCoef: 0.7,
+        value: data['cpu'],
+        thickness: 10,
+        startAngle: -Math.PI / 2,
+        fill: {	gradient: ['#46a6b6'] }
+    }).on('circle-animation-progress', function(event, progress) {
+        if (progress > data['cpu']) {
+            $(this).find('strong').html(parseInt(100 * data['cpu']) + '%');
+        } else {
+            $(this).find('strong').html(parseInt(100 * progress) + '%');
+        }
+    });
 
-		// Text
-		$('#stats-text ul').append('<li>' + MESSAGES[39] + ': <code>' + data['version'] + '</code></li>');
-		$('#stats-text ul').append('<li>' + MESSAGES[49] + ': <code>' + data['qemu_version'] + '</code></li>');
-		$('#stats-text ul').append('<li>' + MESSAGES[29] + ': <code>' + ROLE + '</code></li>');
-		$('#stats-text ul').append('<li>' + MESSAGES[32] + ': <code>' + ((TENANT == -1) ? 'none' : TENANT) + '</code></li>');
+    // Memory usage
+    $('#stats-graph ul').append('<li><div class="circle circle-memory col-md-3 col-lg-3"><strong></strong><br/><span>' + MESSAGES[37] + '</span></div></li>');
+    $('.circle-memory').circleProgress({
+        arcCoef: 0.7,
+        value: data['mem'],
+        thickness: 10,
+        startAngle: -Math.PI / 2,
+        fill: {	gradient: ['#46a6b6'] }
+    }).on('circle-animation-progress', function(event, progress) {
+        if (progress > data['mem']) {
+            $(this).find('strong').html(parseInt(100 * data['mem']) + '%');
+        } else {
+            $(this).find('strong').html(parseInt(100 * progress) + '%');
+        }
+    });
 
-		// CPU usage
-		$('#stats-graph ul').append('<li><div class="circle circle-cpu col-md-3 col-lg-3"><strong></strong><br/><span>' + MESSAGES[36] + '</span></div></li>');
-		$('.circle-cpu').circleProgress({
-			arcCoef: 0.7,
-			value: data['cpu'],
-			thickness: 10,
-			startAngle: -Math.PI / 2,
-			fill: {	gradient: ['#46a6b6'] }
-		}).on('circle-animation-progress', function(event, progress) {
-			if (progress > data['cpu']) {
-				$(this).find('strong').html(parseInt(100 * data['cpu']) + '%');
-			} else {
-				$(this).find('strong').html(parseInt(100 * progress) + '%');
-			}
-		});
+    // Swap usage
+    $('#stats-graph ul').append('<li><div class="circle circle-swap col-md-3 col-lg-3"><strong></strong><br/><span>Swap usage</span></div></li>');
+    $('.circle-swap').circleProgress({
+        arcCoef: 0.7,
+        value: data['swap'],
+        thickness: 10,
+        startAngle: -Math.PI / 2,
+        fill: {	gradient: ['#46a6b6'] }
+    }).on('circle-animation-progress', function(event, progress) {
+        if (progress > data['swap']) {
+            $(this).find('strong').html(parseInt(100 * data['swap']) + '%');
+        } else {
+            $(this).find('strong').html(parseInt(100 * progress) + '%');
+        }
+    });
 
-		// Memory usage
-		$('#stats-graph ul').append('<li><div class="circle circle-memory col-md-3 col-lg-3"><strong></strong><br/><span>' + MESSAGES[37] + '</span></div></li>');
-		$('.circle-memory').circleProgress({
-			arcCoef: 0.7,
-			value: data['mem'],
-			thickness: 10,
-			startAngle: -Math.PI / 2,
-			fill: {	gradient: ['#46a6b6'] }
-		}).on('circle-animation-progress', function(event, progress) {
-			if (progress > data['mem']) {
-				$(this).find('strong').html(parseInt(100 * data['mem']) + '%');
-			} else {
-				$(this).find('strong').html(parseInt(100 * progress) + '%');
-			}
-		});
+    // Disk usage
+    $('#stats-graph ul').append('<li><div class="circle circle-disk col-md-3 col-lg-3"><strong></strong><br/><span>' + MESSAGES[38]+ '</span></div></li>');
+    $('.circle-disk').circleProgress({
+        arcCoef: 0.7,
+        value: data['disk'],
+        thickness: 10,
+        startAngle: -Math.PI / 2,
+        fill: {	gradient: ['#46a6b6'] }
+    }).on('circle-animation-progress', function(event, progress) {
+        if (progress > data['disk']) {
+            $(this).find('strong').html(parseInt(100 * data['disk']) + '%');
+        } else {
+            $(this).find('strong').html(parseInt(100 * progress) + '%');
+        }
+    });
 
-		// Swap usage
-		$('#stats-graph ul').append('<li><div class="circle circle-swap col-md-3 col-lg-3"><strong></strong><br/><span>Swap usage</span></div></li>');
-		$('.circle-swap').circleProgress({
-			arcCoef: 0.7,
-			value: data['swap'],
-			thickness: 10,
-			startAngle: -Math.PI / 2,
-			fill: {	gradient: ['#46a6b6'] }
-		}).on('circle-animation-progress', function(event, progress) {
-			if (progress > data['swap']) {
-				$(this).find('strong').html(parseInt(100 * data['swap']) + '%');
-			} else {
-				$(this).find('strong').html(parseInt(100 * progress) + '%');
-			}
-		});
+    // IOL running nodes
+    $('#stats-graph ul').append('<li><div class="count count-iol col-md-4 col-lg-4"></div>');
+    $('.count-iol').html('<strong>' + data['iol'] + '</strong><br/><span>' + MESSAGES[41] + '</span></li>');
 
-		// Disk usage
-		$('#stats-graph ul').append('<li><div class="circle circle-disk col-md-3 col-lg-3"><strong></strong><br/><span>' + MESSAGES[38]+ '</span></div></li>');
-		$('.circle-disk').circleProgress({
-			arcCoef: 0.7,
-			value: data['disk'],
-			thickness: 10,
-			startAngle: -Math.PI / 2,
-			fill: {	gradient: ['#46a6b6'] }
-		}).on('circle-animation-progress', function(event, progress) {
-			if (progress > data['disk']) {
-				$(this).find('strong').html(parseInt(100 * data['disk']) + '%');
-			} else {
-				$(this).find('strong').html(parseInt(100 * progress) + '%');
-			}
-		});
+    // Dynamips running nodes
+    $('#stats-graph ul').append('<li><div class="count count-dynamips col-md-4 col-lg-4"></div></li>');
+    $('.count-dynamips').html('<strong>' + data['dynamips'] + '</strong><br/><span>' + MESSAGES[42] + '</span>');
 
-		// IOL running nodes
-		$('#stats-graph ul').append('<li><div class="count count-iol col-md-4 col-lg-4"></div>');
-		$('.count-iol').html('<strong>' + data['iol'] + '</strong><br/><span>' + MESSAGES[41] + '</span></li>');
+    // QEMU running nodes
+    $('#stats-graph ul').append('<li><div class="count count-qemu col-md-4 col-lg-4"></div></li>');
+    $('.count-qemu').html('<strong>' + data['qemu'] + '</strong><br/><span>' + MESSAGES[43] + '</span>');
+}
 
-		// Dynamips running nodes
-		$('#stats-graph ul').append('<li><div class="count count-dynamips col-md-4 col-lg-4"></div></li>');
-		$('.count-dynamips').html('<strong>' + data['dynamips'] + '</strong><br/><span>' + MESSAGES[42] + '</span>');
+/*******************************************************************************
+* Custom Shape Functions
+* *****************************************************************************/
+// Get All Text Objects
+function getTextObjects() {
+  var deferred = $.Deferred();
+  var lab_filename = $('#lab-viewport').attr('data-path');
+  var url = '/api/labs'+ lab_filename +'/textobjects';
+  var type = 'GET';
+  $.ajax({
+    timeout: TIMEOUT,
+    type: type,
+    url: encodeURI(url),
+    dataType: 'json',
+    success: function(data) {
+      if (data['status'] == 'success') {
+        logger(1, 'DEBUG: got shape(s) from lab "' + lab_filename + '".');
+        deferred.resolve(data['data']);
+      } else {
+        // Application error
+        logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+        deferred.reject(data['message']);
+      }
+    },
+    error: function(data) {
+      // Server error
+      var message = getJsonMessage(data['responseText']);
+      logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+      logger(1, 'DEBUG: ' + message);
+      deferred.reject(message);
+    }
+  });
+  return deferred.promise();
+}
 
-		// QEMU running nodes
-		$('#stats-graph ul').append('<li><div class="count count-qemu col-md-4 col-lg-4"></div></li>');
-		$('.count-qemu').html('<strong>' + data['qemu'] + '</strong><br/><span>' + MESSAGES[43] + '</span>');
-	}).fail(function(message) {
-		addModalError(message);
-	});
+// Get Text Object By Id
+function getTextObject(id) {
+  var deferred = $.Deferred();
+  var lab_filename = $('#lab-viewport').attr('data-path');
+  var url = '/api/labs' + lab_filename + '/textobjects/' + id;
+  var type = 'GET';
+  $.ajax({
+    timeout: TIMEOUT,
+    type: type,
+    url: encodeURI(url),
+    dataType: 'json',
+    success: function(data) {
+      if (data['status'] == 'success') {
+        logger(1, 'DEBUG: got shape ' + id +'from lab "' + lab_filename + '".');
+        deferred.resolve(data['data']);
+      } else {
+        // Application error
+        logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+        deferred.reject(data['message']);
+      }
+    },
+    error: function(data) {
+      // Server error
+      var message = getJsonMessage(data['responseText']);
+      logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+      logger(1, 'DEBUG: ' + message);
+      deferred.reject(message);
+    }
+  });
+  return deferred.promise();
+}
+
+// Create New Text Object
+function createTextObject(newData) {
+  var deferred = $.Deferred()
+    , lab_filename = $('#lab-viewport').attr('data-path')
+    , url = '/api/labs' + lab_filename + '/textobjects'
+    , type = 'POST';
+
+  $.ajax({
+    timeout: TIMEOUT,
+    type: type,
+    url: encodeURI(url),
+    data: JSON.stringify(newData),
+    dataType: 'json',
+    success: function(data) {
+      if (data['status'] == 'success') {
+        logger(1, 'DEBUG: create shape ' + 'for lab "' + lab_filename + '".');
+        deferred.resolve(data['data']);
+      } else {
+        // Application error
+        logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+        deferred.reject(data['message']);
+      }
+    },
+    error: function(data) {
+      // Server error
+      var message = getJsonMessage(data['responseText']);
+      logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+      logger(1, 'DEBUG: ' + message);
+      deferred.reject(message);
+    }
+  });
+
+  return deferred.promise();
+}
+
+// Update Text Object
+function editTextObject(id, newData) {
+  var lab_filename = $('#lab-viewport').attr('data-path');
+  var deferred = $.Deferred();
+  var type = 'PUT';
+  var url = '/api/labs' + lab_filename + '/textobjects/' + id;
+  $.ajax({
+    timeout: TIMEOUT,
+    type: type,
+    url: encodeURI(url),
+    dataType: 'json',
+    data: JSON.stringify(newData), // newData is object with differences between old and new data
+    success: function(data) {
+      if (data['status'] == 'success') {
+        logger(1, 'DEBUG: custom shape text object updated.');
+        deferred.resolve(data['message']);
+      } else {
+        // Application error
+        logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+        deferred.reject(data['message']);
+      }
+    },
+    error: function(data) {
+      // Server error
+      var message = getJsonMessage(data['responseText']);
+      logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+      logger(1, 'DEBUG: ' + message);
+      deferred.reject(message);
+    }
+  });
+  return deferred.promise();
+}
+
+// Delete Text Object By Id
+function deleteTextObject(id) {
+  var deferred = $.Deferred();
+  var type = 'DELETE';
+  var lab_filename = $('#lab-viewport').attr('data-path');
+  var url = '/api/labs' + lab_filename + '/textobjects/' + id;
+  $.ajax({
+    timeout: TIMEOUT,
+    type: type,
+    url: encodeURI(url),
+    dataType: 'json',
+    success: function(data) {
+      if (data['status'] == 'success') {
+        logger(1, 'DEBUG: shape/text deleted.');
+        deferred.resolve();
+      } else {
+        // Application error
+        logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+        deferred.reject(data['message']);
+      }
+    },
+    error: function(data) {
+      // Server error
+      var message = getJsonMessage(data['responseText']);
+      logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+      logger(1, 'DEBUG: ' + message);
+      deferred.reject(message);
+    }
+  });
+  return deferred.promise();
+}
+
+// Text Object Drag Stop / Resize Stop
+function textObjectDragStop(event, ui) {
+  var id;
+  if (event.target.id.indexOf("customShape") != -1) {
+    id = event.target.id.slice("customShape".length);
+  }
+  else if (event.target.id.indexOf("customText") != -1) {
+    id = event.target.id.slice("customText".length);
+  }
+
+  editTextObject(id, {
+    data: event.target.outerHTML
+  });
+}
+
+// Text Object Resize Event
+function textObjectResize(event, ui, shape_options) {
+  var newWidth = ui.size.width
+    , newHeight = ui.size.height
+    ;
+
+  $("svg", ui.element).attr({
+    width: newWidth,
+    height: newHeight
+  });
+  $("svg > rect", ui.element).attr({
+    width: newWidth,
+    height: newHeight
+  });
+  $("svg > ellipse", ui.element).attr({
+    rx: newWidth/2 - shape_options['shape_border_width']/2,
+    ry: newHeight/2 - shape_options['shape_border_width']/2,
+    cx: newWidth/2,
+    cy: newHeight/2
+  });
+  var n = $("br", ui.element).size();
+  if(n){
+    $("p", ui.element).css({
+      "font-size": newHeight / (n*1.5 + 1)
+    });
+  } else {
+    $("p", ui.element).css({
+      "font-size": newHeight / 2
+    });
+  }
+  if ($("p", ui.element).length && $(ui.element).width() > newWidth) {
+    ui.size.width = $(ui.element).width();
+  }
+}
+
+// Edit Form: Custom Shape
+function printFormEditCustomShape(id){
+  $('.edit-custom-shape-form').remove();
+  $('.edit-custom-text-form').remove();
+  $('.customShape').each(function(index) {
+    $( this ).removeClass('in-editing');
+  });
+
+  var  borderTypes= ['solid','dashed']
+    , firstShapeValues = {}
+    , shape
+    , transparent = false
+    , colorDigits
+    , bgColor
+    , html =
+    '<form id="main" class="container col-md-12 col-lg-12 edit-custom-shape-form" data-path="' + id + '">' +
+      '<div class="row col-md-9 top-part">'+
+        '<label class="edit-custom-shape-label">Edit: '+ id + '</label><br>'+
+        '<div class="form-group">'+
+          '<label class="control-label form-group-addon">Z-Index</label>'+
+            '<input type="number" class="form-control shape-z_index-input"  min="-100" max="100" step="1" data-path="' + id + '">'+
+        '</div>'+
+        '<div class="form-group">'+
+          '<label class="control-label form-group-addon">Border-width</label>'+
+            '<input type="number" class="form-control shape_border_width" min="0" data-path="' + id + '">'+
+        '</div>'+
+        '<div class="form-group">'+
+          '<label class=" control-label form-group-addon">Border-type</label>'+
+            '<select class="form-control border-type-select" data-path="' + id + '">'+
+            '</select>'+
+        '</div>'+
+        '<div class="form-group">'+
+          '<label class="control-label form-group-addon">Border-color</label>'+
+            '<input type="color" class="form-control shape_border_color" data-path="' + id + '">'+
+        '</div>'+
+        '<div class="form-group">'+
+          '<label class="control-label form-group-addon">Background-color</label> ' +
+            '<input type="color" class="form-control shape_background_color" data-path="' + id + '">'+
+        '</div>'+
+        '<div class="form-group">'+
+          '<label class="control-label form-group-addon">Transparent</label> ' +
+          '<button type="button" class="btn btn-default shape_background_transparent" data-path="' + id + '"></button>'+
+        '</div>'+
+        '<div class="form-group">'+
+          '<label class="control-label form-group-addon">Rotate</label>'+
+          '<input type="number" class="form-control shape-rotation-input" data-path="' + id + '" min="-360" max="360" step="1">'+
+        '</div>'+
+      '</div>'+
+      '<div class="row col-md-3 btn-part">'+
+        '<button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button>' +
+        '<button type="button" class="btn btn-grey cancelForm" data-path="' + id + '">' + MESSAGES[18] + '</button>'+
+      '</div>'+
+      '<input type="hidden" class="firstShapeValues-z_index">' +
+      '<input type="hidden" class="firstShapeValues-border-color">'+
+      '<input type="hidden" class="firstShapeValues-background-color">' +
+      '<input type="hidden" class="firstShapeValues-border-type">'+
+      '<input type="hidden" class="firstShapeValues-border-width">' +
+      '<input type="hidden" class="firstShapeValues-rotation">' +
+    '</form>';
+
+  $('#lab-viewport').append(html);
+
+  for (var i = 0; i < borderTypes.length; i++){
+    $('.edit-custom-shape-form .border-type-select').append($('<option></option>').val(borderTypes[i]).html(borderTypes[i]));
+  }
+
+  if($("#customShape" + id + " svg").children().attr('stroke-dasharray')){
+    $('.edit-custom-shape-form .border-type-select').val(borderTypes[1]);
+    firstShapeValues['border-types'] = borderTypes[1];
+  } else{
+    $('.edit-custom-shape-form .border-type-select').val(borderTypes[0]);
+    firstShapeValues['border-types'] = borderTypes[0];
+  }
+
+  bgColor = $("#customShape" + id + " svg").children().attr('fill');
+  colorDigits = /(.*?)rgba{0,1}\((\d+), (\d+), (\d+)\)/.exec(bgColor);
+  if (colorDigits === null){
+    var ifHex = bgColor.indexOf('#');
+    if(ifHex < 0){
+      transparent = true;
+    }
+  }
+
+  if(transparent){
+      $('.edit-custom-shape-form .shape_background_transparent').addClass('active  btn-success').text('On');
+    } else {
+      $('.edit-custom-shape-form .shape_background_transparent').removeClass('active  btn-success').text('Off');
+    }
+
+  firstShapeValues['shape-z-index'] = $('#customShape'+id).css('z-index');
+  firstShapeValues['shape-background-color'] =rgb2hex($("#customShape" + id + " svg").children().attr('fill'));
+  firstShapeValues['shape-border-color'] = rgb2hex($("#customShape" + id + " svg ").children().attr('stroke'));
+  firstShapeValues['shape-border-width'] = $("#customShape" + id + " svg").children().attr('stroke-width');
+  firstShapeValues['shape-rotation'] = getElementsAngle("#customShape" + id);
+
+  // fill inputs
+  $('.edit-custom-shape-form .shape-z_index-input').val(firstShapeValues['shape-z-index'] - 1000);
+  $('.edit-custom-shape-form .shape_background_color').val(firstShapeValues['shape-background-color']);
+  $('.edit-custom-shape-form .shape_border_color').val(firstShapeValues['shape-border-color']);
+  $('.edit-custom-shape-form .shape_border_width').val(firstShapeValues['shape-border-width']);
+  $('.edit-custom-shape-form .shape-rotation-input').val(firstShapeValues['shape-rotation']);
+
+  // fill backup
+  $('.edit-custom-shape-form .firstShapeValues-z_index').val(firstShapeValues['shape-z-index']);
+  $('.edit-custom-shape-form .firstShapeValues-border-color').val(firstShapeValues['shape-border-color']);
+  $('.edit-custom-shape-form .firstShapeValues-background-color').val(firstShapeValues['shape-background-color']);
+  $('.edit-custom-shape-form .firstShapeValues-border-type').val(firstShapeValues['border-types']);
+  $('.edit-custom-shape-form .firstShapeValues-border-width').val(firstShapeValues['shape-border-width']);
+  $('.edit-custom-shape-form .firstShapeValues-rotation').val(firstShapeValues['shape-rotation']);
+
+  if($("#customShape" + id + " svg").children().attr('cx')){
+    $('.edit-custom-shape-form .shape_border_width').val(firstShapeValues['shape-border-width']*2);
+    $('.edit-custom-shape-form .firstShapeValues-border-width').val(firstShapeValues['shape-border-width']*2);
+  }
+  $("#customShape" + id).addClass('in-editing');
+}
+
+// Edit Form: Text
+function printFormEditText(id){
+  $('.edit-custom-shape-form').remove();
+  $('.edit-custom-text-form').remove();
+  $('.customShape').each(function(index) {
+    $( this ).removeClass('in-editing');
+  });
+
+  var firstTextValues = {}
+    , transparent = false
+    , colorDigits
+    , bgColor
+    , html =
+  '<form id="main" class="container col-md-12 col-lg-12 edit-custom-text-form"  data-path="' + id + '">' +
+    '<div class="row col-md-9  top-part">'+
+      '<label class="edit-custom-text-label">Edit: '+ id + '</label><br>'+
+      '<div class="form-group">'+
+        '<label class="control-label form-group-addon">Z-Index</label>'+
+        '<input type="number" class="form-control text-z_index-input" min="-100" max="100" step="1" data-path="' + id + '">'+
+      '</div>'+
+      '<div class="form-group">'+
+        '<label class="control-label form-group-addon">Text-align</label>'+
+        '<div class="btn-group">'+
+          '<button type="button" class="btn btn-default btn-align-left" data-path="' + id + '"><i class="glyphicon glyphicon-align-left"></i></button>'+
+          '<button type="button" class="btn btn-default btn-align-center" data-path="' + id + '"><i class="glyphicon glyphicon-align-center"></i></button>'+
+          '<button type="button" class="btn btn-default btn-align-right" data-path="' + id + '"><i class="glyphicon glyphicon-align-right"></i></button>'+
+        '</div>'+
+      '</div>'+
+      '<div class="form-group">'+
+        '<label class="control-label form-group-addon">Text-type</label>'+
+        '<div class="btn-group">'+
+          '<button type="button" class="btn btn-default btn-text-bold" data-path="' + id + '"><i class="glyphicon glyphicon-bold"></i></button>'+
+          '<button type="button" class="btn btn-default btn-text-italic" data-path="' + id + '"><i class="glyphicon glyphicon-italic"></i></button>'+
+        '</div>'+
+      '</div>'+
+      '<div class="form-group">'+
+        '<label class="control-label form-group-addon">Text-color</label>'+
+        '<input type="color" class="form-control text_color"  data-path="' + id + '">'+
+      '</div>'+
+      '<div class="form-group">'+
+        '<label class="control-label form-group-addon">Background-color</label> ' +
+        '<input type="color" class="form-control text_background_color"  data-path="' + id + '">'+
+      '</div>'+
+      '<div class="form-group">'+
+        '<label class="control-label form-group-addon">Transparent</label> ' +
+        '<button type="button" class="btn btn-default text_background_transparent" data-path="' + id + '"></button>'+
+      '</div>'+
+      '<div class="form-group">'+
+        '<label class="control-label form-group-addon">Rotate</label>'+
+        '<input type="number" class="form-control text-rotation-input"  data-path="' + id + '" min="-360" max="360" step="1">'+
+      '</div>'+
+    '</div>'+
+    '<div class="row col-md-3 btn-part">'+
+      '<button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button>' +
+      '<button type="button" class="btn btn-grey cancelForm" data-path="' + id + '">' + MESSAGES[18] + '</button>'+
+    '</div>'+
+    '<input type="text" class="hide firstTextValues-z_index">' +
+    '<input type="text" class="hide firstTextValues-color">'+
+    '<input type="text" class="hide firstTextValues-background-color">' +
+    '<input type="text" class="hide firstTextValues-italic">'+
+    '<input type="text" class="hide firstTextValues-bold">' +
+    '<input type="text" class="hide firstTextValues-align">' +
+    '<input type="text" class="hide firstTextValues-rotation">' +
+  '</form>';
+
+  $('#lab-viewport').append(html);
+
+  bgColor = $("#customText" + id + " p").css('background-color');
+  colorDigits = /(.*?)rgba{0,1}\((\d+), (\d+), (\d+)\)/.exec(bgColor);
+  if (colorDigits === null){
+    var ifHex = bgColor.indexOf('#');
+    if(ifHex < 0){
+      transparent = true;
+    }
+  }
+
+  if(transparent){
+    $('.edit-custom-text-form .text_background_transparent').addClass('active  btn-success').text('On');
+  } else {
+    $('.edit-custom-text-form .text_background_transparent').removeClass('active  btn-success').text('Off');
+  }
+
+  firstTextValues['text-z-index'] = parseInt($('#customText'+id).css('z-index'));
+  firstTextValues['text-color'] = rgb2hex($("#customText" + id + " p").css('color'));
+  firstTextValues['text-background-color'] = rgb2hex($("#customText" + id + " p").css('background-color'));
+  firstTextValues['text-rotation'] = getElementsAngle("#customText" + id);
+
+
+  $('.edit-custom-text-form .text-z_index-input').val(parseInt(firstTextValues['text-z-index']) - 1000);
+  $('.edit-custom-text-form .text_color').val(firstTextValues['text-color']);
+  $('.edit-custom-text-form .text_background_color').val(firstTextValues['text-background-color']);
+  $('.edit-custom-text-form .text-rotation-input').val(firstTextValues['text-rotation']);
+
+  if( $("#customText" + id + " p").css('font-style') == 'italic'){
+    $('.edit-custom-text-form .btn-text-italic').addClass('active');
+    firstTextValues['text-type-italic'] = 'italic'
+  }
+  if( $("#customText" + id + " p").css('font-weight') == 'bold'){
+    $('.edit-custom-text-form .btn-text-bold').addClass('active');
+    firstTextValues['text-type-bold'] = 'bold';
+  }
+  if($("#customText" + id + " p").attr('align') == 'left'){
+    $('.edit-custom-text-form .btn-align-left').addClass('active');
+    firstTextValues['text-align'] = 'left';
+  } else if($("#customText" + id + " p").attr('align') == 'center'){
+    $('.edit-custom-text-form .btn-align-center').addClass('active');
+    firstTextValues['text-align'] = 'center';
+  } else if($("#customText" + id + " p").attr('align') == 'right'){
+    $('.edit-custom-text-form .btn-align-right').addClass('active');
+    firstTextValues['text-align'] = 'right';
+  }
+
+  $('.edit-custom-text-form .firstTextValues-z_index').val(parseInt(firstTextValues['text-z-index']));
+  $('.edit-custom-text-form .firstTextValues-color').val(firstTextValues['text-color']);
+  $('.edit-custom-text-form .firstTextValues-background-color').val($("#customText" + id + " p").css('background-color'));
+  $('.edit-custom-text-form .firstTextValues-italic').val(firstTextValues['text-type-italic']);
+  $('.edit-custom-text-form .firstTextValues-bold').val(firstTextValues['text-type-bold']);
+  $('.edit-custom-text-form .firstTextValues-align').val(firstTextValues['text-align']);
+  $('.edit-custom-text-form .firstTextValues-rotation').val(firstTextValues['text-rotation']);
+
+  $("#customText" + id).addClass('in-editing');
+}
+
+// Change from RGB to Hex color
+function rgb2hex(color) {
+  if (color.substr(0, 1) === '#') {
+    return color;
+  }
+  var digits = /(.*?)rgba{0,1}\((\d+), (\d+), (\d+)\)/.exec(color);
+
+  if (digits == null){
+    digits = /(.*?)rgba\((\d+), (\d+), (\d+), (\d+)\)/.exec(color);
+  }
+
+  var red = parseInt(digits[2]);
+  var green = parseInt(digits[3]);
+  var blue = parseInt(digits[4]);
+
+  var rgb = blue | (green << 8) | (red << 16);
+  return digits[1] + '#' + ("000000" + rgb.toString(16)).slice(-6);
+}
+
+// Change from Hex to RGB color
+function hex2rgb(hex,opacity){
+  hex = hex.replace('#','');
+  var r = parseInt(hex.substring(0,2), 16);
+  var g = parseInt(hex.substring(2,4), 16);
+  var b = parseInt(hex.substring(4,6), 16);
+
+  return 'rgba('+r+', '+g+', '+b+', '+opacity+')';
+}
+
+function getElementsAngle(selector) {
+  var el = document.querySelector(selector)
+    , st = window.getComputedStyle(el, null)
+    , tr = st.getPropertyValue("-webkit-transform") ||
+    st.getPropertyValue("-moz-transform") ||
+    st.getPropertyValue("-ms-transform") ||
+    st.getPropertyValue("-o-transform") ||
+    st.getPropertyValue("transform") ||
+    "FAIL";
+
+  if (tr === "FAIL" || tr === "none") {
+    return 0;
+  }
+
+  // With rotate(30deg)...
+  // matrix(0.866025, 0.5, -0.5, 0.866025, 0px, 0px)
+  // rotation matrix - http://en.wikipedia.org/wiki/Rotation_matrix
+
+  var values = tr.split('(')[1].split(')')[0].split(',')
+    , a = values[0]
+    , b = values[1]
+    , c = values[2]
+    , d = values[3]
+    , scale = Math.sqrt(a*a + b*b)
+    // arc sin, convert from radians to degrees, round
+    , sin = b/scale
+    , angle = Math.round(Math.atan2(b, a) * (180/Math.PI))
+    ;
+
+  return angle;
 }
