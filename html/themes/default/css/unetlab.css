@@ -44,7 +44,7 @@
 	overflow-y: auto;
 }
 
-#context-menu .dropdown-header {
+#context-menu .dropdown-header, .edit-custom-shape-form .edit-custom-shape-label, .edit-custom-text-form .edit-custom-text-label {
 	color: #3ba9ba;
 	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
 	font-size: 1em;
@@ -107,6 +107,10 @@
     font-size: 0.8em;
     font-weight: bold;
     padding: 0px 2px 0px 2px;
+}
+
+[class*="node"], [class*="network"] {
+    z-index: 1000;
 }
 
 #list-title-folders {
@@ -809,4 +813,119 @@ map area:active,
 map area:focus,
 map area:visited {
     outline: none;
+}
+
+.custom-shape-form .form-group {
+  width: 100%;
+}
+
+#main > .form-group{
+    margin-bottom:15px;
+}
+
+.custom-shape-form .btn, .add-text-form .btn, .edit-custom-shape-form .btn, .edit-custom-text-form .btn{
+    margin-right: 10px;
+}
+
+.customShape p {
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
+
+.edit-custom-shape-form, .edit-custom-text-form{
+    position: fixed;
+    left: 0;
+    bottom: 15px;     /*bottom: 0;  - but  */
+    width: 100%;
+    z-index: 4000;
+    border-top: 3px solid #46a6b6;
+    padding-top: 5px !important;
+    background-color: #ffffff;
+}
+
+.edit-custom-shape-form .top-part, .edit-custom-text-form .top-part{
+    padding-left: 35px !important;
+}
+
+.edit-custom-shape-form .form-group, .edit-custom-text-form .form-group{
+    padding-right: 5px;
+}
+
+.edit-custom-shape-form .form-group input, .edit-custom-text-form .form-group input{
+    width: 90px;
+}
+.edit-custom-shape-form .form-group .checkbox, .edit-custom-text-form .form-group .checkbox{
+    width: 20px;
+    display: inline-block;
+    margin: 0;
+}
+
+.edit-custom-shape-form .form-group label, .edit-custom-text-form .form-group label{
+    display: block;
+}
+
+.edit-custom-shape-form .form-group i, .edit-custom-text-form .form-group i{
+    padding: 0;
+    margin: 0;
+}
+
+.edit-custom-shape-form .form-group .btn-part, .edit-custom-text-form .form-group .btn-part{
+    float: right;
+}
+
+.edit-custom-shape-form .form-group, .edit-custom-text-form .form-group{
+    display: block;
+    float: left;
+    height: 60px;
+}
+#main .btn-part{
+    margin-top: 36px;
+}
+.in-editing{
+    box-shadow: 0 0 10px 10px rgba(70, 166, 182, 0.5);
+}
+
+/*******************************************************************************
+* Free Select
+* *****************************************************************************/
+#lab-sidebar a.active i {
+	color: red;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.49);
+}
+
+.node_frame.free-selected {
+	box-shadow: 0 0 10px 10px rgba(70, 166, 182, 0.5);
+}
+
+/*******************************************************************************
+* Loading animation
+* *****************************************************************************/
+.loading-lab {
+    background-color: #3ba9b9;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 30px;
+    z-index: 9999;
+}
+
+.loading-lab > .container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+        -ms-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.loading-lab h3 {
+    background-color: #3ba9b9;
+    font-family: 'Ubuntu Light', Helvetica, Arial, sans-serif;;
+}
+
+.loading-lab img {
+    margin: 0 auto;
 }
