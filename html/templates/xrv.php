@@ -35,8 +35,9 @@ $p['name'] = 'xrv';
 $p['icon'] = 'Router.png';
 $p['cpu'] = 1;
 $p['ram'] = 3072;
+$p['qemu_nic'] = 'virtio-net-pci';
 $p['ethernet'] = 4;
 $p['console'] = 'telnet';
 $p['qemu_arch'] = 'i386';
-$p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -serial mon:stdio -nographic -nodefconfig -nodefaults -rtc base=utc';
+$p['qemu_options'] = '-machine type=pc,accel=kvm,usb=off -serial mon:stdio -nographic -nodefconfig -nodefaults -rtc base=utc,driftfix=slew -global kvm-pit.lost_tick_policy=discard -no-hpet -realtime mlock=off -no-shutdown -boot order=c';
 ?>
