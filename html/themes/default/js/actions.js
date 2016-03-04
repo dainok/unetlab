@@ -2692,6 +2692,9 @@ $(document).on('focusout', '.editable' , function(e){
 
     // trim whitespace in the start and end of string
     innerHtml = innerHtml.replace(/^(<br>)+/, "").replace(/(<br>)+$/, "");
+    if (!innerHtml) {
+        innerHtml = "<br>";
+    }
     $("p", $selected_shape).html(innerHtml);
 
     // Calculate and apply new Width / Height based lines count
