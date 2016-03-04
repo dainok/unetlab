@@ -929,3 +929,33 @@ map area:visited {
 .loading-lab img {
     margin: 0 auto;
 }
+
+/*******************************************************************************
+* Secondary menu for actions
+* *****************************************************************************/
+ul.navbar-secondary {
+    width: 70vw;
+    display: flex;
+    list-style: none;
+    margin-bottom: 0;
+}
+ul.navbar-secondary > li {
+    display: inline;
+    margin: 0;
+}
+ul.navbar-secondary > li > a {
+    padding: 5px 10px;
+    background-color: #babbbd;
+    color: #fff;
+    margin-right: 2px;
+}
+ul.navbar-secondary > li > a:hover {
+    color: #89888c;
+    background-color: #ffffff;
+}
+ul.navbar-secondary .glyphicon {
+    color: #ffffff;
+}
+ul.navbar-secondary a:hover .glyphicon {
+    color: #8b8c90;
+}
