@@ -224,10 +224,10 @@ tbody td .glyphicon-trash {
 #navbar-main-spacer {
 	background-color: #3ba9ba;
 	float: left;
-	margin: 0;
+	margin: 0px;
 	position: relative;
-	padding: 0;
-	height: 88px;
+	padding: 0px;
+	height: 50px;
 	width: 15px;
 }
 
