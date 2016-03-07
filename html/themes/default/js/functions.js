@@ -2526,28 +2526,7 @@ function printPageLabList(folder) {
 				html += '<nav id="navbar-top" class="hidden-xs hidden-sm navbar navbar-static-top"><div class="container col-md-12 col-lg-12"><div id="logo-main" class="col-md-3 col-lg-3"><img alt="Logo" class="img-responsive" src="/themes/default/images/logo_rr.png"/></div><div class="navbar-collapse collapse"><ul class="nav navbar-nav navbar-right"><li class="navbar-item-aqua"><a href="https://www.unetlab.com/" target="_blank"">Help</a></li><li class="navbar-item-grey"><a href="http://www.unetlab.com/" target="_blank">About</a></li><li class="navbar-item-grey"><a href="http://forum.802101.com/forum39.html" target="_blank">Forum</a></li></ul></div></div></nav>';
 
 				// Navbar: main
-				//html += '<nav id="navbar-main" class="navbar navbar-static-top"><div class="container col-md-12 col-lg-12"><div id="navbar-main-text" class="hidden-xs hidden-sm col-md-3 col-lg-3">by Andrea Dainese</div><div id="navbar-main-spacer" class="hidden-xs hidden-sm"></div><div class="navbar-collapse collapse"><ul class="col-md-9 col-lg-9 nav navbar-nav"><li class="item-first lab-list"><a class="action-lablist" href="#">' + MESSAGES[11] + '</a></li><li class="separator hidden-xs hidden-sm"><img alt="Spacer" src="/themes/default/images/vertical_dots.gif"/></li><li class="item dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Actions <span class="caret"></span></a><ul id="actions-menu" class="dropdown-menu"><li><a href="#">&lt;' + MESSAGES[3] + '&gt;</a></li></ul></li><li class="separator hidden-xs hidden-sm"><img alt="Spacer" src="/themes/default/images/vertical_dots.gif"/></li><li class="item usermgmt"><a class="action-usermgmt" href="#">' + MESSAGES[12] + '</a></li><li class="separator hidden-xs hidden-sm"><img alt="Spacer" src="/themes/default/images/vertical_dots.gif"/></li><li class="item sysstatus"><a class="action-sysstatus" href="#">' + MESSAGES[13] + '</a></li><li class="separator hidden-xs hidden-sm"><img alt="Spacer" src="/themes/default/images/vertical_dots.gif"/></li><li class="item"><a class="action-logout item" href="#"><i class="glyphicon glyphicon-log-out"></i> ' + MESSAGES[14] + '</a></li></ul></div></div></nav>';
-				html +=
-                    '<nav id="navbar-main" class="navbar navbar-static-top">' +
-                        '<div class="container col-md-12 col-lg-12">' +
-                            '<div id="navbar-main-text" class="hidden-xs hidden-sm col-md-3 col-lg-3">by Andrea Dainese</div>' +
-                            '<div id="navbar-main-spacer" class="hidden-xs hidden-sm"></div>' +
-                            '<div class="navbar-collapse collapse">' +
-                                '<ul class="nav navbar-nav">' +
-                                    '<li class="item-first lab-list"><a class="action-lablist" href="#">' + MESSAGES[11] + '</a></li>' +
-                                    '<li class="separator hidden-xs hidden-sm"><img alt="Spacer" src="/themes/default/images/vertical_dots.gif"/></li>' +
-                                    '<li class="item usermgmt"><a class="action-usermgmt" href="#">' + MESSAGES[12] + '</a></li>' +
-                                    '<li class="separator hidden-xs hidden-sm"><img alt="Spacer" src="/themes/default/images/vertical_dots.gif"/></li>' +
-                                    '<li class="item sysstatus"><a class="action-sysstatus" href="#">' + MESSAGES[13] + '</a></li>' +
-                                    '<li class="separator hidden-xs hidden-sm"><img alt="Spacer" src="/themes/default/images/vertical_dots.gif"/></li>' +
-                                    '<li class="item"><a class="action-logout item" href="#"><i class="glyphicon glyphicon-log-out"></i> ' + MESSAGES[14] + '</a></li>' +
-                                '</ul>' +
-                                '<ul id="actions-menu" class="nav navbar navbar-secondary">' +
-                                    '<li class="item-first"><a href="#">&lt;' + MESSAGES[3] + '&gt;</a></li>' +
-                                '</ul>' +
-                            '</div>' +
-                        '</div>' +
-                    '</nav>';
+				html += '<nav id="navbar-main" class="navbar navbar-static-top"><div class="container col-md-12 col-lg-12"><div id="navbar-main-text" class="hidden-xs hidden-sm col-md-3 col-lg-3">by Andrea Dainese</div><div id="navbar-main-spacer" class="hidden-xs hidden-sm"></div><div class="navbar-collapse collapse"><ul class="col-md-9 col-lg-9 nav navbar-nav"><li class="item-first lab-list"><a class="action-lablist" href="#">' + MESSAGES[11] + '</a></li><li class="separator hidden-xs hidden-sm"><img alt="Spacer" src="/themes/default/images/vertical_dots.gif"/></li><li class="item dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Actions <span class="caret"></span></a><ul id="actions-menu" class="dropdown-menu"><li><a href="#">&lt;' + MESSAGES[3] + '&gt;</a></li></ul></li><li class="separator hidden-xs hidden-sm"><img alt="Spacer" src="/themes/default/images/vertical_dots.gif"/></li><li class="item usermgmt"><a class="action-usermgmt" href="#">' + MESSAGES[12] + '</a></li><li class="separator hidden-xs hidden-sm"><img alt="Spacer" src="/themes/default/images/vertical_dots.gif"/></li><li class="item sysstatus"><a class="action-sysstatus" href="#">' + MESSAGES[13] + '</a></li><li class="separator hidden-xs hidden-sm"><img alt="Spacer" src="/themes/default/images/vertical_dots.gif"/></li><li class="item"><a class="action-logout item" href="#"><i class="glyphicon glyphicon-log-out"></i> ' + MESSAGES[14] + '</a></li></ul></div></div></nav>';
 
 				// Main: title
 				html += '<div id="main-title" class="container col-md-12 col-lg-12"><div class="row row-eq-height"><div id="list-title-folders" class="col-md-3 col-lg-3"><span title="' + folder + '">' + MESSAGES[0] + ' ' + folder + '</span></div><div id="list-title-labs" class="col-md-3 col-lg-3"><span>' + MESSAGES[1] + '</span></div><div id="list-title-info" class="col-md-6 col-lg-6"><span></span></div></div></div>';
@@ -2582,13 +2561,13 @@ function printPageLabList(folder) {
 				if (ROLE == 'admin' || ROLE == 'editor') {
 					// Adding actions
 					$('#actions-menu').empty();
-					$('#actions-menu').append('<li><a class="action-folderadd" href="#" title="' + MESSAGES[4] + '"><i class="glyphicon glyphicon-folder-close"></i></a></li>');
-					$('#actions-menu').append('<li><a class="action-labadd" href="#" title="' + MESSAGES[5] + '"><i class="glyphicon glyphicon-file"></i></a></li>');
-					$('#actions-menu').append('<li><a class="action-selectedclone" href="#" title="' + MESSAGES[6] + '"><i class="glyphicon glyphicon-copy"></i></a></li>');
-					$('#actions-menu').append('<li><a class="action-selectedexport" href="#" title="' + MESSAGES[8] + '"><i class="glyphicon glyphicon-export"></i></a></li>');
-					$('#actions-menu').append('<li><a class="action-import" href="#" title="' + MESSAGES[9] + '"><i class="glyphicon glyphicon-import"></i></a></li>');
-					$('#actions-menu').append('<li><a class="action-folderrename" href="#" title="' + MESSAGES[10] + '"><i class="glyphicon glyphicon-pencil"></i></a></li>');
-					$('#actions-menu').append('<li><a class="action-selecteddelete" href="#" title="' + MESSAGES[7] + '"><i class="glyphicon glyphicon-trash"></i></a></li>');
+					$('#actions-menu').append('<li><a class="action-folderadd" href="#"><i class="glyphicon glyphicon-folder-close"></i> ' + MESSAGES[4] + '</a></li>');
+					$('#actions-menu').append('<li><a class="action-labadd" href="#"><i class="glyphicon glyphicon-file"></i> ' + MESSAGES[5] + '</a></li>');
+					$('#actions-menu').append('<li><a class="action-selectedclone" href="#"><i class="glyphicon glyphicon-copy"></i> ' + MESSAGES[6] + '</a></li>');
+					$('#actions-menu').append('<li><a class="action-selectedexport" href="#"><i class="glyphicon glyphicon-export"></i> ' + MESSAGES[8] + '</a></li>');
+					$('#actions-menu').append('<li><a class="action-import" href="#"><i class="glyphicon glyphicon-import"></i> ' + MESSAGES[9] + '</a></li>');
+					$('#actions-menu').append('<li><a class="action-folderrename" href="#"><i class="glyphicon glyphicon-pencil"></i> ' + MESSAGES[10] + '</a></li>');
+					$('#actions-menu').append('<li><a class="action-selecteddelete" href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[7] + '</a></li>');
 
 					// Make labs draggable (to move inside folders)
 					$('.lab').draggable({
@@ -2700,8 +2679,8 @@ function printUserManagement() {
 		if (ROLE == 'admin') {
 			// Adding actions
 			$('#actions-menu').empty();
-			$('#actions-menu').append('<li><a class="action-useradd" href="#" title="'+ MESSAGES[34] +'"><i class="glyphicon glyphicon-plus"></i></a></li>');
-			$('#actions-menu').append('<li><a class="action-selecteddelete" href="#" title="'+ MESSAGES[35] +'"><i class="glyphicon glyphicon-trash"></i></a></li>');
+			$('#actions-menu').append('<li><a class="action-useradd" href="#"><i class="glyphicon glyphicon-plus"></i> ' + MESSAGES[34] + '</a></li>');
+			$('#actions-menu').append('<li><a class="action-selecteddelete" href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[35] + '</a></li>');
 		} else {
 			$('#actions-menu').empty();
 			$('#actions-menu').append('<li><a href="#">&lt;' + MESSAGES[3] + '&gt;</a></li>');
@@ -2761,9 +2740,9 @@ function drawStatusInModal(data) {
 
     // Read privileges and set specific actions/elements
     $('#actions-menu', $statusModalBody).empty();
-    $('#actions-menu', $statusModalBody).append('<li><a class="action-sysstatus" href="#" title="' + MESSAGES[40] + '"><i class="glyphicon glyphicon-refresh"></i></a></li>');
-    $('#actions-menu', $statusModalBody).append('<li><a class="action-stopall" href="#" title="' + MESSAGES[50] + '"><i class="glyphicon glyphicon-stop"></i></a></li>');
-    $('#actions-menu', $statusModalBody).append('<li><a class="action-update" href="#" title="' + MESSAGES[132] + '"><i class="glyphicon glyphicon-repeat"></i></a></li>');
+    $('#actions-menu', $statusModalBody).append('<li><a class="action-sysstatus" href="#"><i class="glyphicon glyphicon-refresh"></i> ' + MESSAGES[40] + '</a></li>');
+    $('#actions-menu', $statusModalBody).append('<li><a class="action-stopall" href="#"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[50] + '</a></li>');
+    $('#actions-menu', $statusModalBody).append('<li><a class="action-update" href="#"><i class="glyphicon glyphicon-repeat"></i> ' + MESSAGES[132] + '</a></li>');
 
     // Adding all stats
 
@@ -2889,9 +2868,9 @@ function printSystemStats(data) {
     }
     // Read privileges and set specific actions/elements
     $('#actions-menu').empty();
-    $('#actions-menu').append('<li><a class="action-sysstatus" href="#" title="' + MESSAGES[40] + '"><i class="glyphicon glyphicon-refresh"></i></a></li>');
-    $('#actions-menu').append('<li><a class="action-stopall" href="#" title="' + MESSAGES[50] + '"><i class="glyphicon glyphicon-stop"></i></a></li>');
-    $('#actions-menu').append('<li><a class="action-update" href="#" title="' + MESSAGES[132] + '"><i class="glyphicon glyphicon-repeat"></i></a></li>');
+    $('#actions-menu').append('<li><a class="action-sysstatus" href="#"><i class="glyphicon glyphicon-refresh"></i> ' + MESSAGES[40] + '</a></li>');
+    $('#actions-menu').append('<li><a class="action-stopall" href="#"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[50] + '</a></li>');
+    $('#actions-menu').append('<li><a class="action-update" href="#"><i class="glyphicon glyphicon-repeat"></i> ' + MESSAGES[132] + '</a></li>');
 
     // Adding all stats
 
