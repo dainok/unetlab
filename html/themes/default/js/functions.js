@@ -2744,7 +2744,7 @@ function drawStatusInModal(data) {
     $('#actions-menu', $statusModalBody).empty();
     $('#actions-menu', $statusModalBody).append('<li><a class="action-sysstatus" href="#"><i class="glyphicon glyphicon-refresh"></i> ' + MESSAGES[40] + '</a></li>');
     $('#actions-menu', $statusModalBody).append('<li><a class="action-stopall" href="#"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[50] + '</a></li>');
-    $('#actions-menu', $statusModalBody).append('<li><a class="action-update" href="#"><i class="glyphicon glyphicon-repeat"></i> ' + MESSAGES[132] + '</a></li>');
+    //$('#actions-menu', $statusModalBody).append('<li><a class="action-update" href="#"><i class="glyphicon glyphicon-repeat"></i> ' + MESSAGES[132] + '</a></li>');
 
     // Adding all stats
 
@@ -2872,7 +2872,7 @@ function printSystemStats(data) {
     $('#actions-menu').empty();
     $('#actions-menu').append('<li><a class="action-sysstatus" href="#"><i class="glyphicon glyphicon-refresh"></i> ' + MESSAGES[40] + '</a></li>');
     $('#actions-menu').append('<li><a class="action-stopall" href="#"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[50] + '</a></li>');
-    $('#actions-menu').append('<li><a class="action-update" href="#"><i class="glyphicon glyphicon-repeat"></i> ' + MESSAGES[132] + '</a></li>');
+    //$('#actions-menu').append('<li><a class="action-update" href="#"><i class="glyphicon glyphicon-repeat"></i> ' + MESSAGES[132] + '</a></li>');
 
     // Adding all stats
 
