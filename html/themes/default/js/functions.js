@@ -1352,6 +1352,7 @@ function update(path) {
 				deferred.reject(data['message']);
 			}
 		},
+		/*
 		error: function(data) {
 			// Server error
 			var message = getJsonMessage(data['responseText']);
@@ -1359,6 +1360,7 @@ function update(path) {
 			logger(1, 'DEBUG: ' + message);
 			deferred.reject(message);
 		}
+		*/
 	});
 	return deferred.promise();
 }
