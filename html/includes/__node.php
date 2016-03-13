@@ -1922,9 +1922,9 @@ class Node {
 								$this -> ethernets[$i] = $old_ethernets[$i];
 							} else {
 								if ($i == 0) {
-									$n = 'fxp0';			// Interface name
+									$n = 'em0 / fxp0';			// Interface name
 								} else if ($i == 1) {
-									$n = 'Do not use';		// Interface name
+									$n = 'em1 / Internal use';		// Interface name
 								} else {
 									$n = 'em'.$i.' / ge-0/0/'.($i - 2);
 								}
