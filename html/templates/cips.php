@@ -39,5 +39,5 @@ $p['ethernet'] = 5;
 $p['console'] = 'telnet'; 
 $p['qemu_arch'] = 'i386';
 $p['qemu_version'] = '1.3.1';
-$p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -serial mon:stdio -nographic -nodefconfig -nodefaults -rtc base=utc -smbios type=1,product=IPS-4240,version=1.0,family=IPS-4240';
+$p['qemu_options'] = '-machine type=pc-1.0 -serial mon:stdio -nographic -nodefconfig -nodefaults -rtc base=utc -no-shutdown -boot order=c -smbios type=1,product=IPS-4240/4255,version=1.0,family=IPS-4240/4255';
 ?>
