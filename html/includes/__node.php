@@ -798,6 +798,12 @@ class Node {
 					$patterns[0] = '/^hd([a-z]+).qcow2$/';
 					$replacements[0] = '$1';
 					$disk_id = preg_replace($patterns, $replacements, $filename);
+					$flags .= ' -hd'.$disk_id.' '.$filename;
+				} else if (preg_match('/^virtide[a-z]+.qcow2$/', $filename)) {
+					// IDE
+					$patterns[0] = '/^virtide([a-z]+).qcow2$/';
+					$replacements[0] = '$1';
+					$disk_id = preg_replace($patterns, $replacements, $filename);
 					$disk_num = (int) ord(strtolower($disk_id)) - 97;
 					$flags .= ' -device virtio-blk-pci,scsi=off,drive=idedisk'.$disk_num.',id=hd'.$disk_id.',bootindex=1';
 					$flags .= ' -drive file='.$filename.',if=none,id=idedisk'.$disk_num.',format=qcow2,cache=none';
