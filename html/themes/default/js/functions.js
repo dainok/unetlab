@@ -2999,102 +2999,119 @@ function getTextObjects() {
 
 // Get Text Object By Id
 function getTextObject(id) {
-  var deferred = $.Deferred();
-  var lab_filename = $('#lab-viewport').attr('data-path');
-  var url = '/api/labs' + lab_filename + '/textobjects/' + id;
-  var type = 'GET';
-  $.ajax({
-    timeout: TIMEOUT,
-    type: type,
-    url: encodeURI(url),
-    dataType: 'json',
-    success: function(data) {
-      if (data['status'] == 'success') {
-        logger(1, 'DEBUG: got shape ' + id +'from lab "' + lab_filename + '".');
-        deferred.resolve(data['data']);
-      } else {
-        // Application error
-        logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-        deferred.reject(data['message']);
-      }
-    },
-    error: function(data) {
-      // Server error
-      var message = getJsonMessage(data['responseText']);
-      logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
-      logger(1, 'DEBUG: ' + message);
-      deferred.reject(message);
-    }
-  });
-  return deferred.promise();
+    var deferred = $.Deferred();
+    var lab_filename = $('#lab-viewport').attr('data-path');
+    var url = '/api/labs' + lab_filename + '/textobjects/' + id;
+    var type = 'GET';
+    $.ajax({
+        timeout: TIMEOUT,
+        type: type,
+        url: encodeURI(url),
+        dataType: 'json',
+        success: function(data) {
+            if (data['status'] == 'success') {
+                logger(1, 'DEBUG: got shape ' + id +'from lab "' + lab_filename + '".');
+
+                try {
+                    data['data'].data = new TextDecoderLite('utf-8').decode(toByteArray(data['data'].data));
+                }
+                catch (e) {
+                    console.warn("Compatibility issue", e);
+                }
+
+                deferred.resolve(data['data']);
+            } else {
+                // Application error
+                logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+                deferred.reject(data['message']);
+            }
+        },
+        error: function(data) {
+            // Server error
+            var message = getJsonMessage(data['responseText']);
+            logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+            logger(1, 'DEBUG: ' + message);
+            deferred.reject(message);
+        }
+    });
+    return deferred.promise();
 }
 
 // Create New Text Object
 function createTextObject(newData) {
-  var deferred = $.Deferred()
-    , lab_filename = $('#lab-viewport').attr('data-path')
-    , url = '/api/labs' + lab_filename + '/textobjects'
-    , type = 'POST';
+    var deferred = $.Deferred()
+        , lab_filename = $('#lab-viewport').attr('data-path')
+        , url = '/api/labs' + lab_filename + '/textobjects'
+        , type = 'POST';
 
-  $.ajax({
-    timeout: TIMEOUT,
-    type: type,
-    url: encodeURI(url),
-    data: JSON.stringify(newData),
-    dataType: 'json',
-    success: function(data) {
-      if (data['status'] == 'success') {
-        logger(1, 'DEBUG: create shape ' + 'for lab "' + lab_filename + '".');
-        deferred.resolve(data['data']);
-      } else {
-        // Application error
-        logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-        deferred.reject(data['message']);
-      }
-    },
-    error: function(data) {
-      // Server error
-      var message = getJsonMessage(data['responseText']);
-      logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
-      logger(1, 'DEBUG: ' + message);
-      deferred.reject(message);
+    if (newData.data) {
+        newData.data = fromByteArray(new TextEncoderLite('utf-8').encode(newData.data));
     }
-  });
 
-  return deferred.promise();
+    $.ajax({
+        timeout: TIMEOUT,
+        type: type,
+        url: encodeURI(url),
+        data: JSON.stringify(newData),
+        dataType: 'json',
+        success: function(data) {
+            if (data['status'] == 'success') {
+                logger(1, 'DEBUG: create shape ' + 'for lab "' + lab_filename + '".');
+                deferred.resolve(data['data']);
+            } else {
+                // Application error
+                logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+                deferred.reject(data['message']);
+            }
+        },
+        error: function(data) {
+            // Server error
+            var message = getJsonMessage(data['responseText']);
+            logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+            logger(1, 'DEBUG: ' + message);
+            deferred.reject(message);
+        }
+    });
+
+    return deferred.promise();
 }
 
 // Update Text Object
 function editTextObject(id, newData) {
-  var lab_filename = $('#lab-viewport').attr('data-path');
-  var deferred = $.Deferred();
-  var type = 'PUT';
-  var url = '/api/labs' + lab_filename + '/textobjects/' + id;
-  $.ajax({
-    timeout: TIMEOUT,
-    type: type,
-    url: encodeURI(url),
-    dataType: 'json',
-    data: JSON.stringify(newData), // newData is object with differences between old and new data
-    success: function(data) {
-      if (data['status'] == 'success') {
-        logger(1, 'DEBUG: custom shape text object updated.');
-        deferred.resolve(data['message']);
-      } else {
-        // Application error
-        logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-        deferred.reject(data['message']);
-      }
-    },
-    error: function(data) {
-      // Server error
-      var message = getJsonMessage(data['responseText']);
-      logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
-      logger(1, 'DEBUG: ' + message);
-      deferred.reject(message);
+    var lab_filename = $('#lab-viewport').attr('data-path');
+    var deferred = $.Deferred();
+    var type = 'PUT';
+    var url = '/api/labs' + lab_filename + '/textobjects/' + id;
+
+    if (newData.data) {
+        newData.data = fromByteArray(new TextEncoderLite('utf-8').encode(newData.data));
     }
-  });
-  return deferred.promise();
+
+    $.ajax({
+        timeout: TIMEOUT,
+        type: type,
+        url: encodeURI(url),
+        dataType: 'json',
+        data: JSON.stringify(newData), // newData is object with differences between old and new data
+        success: function(data) {
+            if (data['status'] == 'success') {
+                logger(1, 'DEBUG: custom shape text object updated.');
+                deferred.resolve(data['message']);
+            } else {
+                // Application error
+                logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+                deferred.reject(data['message']);
+            }
+        },
+        error: function(data) {
+            // Server error
+            var message = getJsonMessage(data['responseText']);
+            logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+            logger(1, 'DEBUG: ' + message);
+            deferred.reject(message);
+        }
+    });
+    return deferred.promise();
 }
 
 // Delete Text Object By Id
@@ -3131,52 +3148,59 @@ function deleteTextObject(id) {
 
 // Text Object Drag Stop / Resize Stop
 function textObjectDragStop(event, ui) {
-  var id;
-  if (event.target.id.indexOf("customShape") != -1) {
-    id = event.target.id.slice("customShape".length);
-  }
-  else if (event.target.id.indexOf("customText") != -1) {
-    id = event.target.id.slice("customText".length);
-  }
+    var id
+        , objectData
+        , shape_border_width
+        ;
+    if (event.target.id.indexOf("customShape") != -1) {
+        id = event.target.id.slice("customShape".length);
+        shape_border_width =  $("#customShape" + id + " svg").children().attr('stroke-width');
+    }
+    else if (event.target.id.indexOf("customText") != -1) {
+        id = event.target.id.slice("customText".length);
+        shape_border_width =  5;
+    }
 
-  editTextObject(id, {
-    data: event.target.outerHTML
-  });
+    objectData = event.target.outerHTML;
+
+    editTextObject(id, {
+        data: objectData
+    });
 }
 
 // Text Object Resize Event
 function textObjectResize(event, ui, shape_options) {
-  var newWidth = ui.size.width
-    , newHeight = ui.size.height
-    ;
+    var newWidth = ui.size.width
+        , newHeight = ui.size.height
+        ;
 
-  $("svg", ui.element).attr({
-    width: newWidth,
-    height: newHeight
-  });
-  $("svg > rect", ui.element).attr({
-    width: newWidth,
-    height: newHeight
-  });
-  $("svg > ellipse", ui.element).attr({
-    rx: newWidth/2 - shape_options['shape_border_width']/2,
-    ry: newHeight/2 - shape_options['shape_border_width']/2,
-    cx: newWidth/2,
-    cy: newHeight/2
-  });
-  var n = $("br", ui.element).size();
-  if(n){
-    $("p", ui.element).css({
-      "font-size": newHeight / (n*1.5 + 1)
+    $("svg", ui.element).attr({
+        width: newWidth,
+        height: newHeight
     });
-  } else {
-    $("p", ui.element).css({
-      "font-size": newHeight / 2
+    $("svg > rect", ui.element).attr({
+        width: newWidth,
+        height: newHeight
     });
-  }
-  if ($("p", ui.element).length && $(ui.element).width() > newWidth) {
-    ui.size.width = $(ui.element).width();
-  }
+    $("svg > ellipse", ui.element).attr({
+        rx: newWidth/2 - shape_options['shape_border_width']/2,
+        ry: newHeight/2 - shape_options['shape_border_width']/2,
+        cx: newWidth/2,
+        cy: newHeight/2
+    });
+    var n = $("br", ui.element).size();
+    if(n){
+        $("p", ui.element).css({
+            "font-size": newHeight / (n*1.5 + 1)
+        });
+    } else {
+        $("p", ui.element).css({
+            "font-size": newHeight / 2
+        });
+    }
+    if ($("p", ui.element).length && $(ui.element).width() > newWidth) {
+        ui.size.width = $(ui.element).width();
+    }
 }
 
 // Edit Form: Custom Shape

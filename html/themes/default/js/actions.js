@@ -59,7 +59,7 @@ $(document).on('keydown', 'body', function(e){
     if(KEY_CODES.escape == e.which){
         $('.lab-viewport-click-catcher').unbind('click');
         $('#mouse_frame').remove();
-        $('#lab-viewport').removeClass('lab-viewport-click-catcher');
+        $('#lab-viewport').removeClass('lab-viewport-click-catcher').data("prevent-contextmenu", false);
     }
 
     if (isFreeSelectMode && KEY_CODES.escape == e.which) {
@@ -187,6 +187,12 @@ $(document).on('contextmenu', '#lab-viewport', function(e) {
         return;
     }
 
+    if ($(this).data("prevent-contextmenu")) {
+        // prevent code execution
+
+        return;
+    }
+
     var body = '';
     body += '<li><a class="action-nodeplace" href="#"><i class="glyphicon glyphicon-hdd"></i> ' + MESSAGES[81] + '</a></li>';
     body += '<li><a class="action-networkplace" href="#"><i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[82] + '</a></li>';
@@ -200,6 +206,12 @@ $(document).on('contextmenu', '#lab-viewport', function(e) {
 $(document).on('contextmenu', '.context-menu', function(e) {
     e.stopPropagation();
     e.preventDefault();  // Prevent default behaviour
+
+    if ($("#lab-viewport").data("prevent-contextmenu")) {
+        // prevent code execution
+
+        return;
+    }
 
     var isFreeSelectMode = $("#lab-viewport").hasClass("freeSelectMode");
 
@@ -300,8 +312,25 @@ $(document).on('contextmenu', '.context-menu', function(e) {
                 '</li>' +
                 '<li>' +
                     '<a class="action-nodewipe-group context-collapsible menu-manage" href="#"><i class="glyphicon glyphicon-erase"></i> ' + MESSAGES[155] + '</a>' +
+                '</li>';
+            if (ROLE == 'admin' || ROLE == 'editor') {
+                body += '' +
+                    '<li role="separator" class="divider"></li>' +
+                    '<li>' +
+                        '<a class="action-nodeexport-group context-collapsible menu-manage" href="#"><i class="glyphicon glyphicon-save"></i> ' + MESSAGES[129] + '</a>' +
+                    '</li>' +
+                    '<li>' +
+                        '<a class="action-nodesbootsaved-group" href="#"><i class="glyphicon glyphicon-floppy-saved"></i> ' + MESSAGES[139] + '</a>' +
+                    '</li>' +
+                    '<li>' +
+                        '<a class="action-nodesbootscratch-group" href="#"><i class="glyphicon glyphicon-floppy-save"></i> ' + MESSAGES[140] + '</a>' +
+                    '</li>';
+            }
+            body += '' +
+                '<li role="separator" class="divider"></li>' +
+                '<li>' +
+                    '<a class="action-nodedelete-group context-collapsible menu-manage" href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[157] + '</a>' +
                 '</li>' +
-                //'<li role="separator" class="divider"></li>' +
                 '';
 
             title = 'Group of ' + window.freeSelectedNodes.map(function (node) {
@@ -503,15 +532,29 @@ $(document).on('click', '.action-networkdelete', function(e) {
 });
 
 // Delete lab node
-$(document).on('click', '.action-nodedelete', function(e) {
-	logger(1, 'DEBUG: action = action-nodedelete');
-	var id = $(this).attr('data-path');
-	$.when(deleteNode(id)).done(function(values) {
-		$('.node' + id).remove();
-	}).fail(function(message) {
-		addModalError(message);
-	});
-	$('#context-menu').remove();
+$(document).on('click', '.action-nodedelete, .action-nodedelete-group', function(e) {
+    logger(1, 'DEBUG: action = action-nodedelete');
+    var node_id = $(this).attr('data-path')
+        , isFreeSelectMode = $("#lab-viewport").hasClass("freeSelectMode")
+        ;
+
+    if (isFreeSelectMode) {
+        $.each(window.freeSelectedNodes, function(i, node) {
+            $.when(deleteNode(node.path)).done(function (values) {
+                $('.node' + node.path).remove();
+            }).fail(function (message) {
+                addModalError(message);
+            });
+        });
+    }
+    else {
+        $.when(deleteNode(node_id)).done(function (values) {
+            $('.node' + node_id).remove();
+        }).fail(function (message) {
+            addModalError(message);
+        });
+    }
+    $('#context-menu').remove();
 });
 
 // Edit/print node interfaces
@@ -662,82 +705,88 @@ $(document).on('click', '.action-networkadd', function(e) {
 
 // Place an object
 $(document).on('click', '.action-nodeplace, .action-networkplace, .action-customshapeadd, .action-textadd', function(e) {
-	var target = $(this);
-	var object, frame = '';
+    var target = $(this)
+        , object
+        , frame = ''
+        ;
 
-  if(target.hasClass('action-customshapeadd')){
-    logger(1, 'DEBUG: action = customshapeadd');
-  } else {
-    logger(1, 'DEBUG: action = nodeplace');
-  }
+    $("#lab-viewport").data("prevent-contextmenu", true);
 
-	$('#context-menu').remove();
-
-	if (target.hasClass('action-nodeplace')) {
-		object = 'node';
-		frame = '<div id="mouse_frame" class="context-menu node_frame"><img src="/images/icons/Router.png"/></div>';
-		$("#lab-viewport").addClass('lab-viewport-click-catcher');
-	} else if (target.hasClass('action-networkplace')) {
-    object = 'network';
-    frame = '<div id="mouse_frame" class="context-menu network_frame"><img src="/images/lan.png"/></div>';
-    $("#lab-viewport").addClass('lab-viewport-click-catcher');
-  } else if (target.hasClass('action-customshapeadd')) {
-    object = 'shape';
-    frame = '<div id="mouse_frame" class="context-menu network_frame"><img src="/images/icons/CustomShape.png"/></div>';
-    $("#lab-viewport").addClass('lab-viewport-click-catcher');
-  } else if (target.hasClass('action-textadd')) {
-      object = 'text';
-      frame = '<div id="mouse_frame" class="context-menu network_frame"><img src="/images/icons/CustomShape.png"/></div>';
-      $("#lab-viewport").addClass('lab-viewport-click-catcher');
+    if(target.hasClass('action-customshapeadd')){
+        logger(1, 'DEBUG: action = customshapeadd');
     } else {
-		return false;
-	}
-
-	addMessage('info', MESSAGES[100]);
-	if (!$('#mouse_frame').length) {
-		// Add the frame container if not exists
-		$('#lab-viewport').append(frame);
-	} else {
-		$('#mouse_frame').remove();
-		$('#lab-viewport').append(frame);
-	}
-
-	// On mouse move, adjust css
-	$('#lab-viewport').mousemove(function(e1) {
-		$('#mouse_frame').css({
-			'left': e1.pageX - 30,
-			'top': e1.pageY
-		});
-	});
-
-  // On click open the form
-  $('.lab-viewport-click-catcher').click(function(e2) {
-    if ($(e2.target).is('#lab-viewport, #lab-viewport *')) {
-      // Click is within viewport
-      if ($('#mouse_frame').length > 0) {
-        // ESC not pressed
-        var values = {};
-        values['left'] = e2.pageX - 30;
-        values['top'] = e2.pageY;
-        if (object == 'node') {
-          printFormNode('add', values);
-        } else if (object == 'network') {
-          printFormNetwork('add', values);
-        } else if (object == 'shape'){
-          printFormCustomShape(values);
-        } else if (object == 'text'){
-          printFormText(values);
-        }
-        $('#mouse_frame').remove();
-      }
-      $('#mouse_frame').remove();
-      $('.lab-viewport-click-catcher').off();
-    } else {
-      addMessage('warning', MESSAGES[101]);
-      $('#mouse_frame').remove();
-      $('.lab-viewport-click-catcher').off();
+        logger(1, 'DEBUG: action = nodeplace');
     }
-  });
+
+    $('#context-menu').remove();
+
+    if (target.hasClass('action-nodeplace')) {
+        object = 'node';
+        frame = '<div id="mouse_frame" class="context-menu node_frame"><img src="/images/icons/Router.png"/></div>';
+        $("#lab-viewport").addClass('lab-viewport-click-catcher');
+    } else if (target.hasClass('action-networkplace')) {
+        object = 'network';
+        frame = '<div id="mouse_frame" class="context-menu network_frame"><img src="/images/lan.png"/></div>';
+        $("#lab-viewport").addClass('lab-viewport-click-catcher');
+    } else if (target.hasClass('action-customshapeadd')) {
+        object = 'shape';
+        frame = '<div id="mouse_frame" class="context-menu network_frame"><img src="/images/icons/CustomShape.png"/></div>';
+        $("#lab-viewport").addClass('lab-viewport-click-catcher');
+    } else if (target.hasClass('action-textadd')) {
+        object = 'text';
+        frame = '<div id="mouse_frame" class="context-menu network_frame"><img src="/images/icons/CustomShape.png"/></div>';
+        $("#lab-viewport").addClass('lab-viewport-click-catcher');
+    } else {
+        return false;
+    }
+
+    addMessage('info', MESSAGES[100]);
+    if (!$('#mouse_frame').length) {
+        // Add the frame container if not exists
+        $('#lab-viewport').append(frame);
+    } else {
+        $('#mouse_frame').remove();
+        $('#lab-viewport').append(frame);
+    }
+
+    // On mouse move, adjust css
+    $('#lab-viewport').off("mousemove").on("mousemove", function(e1) {
+        $('#mouse_frame').css({
+            'left': e1.pageX - 30,
+            'top': e1.pageY
+        });
+    });
+
+    // On click open the form
+    $('.lab-viewport-click-catcher').off("click").on("click", function(e2) {
+        $("#lab-viewport").data("prevent-contextmenu", false);
+
+        if ($(e2.target).is('#lab-viewport, #lab-viewport *')) {
+            // Click is within viewport
+            if ($('#mouse_frame').length > 0) {
+                // ESC not pressed
+                var values = {};
+                values['left'] = e2.pageX - 30;
+                values['top'] = e2.pageY;
+                if (object == 'node') {
+                    printFormNode('add', values);
+                } else if (object == 'network') {
+                    printFormNetwork('add', values);
+                } else if (object == 'shape'){
+                    printFormCustomShape(values);
+                } else if (object == 'text'){
+                    printFormText(values);
+                }
+                $('#mouse_frame').remove();
+            }
+            $('#mouse_frame').remove();
+            $('.lab-viewport-click-catcher').off();
+        } else {
+            addMessage('warning', MESSAGES[101]);
+            $('#mouse_frame').remove();
+            $('.lab-viewport-click-catcher').off();
+        }
+    });
 });
 
 // Add picture
@@ -1024,96 +1073,134 @@ $(document).on('click', '.action-nodesbootdelete', function(e) {
 });
 
 // Configure nodes to boot from scratch
-$(document).on('click', '.action-nodesbootscratch', function(e) {
-	$('#context-menu').remove();
-	$.when(getNodes(null)).done(function(nodes) {
-		$.each(nodes, function(key, values) {
-			$.when(setNodeBoot(key, 0)).done(function() {
-				// Node configured -> print a small green message
-				addMessage('success', values['name'] + ': ' + MESSAGES[144])
-			}).fail(function(message) {
-				// Cannot start
-				addMessage('danger', values['name'] + ': ' + message);
-			});
-		});
-	}).fail(function(message) {
-		addModalError(message);
-	});
+$(document).on('click', '.action-nodesbootscratch, .action-nodesbootscratch-group', function(e) {
+    $('#context-menu').remove();
+
+    var isFreeSelectMode = $("#lab-viewport").hasClass("freeSelectMode")
+        ;
+
+    if (isFreeSelectMode) {
+        $.each(window.freeSelectedNodes, function(i, node) {
+            $.when(setNodeBoot(node.path, 0)).done(function () {
+                addMessage('success', node.name + ': ' + MESSAGES[144]);
+            }).fail(function (message) {
+                // Cannot configure
+                addMessage('danger', node.name + ': ' + message);
+            });
+        });
+    }
+    else {
+        $.when(getNodes(null)).done(function (nodes) {
+            $.each(nodes, function (key, values) {
+                $.when(setNodeBoot(key, 0)).done(function () {
+                    // Node configured -> print a small green message
+                    addMessage('success', values['name'] + ': ' + MESSAGES[144])
+                }).fail(function (message) {
+                    // Cannot start
+                    addMessage('danger', values['name'] + ': ' + message);
+                });
+            });
+        }).fail(function (message) {
+            addModalError(message);
+        });
+    }
 });
 
 // Configure nodes to boot from startup-config
-$(document).on('click', '.action-nodesbootsaved', function(e) {
-	$('#context-menu').remove();
-	$.when(getNodes(null)).done(function(nodes) {
-		$.each(nodes, function(key, values) {
-			$.when(setNodeBoot(key, 1)).done(function() {
-				// Node configured -> print a small green message
-				addMessage('success', values['name'] + ': ' + MESSAGES[143])
-			}).fail(function(message) {
-				// Cannot configure
-				addMessage('danger', values['name'] + ': ' + message);
-			});
-		});
-	}).fail(function(message) {
-		addModalError(message);
-	});
+$(document).on('click', '.action-nodesbootsaved, .action-nodesbootsaved-group', function(e) {
+    $('#context-menu').remove();
+
+    var isFreeSelectMode = $("#lab-viewport").hasClass("freeSelectMode")
+        ;
+
+    if (isFreeSelectMode) {
+        $.each(window.freeSelectedNodes, function(i, node) {
+            $.when(setNodeBoot(node.path, 1)).done(function () {
+                addMessage('success', node.name + ': ' + MESSAGES[143]);
+            }).fail(function (message) {
+                // Cannot configure
+                addMessage('danger', node.name + ': ' + message);
+            });
+        });
+    }
+    else {
+        $.when(getNodes(null)).done(function (nodes) {
+            $.each(nodes, function (key, values) {
+                $.when(setNodeBoot(key, 1)).done(function () {
+                    // Node configured -> print a small green message
+                    addMessage('success', values['name'] + ': ' + MESSAGES[143])
+                }).fail(function (message) {
+                    // Cannot configure
+                    addMessage('danger', values['name'] + ': ' + message);
+                });
+            });
+        }).fail(function (message) {
+            addModalError(message);
+        });
+    }
 });
 
 // Export a config
-$(document).on('click', '.action-nodeexport, .action-nodesexport', function(e) {
-	$('#context-menu').remove();
-	if ($(this).hasClass('action-nodeexport')) {
-		logger(1, 'DEBUG: action = nodeexport');
-		var node_id = $(this).attr('data-path');
-	} else {
-		logger(1, 'DEBUG: action = nodesexport');
-		var node_id = null;
-	}
+$(document).on('click', '.action-nodeexport, .action-nodesexport, .action-nodeexport-group', function(e) {
+    $('#context-menu').remove();
 
-	$.when(getNodes(null)).done(function(nodes) {
-		if (node_id != null) {
-			addMessage('info', nodes[node_id]['name'] + ': ' + MESSAGES[138])
-			$.when(cfg_export(node_id)).done(function() {
-				// Node exported -> print a small green message
-				setNodeBoot(node_id, '1');
-				addMessage('success', nodes[node_id]['name'] + ': ' + MESSAGES[79])
-			}).fail(function(message) {
-				// Cannot export
-				addMessage('danger', nodes[node_id]['name'] + ': ' + message);
-			});
-		} else {
-			/*
-			 * Parallel call for each node
-			 */
-			var nodeLenght = Object.keys(nodes).length;
-			$.each(nodes, function(key, values) {
-				addMessage('info', values['name'] + ': ' + MESSAGES[138])
-				$.when(cfg_export(key)).done(function() {
-					// Node exported -> print a small green message
-					addMessage('success', values['name'] + ': ' + MESSAGES[79])
-				}).fail(function(message) {
-					// Cannot exported
-					addMessage('danger', values['name'] + ': ' + message);
-				});
-			});
+    var node_id
+        , isFreeSelectMode = $("#lab-viewport").hasClass("freeSelectMode")
+        , exportAll = false
+        , nodesLength
+        ;
 
-			/*
-			 * Single call
-			addMessage('info', MESSAGES[138])
-			var lab_filename = $('#lab-viewport').attr('data-path');
-			var url = '/api/labs' + lab_filename + '/nodes/export';
-			var type = 'PUT';
-			$.ajax({
-				timeout: TIMEOUT * 10,	// Takes a lot of time
-				type: type,
-				url: encodeURI(url),
-				dataType: 'json',
-			});
-			*/
-		}
-	}).fail(function(message) {
-		addModalError(message);
-	});
+    if ($(this).hasClass('action-nodeexport')) {
+        logger(1, 'DEBUG: action = nodeexport');
+        node_id = $(this).attr('data-path');
+    } else {
+        logger(1, 'DEBUG: action = nodesexport');
+        exportAll = true;
+    }
+
+    $.when(getNodes(null)).done(function(nodes) {
+        if (isFreeSelectMode) {
+            nodesLenght = window.freeSelectedNodes.length;
+            $.each(window.freeSelectedNodes, function(i, node) {
+                addMessage('info', node.name + ': ' + MESSAGES[138]);
+                $.when(cfg_export(node.path)).done(function() {
+                    // Node exported -> print a small green message
+                    addMessage('success', node.name + ': ' + MESSAGES[79])
+                }).fail(function(message) {
+                    // Cannot exported
+                    addMessage('danger', node.name + ': ' + message);
+                });
+            });
+        }
+        else if (node_id) {
+            addMessage('info', nodes[node_id]['name'] + ': ' + MESSAGES[138]);
+            $.when(cfg_export(node_id)).done(function() {
+                // Node exported -> print a small green message
+                setNodeBoot(node_id, '1');
+                addMessage('success', nodes[node_id]['name'] + ': ' + MESSAGES[79])
+            }).fail(function(message) {
+                // Cannot export
+                addMessage('danger', nodes[node_id]['name'] + ': ' + message);
+            });
+        } else if (exportAll) {
+            /*
+             * Parallel call for each node
+             */
+            nodesLenght = Object.keys(nodes).length;
+            $.each(nodes, function(key, values) {
+                addMessage('info', values['name'] + ': ' + MESSAGES[138]);
+                $.when(cfg_export(key)).done(function() {
+                    // Node exported -> print a small green message
+                    addMessage('success', values['name'] + ': ' + MESSAGES[79])
+                }).fail(function(message) {
+                    // Cannot exported
+                    addMessage('danger', values['name'] + ': ' + message);
+                });
+            });
+        }
+    }).fail(function(message) {
+        addModalError(message);
+    });
 });
 
 // Start a node
@@ -2214,7 +2301,7 @@ $('body').on('click', '.action-textobjectduplicate', function(e){
     , $duplicated_shape
     , new_id
     , textObjectsLength
-    ,shape_border_width
+    , shape_border_width
     , form_data = {}
     , new_data_html;
 
@@ -2671,11 +2758,27 @@ $('body').on('submit', '.edit-custom-text-form', function(e){
 });
 
 $(document).on('dblclick', '.customText', function(e) {
-  logger(1, 'DEBUG: action = action-edit text');
-  var id = $(this).attr('data-path')
-    , selectedCustomText = $("#customText" + id + " p");
+    logger(1, 'DEBUG: action = action-edit text');
+    var id = $(this).attr('data-path')
+        , $selectedCustomText = $("#customText" + id + " p")
+        ;
 
-  selectedCustomText.attr('contenteditable', 'true').focus().addClass('editable');
+    // Disable draggable and resizable before sending request
+    try {
+        $(this).draggable( "destroy" ).resizable( "destroy" );
+    }
+    catch(e) {
+        console.warn(e);
+    }
+
+    $selectedCustomText.attr('contenteditable', 'true').focus().addClass('editable');
+});
+
+$(document).on('paste', '[contenteditable="true"]', function (e) {
+    e.preventDefault();
+    var text = null;
+    text = (e.originalEvent || e).clipboardData.getData('text/plain') || prompt('Paste Your Text Here');
+    document.execCommand("insertText", false, text);
 });
 
 $(document).on('focusout', '.editable' , function(e){
@@ -2688,15 +2791,18 @@ $(document).on('focusout', '.editable' , function(e){
 
     $("#customText" + id + " p").removeClass('editable');
     $("#customText" + id + " p").attr('contenteditable', 'false');
-    $selected_shape.resizable( "destroy" );
 
     // trim whitespace in the start and end of string
     innerHtml = innerHtml.replace(/^(<br>)+/, "").replace(/(<br>)+$/, "");
+
+    // replace all HTML tags except <br>, replace closing DIV </div> with br
+    innerHtml = innerHtml.replace(/<(\w+\b)[^>]*>([^<>]*)<\/\1>/g, '$2<br>');
+
     if (!innerHtml) {
         innerHtml = "<br>";
     }
-    $("p", $selected_shape).html(innerHtml);
 
+    $("p", $selected_shape).html(innerHtml);
     // Calculate and apply new Width / Height based lines count
     textLines = $("br", $selected_shape).size();
     if (textLines) {
@@ -2707,20 +2813,23 @@ $(document).on('focusout', '.editable' , function(e){
         // 1 line text
         $selected_shape.css("height", parseFloat($("p", $selected_shape).css("font-size")) * 2 + "px");
     }
+    $selected_shape.css("width", "auto");
 
     new_data = document.getElementById("customText"+id).outerHTML;
-    $selected_shape.resizable({
+    editTextObject(id, { data: new_data }).done(function(){
+        addMessage('SUCCESS', 'Lab has been saved (60023).');
+    }).fail(function(message){
+        addModalError(message);
+    });
+
+    $selected_shape.draggable({
+        stop: textObjectDragStop
+    }).resizable({
         autoHide: true,
         resize: function (event, ui) {
             textObjectResize(event, ui, {"shape_border_width": 5});
         },
         stop: textObjectDragStop
-    });
-
-    editTextObject(id, { data: new_data }).done(function(){
-        addMessage('SUCCESS', 'Lab has been saved (60023).');
-    }).fail(function(message){
-        addModalError(message);
     });
 });
 
@@ -2968,20 +3077,3 @@ $(document).on("click", "#lab-viewport.freeSelectMode .node_frame", function (ev
 
     $(self).toggleClass("free-selected", !isFreeSelected);
 });
-
-
-/*******************************************************************************
- * Loading lab Functions
- * *****************************************************************************/
-//$(document).ajaxStart( function() {
-//  $('#body').append('<div id="loading-lab">Loading Lab<span>.</span><span>.</span><span>.</span></div>');
-//  $('#lab-vievport').css('display', 'none');
-//  console.log('LOADING LAB HERE - START');
-//});
-//
-//$(document).ajaxStop(function() {
-//    console.log('LOADING LAB HERE - STOP');
-//    $('#lab-vievport').css('display', 'block');
-//    $('#loading-lab').remove();
-//  }
-//);
