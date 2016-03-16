@@ -185,3 +185,4 @@ MESSAGES[153] = 'Start All';
 MESSAGES[154] = 'Stop All';
 MESSAGES[155] = 'Wipe All';
 MESSAGES[156] = 'Duplicated objects found.';
+MESSAGES[157] = 'Delete All';
