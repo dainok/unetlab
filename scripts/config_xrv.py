@@ -180,7 +180,7 @@ def config_get(handler):
     # Getting the config
     handler.sendline('show running-config')
     try:
-        handler.expect('[^)]#', timeout = longtimeout)
+        handler.expect('\nend\r\n', timeout = longtimeout)
     except:
         print('ERROR: error waiting for "#" prompt.')
         node_quit(handler)
@@ -190,7 +190,7 @@ def config_get(handler):
     # Manipulating the config
     config = re.sub('\r', '', config, flags=re.DOTALL)                                      # Unix style
     config = re.sub('.*!! IOS XR Configuration', '!! IOS XR Configuration', config, flags=re.DOTALL)   # Header
-    config = re.sub('!\nend.*', '!\nend\n', config, flags=re.DOTALL)                # Footer
+    config = re.sub('$', '\nend\n', config, flags=re.DOTALL)                # Footer
 
     return config
 
