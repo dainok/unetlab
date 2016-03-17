@@ -7,4 +7,5 @@ Homepage: http://www.unetlab.com/
 Installed-Size: 80420
 Section: devel
 Priority: optional
+Depends: libaio1
 Description: QEMU files for UNetLab.
