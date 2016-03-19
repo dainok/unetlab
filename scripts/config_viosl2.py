@@ -195,52 +195,13 @@ def config_get(handler):
 
     return config
 
-def config_put(handler, config):
-    # Got to configure mode
-    handler.sendline('configure terminal')
-    try:
-        handler.expect('\(config', timeout = expctimeout)
-    except:
-        print('ERROR: error waiting for "(config prompt.')
-        node_quit(handler)
-        return False
-
-    # Pushing the config
-    for line in config.splitlines():
-        handler.sendline(line)
+def config_put(handler):
+    while True:
         try:
-            handler.expect('\r\n', timeout = expctimeout)
+           i = handler.expect('CVAC-4-CONFIG_DONE', timeout = 300)
         except:
-            print('ERROR: error waiting for EOL.')
-            node_quit(handler)
-            return False
-
-    # At the end of configuration be sure we are in non config mode (sending CTRl + Z)
-    handler.sendline('\x1A')
-    try:
-        handler.expect('#', timeout = expctimeout)
-    except:
-        print('ERROR: error waiting for "#" prompt.')
-        node_quit(handler)
-        return False
-
-    # Save
-    handler.sendline('copy running-config startup-config')
-    try:
-        handler.expect('Destination filename', timeout = expctimeout)
-    except:
-        print('ERROR: error waiting for "Destination filename" prompt.')
-        node_quit(handler)
-        return False
-    handler.sendline('\r\n')
-    try:
-        handler.expect('#', timeout = longtimeout)
-    except:
-        print('ERROR: error waiting for "#" prompt.')
-        node_quit(handler)
-        return False
-
-    return True
+           return False
+        return True
 
 def usage():
     print('Usage: %s <standard options>' %(sys.argv[0]));
@@ -273,14 +234,11 @@ def main(action, fiename, port):
             node_quit(handler)
             sys.exit(1)
 
-        # Login to the device and get a privileged prompt
-        rc = node_login(handler)
-        if rc != True:
-            print('ERROR: failed to login.')
-            node_quit(handler)
-            sys.exit(1)
-
         if action == 'get':
+            if rc != True:
+                print('ERROR: failed to login.')
+                node_quit(handler)
+                sys.exit(1)
             config = config_get(handler)
             if config in [False, None]:
                 print('ERROR: failed to retrieve config.')
@@ -296,16 +254,7 @@ def main(action, fiename, port):
                 node_quit(handler)
                 sys.exit(1)
         elif action == 'put':
-            try:
-                fd = open(filename, 'r')
-                config = fd.read()
-                fd.close()
-            except:
-                print('ERROR: cannot read config from file.')
-                node_quit(handler)
-                sys.exit(1)
-
-            rc = config_put(handler, config)
+            rc = config_put(handler)
             if rc != True:
                 print('ERROR: failed to push config.')
                 node_quit(handler)
