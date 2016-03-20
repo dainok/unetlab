@@ -194,72 +194,13 @@ def config_get(handler):
 
     return config
 
-def config_put(handler, config):
-    # Clearing all "expect" buffer
+def config_put(handler): 
     while True:
         try:
-            handler.expect('#', timeout = 0.1)
+           i = handler.expect('CVAC-4-CONFIG_DONE', timeout = 300)
         except:
-            break
-
-    # Got to configure mode
-    i = -1
-    while i != 1:
-        try: 
-            handler.sendline('configure terminal')
-            i = handler.expect(['Would you like to proceed in configuration mode', '\(config'], timeout = expctimeout)
-        except:
-            i = -1
-
-        if i == 0:
-            # XRv not ready yet
-            handler.sendline('no')
-            handler.expect('#', timeout = expctimeout)
-            time.sleep(5)
-
-    if i == -1:
-        print('ERROR: error waiting for ["Would you like to proceed in configuration mode","(config"] prompt.')
-        node_quit(handler)
-        return False
-
-    # Clearing all "expect" buffer
-    while True:
-        try:
-            handler.expect('#', timeout = 0.1)
-        except:
-            break
-
-    # Pushing the config
-    for line in config.splitlines():
-        handler.sendline(line)
-        try:
-            handler.expect('\r\n', timeout = expctimeout)
-        except:
-            print('ERROR: error waiting for EOL.')
-            node_quit(handler)
-            return False
-
-    # At the end of configuration be sure we are in config mode
-    handler.sendline('\r\n')
-
-    # Save
-    handler.sendline('end')
-    try:
-        handler.expect('Uncommitted changes found', timeout = expctimeout)
-    except:
-        print('ERROR: error waiting for "Uncommitted changes found prompt.')
-        node_quit(handler)
-        return False
-
-    # Confirm the commit
-    handler.sendline('yes')
-    try:
-        handler.expect('[^)]#', timeout = longtimeout)
-    except:
-        print('ERROR: error waiting for "#" prompt.')
-        node_quit(handler)
-        return False
-    return True
+           return False
+        return True
 
 def usage():
     print('Usage: %s <standard options>' %(sys.argv[0]));
@@ -287,23 +228,16 @@ def main(action, fiename, port):
             if handler.isalive() == True:
                 break
 
-        if (handler.isalive() != True):
-            print('ERROR: cannot connect to port "%i".' %(port))
-            node_quit(handler)
-            sys.exit(1)
-
-        # Login to the device and get a privileged prompt
         if action == 'get':
+            if (handler.isalive() != True):
+                print('ERROR: cannot connect to port "%i".' %(port))
+                node_quit(handler)
+                sys.exit(1)
             rc = node_login(handler)
-        else:
-            rc = node_firstlogin(handler)
-
-        if rc != True:
-            print('ERROR: failed to login.')
-            node_quit(handler)
-            sys.exit(1)
-
-        if action == 'get':
+            if rc != True:
+                print('ERROR: failed to login.')
+                node_quit(handler)
+                sys.exit(1)
             config = config_get(handler)
             if config in [False, None]:
                 print('ERROR: failed to retrieve config.')
@@ -319,16 +253,7 @@ def main(action, fiename, port):
                 node_quit(handler)
                 sys.exit(1)
         elif action == 'put':
-            try:
-                fd = open(filename, 'r')
-                config = fd.read()
-                fd.close()
-            except:
-                print('ERROR: cannot read config from file.')
-                node_quit(handler)
-                sys.exit(1)
-
-            rc = config_put(handler, config)
+            rc = config_put(handler)
             if rc != True:
                 print('ERROR: failed to push config.')
                 node_quit(handler)
