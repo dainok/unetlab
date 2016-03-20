@@ -696,6 +696,27 @@ function prepareNode($n, $id, $t, $nets) {
 			if (!dumpConfig($n -> getConfigData(), $n -> getRunningPath().'/startup-config')) {
 				// Cannot dump config to startup-config file
 				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][80067]);
+			} else {
+				switch ($n -> getTemplate()) {
+					default:
+						break;
+					case 'xrv':
+						copy (  $n -> getRunningPath().'/startup-config',  $n -> getRunningPath().'/iosxr_config.txt');
+						$isocmd = 'mkisofs -o '.$n -> getRunningPath().'/config.iso -l --iso-level 2 '.$n -> getRunningPath().'/iosxr_config.txt' ;
+						exec($isocmd, $o, $rc);
+						break;
+					case 'csr1000v':
+						copy (  $n -> getRunningPath().'/startup-config',  $n -> getRunningPath().'/iosxe_config.txt');
+	                                        $isocmd = 'mkisofs -o '.$n -> getRunningPath().'/config.iso -l --iso-level 2 '.$n -> getRunningPath().'/iosxe_config.txt' ;
+        	                                exec($isocmd, $o, $rc);
+						break;
+					case 'vios':
+					case 'viosl2':
+						copy (  $n -> getRunningPath().'/startup-config',  $n -> getRunningPath().'/ios_config.txt');
+	                                        $diskcmd = '/opt/unetlab/scripts/createdosdisk.sh '.$n -> getRunningPath() ;
+        	                                exec($diskcmd, $o, $rc);
+						break;
+				}
 			}
 		}
 
@@ -836,14 +857,12 @@ function start($n, $id, $t, $nets) {
 					$cmd .= ' -l '.$interface_id.':localhost:'.$interface -> getRemoteId().':'.$interface -> getRemoteIf();
 				}
 			}
-			$cmd .= ' -- '.$flags.' > '.$n -> getRunningPath().'/wrapper.txt 2>&1 &';
 			break;
 		case 'docker':
 			$cmd = 'docker -H=tcp://127.0.0.1:4243 start -ai '.$n -> getUuid();
 			break;
 		case 'dynamips':
 			$cmd = '/opt/unetlab/wrappers/dynamips_wrapper -T '.$t.' -D '.$id.' -t "'.$n -> getName().'" -F /opt/unetlab/addons/dynamips/'.$n -> getImage().' -d '.$n -> getDelay();
-			$cmd .= ' -- '.$flags.' > '.$n -> getRunningPath().'/wrapper.txt 2>&1 &';
 			break;
 		case 'qemu':
 			$cmd = '/opt/unetlab/wrappers/qemu_wrapper -T '.$t.' -D '.$id.' -t "'.$n -> getName().'" -F '.$bin.' -d '.$n -> getDelay();
@@ -851,16 +870,28 @@ function start($n, $id, $t, $nets) {
 				// Disable telnet (wrapper) console
 				$cmd .= ' -x';
 			}
-			$cmd .= ' -- '.$flags.' > '.$n -> getRunningPath().'/wrapper.txt 2>&1 &';
 			break;
 	}
+	// Special Case for xrv - csr1000v - vIOS - vIOSL - Docker
+	if ( $n->getTemplate() == 'xrv' || $n->getTemplate() == 'csr1000v'  && is_file($n -> getRunningPath().'/config.iso') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
+		$flags .= ' -cdrom config.iso' ;
+                touch($n -> getRunningPath().'/.lock') ;
+        }
 
+	if ( $n->getTemplate() == 'vios'  || $n->getTemplate() == 'viosl2' && is_file($n -> getRunningPath().'/minidisk') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
+		$flags .= ' -drive file=minidisk,if=virtio,bus=0,unit=1,cache=none' ;
+		touch($n -> getRunningPath().'/.lock') ;
+	}
+
+	if ( $n -> getNType() != 'docker')  {
+		$cmd .= ' -- '.$flags.' > '.$n -> getRunningPath().'/wrapper.txt 2>&1 &';
+	}
 	error_log(date('M d H:i:s ').'INFO: CWD is '.getcwd());
 	error_log(date('M d H:i:s ').'INFO: starting '.$cmd);
 	exec($cmd, $o, $rc);
 
 	if ($rc == 0 && $n -> getNType() == 'qemu' && is_file($n -> getRunningPath().'/startup-config') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0) {
-		// Start configuration process
+		// Start configuration process or check if bootstrap is done
 		touch($n -> getRunningPath().'/.lock');
 		$cmd = 'nohup /opt/unetlab/scripts/config_'.$n -> getTemplate().'.py -a put -p '.$n -> getPort().' -f '.$n -> getRunningPath().'/startup-config -t '.($n -> getDelay() + 300).' > /dev/null 2>&1 &';
 		exec($cmd, $o, $rc);
@@ -962,3 +993,4 @@ function usage() {
 	print($output);
 }
 ?>
+
