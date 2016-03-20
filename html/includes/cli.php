@@ -710,6 +710,11 @@ function prepareNode($n, $id, $t, $nets) {
 	                                        $isocmd = 'mkisofs -o '.$n -> getRunningPath().'/config.iso -l --iso-level 2 '.$n -> getRunningPath().'/iosxe_config.txt' ;
         	                                exec($isocmd, $o, $rc);
 						break;
+					case 'asav':
+						copy (  $n -> getRunningPath().'/startup-config',  $n -> getRunningPath().'/day0-config');
+						$isocmd = 'mkisofs -r -o '.$n -> getRunningPath().'/config.iso -l --iso-level 2 '.$n -> getRunningPath().'/day0-config' ;
+						exec($isocmd, $o, $rc);
+						break;
 					case 'vios':
 					case 'viosl2':
 						copy (  $n -> getRunningPath().'/startup-config',  $n -> getRunningPath().'/ios_config.txt');
@@ -873,7 +878,7 @@ function start($n, $id, $t, $nets) {
 			break;
 	}
 	// Special Case for xrv - csr1000v - vIOS - vIOSL - Docker
-	if ( $n->getTemplate() == 'xrv' || $n->getTemplate() == 'csr1000v'  && is_file($n -> getRunningPath().'/config.iso') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
+	if ( $n->getTemplate() == 'xrv' || $n->getTemplate() == 'csr1000v' || $n->getTemplate() == 'asav'   && is_file($n -> getRunningPath().'/config.iso') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
 		$flags .= ' -cdrom config.iso' ;
                 touch($n -> getRunningPath().'/.lock') ;
         }
@@ -890,7 +895,7 @@ function start($n, $id, $t, $nets) {
 	error_log(date('M d H:i:s ').'INFO: starting '.$cmd);
 	exec($cmd, $o, $rc);
 
-	if ($rc == 0 && $n -> getNType() == 'qemu' && is_file($n -> getRunningPath().'/startup-config') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0) {
+	if ($rc == 0 && $n -> getNType() == 'qemu' && is_file($n -> getRunningPath().'/startup-config') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0 ) {
 		// Start configuration process or check if bootstrap is done
 		touch($n -> getRunningPath().'/.lock');
 		$cmd = 'nohup /opt/unetlab/scripts/config_'.$n -> getTemplate().'.py -a put -p '.$n -> getPort().' -f '.$n -> getRunningPath().'/startup-config -t '.($n -> getDelay() + 300).' > /dev/null 2>&1 &';
