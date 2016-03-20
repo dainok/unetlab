@@ -235,6 +235,7 @@ def main(action, fiename, port):
             sys.exit(1)
 
         if action == 'get':
+            rc = node_login(handler)
             if rc != True:
                 print('ERROR: failed to login.')
                 node_quit(handler)
