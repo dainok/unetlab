@@ -151,46 +151,6 @@ def config_put(handler):
            return False
         return True
 
-def config_put2(handler, config):
-    # Got to configure mode
-    handler.sendline('configure terminal')
-    try:
-        handler.expect('\(config', timeout = expctimeout)
-    except:
-        print('ERROR: error waiting for "(config prompt.')
-        node_quit(handler)
-        return False
-
-    # Pushing the config
-    for line in config.splitlines():
-        handler.sendline(line)
-        try:
-            handler.expect('\r\n', timeout = expctimeout)
-        except:
-            print('ERROR: error waiting for EOL.')
-            node_quit(handler)
-            return False
-
-    # At the end of configuration be sure we are in non config mode (sending CTRl + Z)
-    handler.sendline('\x1A')
-    try:
-        handler.expect('#', timeout = expctimeout)
-    except:
-        print('ERROR: error waiting for "#" prompt.')
-        node_quit(handler)
-        return False
-
-    # Save
-    handler.sendline('copy running-config startup-config')
-    try:
-        handler.expect('#', timeout = longtimeout)
-    except:
-        print('ERROR: error waiting for "#" prompt.')
-        node_quit(handler)
-        return False
-
-    return True
-
 def usage():
     print('Usage: %s <standard options>' %(sys.argv[0]));
     print('Standard Options:');
