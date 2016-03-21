@@ -891,7 +891,7 @@ function start($n, $id, $t, $nets) {
                 touch($n -> getRunningPath().'/.lock') ;
         }
 
-	if ( $n->getTemplate() == 'vios'  || $n->getTemplate() == 'viosl2' && is_file($n -> getRunningPath().'/minidisk') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
+	if (( $n->getTemplate() == 'vios'  || $n->getTemplate() == 'viosl2' ) && is_file($n -> getRunningPath().'/minidisk') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
 		$flags .= ' -drive file=minidisk,if=virtio,bus=0,unit=1,cache=none' ;
 		touch($n -> getRunningPath().'/.lock') ;
 	}
