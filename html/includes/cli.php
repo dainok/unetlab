@@ -691,45 +691,6 @@ function prepareNode($n, $id, $t, $nets) {
 			return 80037;
 		}
 
-		if ($n -> getConfig() == '1' && $n -> getConfigData() != '') {
-			// Node should use saved startup-config
-			if (!dumpConfig($n -> getConfigData(), $n -> getRunningPath().'/startup-config')) {
-				// Cannot dump config to startup-config file
-				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][80067]);
-			} else {
-				switch ($n -> getTemplate()) {
-					default:
-						break;
-					case 'xrv':
-						copy (  $n -> getRunningPath().'/startup-config',  $n -> getRunningPath().'/iosxr_config.txt');
-						$isocmd = 'mkisofs -o '.$n -> getRunningPath().'/config.iso -l --iso-level 2 '.$n -> getRunningPath().'/iosxr_config.txt' ;
-						exec($isocmd, $o, $rc);
-						break;
-					case 'csr1000v':
-						copy (  $n -> getRunningPath().'/startup-config',  $n -> getRunningPath().'/iosxe_config.txt');
-	                                        $isocmd = 'mkisofs -o '.$n -> getRunningPath().'/config.iso -l --iso-level 2 '.$n -> getRunningPath().'/iosxe_config.txt' ;
-        	                                exec($isocmd, $o, $rc);
-						break;
-					case 'asav':
-						copy (  $n -> getRunningPath().'/startup-config',  $n -> getRunningPath().'/day0-config');
-						$isocmd = 'mkisofs -r -o '.$n -> getRunningPath().'/config.iso -l --iso-level 2 '.$n -> getRunningPath().'/day0-config' ;
-						exec($isocmd, $o, $rc);
-						break;
-                                        case 'titanium':
-                                                copy (  $n -> getRunningPath().'/startup-config',  $n -> getRunningPath().'/nxos_config.txt');
-                                                $isocmd = 'mkisofs -o '.$n -> getRunningPath().'/config.iso -l --iso-level 2 '.$n -> getRunningPath().'/nxos_config.txt' ;
-                                                exec($isocmd, $o, $rc);
-                                                break;
-					case 'vios':
-					case 'viosl2':
-						copy (  $n -> getRunningPath().'/startup-config',  $n -> getRunningPath().'/ios_config.txt');
-	                                        $diskcmd = '/opt/unetlab/scripts/createdosdisk.sh '.$n -> getRunningPath() ;
-        	                                exec($diskcmd, $o, $rc);
-						break;
-				}
-			}
-		}
-
 		switch ($n -> getNType()) {
 			default:
 				// Invalid node_type
@@ -806,6 +767,48 @@ function prepareNode($n, $id, $t, $nets) {
 				break;
 		}
 
+		if ($n -> getConfig() == '1' && $n -> getConfigData() != '') {
+			// Node should use saved startup-config
+			if (!dumpConfig($n -> getConfigData(), $n -> getRunningPath().'/startup-config')) {
+				// Cannot dump config to startup-config file
+				error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][80067]);
+			} else {
+				switch ($n -> getTemplate()) {
+					default:
+						break;
+					case 'xrv':
+						copy (  $n -> getRunningPath().'/startup-config',  $n -> getRunningPath().'/iosxr_config.txt');
+						$isocmd = 'mkisofs -o '.$n -> getRunningPath().'/config.iso -l --iso-level 2 '.$n -> getRunningPath().'/iosxr_config.txt' ;
+						exec($isocmd, $o, $rc);
+						break;
+					case 'csr1000v':
+						copy (  $n -> getRunningPath().'/startup-config',  $n -> getRunningPath().'/iosxe_config.txt');
+	                                        $isocmd = 'mkisofs -o '.$n -> getRunningPath().'/config.iso -l --iso-level 2 '.$n -> getRunningPath().'/iosxe_config.txt' ;
+        	                                exec($isocmd, $o, $rc);
+						break;
+					case 'asav':
+						copy (  $n -> getRunningPath().'/startup-config',  $n -> getRunningPath().'/day0-config');
+						$isocmd = 'mkisofs -r -o '.$n -> getRunningPath().'/config.iso -l --iso-level 2 '.$n -> getRunningPath().'/day0-config' ;
+						exec($isocmd, $o, $rc);
+						break;
+                                        case 'titanium':
+                                                copy (  $n -> getRunningPath().'/startup-config',  $n -> getRunningPath().'/nxos_config.txt');
+                                                $isocmd = 'mkisofs -o '.$n -> getRunningPath().'/config.iso -l --iso-level 2 '.$n -> getRunningPath().'/nxos_config.txt' ;
+                                                exec($isocmd, $o, $rc);
+                                                break;
+					case 'vios':
+					case 'viosl2':
+						copy (  $n -> getRunningPath().'/startup-config',  $n -> getRunningPath().'/ios_config.txt');
+	                                        $diskcmd = '/opt/unetlab/scripts/createdosdisk.sh '.$n -> getRunningPath() ;
+        	                                exec($diskcmd, $o, $rc);
+						break;
+					case 'veos':
+						$diskcmd = '/opt/unetlab/scripts/veos_diskmod.sh '.$n -> getRunningPath() ;
+						exec($diskcmd, $o, $rc);
+						break;
+				}
+			}
+		}
 		// Mark the node as prepared
 		if (!touch($n -> getRunningPath().'/.prepared')) {
 			// Cannot write on directory
