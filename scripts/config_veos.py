@@ -279,7 +279,7 @@ def main(action, fiename, port):
                 print('ERROR: cannot write config to file.')
                 node_quit(handler)
                 sys.exit(1)
-           node_quit(handler)
+            node_quit(handler)
 
         elif action == 'put':
             rc = config_put(handler)
