@@ -197,7 +197,7 @@ def config_get(handler):
 def config_put(handler): 
     while True:
         try:
-           i = handler.expect('CVAC-4-CONFIG_DONE', timeout = 300)
+           i = handler.expect('CVAC-4-CONFIG_DONE', timeout)
         except:
            return False
         return True
