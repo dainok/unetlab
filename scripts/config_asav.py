@@ -213,7 +213,7 @@ def config_get(handler):
 def config_put(handler):
     while True:
         try:
-           i = handler.expect('>', timeout = 300)
+           i = handler.expect('>', timeout)
         except:
            return False
         return True

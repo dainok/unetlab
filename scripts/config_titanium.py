@@ -143,7 +143,15 @@ def config_get(handler):
 
     return config
 
-def config_put(handler, config):
+def config_put(handler):
+    while True:
+        try:
+           i = handler.expect('bootstrap configure is applied successfully', timeout)
+        except:
+           return False
+        return True
+
+def config_put2(handler, config):
     # Got to configure mode
     handler.sendline('configure terminal')
     try:
@@ -214,14 +222,13 @@ def main(action, fiename, port):
             node_quit(handler)
             sys.exit(1)
 
-        # Login to the device and get a privileged prompt
-        rc = node_login(handler)
-        if rc != True:
-            print('ERROR: failed to login.')
-            node_quit(handler)
-            sys.exit(1)
-
         if action == 'get':
+            # Login to the device and get a privileged prompt
+            rc = node_login(handler)
+            if rc != True:
+                print('ERROR: failed to login.')
+                node_quit(handler)
+                sys.exit(1)
             config = config_get(handler)
             if config in [False, None]:
                 print('ERROR: failed to retrieve config.')
@@ -237,16 +244,7 @@ def main(action, fiename, port):
                 node_quit(handler)
                 sys.exit(1)
         elif action == 'put':
-            try:
-                fd = open(filename, 'r')
-                config = fd.read()
-                fd.close()
-            except:
-                print('ERROR: cannot read config from file.')
-                node_quit(handler)
-                sys.exit(1)
-
-            rc = config_put(handler, config)
+            rc = config_put(handler)
             if rc != True:
                 print('ERROR: failed to push config.')
                 node_quit(handler)
