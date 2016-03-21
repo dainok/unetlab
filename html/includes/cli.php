@@ -878,7 +878,7 @@ function start($n, $id, $t, $nets) {
 			break;
 	}
 	// Special Case for xrv - csr1000v - vIOS - vIOSL - Docker
-	if ( $n->getTemplate() == 'xrv' || $n->getTemplate() == 'csr1000v' || $n->getTemplate() == 'asav'   && is_file($n -> getRunningPath().'/config.iso') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
+	if (($n->getTemplate() == 'xrv' || $n->getTemplate() == 'csr1000v' || $n->getTemplate() == 'asav') && is_file($n -> getRunningPath().'/config.iso') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
 		$flags .= ' -cdrom config.iso' ;
                 touch($n -> getRunningPath().'/.lock') ;
         }
