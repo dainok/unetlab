@@ -539,13 +539,8 @@ $(document).on('click', '.action-nodedelete, .action-nodedelete-group', function
         ;
 
     if (isFreeSelectMode) {
-        $.each(window.freeSelectedNodes, function(i, node) {
-            $.when(deleteNode(node.path)).done(function (values) {
-                $('.node' + node.path).remove();
-            }).fail(function (message) {
-                addModalError(message);
-            });
-        });
+        window.freeSelectedNodes = window.freeSelectedNodes.sort(function(a, b) { return a.path < b.path ? -1 : 1});
+        recursionNodeDelete(window.freeSelectedNodes);
     }
     else {
         $.when(deleteNode(node_id)).done(function (values) {
@@ -556,6 +551,22 @@ $(document).on('click', '.action-nodedelete, .action-nodedelete-group', function
     }
     $('#context-menu').remove();
 });
+function recursionNodeDelete(restOfList) {
+    var node = restOfList.pop();
+
+    if (!node) {
+        return 1;
+    }
+
+    console.log("Deleting... ", node.path);
+    $.when(deleteNode(node.path)).done(function (values) {
+        $('.node' + node.path).remove();
+        recursionNodeDelete(restOfList);
+    }).fail(function (message) {
+        addModalError(message);
+        recursionNodeDelete(restOfList);
+    });
+}
 
 // Edit/print node interfaces
 $(document).on('click', '.action-nodeinterfaces', function(e) {
