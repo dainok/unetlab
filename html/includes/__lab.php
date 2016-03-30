@@ -56,6 +56,7 @@ class Lab {
 	private $pictures = array();
 	private $tenant;
 	private $version;
+	private $scripttimeout;
 
 	/**
 	 * Constructor which load an existent lab or create an empty one.
@@ -88,6 +89,7 @@ class Lab {
 			$this -> name = substr(basename($f), 0, -4);
 			$this -> id = genUuid();
 			$modified = True;
+			$this -> scripttimeout = 600;
 		} else {
 			// Load the existent lab
 			$this -> filename = basename($f);
@@ -276,6 +278,14 @@ class Lab {
 				}
 			}
 
+			// lab script timeout
+			$result = (string) array_pop($xml -> xpath('//lab/@scripttimeout'));
+                        if (strlen($result) !== 0 && (int) $result >= 300) {
+                                $this -> scripttimeout = $result;
+                        } else if (strlen($result) !== 0) {
+                                error_log(date('M d H:i:s ').'WARNING: '.$f.' '.$GLOBALS['messages'][20045]);
+				$this -> scripttimeout = 300;
+                        }
 
 			// Lab Pictures
 			foreach ($xml -> xpath('//lab/objects/pictures/picture') as $picture) {
@@ -582,6 +592,10 @@ class Lab {
 			$this -> version = (int) $p['version'];
 			$modified = True;
 		}
+		if (isset($p['scripttimeout'])) {
+                        $this -> scripttimeout = (int) $p['scripttimeout'];
+                        $modified = True;
+		}
 
 		if ($modified) {
 			// At least an attribute is changed
@@ -859,6 +873,19 @@ class Lab {
 			return 0;
 		}
 	}
+	        /**
+         * Method to get lab scripttimeout
+         *
+         * @return  int                      Lab version or False if not set
+         */
+        public function getScriptTimeout() {
+                if (isset($this -> scripttimeout)) {
+                        return (int) $this -> scripttimeout;
+                } else {
+                        // By default return 0
+                        return 0;
+                }
+        }
 
 	/**
 	 * Method to connect a node to a network or to a remote node.
@@ -976,6 +1003,7 @@ class Lab {
 		$xml -> addAttribute('id', $this -> id);
 
 		if (isset($this -> version)) $xml -> addAttribute('version', $this -> version);
+		if (isset($this -> scripttimeout)) $xml -> addAttribute('scripttimeout', $this -> scripttimeout);
 		if (isset($this -> author)) $xml -> addAttribute('author', $this -> author);
 		if (isset($this -> description)) $xml -> addChild('description', $this -> description);
 		if (isset($this -> body)) $xml -> addChild('body', $this -> body);
