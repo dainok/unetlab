@@ -186,3 +186,4 @@ MESSAGES[154] = 'Stop All';
 MESSAGES[155] = 'Wipe All';
 MESSAGES[156] = 'Duplicated objects found.';
 MESSAGES[157] = 'Delete All';
+MESSAGES[158] = 'config Script Timeout';
