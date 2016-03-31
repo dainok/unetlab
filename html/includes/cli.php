@@ -798,6 +798,8 @@ function prepareNode($n, $id, $t, $nets) {
                                                 break;
 					case 'vios':
 					case 'viosl2':
+					case 'vmx':
+					case 'vsrx':
 						copy (  $n -> getRunningPath().'/startup-config',  $n -> getRunningPath().'/ios_config.txt');
 	                                        $diskcmd = '/opt/unetlab/scripts/createdosdisk.sh '.$n -> getRunningPath() ;
         	                                exec($diskcmd, $o, $rc);
@@ -892,8 +894,13 @@ function start($n, $id, $t, $nets, $scripttimeout) {
                 touch($n -> getRunningPath().'/.lock') ;
         }
 
-	if (( $n->getTemplate() == 'vios'  || $n->getTemplate() == 'viosl2' ) && is_file($n -> getRunningPath().'/minidisk') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
+	if (( $n->getTemplate() == 'vios'  || $n->getTemplate() == 'viosl2') && is_file($n -> getRunningPath().'/minidisk') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
 		$flags .= ' -drive file=minidisk,if=virtio,bus=0,unit=1,cache=none' ;
+		touch($n -> getRunningPath().'/.lock') ;
+	}
+
+	if (( $n->getTemplate() == 'vmx'  || $n->getTemplate() == 'vsrx') && is_file($n -> getRunningPath().'/minidisk') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
+		$flags .= ' -hdb minidisk' ;
 		touch($n -> getRunningPath().'/.lock') ;
 	}
 

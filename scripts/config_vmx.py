@@ -173,6 +173,15 @@ def config_get(handler):
     return config
 
 def config_put(handler, config):
+    # mount drive
+    handler.sendline('mount -t msdos /dev/ad1 /mnt')
+    try:
+        handler.expect(['root>', 'root@.*%'], timeout = expctimeout)
+    except:
+        print('ERROR: error waiting for ["root>", "root@.*%"] prompt.')
+        node_quit(handler)
+        return False
+
     # Go into CLI mode
     handler.sendline('cli')
     try:
@@ -192,30 +201,11 @@ def config_put(handler, config):
         return False
 
     # Start the load mode
-    handler.sendline('load set terminal')
+    handler.sendline('load set /mnt/ios_config.txt')
     try:
-        handler.expect('to end input', timeout = expctimeout)
+        handler.expect('load complete', timeout = expctimeout)
     except:
-        print('ERROR: error waiting for "to end input" prompt.')
-        node_quit(handler)
-        return False
-
-    # Pushing the config
-    for line in config.splitlines():
-        handler.sendline(line)
-        try:
-            handler.expect('\r\n', timeout = expctimeout)
-        except:
-            print('ERROR: error waiting for EOL.')
-            node_quit(handler)
-            return False
-
-    # At the end of configuration be sure we are in non config mode (sending CTRl + D)
-    handler.sendline('\x04')
-    try:
-        handler.expect(['root#', 'root@.*#'], timeout = expctimeout)
-    except:
-        print('ERROR: error waiting for ["root#", "root@.*#"] prompt.')
+        print('ERROR: error waiting for "load complete" prompt.')
         node_quit(handler)
         return False
 
