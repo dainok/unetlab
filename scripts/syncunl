@@ -1,0 +1,6 @@
+#!/bin/sh
+cd /usr/src/unetlab
+git pull
+cd scripts
+DEB=$(./build_deb_gitunetlab.sh)
+dpkg -i $DEB
