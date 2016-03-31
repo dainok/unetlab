@@ -1478,6 +1478,7 @@ function printFormLab(action, values) {
 	}
 	var name = (values['name'] != null) ? values['name'] : '';
 	var version = (values['version'] != null) ? values['version'] : '';
+	var scripttimeout = (values['scripttimeout'] != null) ? values['scripttimeout'] : '600';
 	var author = (values['author'] != null) ? values['author'] : '';
 	var description = (values['description'] != null) ? values['description'] : '';
 	var body = (values['body'] != null) ? values['body'] : '';
@@ -1515,6 +1516,11 @@ function printFormLab(action, values) {
                   '<label class="col-md-3 control-label">' + MESSAGES[88] + '</label>' +
                   '<div class="col-md-5">' +
                     '<textarea class="form-control" name="lab[body]">' + body + '</textarea>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="form-group">'+
+                  '<label class="col-md-3 control-label">' + MESSAGES[158] + '</label>' +
+                    '<div class="col-md-5"><input class="form-control" name="lab[scripttimeout]" value="' + scripttimeout + '" type="text"/>' +
                   '</div>' +
                 '</div>' +
                 '<div class="form-group">' +

@@ -313,6 +313,7 @@ function apiGetLab($lab) {
 		'id' => $lab -> getId(),
 		'name' => $lab -> getName(),
 		'version' => $lab -> getVersion(),
+		'scripttimeout' => $lab -> getScriptTimeout(),
 	);
 	return $output;
 }

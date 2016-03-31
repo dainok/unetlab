@@ -828,9 +828,10 @@ function prepareNode($n, $id, $t, $nets) {
  * @param   Int     $id                 Node ID
  * @param   Int     $t                  Tenant ID
  * @param   Array   $nets               Array of networks
+ * @param   int     $scripttimeout      Config Script Timeout
  * @return  int                         0 means ok
  */
-function start($n, $id, $t, $nets) {
+function start($n, $id, $t, $nets, $scripttimeout) {
 	if ($n -> getStatus() !== 0) {
 		// Node is in running or building state
 		return 0;
@@ -906,7 +907,7 @@ function start($n, $id, $t, $nets) {
 	if ($rc == 0 && $n -> getNType() == 'qemu' && is_file($n -> getRunningPath().'/startup-config') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0 ) {
 		// Start configuration process or check if bootstrap is done
 		touch($n -> getRunningPath().'/.lock');
-		$cmd = 'nohup /opt/unetlab/scripts/config_'.$n -> getTemplate().'.py -a put -p '.$n -> getPort().' -f '.$n -> getRunningPath().'/startup-config -t '.($n -> getDelay() + 600).' > /dev/null 2>&1 &';
+		$cmd = 'nohup /opt/unetlab/scripts/config_'.$n -> getTemplate().'.py -a put -p '.$n -> getPort().' -f '.$n -> getRunningPath().'/startup-config -t '.($n -> getDelay() + $scripttimeout).' > /dev/null 2>&1 &';
 		exec($cmd, $o, $rc);
 		error_log(date('M d H:i:s ').'INFO: importing '.$cmd);
 	}
