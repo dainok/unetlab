@@ -177,12 +177,44 @@ def config_get(handler):
         node_quit(handler)
         return False
 
+    handler.sendline('configure terminal')
+    try:
+        handler.expect('#', timeout = expctimeout)
+    except:
+        print('ERROR: error waiting for "#" prompt.')
+        node_quit(handler)
+        return False
+
+    handler.sendline('no logging console')
+    try:
+        handler.expect('#', timeout = expctimeout)
+    except:
+        print('ERROR: error waiting for "#" prompt.')
+        node_quit(handler)
+        return False
+
+    handler.sendline('commit')
+    try:
+        handler.expect('#', timeout = expctimeout)
+    except:
+        print('ERROR: error waiting for "#" prompt.')
+        node_quit(handler)
+        return False
+
+    handler.sendline('exit')
+    try:
+        handler.expect('#', timeout = expctimeout) 
+    except:
+        print('ERROR: error waiting for "#" prompt.')
+        node_quit(handler)
+        return False
+
     # Getting the config
     handler.sendline('show running-config')
     try:
-        handler.expect('[^)]#', timeout = longtimeout)
+        handler.expect('!\r\nend\r\n', timeout = longtimeout)
     except:
-        print('ERROR: error waiting for "#" prompt.')
+        print('ERROR: error waiting for "end" marker.')
         node_quit(handler)
         return False
     config = handler.before.decode()
@@ -190,8 +222,8 @@ def config_get(handler):
     # Manipulating the config
     config = re.sub('\r', '', config, flags=re.DOTALL)                                      # Unix style
     config = re.sub('.*!! IOS XR Configuration', '!! IOS XR Configuration', config, flags=re.DOTALL)   # Header
-    config = re.sub('!\nend.*', '!\nend\n', config, flags=re.DOTALL)                # Footer
-
+    config = re.sub('no logging console' , '\n!\n' , config, flags=re.DOTALL) # suppress no login console
+    config = re.sub('$.*', '\n!\nend\n', config, flags=re.DOTALL)                # Footer
     return config
 
 def config_put(handler): 
