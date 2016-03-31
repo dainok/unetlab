@@ -112,6 +112,7 @@ $messages[20041] = 'cwObjectPicture ignored, invalid object (20041).';
 $messages[20042] = 'Cannot add object to the lab (20042).';
 $messages[20043] = 'Cannot find object in the selected lab (20043).';
 $messages[20044] = 'Cannot edit object in the selected lab (20044).';
+$messages[20045] = 'Attribute ignored, invalid script timeout - set to default value 300 (20045).';
 
 // __network.php (30000-39999)
 $messages[30000] = 'Cannot create network, invalid or missing mandatory parameters (30000).';
