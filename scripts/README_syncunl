@@ -1,6 +1,6 @@
-Steps to use synunl
+Steps to use syncunl
 
-type the following command on a fresh UNL image:
+type the following commands on a fresh UNL image:
 
 apt-get update
 apt-get upgrade
@@ -9,6 +9,6 @@ apt-get install git
 cd /usr/src
 git clone https://github.com/dainok/unetlab.git
 
-Each time you need to to test new git version:
+Each time you need to test new git version:
 
 /usr/src/unetlab/scripts/syncunl
