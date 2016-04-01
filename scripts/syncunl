@@ -4,3 +4,4 @@ git pull
 cd scripts
 DEB=$(./build_deb_gitunetlab.sh)
 dpkg -i $DEB
+apt-get install -f
