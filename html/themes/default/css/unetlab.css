@@ -14,23 +14,207 @@
 	border-radius: 10px;
 	background-color: #8b8c90;
 }
-
+body{
+	background: #fff;
+}
+#form-login{
+	display:inline-block;
+	max-width:600px;
+}
+#notification_container {
+	position: fixed;
+	right: 1%;
+	top: 35px;
+	width: 30%;
+	z-index:3;
+}
+.alert-danger{
+	border-color:#a94442;
+}
 #alert_container {
-	bottom: 0px;
+	bottom: auto;
 	left: auto;
 	position: fixed;
 	right: 1%;
-	top: auto;
+	top: 0px;
 	width: 30%;
-	z-index: 9999;
+	z-index:4;
+	background:#333;
+	overflow:hidden;
+	padding:3px;
+	color:#fff;
+	max-height:31px;			
+	overflow:hidden;
 }
-
+#alert_container .inner{
+	max-height:0px;	
+	overflow:hidden;
+}
+#alert_container:hover {
+	max-height:100%;
+	overflow:auto;
+}
+#alert_container:hover .inner{
+	max-height:100%;
+	overflow:auto;
+}
+#alert_container .alert{
+	padding:3px;
+	border-radius:0;
+	background:transparent;
+	color:#fff;
+	border:none;
+	margin:0 0 3px;
+}
+#alert_container b{
+	display:block;
+	height:28px;
+	line-height:28px;
+	padding:0 0 0 3px;
+}
+#alert_container .alert .close{
+	color:#fff;
+}
+#alert_container .alert.alert-success{
+	border-left:2px solid #3ba9ba;
+}
+#alert_container .alert.alert-danger{
+	border-left:2px solid #f00;
+}
+#alert_container .alert.alert-info{
+	border-left:2px solid #FFF;
+}
+.response{
+	max-width:400px;
+}
+.navbar-item-aqua{
+	
+}
+#navbar-top .navbar-right{
+	margin-right:0;
+}
+#navbar-top .action-logout, .user-settings{
+    background: #fff none repeat scroll 0 0;
+    color: #333;
+    height: 28px;
+    line-height: 28px;
+    margin: 10px 10px 0 0;
+	padding:0 10px;
+    text-align: center;
+    border-radius:14px;
+	transition: all 0.2s ease-out 0.1s;
+	display:inline-block;
+	float:right;
+}
+#navbar-top .action-logout:hover, .user-settings:hover{
+	color:#fff;
+	background:#333;
+	text-decoration:none;
+}
+#logo-main img{
+	height:100px;
+	width:auto;
+}
 #context-menu {
 	display: block !important;
 	position: absolute;
 	z-index: 5200;
 	aoverflow-x: hidden;
 	aoverflow-y: auto;
+}
+
+
+#navbar-main {
+	margin-bottom:0;
+	margin-top:23px;
+	min-height:auto;
+	margin-left:0px;
+	background-color: #aaa;
+}
+
+#navbar-top {
+	margin-bottom:0;
+}
+
+#navbar-main .item-search input {
+	border: 1px solid #46a6b6;
+	border-bottom-left-radius: 5px;
+	border-top-left-radius: 5px;
+	color: #89888c;
+	margin-left: 1vw;
+	width: 10vw;
+}
+
+#navbar-main .item-search button {
+	background: #46a6b6;
+	border: 1px solid #46a6b6;
+	color: #ffffff;
+	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
+}
+
+#navbar-main .separator {
+	margin-top: -63px;
+}
+#navbar-main  .item-first a{
+	
+}
+#navbar-main .item{
+	margin-right:5px;
+}
+#navbar-main  .item > a, #navbar-main  .item-first > a, #navbar-main .item > a:link, #navbar-main .item-first > a:link, #navbar-main .item > a:visited, #navbar-main .item-first > a:visited {
+	background-color: transparent;
+	border-bottom: 0;
+	color: #FFF;
+	font-family: "Open Sans",Helvetica,Arial,sans-serif;
+	font-size: 17px;
+	margin: 0px;
+	padding: 4px 15px;
+	font-weight:normal;
+	text-transform: uppercase;
+	border-radius:4px;
+}
+
+#navbar-main .item > a:active, #navbar-main .item-first > a:active, #navbar-main .item > a:hover, #navbar-main .item-first > a:hover ,#navbar-main .item.open a{
+	background-color: #fff;
+	color:#333;
+}
+#navbar-main .navbar-nav > li > .dropdown-menu{
+	border-radius:4px;
+}
+
+#navbar-main .dropdown-menu a, #navbar-main .dropdown-menu a:link, #navbar-main .dropdown-menu a:visited {
+	color: #333;
+	font-size: 14px;
+	text-align: left;
+	text-transform: none;
+	width: 100%;
+	font-weight:normal;
+}
+#navbar-main .dropdown-menu > li > a{
+	padding:5px 10px;
+}
+#navbar-main .dropdown-menu > li > a:hover{
+	color:#fff;
+	background:#333;
+}
+#navbar-main .dropdown-menu > li > a i{
+	margin-right:5px;
+}
+
+#navbar-main .dropdown-menu a:active, #navbar-main .dropdown-menu a:hover {
+	background-color: #f5f5f5;
+}
+
+.block_title{
+	font-size:16px;
+	font-weight:bold;
+	color:#FFF;
+	background:#46a6b6 ;
+	margin:0 -15px;
+	padding:4px 15px;
+}
+#main{
+	background:#fff;
 }
 
 #context-menu code {
@@ -59,24 +243,50 @@
 	left: 0px;
 	top: 0px;
 	width: 30px;
+	position:relative;
+	z-index:9;
+	height:100%;
+	transition: width 0.2s ease-out;
 }
-
+#lab-sidebar:hover {
+	width: 200px;
+}
 #lab-sidebar ul {
-	line-height: 2em;
+	margin:0;
+	padding:0;
 	list-style-type: none;
-	margin-left: -32px;
-	margin-right: -15px;
-	margin-top: 0px;
+	width:30px;
+	overflow:hidden;
+	transition: width 0.2s ease-out;
+}
+#lab-sidebar ul li{
+	width:250px;
+	display:block;
+	padding:4px 0 4px 6px;
+	vertical-align:middle;
+	
+}
+#lab-sidebar ul li i{
+	margin-right:7px;
+}
+#lab-sidebar:hover ul {
+	width:200px;
 }
 
-#lab-sidebar a i, #lab-sidebar a:link i, #lab-sidebar a:visited i {
-	color: #ffffff;
+#lab-sidebar a i, #lab-sidebar a:link i, #lab-sidebar a:visited i{
 	font-size: 1.2em;
 }
+#lab-sidebar a, #lab-sidebar a:link, #lab-sidebar a:visited{
+	color: #ffffff;
+	font-size: 14px;
+	display:block;
+}
 
-#lab-sidebar a:active i, #lab-sidebar a:hover i {
-	color: red;
-	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.49);
+#lab-sidebar li:active, #lab-sidebar li:hover{
+	background: #333;
+}
+#lab-sidebar a:hover{
+	text-decoration:none;
 }
 
 #lab-viewport {
@@ -87,6 +297,7 @@
 	right: 0px;
 	top: 0px;
 	white-space: nowrap;
+	z-index:2;
 }
 
 #lab-viewport .network, #lab-viewport .node {
@@ -169,7 +380,7 @@
 }
 
 #list-labs {
-	background-color: #babbbd;
+	background-color: #aaa;
 	margin-left: 15px;
 	margin-right: -15px;
 	overflow: hidden;
@@ -188,8 +399,8 @@
 }
 
 #list-title-info {
-	color: #ffffff;
-	background-color: #46a6b6;
+	color: #333;
+	
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -288,6 +499,9 @@
 	font-size: 0.8em;
 }
 
+#systemStats{
+	height:100%;
+}
 #stats-text {
 	background-color: #e2edef;
 	margin-left: 0px;
@@ -296,6 +510,7 @@
 	padding-bottom: 35px;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+	color:#46a6b6;
 }
 
 #stats-text ul {
@@ -384,6 +599,7 @@
 
 .full-height {
 	height: 100%;
+	background-color: #3ba9ba;
 }
 
 .menuhide {
@@ -550,21 +766,13 @@
 	width: 100%;
 }
 
-img, input[type='image'] {
-	display: block;
-	height: auto;
-	max-width: 100%;
+#form-login img, #form-login input[type='image'] {
+	max-width: 400px;
+	width: 100%;
 }
 
 input[name='login[username]'], input[name='login[password]']{
-	background-color: #96c5cf;
-	border: 0px;
-	color: #58585a;
-	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
-	font-size: 1.8vmin;
-	height: 5vmin;
-	text-align: center;
-	width: 100%;
+	max-width:600px;
 }
 
 #small {
@@ -597,13 +805,9 @@ input[name='login[username]'], input[name='login[password]']{
 }
 
 #auth-left {
-	background: url('/themes/default/images/shade-home.png') #46a6b6 100% repeat-y;
-	background-size: 3% 100%;
 	color: #ffffff;
-	display: table;
-	font-family: 'Ubuntu Light', Helvetica, Arial, sans-serif;
-	font-size: 2.8vmin;
-	table-layout: fixed;
+	font-size: 14px;
+	text-align:center;
 }
 
 #auth-left  .white{
@@ -636,20 +840,13 @@ input[name='login[username]'], input[name='login[password]']{
 	max-width: 30vmin;
 }
 
-#auth-right #logo-text {
-	bottom: 16%;
-	bottom: 15vmin;
-	position: absolute;
-	right: 24%;
-	right: 20vmin;
-	width: 58%;
+#logo-text {
+	color:#fff;
+	font-size:13px;
 }
 
-#auth-right #logo-text h1 {
-	color: #46a6b6;
-	font-family: 'Ubuntu Light', Helvetica, Arial, sans-serif;
-	font-size: 3.5vmin;
-	line-height: 200%;
+#logo-text h1 {
+	color: #FFF;
 }
 
 #auth-right #logo-text p {
@@ -762,11 +959,12 @@ input[name='login[username]'], input[name='login[password]']{
 .lab:active, .lab:hover, .lab-opened, .lab-opened:visited, .lab-opened:active, .lab-opened:hover, .lab.ui-draggable-dragging {
 	background-color: #ffffff;
 	border-bottom: 1px dotted #ffffff;
-	color: #46a6b6;
+	color: #333;
 	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
 	font-weight: bold;
-	text-decoration: none;
+	text-decoration: none !important;
 	width: 100%;
+	
 }
 
 .lab.ui-draggable-dragging {
@@ -776,17 +974,15 @@ input[name='login[username]'], input[name='login[password]']{
 
 .selected, .selected:visited, .selected:active, .selected:hover {
 	background: rgba(60, 153, 171, 0.75);
-	text-decoration: underline;
+	text-decoration: none;
 }
 
 .selected:hover {
-	color: red;
+	color: #333;
 }
 
 .middle {
 	/* parent must use: "display: table; table-layout: fixed;" */
-	display: table-cell;
-	height: 100%;
 	vertical-align: middle;
 }
 
@@ -929,4 +1125,8 @@ map area:visited {
 
 .loading-lab img {
     margin: 0 auto;
+}
+a:focus{
+	text-decoration:none;
+	outline:none;
 }
