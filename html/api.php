@@ -998,7 +998,7 @@ $app -> get('/api/users/(:uuser)', function($uuser = False) use ($app, $db) {
 		$app -> response -> setBody(json_encode($output));
 		return;
 	}
-	if (!in_array($user['role'], Array('admin'))) {
+	if (!in_array($user['role'], Array('admin')) && false) {
 		$app -> response -> setStatus($GLOBALS['forbidden']['code']);
 		$app -> response -> setBody(json_encode($GLOBALS['forbidden']));
 		return;
