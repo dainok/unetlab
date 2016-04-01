@@ -130,7 +130,7 @@ def config_get(handler):
     # Go into CLI mode
     handler.sendline('cli')
     try:
-        handler.expect(['root>', 'root@.*>'], timeout = expctimeout)
+        handler.expect(['root>', 'root@.*>'], timeout = longtimeout)
     except:
         print('ERROR: error waiting for ["root>", "root@.*>"] prompt.')
         node_quit(handler)
@@ -139,7 +139,7 @@ def config_get(handler):
     # Disable paging
     handler.sendline('set cli screen-length 0')
     try:
-        handler.expect(['root>', 'root@.*>'], timeout = expctimeout)
+        handler.expect(['root>', 'root@.*>'], timeout = longtimeout)
     except:
         print('ERROR: error waiting for ["root>", "root@.*>"] prompt.')
         node_quit(handler)
@@ -148,7 +148,7 @@ def config_get(handler):
     # Getting the config
     handler.sendline('show configuration | display set')
     try:
-        handler.expect(['root>', 'root@.*>'], timeout = expctimeout)
+        handler.expect(['root>', 'root@.*>'], timeout = longtimeout)
     except:
         print('ERROR: error waiting for ["root>", "root@.*>"] prompt.')
         node_quit(handler)
@@ -176,7 +176,7 @@ def config_put(handler, config):
     # mount drive
     handler.sendline('mount -t msdos /dev/ad1 /mnt')
     try:
-        handler.expect(['root>', 'root@.*%'], timeout = expctimeout)
+        handler.expect(['root>', 'root@.*%'], timeout = longtimeout)
     except:
         print('ERROR: error waiting for ["root>", "root@.*%"] prompt.')
         node_quit(handler)
@@ -185,7 +185,7 @@ def config_put(handler, config):
     # Go into CLI mode
     handler.sendline('cli')
     try:
-        handler.expect(['root>', 'root@.*>'], timeout = expctimeout)
+        handler.expect(['root>', 'root@.*>'], timeout = longtimeout)
     except:
         print('ERROR: error waiting for ["root>", "root@.*>"] prompt.')
         node_quit(handler)
@@ -194,7 +194,7 @@ def config_put(handler, config):
     # Got to configure mode
     handler.sendline('configure')
     try:
-        handler.expect(['root#', 'root@.*#'], timeout = expctimeout)
+        handler.expect(['root#', 'root@.*#'], timeout = longtimeout)
     except:
         print('ERROR: error waiting for ["root#", "root@.*#"] prompt.')
         node_quit(handler)
@@ -203,7 +203,7 @@ def config_put(handler, config):
 
     handler.sendline('load set /mnt/ios_config.txt')
     try:
-        handler.expect('load complete', timeout = expctimeout)
+        handler.expect('load complete', timeout = longtimeout)
     except:
         print('ERROR: error waiting for "load complete" prompt.')
         node_quit(handler)
