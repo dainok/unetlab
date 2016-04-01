@@ -236,7 +236,7 @@ switch ($action) {
 			}
 
 			// Starting the node
-			$rc = start($lab -> getNodes()[$node_id], $node_id, $tenant, $lab -> getNetworks(), $lab -> getScriptTimeout());
+			$rc = start($lab -> getNodes()[$node_id], $node_id, $tenant, $lab -> getNetworks());
 			if ($rc !== 0) {
 				// Failed to start the node
 				error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][$rc]);
@@ -265,7 +265,7 @@ switch ($action) {
 			foreach ($lab -> getNodes() as $node_id => $node) {
 				if ($node -> getNType() != 'iol') {
 					// IOL nodes drop privileges, so need to be postponed
-					$rc = start($node, $node_id, $tenant, $lab -> getNetworks(), $lab -> getScriptTimeout());
+					$rc = start($node, $node_id, $tenant, $lab -> getNetworks());
 					if ($rc !== 0) {
 						// Failed to start the node
 						error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][$rc]);
@@ -279,7 +279,7 @@ switch ($action) {
 			foreach ($lab -> getNodes() as $node_id => $node) {
 				if ($node -> getNType() == 'iol') {
 					// IOL nodes drop privileges, so need to be postponed
-					$rc = start($node, $node_id, $tenant, $lab -> getNetworks(), $lab -> getScriptTimeout());
+					$rc = start($node, $node_id, $tenant, $lab -> getNetworks());
 					if ($rc !== 0) {
 						// Failed to start the node
 						error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][$rc]);
@@ -350,6 +350,16 @@ switch ($action) {
 		if (isset($node_id)) {
 			// Node ID is set, stop and wipe the node
 			stop($lab -> getNodes()[$node_id]);
+			// Delete Docker image
+			if ($lab -> getNodes()[$node_id] -> getNType() == 'docker') {
+				$cmd = '/usr/bin/docker -H=tcp://127.0.0.1:4243 rm '.$lab -> getNodes()[$node_id] -> getUuid();
+				exec($cmd, $o, $rc);
+				if ($rc !== 0) {
+					error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][13]);
+					error_log(date('M d H:i:s ').date('M d H:i:s ').implode("\n", $o));
+					exit(13);
+				}
+			}
 			$cmd = 'rm -rf "/opt/unetlab/tmp/'.$tenant.'/'.$lab -> getId().'/'.$node_id.'/"';
 			exec($cmd, $o, $rc);
 			if ($rc !== 0) {
@@ -361,14 +371,24 @@ switch ($action) {
 			// Node ID is not set, stop and wipe all nodes
 			foreach ($lab -> getNodes() as $node_id => $node) {
 				stop($node);
-			}
-			$cmd = 'rm -rf "/opt/unetlab/tmp/'.$tenant.'/'.$lab -> getId().'/"';
-			exec($cmd, $o, $rc);
-			if ($rc !== 0) {
-				error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][13]);
-				error_log(date('M d H:i:s ').date('M d H:i:s ').implode("\n", $o));
-				exit(13);
-			}
+				// Delete Docker image
+				if ($lab -> getNodes()[$node_id] -> getNType() == 'docker') {
+					$cmd = '/usr/bin/docker -H=tcp://127.0.0.1:4243 rm '.$lab -> getNodes()[$node_id] -> getUuid();
+					exec($cmd, $o, $rc);
+					if ($rc !== 0) {
+						error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][13]);
+						error_log(date('M d H:i:s ').date('M d H:i:s ').implode("\n", $o));
+						exit(13);
+					}
+				}
+				}
+				$cmd = 'rm -rf "/opt/unetlab/tmp/'.$tenant.'/'.$lab -> getId().'/"';
+				exec($cmd, $o, $rc);
+				if ($rc !== 0) {
+					error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][13]);
+					error_log(date('M d H:i:s ').date('M d H:i:s ').implode("\n", $o));
+					exit(13);
+				}
 		}
 		break;
 }

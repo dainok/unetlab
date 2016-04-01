@@ -39,6 +39,7 @@ ${CC} ${CFLAGS} -o ${DST}/qemu_wrapper ${INC} qemu_wrapper.c qemu_functions.c
 ${CC} ${CFLAGS} -o ${DST}/dynamips_wrapper ${INC} dynamips_wrapper.c dynamips_functions.c
 cp -a unl_profile ${DST}/unl_profile
 cp -a unl_wrapper.php ${DST}/unl_wrapper
+cp -a nsenter ${DST}/nsenter
 cd ..
 cp -a /opt/unetlab/addons/iol/lib/libcrypto.so.4 ${DATA_DIR}/opt/unetlab/addons/iol/lib
 
