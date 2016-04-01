@@ -20,6 +20,9 @@ cat html/includes/init.php | sed "s/define('VERSION', .*/define('VERSION', '${VE
 cp -a scripts/remove_uuid.sh ${DATA_DIR}/opt/unetlab/scripts/
 cp -a scripts/fix_iol_nvram.sh ${DATA_DIR}/opt/unetlab/scripts/
 cp -a scripts/config_* ${DATA_DIR}/opt/unetlab/scripts/
+cp -a scripts/veos_diskmod.sh ${DATA_DIR}/opt/unetlab/scripts/
+cp -a scripts/minidisk.bz2 ${DATA_DIR}/opt/unetlab/scripts/
+cp -a scripts/createdosdisk.sh ${DATA_DIR}/opt/unetlab/scripts/
 cp -a IOUtools/iou_export ${DATA_DIR}/opt/unetlab/scripts/
 chown -R root:root ${DATA_DIR}/opt/unetlab
 chown -R www-data:www-data ${DATA_DIR}/opt/unetlab/data ${DATA_DIR}/opt/unetlab/labs
@@ -39,6 +42,7 @@ ${CC} ${CFLAGS} -o ${DST}/qemu_wrapper ${INC} qemu_wrapper.c qemu_functions.c
 ${CC} ${CFLAGS} -o ${DST}/dynamips_wrapper ${INC} dynamips_wrapper.c dynamips_functions.c
 cp -a unl_profile ${DST}/unl_profile
 cp -a unl_wrapper.php ${DST}/unl_wrapper
+cp -a nsenter ${DST}/nsenter
 cd ..
 cp -a /opt/unetlab/addons/iol/lib/libcrypto.so.4 ${DATA_DIR}/opt/unetlab/addons/iol/lib
 

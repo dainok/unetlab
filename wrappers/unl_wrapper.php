@@ -236,7 +236,7 @@ switch ($action) {
 			}
 
 			// Starting the node
-			$rc = start($lab -> getNodes()[$node_id], $node_id, $tenant, $lab -> getNetworks());
+			$rc = start($lab -> getNodes()[$node_id], $node_id, $tenant, $lab -> getNetworks(), $lab -> getScriptTimeout());
 			if ($rc !== 0) {
 				// Failed to start the node
 				error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][$rc]);
@@ -265,7 +265,7 @@ switch ($action) {
 			foreach ($lab -> getNodes() as $node_id => $node) {
 				if ($node -> getNType() != 'iol') {
 					// IOL nodes drop privileges, so need to be postponed
-					$rc = start($node, $node_id, $tenant, $lab -> getNetworks());
+					$rc = start($node, $node_id, $tenant, $lab -> getNetworks(), $lab -> getScriptTimeout());
 					if ($rc !== 0) {
 						// Failed to start the node
 						error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][$rc]);
@@ -279,7 +279,7 @@ switch ($action) {
 			foreach ($lab -> getNodes() as $node_id => $node) {
 				if ($node -> getNType() == 'iol') {
 					// IOL nodes drop privileges, so need to be postponed
-					$rc = start($node, $node_id, $tenant, $lab -> getNetworks());
+					$rc = start($node, $node_id, $tenant, $lab -> getNetworks(), $lab -> getScriptTimeout());
 					if ($rc !== 0) {
 						// Failed to start the node
 						error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][$rc]);
