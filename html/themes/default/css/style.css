@@ -1,6 +1,5 @@
 * {
-	color: #8b8c90;
-	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
+	
 }
 
 body, html {
@@ -53,7 +52,7 @@ h2 {
 	display: inline-block;
 	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
 	font-size: 1.3em;
-	margin: 20px auto 10px auto;
+	margin: 5px auto 0px auto;
 	padding: 2px 10px 2px 4px;
 	text-transform: uppercase;
 }
@@ -107,6 +106,8 @@ li {
 
 p {
 	margin: 10px auto 10px auto;
+	padding: 0px 50px 0px 50px;
+	max-width: 500px;
 }
 
 table {
@@ -160,146 +161,12 @@ tbody td .glyphicon-trash {
 	margin-left: 30px;
 }
 
-#navbar-top, #navbar-top > div {
-	margin: 0px;
-	padding: 0px;
-}
 
 #navbar-top #logo-main {
 	background-color: #3ba9ba;
 }
 
-#navbar-top ul {
-	margin-right: 10vw;
-	text-transform: uppercase;
-}
 
-#navbar-top a, #navbar-top a:link, #navbar-top a:visited {
-	background-color: transparent;
-	color: #ffffff;
-	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
-	font-size: 1em;
-	margin: 0px;
-	padding: 3px;
-	text-align: center;
-}
-
-#navbar-top a:active, #navbar-top a:hover {
-	background-color: transparent;
-	color: red;
-}
-
-#navbar-top .navbar-item-aqua, #navbar-top .navbar-item-grey {
-	margin: 0px 0.2vw 0px 0.2vw;
-	padding: 0px;
-	width: 10vw;
-}
-
-#navbar-top .navbar-item-aqua {
-	background-color: #3ba9ba;
-}
-
-#navbar-top .navbar-item-grey {
-	background-color: #58585a;
-}
-
-#navbar-main {
-	margin-bottom: -1px !important;
-	margin-top: -1px !important;
-}
-
-#navbar-main, #navbar-main > div {
-	margin: 0px;
-	padding: 0px;
-}
-
-#navbar-main-text {
-	font-family: 'Ubuntu Regular', Helvetica, Arial, sans-serif;
-	font-size: 1.2em;
-	height: 50px;
-	padding: 10px 4vw 0px 0px;
-	text-align: right;
-}
-
-#navbar-main-spacer {
-	background-color: #3ba9ba;
-	float: left;
-	margin: 0;
-	position: relative;
-	padding: 0;
-	height: 50px;
-	width: 15px;
-}
-
-#navbar-main ul.navbar-nav {
-	border-bottom: 1px dotted #8b8c90;
-	float: right;
-	text-transform: uppercase;
-	width: 70vw;
-}
-
-#navbar-main li {
-	margin: 0px;
-	padding: 0px;
-}
-
-#navbar-main .item-first a {
-	text-align: left;
-	width: 7vw;
-}
-
-#navbar-main .item a {
-	text-align: center;
-	width: 12vw;
-}
-
-#navbar-main .item-search input {
-	border: 1px solid #46a6b6;
-	border-bottom-left-radius: 5px;
-	border-top-left-radius: 5px;
-	color: #89888c;
-	margin-left: 1vw;
-	width: 10vw;
-}
-
-#navbar-main .item-search button {
-	background: #46a6b6;
-	border: 1px solid #46a6b6;
-	color: #ffffff;
-	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
-}
-
-#navbar-main .separator {
-	margin-top: -63px;
-}
-
-#navbar-main  .item > a, #navbar-main  .item-first > a, #navbar-main .item > a:link, #navbar-main .item-first > a:link, #navbar-main .item > a:visited, #navbar-main .item-first > a:visited {
-	background-color: transparent;
-	border-bottom: 5px solid transparent;
-	color: #89888c;
-	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
-	font-size: 1em;
-	margin: 0px;
-	padding: 4px;
-}
-
-#navbar-main .item > a:active, #navbar-main .item-first > a:active, #navbar-main .item > a:hover, #navbar-main .item-first > a:hover {
-	background-color: transparent;
-	border-bottom: 5px solid #3ba9ba;
-}
-
-#navbar-main .dropdown-menu a, #navbar-main .dropdown-menu a:link, #navbar-main .dropdown-menu a:visited {
-	color: #89888c;
-	font-family: 'Ubuntu Bold', Helvetica, Arial, sans-serif;
-	font-size: 0.8em;
-	text-align: left;
-	text-transform: none;
-	width: 100%;
-}
-
-#navbar-main .dropdown-menu a:active, #navbar-main .dropdown-menu a:hover {
-	background-color: #f5f5f5;
-}
 
 #jumbotron, #jumbotron > div {
 	background-color: #ffffff;

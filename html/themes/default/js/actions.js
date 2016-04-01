@@ -382,8 +382,8 @@ $(document).on('contextmenu', '.context-menu', function(e) {
         // Context menu not defined for this object
         return false;
     }
-
-    printContextMenu(title, body, e.pageX, e.pageY);
+	if (body.length)
+		printContextMenu(title, body, e.pageX, e.pageY);
 });
 
 // Window resize
@@ -677,7 +677,7 @@ $(document).on('click', '.action-moreactions', function(e) {
 		body += '<li><a class="action-nodesbootscratch" href="#"><i class="glyphicon glyphicon-floppy-save"></i> ' + MESSAGES[140] + '</a></li>';
 		body += '<li><a class="action-nodesbootdelete" href="#"><i class="glyphicon glyphicon-floppy-remove"></i> ' + MESSAGES[141] + '</a></li>';
 	}
-	printContextMenu(MESSAGES[125], body, e.pageX, e.pageY);
+	printContextMenu(MESSAGES[125], body, e.pageX+3, e.pageY+3);
 });
 
 // Redraw topology
@@ -916,8 +916,10 @@ $(document).on('click', '.action-picturesget', function(e) {
 			var body = '<div class="row"><div class="picture-list col-md-1 col-lg-1"><ul class="map">';
 			$.each(pictures, function(key, picture) {
 				var title = picture['name'] || "pic name";
-				body += '<li><a class="action-pictureget" data-path="' + key + '" href="#" title="' + title + '">' + picture['name'].split(' ')[0] + '</a>';
-				body += '<a class="delete-picture" href="#" data-path="' + key + '"><i class="glyphicon glyphicon-trash delete-picture" title="Delete"></i>';
+				body += '<li>';
+				if (ROLE != "user")
+					body += '<a class="delete-picture" href="#" data-path="' + key + '"><i class="glyphicon glyphicon-trash delete-picture" title="Delete"></i> ';
+				body += '<a class="action-pictureget" data-path="' + key + '" href="#" title="' + title + '">' + picture['name'].split(' ')[0] + '</a>';
 				body += '</a></li>';
 			});
 			body += '</ul></div><div id="config-data" class="col-md-11 col-lg-11"></div></div>';
@@ -1435,14 +1437,8 @@ $(document).on('click', '.action-sysstatus', function(e) {
     $.when(getSystemStats()).done(function(data) {
         // Main: title
         var html_title = '' +
-            '<div class="row row-eq-height"><div id="list-title-folders" class="col-md-3 col-lg-3">' +
+            '<div class="row row-eq-height"><div id="list-title-folders" class="col-md-12 col-lg-12">' +
                 '<span title="' + MESSAGES[13] + '">' + MESSAGES[13] + '</span>' +
-            '</div>' +
-            '<div id="list-title-labs" class="col-md-3 col-lg-3">' +
-                '<span></span>' +
-            '</div>' +
-            '<div id="list-title-info" class="col-md-6 col-lg-6">' +
-                '<span></span>' +
             '</div>' +
             '</div>';
 
@@ -1461,8 +1457,8 @@ $(document).on('click', '.action-sysstatus', function(e) {
 
         // Footer
         html += '</div>';
-
-        $('#main-title').html(html_title);
+		
+		$('#main-title').html(html_title);
         $('#main-title').show();
         $('#main').html(html);
 
@@ -3087,4 +3083,22 @@ $(document).on("click", "#lab-viewport.freeSelectMode .node_frame", function (ev
     }
 
     $(self).toggleClass("free-selected", !isFreeSelected);
+});
+
+$(document).on("click", ".user-settings", function () {
+	var user = $(this).attr("user");
+    $.when(getUsers(user)).done(function(user) {
+		// Got user
+		printFormUser('edit', user);
+	}).fail(function(message) {
+		// Cannot get user
+		addModalError(message);
+	});
+});
+
+
+// Load user management page
+$(document).on('click', '.logs', function(e) {
+	logger(1, 'DEBUG: action = logs');
+	printLogs('access.txt', 30,"");
 });
