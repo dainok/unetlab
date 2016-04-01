@@ -1021,7 +1021,7 @@ $app -> put('/api/users/(:uuser)', function($uuser = False) use ($app, $db) {
 		$app -> response -> setBody(json_encode($output));
 		return;
 	}
-	if (!in_array($user['role'], Array('admin'))) {
+	if (!in_array($user['role'], Array('admin', 'editor'))) {
 		$app -> response -> setStatus($GLOBALS['forbidden']['code']);
 		$app -> response -> setBody(json_encode($GLOBALS['forbidden']));
 		return;
@@ -1029,7 +1029,13 @@ $app -> put('/api/users/(:uuser)', function($uuser = False) use ($app, $db) {
 
 	$event = json_decode($app -> request() -> getBody());
 	$p = json_decode(json_encode($event), True);	// Reading options from POST/PUT
-
+	
+	if ($user['role'] == 'editor') {
+		unset($p['role']);
+		unset($p['expiration']);
+		unset($p['pod']);
+		unset($p['pexpiration']);
+	}
 	$output = apiEditUUser($db, $uuser, $p);
 	$app -> response -> setStatus($output['code']);
 	$app -> response -> setBody(json_encode($output));
@@ -1162,6 +1168,44 @@ $app -> get('/api/update', function() use ($app, $db) {
 	$app -> response -> setBody(json_encode($output));
 });
 
+
+/***************************************************************************
+ * LOGS
+ **************************************************************************/
+$app -> get('/api/logs/(:file)/(:lines)/(:search)', function($file = False, $lines = 30, $search="") use ($app, $db) {
+	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
+	if ($user === False) {
+		$app -> response -> setStatus($output['code']);
+		$app -> response -> setBody(json_encode($output));
+		return;
+	}
+	
+
+	$f = file_get_contents("/opt/unetlab/data/Logs/" . $file);
+	if ($f)
+	{
+		$arr = explode("\n", $f);
+		if (!is_array($arr))
+			$arr = array();
+		$arr = array_reverse($arr);
+		
+		if ($search)
+		{
+			foreach($arr as $k=>$v )
+			{
+				if (strstr($v, $search) === false)
+					unset($arr[$k]);
+			}
+		}
+		
+		$arr = array_slice($arr, 0 , $lines);
+	}
+	else
+		$arr = array();
+	
+	$app -> response -> setStatus(200);
+	$app -> response -> setBody(json_encode($arr));
+});
 /***************************************************************************
  * Run
  **************************************************************************/
