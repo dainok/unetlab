@@ -1,0 +1,94 @@
+<div id="navbar-top" class="hidden-xs hidden-sm navbar navbar-static-top">
+	<div class="container-fluid ">
+		<div class="row">
+			<div id="logo-main" class="col-md-3 col-lg-3">
+				<img alt="Logo"  src="/themes/default/images/logo_rr.png"/>
+			</div>
+			<a href="#" class="action-logout"><%= MESSAGES[14] %> <i class="fa fa-sign-out"></i></a>
+			<a href="#" class="user-settings" user="<%= username %>"><%= username %> <i class="fa fa-cogs"></i></a>
+			
+			<nav id="navbar-main" class="navbar navbar-static-top col-md-9">
+				<ul class="nav navbar-nav">
+					<li class="item-first lab-list">
+						<a class="action-lablist" href="#"><%= MESSAGES[11] %></a>
+					</li>
+					
+					<% if(ROLE != "user"){ %>
+					<li class="item dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Actions <span class="caret"/>
+						</a>
+						<ul id="actions-menu" class="dropdown-menu">
+							<li>
+								<a href="#">&lt;<%= MESSAGES[3] %>&gt;</a>
+							</li>
+						</ul>
+					</li>
+					<% if(ROLE != "editor"){ %>
+					<li class="item usermgmt">
+						<a class="action-usermgmt" href="#"><%= MESSAGES[12] %></a>
+					</li>
+					<% } %>
+					<% } %>
+					<li class="item sysstatus">
+						<a class="action-sysstatus" href="#"><%= MESSAGES[13] %></a>
+					</li>
+					<% if(ROLE != "user"){ %>
+					<li class="item logs">
+						<a class="action-logs" href="#">Logs</a>
+					</li>
+					<% } %>
+					<li class="item dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Information <span class="caret"/></a>
+						<ul class="dropdown-menu">
+							<li class="navbar-item-aqua">
+								<a href="http://www.unetlab.com/" target="_blank" title="Help">
+									<i class="fa fa-question-circle"></i>
+									Help
+								</a>
+							</li>
+							<li class="navbar-item-grey">
+								<a href="http://www.unetlab.com/" target="_blank" title="About">
+									<i class="fa fa-info-circle"></i>
+									About
+								</a>
+							</li>
+							<li class="navbar-item-grey">
+								<a href="http://forum.802101.com/forum39.html" target="_blank" title="Forum">
+									<i class="fa fa-comment"></i>
+									Forum
+								</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<div id="main-title" class="container-fluid ">
+	<div class="row row-eq-height">
+		<div id="list-title-folders" class="col-md-12 col-lg-12">
+			<i class="fa fa-folder"></i> <span title="<%= folder %>"><%= MESSAGES[0] %> <%= folder %></span>
+		</div>
+	</div>
+</div>
+
+<div id="main" class="container col-md-12 col-lg-12">
+	<div class="fill-height row row-eq-height">
+		<div id="list-folders" class="col-md-3 col-lg-3" data-path="<%= folder %>">
+			<ul/>
+		</div>
+		<div id="list-labs" class="col-md-3 col-lg-3">
+			<div class="block_title">
+				<i class="fa fa-file"></i> <%= MESSAGES[1] %>
+			</div>
+			<ul></ul>
+		</div>
+		<div id="list-info" class="col-md-6 col-lg-6">
+			<div id="list-title-info" >
+				<span></span>
+			</div>
+		</div>
+
+	</div>
+</div>
