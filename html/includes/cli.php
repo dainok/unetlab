@@ -875,7 +875,7 @@ function start($n, $id, $t, $nets, $scripttimeout) {
 			}
 			break;
 		case 'docker':
-			$cmd = 'docker -H=tcp://127.0.0.1:4243 start -ai '.$n -> getUuid();
+			$cmd = 'docker -H=tcp://127.0.0.1:4243 start '.$n -> getUuid();
 			break;
 		case 'dynamips':
 			$cmd = '/opt/unetlab/wrappers/dynamips_wrapper -T '.$t.' -D '.$id.' -t "'.$n -> getName().'" -F /opt/unetlab/addons/dynamips/'.$n -> getImage().' -d '.$n -> getDelay();
@@ -940,7 +940,7 @@ function start($n, $id, $t, $nets, $scripttimeout) {
 			error_log(date('M d H:i:s ').'INFO: starting '.$cmd);
 			exec($cmd, $o, $rc);
 			// ip link set netns ${PID} docker3_4_5 name eth0 address 22:ce:e0:99:04:05 up
-			$cmd = 'ip link set netns '.$o[0].' docker'.$t.'_'.$id.'_'.$interface_id.' name eth0 address '.'50:'.sprintf('%02x', $t).':'.sprintf('%02x', $id / 512).':'.sprintf('%02x', $id % 512).':00:'.sprintf('%02x', $interface_id).' up';
+			$cmd = 'ip link set netns '.$o[1].' docker'.$t.'_'.$id.'_'.$interface_id.' name eth0 address '.'50:'.sprintf('%02x', $t).':'.sprintf('%02x', $id / 512).':'.sprintf('%02x', $id % 512).':00:'.sprintf('%02x', $interface_id).' up';
 			error_log(date('M d H:i:s ').'INFO: starting '.$cmd);
 			exec($cmd, $o, $rc);
 			// /opt/unetlab/wrappers/nsenter -t ${PID} -n ip addr add 1.1.1.1/24 dev eth0
@@ -1001,11 +1001,11 @@ function usage() {
 	$output .= "                     requires -T, -F, -D is optional\n";
 	$output .= "           - fixpermissions: fix file/dir permissions\n";
 	$output .= "           - platform: print the hardware platform\n";
-	$output .= "           - start: fix file/dir permissions\n";
+	$output .= "           - start: start one or all nodes\n";
 	$output .= "                     requires -T, -F, -D is optional\n";
-	$output .= "           - stop: fix file/dir permissions\n";
+	$output .= "           - stop: stop one or all nodes\n";
 	$output .= "                     requires -T, -F, -D is optional\n";
-	$output .= "           - wipe: fix file/dir permissions\n";
+	$output .= "           - wipe: wipe one or all nodes\n";
 	$output .= "                     requires -T, -F, -D is optional\n";
 	$output .= "Options:\n";
 	$output .= "-F <n>     Lab file\n";

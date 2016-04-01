@@ -33,6 +33,10 @@ all:
 	chmod 755 $(DST)/nsenter
 	chown root:root $(DST)/nsenter
 
+	cp -a unl_wrapper.php $(DST)/unl_wrapper
+	chmod 755 $(DST)/unl_wrapper
+	chown root:root $(DST)/unl_wrapper
+
 uninstall:
 	rm -f $(DST)/simple_forwarder
 	rm -f $(DST)/iol_wrapper
