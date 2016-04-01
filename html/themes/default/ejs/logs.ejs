@@ -1,0 +1,44 @@
+
+<div class="fill-height row row-eq-height">
+	<div id="list-folders" class="col-md-3 col-lg-3" >
+		<ul>
+			<li>
+				<a href="#" class="folder <%if (file=="access.txt") {%>selected<%}%>" onclick="search_log('access.txt'); return false">access.txt</a>
+			</li>
+			<li>
+				<a href="#" class="folder  <%if (file=="api.txt") {%>selected<%}%>" onclick="search_log('api.txt'); return false">api.txt</a>
+			</li>
+			<li>
+				<a href="#" class="folder  <%if (file=="error.txt") {%>selected<%}%>" onclick="search_log('error.txt'); return false">error.txt</a>
+			</li>
+			<li>
+				<a href="#" class="folder  <%if (file=="php_errors.txt") {%>selected<%}%>" onclick="search_log('php_errors.txt'); return false">php_errors.txt</a>
+			</li>
+			<li>
+				<a href="#" class="folder  <%if (file=="unl_wrapper.txt") {%>selected<%}%>" onclick="search_log('unl_wrapper.txt'); return false">unl_wrapper.txt</a>
+			</li>
+		</ul>
+		<div class="clearfix"></div>
+		<form onsubmit="search_log(); return false" style="padding-top:15px; color:#46a6b6" class="form-horizontal">
+			<div class="form-group">
+				<label for="log_lines" class="col-sm-5 control-label">Line</label>
+				<div class="col-sm-7">
+					<input type="text" class="form-control"  id="log_lines" placeholder="30" value="<%= per_page %>">
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="log_search" class="col-sm-5 control-label">Search text</label>
+				<div class="col-sm-7">
+					<input type="text" class="form-control"  id="log_search" placeholder="" value="<%= search %>">
+				</div>
+			</div>
+		
+			<button type="submit" class="btn btn-default pull-right"><i class="fa fa-search"></i> Submit</button>
+		</form>
+	</div>
+	<div id="list-info" class="col-md-9 col-lg-9">
+		<% for(var i=0; i<logs.length; i++) {%>
+		   <div><%= logs[i] %></div>
+		<% } %>
+	</div>
+</div>
