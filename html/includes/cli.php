@@ -798,11 +798,20 @@ function prepareNode($n, $id, $t, $nets) {
                                                 break;
 					case 'vios':
 					case 'viosl2':
-					case 'vmx':
-					case 'vsrx':
 						copy (  $n -> getRunningPath().'/startup-config',  $n -> getRunningPath().'/ios_config.txt');
 	                                        $diskcmd = '/opt/unetlab/scripts/createdosdisk.sh '.$n -> getRunningPath() ;
         	                                exec($diskcmd, $o, $rc);
+						break;
+					case 'vmx':
+					case 'vsrx':
+					case 'vsrxng':
+						copy (  $n -> getRunningPath().'/startup-config',  $n -> getRunningPath().'/juniper.conf');
+						$isocmd = 'mkisofs -o '.$n -> getRunningPath().'/config.iso -l --iso-level 2 '.$n -> getRunningPath().'/juniper.conf' ;
+						exec($isocmd, $o, $rc);
+                                                break;
+					case 'vsrx-old':
+						$diskcmd = '/opt/unetlab/scripts/createjundisk.sh '.$n -> getRunningPath() ;
+						exec($diskcmd, $o, $rc);
 						break;
 					case 'veos':
 						$diskcmd = '/opt/unetlab/scripts/veos_diskmod.sh '.$n -> getRunningPath() ;
@@ -899,8 +908,8 @@ function start($n, $id, $t, $nets, $scripttimeout) {
 		touch($n -> getRunningPath().'/.lock') ;
 	}
 
-	if (( $n->getTemplate() == 'vmx'  || $n->getTemplate() == 'vsrx') && is_file($n -> getRunningPath().'/minidisk') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
-		$flags .= ' -hdb minidisk' ;
+	if (( $n->getTemplate() == 'vmx'  || $n->getTemplate() == 'vsrx' || $n->getTemplate() == 'vsrxng') && is_file($n -> getRunningPath().'/config.iso') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
+		$flags .= ' -drive file=config.iso,if=virtio,media=cdrom,index=2' ;
 		touch($n -> getRunningPath().'/.lock') ;
 	}
 
