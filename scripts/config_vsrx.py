@@ -174,7 +174,7 @@ def config_get(handler):
 
 def config_put(handler, config):
     # mount drive
-    handler.sendline('mount -t msdos /dev/ad1 /mnt')
+    handler.sendline('mount -t cd9660 /dev/vtbd1 /mnt')
     try:
         handler.expect(['root>', 'root@.*%'], timeout = longtimeout)
     except:
@@ -201,7 +201,7 @@ def config_put(handler, config):
         return False
     # Start the load mode
 
-    handler.sendline('load set /mnt/ios_config.txt')
+    handler.sendline('load set /mnt/juniper.conf')
     try:
         handler.expect('load complete', timeout = longtimeout)
     except:
