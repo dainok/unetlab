@@ -48,25 +48,34 @@ function dirname(path) {
 function addMessage(severity, message) {
 	// Severity can be success (green), info (blue), warning (yellow) and danger (red)
 
-	var timeout = 3000;		// by default close messages after 3 seconds
-  if (severity == 'danger') timeout = 8000;
+	var timeout = 10000;		// by default close messages after 3 seconds
+  if (severity == 'danger') timeout = 5000;
 	if (severity == 'alert') timeout = 10000;
 	if (severity == 'warning') timeout = 10000;
 
 	if (!$('#alert_container').length) {
 		// Add the frame container if not exists
-		$('body').append('<div id="alert_container"></div>');
+		$('body').append('<div id="alert_container"><b><i class="fa fa-bell-o"></i> Notifications</b><div class="inner"></div></div>');
+	}
+	if (!$('#notification_container').length) {
+		$('body').append('<div id="notification_container"></div>');
 	}
 	
 	var msgalert = $('<div class="alert alert-' + severity.toLowerCase() + ' fade in">').append($('<button type="button" class="close" data-dismiss="alert">').append("&times;")).append(message);
 
 	// Add the alert div to top (prepend()) or to bottom (append())
-	$('#alert_container').append(msgalert);
+	$('#alert_container .inner').prepend(msgalert);
 	
-	if (timeout) {
-		window.setTimeout(function() {
-			msgalert.alert("close");
-		}, timeout);
+	if (severity == "danger")
+	{
+		var notification_alert = $('<div class="alert alert-' + severity.toLowerCase() + ' fade in">').append($('<button type="button" class="close" data-dismiss="alert">').append("&times;")).append(message);
+
+		$('#notification_container').prepend(notification_alert);
+		if (timeout) {
+			window.setTimeout(function() {
+				notification_alert.alert("close");
+			}, timeout);
+		}
 	}
 }
 
@@ -2090,9 +2099,21 @@ function printFormUser(action, values) {
 			var role_selected = (role == key) ? 'selected ' : '';
 			html += '<option ' + role_selected + 'value="' + key + '">' + value + '</option>';
 		});
-		html += '</select></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[30] + '</label><div class="col-md-5"><input class="form-control" name="user[expiration]" value="' + expiration + '" type="text"/></div></div><h4>' + MESSAGES[46] + '</h4><div class="form-group"><label class="col-md-3 control-label">POD</label><div class="col-md-5"><input class="form-control" name="user[pod]" value="' + pod + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[30] + '</label><div class="col-md-5"><input class="form-control" name="user[pexpiration]" value="' + pexpiration + '" type="text"/></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + submit + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
+		html += '</select></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[30] + '</label><div class="col-md-5"><input class="form-control expiration" name="user[expiration]" value="' + expiration + '" type="text"/></div></div><h4>' + MESSAGES[46] + '</h4><div class="form-group"><label class="col-md-3 control-label">POD</label><div class="col-md-5"><input class="form-control pod" name="user[pod]" value="' + pod + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[30] + '</label><div class="col-md-5"><input class="form-control expiration pod" name="user[pexpiration]" value="' + pexpiration + '" type="text"/></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + submit + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
 		addModal(title, html, '');
+		if (ROLE == "user")
+		{
+			$("#form-user-edit input,#form-user-edit select").prop("disabled", true)
+			$("#form-user-edit button").remove();
+		}
+		if (ROLE == "editor")
+		{
+			$("#form-user-edit select").prop("disabled", true)
+			$("#form-user-edit .pod,#form-user-edit .expiration").prop("disabled", true)
+		}
 		$('.selectpicker').selectpicker();
+		$('.expiration').datepicker({dateFormat : 'yy-mm-dd'});
+		$(".expiration").on("blur", function(e) { $(this).datepicker("hide"); });
 		validateUser();
 	}).fail(function(message) {
 		// Cannot get data
@@ -2126,8 +2147,8 @@ function printLabTopology() {
         , loadingLabHtml = ''+
             '<div id="loading-lab" class="loading-lab">' +
                 '<div class="container">' +
+                    '<img src="/themes/default/images/wait.gif"/><br />' +
                     '<h3>Loading Lab</h3>' +
-                    '<img src="/themes/default/images/wait.gif"/>' +
                     '<div class="progress">' +
                         '<div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>' +
                     '</div>' +
@@ -2145,7 +2166,8 @@ function printLabTopology() {
     $labViewport.empty();
     $labViewport.data('refreshing', true);
     $labViewport.after(loadingLabHtml);
-
+	$("#lab-sidebar *").hide();
+	
     $.when(getNetworks(null), getNodes(null), getTopology(), getTextObjects()).done(function(networks, nodes, topology, textObjects) {
         var networkImgs = []
             , nodesImgs = []
@@ -2393,6 +2415,7 @@ function printLabTopology() {
 
     $.when(labNodesResolver, labTextObjectsResolver).done(function () {
         $("#loading-lab").remove();
+        $("#lab-sidebar *").show();
     }).fail(function (message1, message2) {
         if (message1 != null) {
             addModalError(message1);
@@ -2438,7 +2461,14 @@ function printListNetworks(networks) {
 		body += '<tr class="network' + value['id'] + '"><td>' + value['id'] + '</td><td>' + value['name'] + '</td><td>' + value['type'] + '</td><td>' + value['count'] + '</td><td><a class="action-networkedit" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[71] + '"><i class="glyphicon glyphicon-edit"></i></a><a class="action-networkdelete" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[65] + '"><i class="glyphicon glyphicon-trash"></i></a></td></tr>';
 	});
 	body += '</tbody></table></div>';
-	addModalWide(MESSAGES[96], body, '');
+	
+	body = $(body);
+	if (ROLE == "user")
+	{
+		body.find(".action-networkedit,.action-networkdelete").remove();
+	}
+	
+	addModalWide(MESSAGES[96], body.html(), '');
 }
 
 // Display all nodes in a table
@@ -2495,14 +2525,16 @@ function printListTextobjects(textobjects) {
                 '<td>' + value['name'] + '</td>' +
                 '<td>' + value['type'] + '</td>' +
                 '<td>' + text + '</td>' +
-                '<td>' +
-                    '<a class="action-textobjectedit" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[71] + '">' +
+                '<td>' ;
+				if (ROLE != "user") { 
+             body +=       '<a class="action-textobjectedit" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[71] + '">' +
                         '<i class="glyphicon glyphicon-edit"></i>' +
                     '</a>' +
                     '<a class="action-textobjectdelete" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[65] + '">' +
                         '<i class="glyphicon glyphicon-trash"></i>' +
-                    '</a>' +
-                '</td>' +
+				'</a>' 
+				}
+               body += '</td>' +
             '</tr>';
     });
     body += '</tbody></table></div>';
@@ -2511,8 +2543,9 @@ function printListTextobjects(textobjects) {
 
 // Print Authentication Page
 function printPageAuthentication() {
-	var html = '<div class="row full-height"><div class="col-md-5 col-lg-5 full-height" id="auth-left"><div class="middle"><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><img class="response" alt="Logo RR" src="/themes/default/images/logo-rr.png" /></div></div><!-- <div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><img class="response" alt="Signup Icon" src="/themes/default/images/button-signup.png"></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2">to access more features</div></div> --><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2 white">Existing user...</div></div><form id="form-login"><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input name="login[username]" placeholder="USERNAME" type="text" /></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input name="login[password]" placeholder="PASSWORD" type="password" /></div></div><div class="row"><div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2"><input alt="Login Icon" src="/themes/default/images/button-login.png" type="image" /></div></div></form></div></div><div class="col-md-7 col-lg-7" id="auth-right"><div id="logo-angular"><img class="response" alt="Logo Angular" src="/themes/default/images/logo-angular.png" /></div><div id="logo-ad"><img class="response" alt="Logo AD" src="/themes/default/images/logo-ad.png" /></div><div id="logo-text"><h1>Unified Networking Lab</h1><p>UNetLab can be considered the next major version of<br>iou-web, but the software has been rewritten from<br>scratch. The major advantage over GNS3 and<br>iou-web itself is about multi-hypervisor<br>support within a single entity. UNetLab<br>allows to design labs using IOU, Dy-<br>namips and QEMU nodes without<br>dealing with multi virtual ma-<br>chines: everything run in-<br>side a UNetLab host,<br>and a lab is a single<br>file including all<br>information<br>needed.</p></div></div></div>'
+	var html = new EJS({url: '/themes/default/ejs/login.ejs'}).render()
 	$('#body').html(html);
+	$("#form-login input:eq(0)").focus();
 }
 
 // Print lab list page
@@ -2530,20 +2563,8 @@ function printPageLabList(folder) {
 			if (data['status'] == 'success') {
 				logger(1, 'DEBUG: folder "' + folder + '" found.');
 
-				// Navbar: top
-				html += '<nav id="navbar-top" class="hidden-xs hidden-sm navbar navbar-static-top"><div class="container col-md-12 col-lg-12"><div id="logo-main" class="col-md-3 col-lg-3"><img alt="Logo" class="img-responsive" src="/themes/default/images/logo_rr.png"/></div><div class="navbar-collapse collapse"><ul class="nav navbar-nav navbar-right"><li class="navbar-item-aqua"><a href="https://www.unetlab.com/" target="_blank"">Help</a></li><li class="navbar-item-grey"><a href="http://www.unetlab.com/" target="_blank">About</a></li><li class="navbar-item-grey"><a href="http://forum.802101.com/forum39.html" target="_blank">Forum</a></li></ul></div></div></nav>';
-
-				// Navbar: main
-				html += '<nav id="navbar-main" class="navbar navbar-static-top"><div class="container col-md-12 col-lg-12"><div id="navbar-main-text" class="hidden-xs hidden-sm col-md-3 col-lg-3">by Andrea Dainese</div><div id="navbar-main-spacer" class="hidden-xs hidden-sm"></div><div class="navbar-collapse collapse"><ul class="col-md-9 col-lg-9 nav navbar-nav"><li class="item-first lab-list"><a class="action-lablist" href="#">' + MESSAGES[11] + '</a></li><li class="separator hidden-xs hidden-sm"><img alt="Spacer" src="/themes/default/images/vertical_dots.gif"/></li><li class="item dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Actions <span class="caret"></span></a><ul id="actions-menu" class="dropdown-menu"><li><a href="#">&lt;' + MESSAGES[3] + '&gt;</a></li></ul></li><li class="separator hidden-xs hidden-sm"><img alt="Spacer" src="/themes/default/images/vertical_dots.gif"/></li><li class="item usermgmt"><a class="action-usermgmt" href="#">' + MESSAGES[12] + '</a></li><li class="separator hidden-xs hidden-sm"><img alt="Spacer" src="/themes/default/images/vertical_dots.gif"/></li><li class="item sysstatus"><a class="action-sysstatus" href="#">' + MESSAGES[13] + '</a></li><li class="separator hidden-xs hidden-sm"><img alt="Spacer" src="/themes/default/images/vertical_dots.gif"/></li><li class="item"><a class="action-logout item" href="#"><i class="glyphicon glyphicon-log-out"></i> ' + MESSAGES[14] + '</a></li></ul></div></div></nav>';
-
-				// Main: title
-				html += '<div id="main-title" class="container col-md-12 col-lg-12"><div class="row row-eq-height"><div id="list-title-folders" class="col-md-3 col-lg-3"><span title="' + folder + '">' + MESSAGES[0] + ' ' + folder + '</span></div><div id="list-title-labs" class="col-md-3 col-lg-3"><span>' + MESSAGES[1] + '</span></div><div id="list-title-info" class="col-md-6 col-lg-6"><span></span></div></div></div>';
-
-				// Main
-				html += '<div id="main" class="container col-md-12 col-lg-12"><div class="fill-height row row-eq-height"><div id="list-folders" class="col-md-3 col-lg-3" data-path="' + folder + '"><ul></ul></div><div id="list-labs" class="col-md-3 col-lg-3"><ul></ul></div><div id="list-info" class="col-md-6 col-lg-6"></div></div></div>';
-
-				// Footer
-				html += '';
+				html = new EJS({url: '/themes/default/ejs/layout.ejs'}).render({"MESSAGES" : MESSAGES , "folder" : folder , "username" : USERNAME , "role" : ROLE})
+				$("#alert_container").remove();
 
 				// Adding to the page
 				$('#body').html(html);
@@ -2673,6 +2694,10 @@ function printPageLabOpen(lab) {
 	$('#lab-sidebar ul').append('<li><a class="action-status" href="#" title="' + MESSAGES[13] + '"><i class="glyphicon glyphicon-info-sign"></i></a></li>');
 	$('#lab-sidebar ul').append('<li><a class="action-labclose" href="#" title="' + MESSAGES[60] + '"><i class="glyphicon glyphicon-off"></i></a></li>');
 	$('#lab-sidebar ul').append('<li><a class="action-logout" href="#" title="' + MESSAGES[14] + '"><i class="glyphicon glyphicon-log-out"></i></a></li>');
+	$('#lab-sidebar ul a').each(function(){
+		var t = $(this).attr("title");
+		$(this).append(t);
+	})
 }
 
 // Print user management section
@@ -2680,7 +2705,14 @@ function printUserManagement() {
 	$.when(getUsers(null)).done(function(data) {
 		var html = '<div class="row"><div id="users" class="col-md-12 col-lg-12"><div class="table-responsive"><table class="table"><thead><tr><th>' + MESSAGES[44] + '</th><th>' + MESSAGES[19] + '</th><th>' + MESSAGES[28] + '</th><th>' + MESSAGES[29] + '</th><th>' + MESSAGES[30] + '</th><th>' + MESSAGES[31] + '</th><th>' + MESSAGES[32] + '</th></tr></thead><tbody></tbody></table></div></div></div>';
 		html += '<div class="row"><div id="pods" class="col-md-12 col-lg-12"><div class="table-responsive"><table class="table"><thead><tr><th>' + MESSAGES[44] + '</th><th>' + MESSAGES[32] + '</th><th>' + MESSAGES[33] + '</th><th>' + MESSAGES[63] + '</th></tr></thead><tbody></tbody></table></div></div></div>';
-		$('#main-title').hide();
+		
+		var html_title = '' +
+            '<div class="row row-eq-height"><div id="list-title-folders" class="col-md-12 col-lg-12">' +
+                '<span title="Users">Users</span>' +
+            '</div>' +
+            '</div>';
+		$('#main-title').html(html_title);
+        $('#main-title').show();
 		$('#main').html(html);
 
 		// Read privileges and set specific actions/elements
@@ -3508,4 +3540,61 @@ function getElementsAngle(selector) {
     ;
 
   return angle;
+}
+
+function getLogs(file,per_page, search)
+{
+	var deferred = $.Deferred();
+	var url = '/api/logs/' + file + "/" + per_page + "/" + search;
+	var type = 'GET';
+	$.ajax({
+		timeout: TIMEOUT,
+		type: type,
+		url: encodeURI(url),
+		dataType: 'json',
+		success: function(data) {
+			var html = new EJS({url: '/themes/default/ejs/logs.ejs'}).render({"logs" :data , "per_page" : per_page, "search" : search , "file" : file});
+			$('#main').html(html);
+			
+			var html_title = '' +
+				'<div class="row row-eq-height"><div id="list-title-folders" class="col-md-12 col-lg-12">' +
+					'<span title="Logs">Logs</span>' +
+				'</div>' +
+				'</div>';
+			$('#main-title').html(html_title);
+			$('#main-title').show();
+		},
+		error: function(data) {
+			// Server error
+			var message = getJsonMessage(data['responseText']);
+			logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+			logger(1, 'DEBUG: ' + message);
+			deferred.reject(message);
+		}
+	});
+	return deferred.promise();
+}
+
+function search_log(file)
+{
+	if (file)
+		curr_log = file;
+	per_page = $("#log_lines").val();
+	search = $("#log_search").val();
+	
+	getLogs(curr_log,per_page, search);
+}
+
+var curr_log = "";
+// Print user management section
+function printLogs(file,per_page, search) {
+	curr_log = file;
+	$('#actions-menu').empty();
+	$('#actions-menu').append('<li><a href="#" onclick="search_log(); return false"><i class="glyphicon glyphicon-refresh"></i> Refresh</a></li>');
+			
+	$.when(getLogs(file, per_page, search)).done(function(data) {
+		
+	}).fail(function(message) {
+		addModalError(message);
+	});
 }
