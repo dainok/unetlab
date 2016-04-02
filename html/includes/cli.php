@@ -802,9 +802,9 @@ function prepareNode($n, $id, $t, $nets) {
 	                                        $diskcmd = '/opt/unetlab/scripts/createdosdisk.sh '.$n -> getRunningPath() ;
         	                                exec($diskcmd, $o, $rc);
 						break;
+					//case 'vsrxng':
 					case 'vmx':
 					case 'vsrx':
-					case 'vsrxng':
 						copy (  $n -> getRunningPath().'/startup-config',  $n -> getRunningPath().'/juniper.conf');
 						$isocmd = 'mkisofs -o '.$n -> getRunningPath().'/config.iso -l --iso-level 2 '.$n -> getRunningPath().'/juniper.conf' ;
 						exec($isocmd, $o, $rc);
@@ -900,17 +900,14 @@ function start($n, $id, $t, $nets, $scripttimeout) {
 	// Special Case for xrv - csr1000v - vIOS - vIOSL - Docker
 	if ( ( $n->getTemplate() == 'xrv' || $n->getTemplate() == 'csr1000v' || $n->getTemplate() == 'asav' || $n->getTemplate() == 'titanium' )  && is_file($n -> getRunningPath().'/config.iso') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
 		$flags .= ' -cdrom config.iso' ;
-                touch($n -> getRunningPath().'/.lock') ;
         }
 
 	if (( $n->getTemplate() == 'vios'  || $n->getTemplate() == 'viosl2') && is_file($n -> getRunningPath().'/minidisk') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
 		$flags .= ' -drive file=minidisk,if=virtio,bus=0,unit=1,cache=none' ;
-		touch($n -> getRunningPath().'/.lock') ;
 	}
 
 	if (( $n->getTemplate() == 'vmx'  || $n->getTemplate() == 'vsrx' || $n->getTemplate() == 'vsrxng') && is_file($n -> getRunningPath().'/config.iso') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
 		$flags .= ' -drive file=config.iso,if=virtio,media=cdrom,index=2' ;
-		touch($n -> getRunningPath().'/.lock') ;
 	}
 
 	if ( $n -> getNType() != 'docker')  {
