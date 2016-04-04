@@ -320,6 +320,10 @@ body{
     font-weight: bold;
     padding: 0px 2px 0px 2px;
 }
+#lab-viewport .node_interface:hover {
+    z-index: 9000;
+	
+}
 
 [class*="node"], [class*="network"] {
     z-index: 1000;
