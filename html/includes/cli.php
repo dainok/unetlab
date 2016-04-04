@@ -802,7 +802,7 @@ function prepareNode($n, $id, $t, $nets) {
 	                                        $diskcmd = '/opt/unetlab/scripts/createdosdisk.sh '.$n -> getRunningPath() ;
         	                                exec($diskcmd, $o, $rc);
 						break;
-					//case 'vsrxng':
+					case 'vsrxng':
 					case 'vmx':
 					case 'vsrx':
 						copy (  $n -> getRunningPath().'/startup-config',  $n -> getRunningPath().'/juniper.conf');
@@ -906,9 +906,15 @@ function start($n, $id, $t, $nets, $scripttimeout) {
 		$flags .= ' -drive file=minidisk,if=virtio,bus=0,unit=1,cache=none' ;
 	}
 
-	if (( $n->getTemplate() == 'vmx'  || $n->getTemplate() == 'vsrx' || $n->getTemplate() == 'vsrxng') && is_file($n -> getRunningPath().'/config.iso') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
+	if (( $n->getTemplate() == 'vmx'  || $n->getTemplate() == 'vsrx') && is_file($n -> getRunningPath().'/config.iso') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
 		$flags .= ' -drive file=config.iso,if=virtio,media=cdrom,index=2' ;
 	}
+
+        if ((  $n->getTemplate() == 'vsrxng') && is_file($n -> getRunningPath().'/config.iso') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
+                $flags .= ' -drive file=config.iso,if=ide,media=cdrom,index=2' ;
+        }
+
+
 
 	if ( $n -> getNType() != 'docker')  {
 		$cmd .= ' -- '.$flags.' > '.$n -> getRunningPath().'/wrapper.txt 2>&1 &';
