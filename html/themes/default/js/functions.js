@@ -2132,7 +2132,9 @@ function printLabPreview(lab_filename) {
 		if (lab['description'] != null) {
 			html += '<p>' + lab['description'] + '</p>';
 		}
-		html += '<button class="action-labopen btn btn-aqua" type="button" data-path="' + lab_filename + '">' + MESSAGES[22] + '</button>';
+		html += '<button class="action-labopen btn btn-aqua" type="button" data-path="' + lab_filename + '">' + MESSAGES[22] + '</button> ';
+		if (ROLE != "user")
+			html += '<button class="action-labedit-inline btn btn-aqua" type="button" data-path="' + lab_filename + '">Edit</button>';
 		$('#list-title-info span').html(lab['filename'].replace(/\\/g,'/').replace(/.*\//, ''));
 		$('#list-info').html(html);
 	}).fail(function(message) {
@@ -2762,7 +2764,7 @@ function printUserManagement() {
 			}
 			$('#users tbody').append('<tr class="action-useredit user" data-path="' + username + '"><td class="username">' + username + '</td><td class="class="name">' + name + '</td><td class="email">' + email + '</td><td class="role">' + role + '</td><td class="expiration">' + expiration + '</td><td class="session">' + session + '</td><td class="pod">' + pod + '</td></tr>');
 			if (object['pod'] >= 0) {
-				$('#pods tbody').append('<tr class="action-useredit user" data-path="' + username + '"><td class="username">' + username + '</td><td class="pod">' + pod + '</td><td class="pexpiration">' + pexpiration + '</td><td class="lab">' + lab + '</td></tr>');
+				$('#pods tbody').append('<tr class="action-useredit user" data-path="' + username + '"><td class="username">' + username + '</td><td class="pod">' + pod + '</td><td class="pexpiration">' + pexpiration + '</td><td class="">' + lab + '</td></tr>');
 			}
 		});
 	}).fail(function(message) {

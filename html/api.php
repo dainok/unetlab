@@ -1172,7 +1172,7 @@ $app -> get('/api/update', function() use ($app, $db) {
 /***************************************************************************
  * LOGS
  **************************************************************************/
-$app -> get('/api/logs/(:file)/(:lines)/(:search)', function($file = False, $lines = 30, $search="") use ($app, $db) {
+$app -> get('/api/logs/(:file)/(:lines)/(:search)', function($file = False, $lines = 10, $search="") use ($app, $db) {
 	list($user, $tenant, $output) = apiAuthorization($db, $app -> getCookie('unetlab_session'));
 	if ($user === False) {
 		$app -> response -> setStatus($output['code']);
@@ -1181,7 +1181,7 @@ $app -> get('/api/logs/(:file)/(:lines)/(:search)', function($file = False, $lin
 	}
 	
 
-	$f = file_get_contents("/opt/unetlab/data/Logs/" . $file);
+	$f = @file_get_contents("/opt/unetlab/data/Logs/" . $file);
 	if ($f)
 	{
 		$arr = explode("\n", $f);

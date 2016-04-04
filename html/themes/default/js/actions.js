@@ -628,6 +628,18 @@ $(document).on('click', '.action-labedit', function(e) {
   $('#context-menu').remove();
 });
 
+// Edit a lab inline
+$(document).on('click', '.action-labedit-inline', function(e) {
+	logger(1, 'DEBUG: action = labedit');
+	$.when(getLabInfo($('.action-labedit-inline').attr('data-path'))).done(function(values) {
+		values['path'] = dirname($('.action-labedit-inline').attr('data-path'));
+		printFormLab('edit', values);
+	}).fail(function(message) {
+		addModalError(message);
+	});
+  $('#context-menu').remove();
+});
+
 // List all labs
 $(document).on('click', '.action-lablist', function(e) {
 	logger(1, 'DEBUG: action = lablist');
@@ -3100,5 +3112,5 @@ $(document).on("click", ".user-settings", function () {
 // Load user management page
 $(document).on('click', '.logs', function(e) {
 	logger(1, 'DEBUG: action = logs');
-	printLogs('access.txt', 30,"");
+	printLogs('access.txt', 10,"");
 });
