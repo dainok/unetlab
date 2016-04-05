@@ -2,7 +2,7 @@
 # vim: syntax=php tabstop=4 softtabstop=0 noexpandtab laststatus=1 ruler
 
 /**
- r html/includes/__node.php
+ * html/includes/__node.php
  *
  * Class for UNetLab nodes.
  *
