@@ -192,14 +192,17 @@ $(document).on('contextmenu', '#lab-viewport', function(e) {
 
         return;
     }
-
-    var body = '';
-    body += '<li><a class="action-nodeplace" href="#"><i class="glyphicon glyphicon-hdd"></i> ' + MESSAGES[81] + '</a></li>';
-    body += '<li><a class="action-networkplace" href="#"><i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[82] + '</a></li>';
-    body += '<li><a class="action-pictureadd" href="#"><i class="glyphicon glyphicon-picture"></i> ' + MESSAGES[83] + '</a></li>';
-    body += '<li><a class="action-customshapeadd" href="#"><i class="glyphicon glyphicon-unchecked"></i> ' + MESSAGES[145] + '</a></li>';
-    body += '<li><a class="action-textadd" href="#"><i class="glyphicon glyphicon-font"></i> ' + MESSAGES[146] + '</a></li>';
-    printContextMenu(MESSAGES[80], body, e.pageX, e.pageY);
+	
+	if (ROLE != "user")
+	{
+		var body = '';
+		body += '<li><a class="action-nodeplace" href="#"><i class="glyphicon glyphicon-hdd"></i> ' + MESSAGES[81] + '</a></li>';
+		body += '<li><a class="action-networkplace" href="#"><i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[82] + '</a></li>';
+		body += '<li><a class="action-pictureadd" href="#"><i class="glyphicon glyphicon-picture"></i> ' + MESSAGES[83] + '</a></li>';
+		body += '<li><a class="action-customshapeadd" href="#"><i class="glyphicon glyphicon-unchecked"></i> ' + MESSAGES[145] + '</a></li>';
+		body += '<li><a class="action-textadd" href="#"><i class="glyphicon glyphicon-font"></i> ' + MESSAGES[146] + '</a></li>';
+		printContextMenu(MESSAGES[80], body, e.pageX, e.pageY);
+	}
 });
 
 // Manage context menu
@@ -998,6 +1001,8 @@ $(document).on('click', '.action-selectedclone', function(e) {
 $(document).on('click', '.action-selecteddelete', function(e) {
 	if ($('.selected').size() > 0) {
 		logger(1, 'DEBUG: action = selecteddelete');
+		if (!confirm('Are you sure ?'))
+			return;
 		$('.selected').each(function(id, object) {
 			var path = $(this).attr('data-path');
 			if ($(this).hasClass('folder')) {
