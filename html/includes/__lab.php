@@ -1041,6 +1041,9 @@ class Lab {
 								$s -> addAttribute('module', $module);
 							}
 							break;
+						case 'vpcs':
+							$d -> addAttribute('ethernet', $node -> getEthernetCount());
+							break;
 						case 'docker':
 							// Docker specific parameters
 							$d -> addAttribute('ethernet', $node -> getEthernetCount());

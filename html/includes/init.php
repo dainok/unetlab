@@ -124,12 +124,13 @@ if (!isset($node_templates)) {
 		'sterra'		=>	'S-Terra',
 		'vyos'			=>	'VyOS',
 		//'esxi'		=>	'VMware ESXi',
-		'win'			=>	'Windows'
+		'win'			=>	'Windows',
+		'vpcs'			=>	'Virtual PC'
 	);
 }
 
 // Define parameters
-define('VERSION', '1.0.0-6-git');
+define('VERSION', '1.0.0-7.001-git');
 define('BASE_DIR', '/opt/unetlab');
 define('BASE_LAB', BASE_DIR.'/labs');
 define('BASE_TMP', BASE_DIR.'/tmp');
