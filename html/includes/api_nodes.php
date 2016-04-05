@@ -245,6 +245,9 @@ function apiGetLabNode($lab, $id) {
 			$output['data']['ethernet'] = $node -> getEthernetCount();
 			$output['data']['ram'] = $node -> getRam();
 		}
+		if ($node -> getNType() == 'vpcs') {
+                        $output['data']['ethernet'] = $node -> getEthernetCount();
+		}
 	} else {
 		// Node not found
 		$output['code'] = 404;
@@ -314,6 +317,9 @@ function apiGetLabNodes($lab) {
 				$output['data'][$node_id]['ethernet'] = $node -> getEthernetCount();
 				$output['data'][$node_id]['ram'] = $node -> getRam();
 			}
+			if ($node -> getNType() == 'vpcs') {
+                                $output['data'][$node_id]['ethernet'] = $node -> getEthernetCount();
+                        }
 		}
 	}
 	return $output;
@@ -498,6 +504,11 @@ function apiGetLabNodeTemplate($p) {
 		'type' => 'input',
 		'value' => $p['ethernet']
 	);
+	if ($p['type'] == 'vpcs') $output['data']['options']['ethernet'] = Array(
+		'name' => $GLOBALS['messages'][70012],
+                'type' => 'input',
+                'value' => $p['ethernet']
+        );
 
 	// Serial
 	if ($p['type'] == 'iol') $output['data']['options']['serial'] = Array(

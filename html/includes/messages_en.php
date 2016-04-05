@@ -340,6 +340,7 @@ $messages[80084] = 'Skipping powered off and unsupported nodes (80084).';
 $messages[80085] = 'Failed to set MTU 9000 on interface (80085).';
 $messages[80086] = 'Cannot import iou-web file (80086).';
 $messages[80087] = 'iou-web file imported (80087).';
+$messages[80088] = 'Cannot find vpcs installation (80088).';
 
 // Authentication (90000-99999)
 $messages[90001] = 'User is not authenticated or session timed out (90001).';

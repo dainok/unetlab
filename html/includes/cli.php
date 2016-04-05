@@ -61,7 +61,7 @@ function addBridge($s) {
 		exec($cmd, $o, $rc);
 		if ($rc != 0) {
 			// Failed to configure forward mask
-			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80028]);
+			error_log(date('M d H:i:s ').'ERROR: '.$cmd." --- ".$GLOBALS['messages'][80028]);
 			error_log(date('M d H:i:s ').implode("\n", $o));
 			return 80028;
 		}
@@ -193,6 +193,7 @@ function addOvs($s) {
 function addTap($s, $u) {
 	// TODO if already exist should fail?
 	$cmd = 'tunctl -u '.$u.' -g root -t '.$s.' 2>&1';
+	error_log(date('M d H:i:s ').'INFO: '.$cmd);
 	exec($cmd, $o, $rc);
 	if ($rc != 0) {
 		// Failed to add the TAP interface
@@ -731,6 +732,12 @@ function prepareNode($n, $id, $t, $nets) {
 					}
 				}
 				break;
+			case 'vpcs':
+				if (!is_file('/opt/vpcsu/bin/vpcs')) {
+                                        error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80088]);
+                                        return 80082;
+                                }
+				break;
 			case 'dynamips':
 				// Nothing to do
 				break;
@@ -886,6 +893,9 @@ function start($n, $id, $t, $nets, $scripttimeout) {
 		case 'docker':
 			$cmd = 'docker -H=tcp://127.0.0.1:4243 start '.$n -> getUuid();
 			break;
+		case 'vpcs':
+			$cmd ='/opt/vpcsu/bin/vpcs -o unl'.$t.' -g root';
+			break;
 		case 'dynamips':
 			$cmd = '/opt/unetlab/wrappers/dynamips_wrapper -T '.$t.' -D '.$id.' -t "'.$n -> getName().'" -F /opt/unetlab/addons/dynamips/'.$n -> getImage().' -d '.$n -> getDelay();
 			break;
@@ -916,9 +926,14 @@ function start($n, $id, $t, $nets, $scripttimeout) {
 
 
 
-	if ( $n -> getNType() != 'docker')  {
+	if ( $n -> getNType() != 'docker' && $n -> getNType() != 'vpcs')  {
 		$cmd .= ' -- '.$flags.' > '.$n -> getRunningPath().'/wrapper.txt 2>&1 &';
 	}
+
+	if ( $n -> getNType() == 'vpcs')  {
+		$cmd .= $flags.' > '.$n -> getRunningPath().'/wrapper.txt 2>&1 &';
+	}
+
 	error_log(date('M d H:i:s ').'INFO: CWD is '.getcwd());
 	error_log(date('M d H:i:s ').'INFO: starting '.$cmd);
 	exec($cmd, $o, $rc);
