@@ -60,6 +60,7 @@ if (!isset($node_config)) {
 		'c1710'			=>	'embedded',
 		'c3725'			=>	'embedded',
 		'c7200'			=>	'embedded',
+		'vpcs'			=>	'embedded',
 		'asa'			=>	'config_asa.py',
 		'asav'			=>	'config_asav.py',
 		'csr1000v'		=>	'config_csr1000v.py',

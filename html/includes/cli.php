@@ -469,6 +469,13 @@ function export($node_id, $n, $lab) {
 				return 80060;
 			}
 			break;
+		case 'vpcs':
+			if (!is_file($n->getRunningPath().'/startup.vpc')) {
+				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80062]);
+			} else {
+				copy($n->getRunningPath().'/startup.vpc',$tmp);
+			}
+			break;
 		case 'iol':
 			$nvram = $n -> getRunningPath().'/nvram_'.sprintf('%05u', $node_id);
 			if (!is_file($nvram)) {
@@ -816,13 +823,12 @@ function prepareNode($n, $id, $t, $nets) {
 						$isocmd = 'mkisofs -o '.$n -> getRunningPath().'/config.iso -l --iso-level 2 '.$n -> getRunningPath().'/juniper.conf' ;
 						exec($isocmd, $o, $rc);
                                                 break;
-					case 'vsrx-old':
-						$diskcmd = '/opt/unetlab/scripts/createjundisk.sh '.$n -> getRunningPath() ;
-						exec($diskcmd, $o, $rc);
-						break;
 					case 'veos':
 						$diskcmd = '/opt/unetlab/scripts/veos_diskmod.sh '.$n -> getRunningPath() ;
 						exec($diskcmd, $o, $rc);
+						break;
+					case 'vpcs':
+						copy ($n -> getRunningPath().'/startup-config',  $n -> getRunningPath().'/startup.vpc');
 						break;
 				}
 			}
@@ -894,7 +900,7 @@ function start($n, $id, $t, $nets, $scripttimeout) {
 			$cmd = 'docker -H=tcp://127.0.0.1:4243 start '.$n -> getUuid();
 			break;
 		case 'vpcs':
-			$cmd ='/opt/vpcsu/bin/vpcs -o unl'.$t.' -g root';
+			$cmd ='/opt/vpcsu/bin/vpcs -m '.$id;
 			break;
 		case 'dynamips':
 			$cmd = '/opt/unetlab/wrappers/dynamips_wrapper -T '.$t.' -D '.$id.' -t "'.$n -> getName().'" -F /opt/unetlab/addons/dynamips/'.$n -> getImage().' -d '.$n -> getDelay();

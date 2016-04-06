@@ -406,27 +406,28 @@ function apiGetLabNodeTemplate($p) {
 	$output['data']['type'] = $p['type'];
 
 	// Image
+	if ($p['type'] != 'vpcs') {	
 	$node_images = listNodeImages($p['type'], $p['template']);
-	if (empty($node_images)) {
-		$output['data']['options']['image'] = Array(
-			'name' => $GLOBALS['messages'][70002],
-			'type' => 'list',
-			'value' => '',
-			'list' => Array()
-		);
-	} else {
-		$output['data']['options']['image'] = Array(
-			'name' => $GLOBALS['messages'][70002],
-			'type' => 'list',
-			'list' => $node_images
-		);
-		if (isset($p['image'])) {
-			$output['data']['options']['image']['value'] =  $p['image'];
+		if (empty($node_images)) {
+			$output['data']['options']['image'] = Array(
+				'name' => $GLOBALS['messages'][70002],
+				'type' => 'list',
+				'value' => '',
+				'list' => Array()
+			);
 		} else {
-			$output['data']['options']['image']['value'] =  end($node_images);
+			$output['data']['options']['image'] = Array(
+				'name' => $GLOBALS['messages'][70002],
+				'type' => 'list',
+				'list' => $node_images
+			);
+			if (isset($p['image'])) {
+				$output['data']['options']['image']['value'] =  $p['image'];
+			} else {
+				$output['data']['options']['image']['value'] =  end($node_images);
+			}
 		}
 	}
-
 	// Node Name/Prefix
 	$output['data']['options']['name'] = Array(
 		'name' => $GLOBALS['messages'][70000],
@@ -504,12 +505,6 @@ function apiGetLabNodeTemplate($p) {
 		'type' => 'input',
 		'value' => $p['ethernet']
 	);
-	if ($p['type'] == 'vpcs') $output['data']['options']['ethernet'] = Array(
-		'name' => $GLOBALS['messages'][70012],
-                'type' => 'input',
-                'value' => $p['ethernet']
-        );
-
 	// Serial
 	if ($p['type'] == 'iol') $output['data']['options']['serial'] = Array(
 		'name' => $GLOBALS['messages'][70017],
@@ -518,7 +513,7 @@ function apiGetLabNodeTemplate($p) {
 	);
 
 	// Startup configs
-	if (in_array($p['type'], Array('dynamips', 'iol', 'qemu', 'docker'))) {
+	if (in_array($p['type'], Array('dynamips', 'iol', 'qemu', 'docker','vpcs'))) {
 		$output['data']['options']['config'] = Array(
 			'name' => $GLOBALS['messages'][70013],
 			'type' => 'list',
