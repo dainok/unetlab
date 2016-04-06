@@ -492,6 +492,8 @@ function export($node_id, $n, $lab) {
 				error_log(date('M d H:i:s ').implode("\n", $o));
 				return 80060;
 			}
+			// Add no shut
+			if (is_file($tmp)) file_put_contents($tmp,preg_replace('/(\ninterface.*)/','$1'.chr(10).' no shutdown',file_get_contents($tmp)));
 			break;
 		case 'qemu':
 			if ($n -> getStatus() < 2 || !isset($GLOBALS['node_config'][$n -> getTemplate()])) {
