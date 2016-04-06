@@ -900,7 +900,7 @@ function start($n, $id, $t, $nets, $scripttimeout) {
 			$cmd = 'docker -H=tcp://127.0.0.1:4243 start '.$n -> getUuid();
 			break;
 		case 'vpcs':
-			$cmd ='/opt/vpcsu/bin/vpcs -m '.$id;
+			$cmd ='/opt/vpcsu/bin/vpcs -m '.$id.' -N '.$n -> getName();
 			break;
 		case 'dynamips':
 			$cmd = '/opt/unetlab/wrappers/dynamips_wrapper -T '.$t.' -D '.$id.' -t "'.$n -> getName().'" -F /opt/unetlab/addons/dynamips/'.$n -> getImage().' -d '.$n -> getDelay();
