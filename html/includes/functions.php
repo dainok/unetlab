@@ -519,6 +519,30 @@ function genUuid() {
 	);
 }
 
+
+/**
+ * Function to check if mac address format is valid
+ *
+ * @return   int (Bool)   
+ */
+
+function IsValidMac($mac)
+{
+  return (preg_match('/([a-fA-F0-9]{2}[:]?){6}/', $mac) == 1);
+}
+/** 
+  * Function to Increment mac address
+  *
+  * @return string  Next Mac
+  */
+
+function incMac($mac,$n)
+{
+        $nmac=substr("000000000000".dechex(hexdec(str_replace(":", '', $mac))+$n),-12);
+        $fmac=trim((preg_replace('/../','$0:',$nmac)),":");
+	return $fmac;
+}
+
 /**
  * Function to check if UNetLab is running as a VM.
  *

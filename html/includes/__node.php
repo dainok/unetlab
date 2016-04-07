@@ -67,6 +67,7 @@ class Node {
 	private $delay;
 	private $ethernet;
 	private $ethernets = Array();
+	private $firstmac;
 	private $host;
 	private $icon;
 	private $id;
@@ -350,6 +351,13 @@ class Node {
 			if (isset($p['ethernet'])) $this -> ethernet = (int) $p['ethernet'];
 			if (isset($p['uuid'])) $this -> uuid = $p['uuid'];
 			if (isset($p['ram'])) $this -> ram = (int) $p['ram'];
+			if ( $p['template']  == 'bigip' ) {
+				if (isset($p['firstmac']) && isValidMac($p['firstmac'])) {
+					$this -> firstmac = (string) $p['firstmac'];
+				} else {
+					$this -> firstmac =  '00:50:'.sprintf('%02x', $this -> tenant).':'.sprintf('%02x', $this -> id / 512).':'.sprintf('%02x', $this -> id % 512).':00';
+				}
+			}
 		}
 
 		// Building docker node
@@ -635,6 +643,13 @@ class Node {
 				$this -> uuid = $p['uuid'];
 				$modified = True;
 			}
+			if (isset($p['firstmac']) && !isValidMac($p['firstmac'])) {
+				$this -> firstmac =  '00:50:'.sprintf('%02x', $this -> tenant).':'.sprintf('%02x', $this -> id / 512).':'.sprintf('%02x', $this -> id % 512).':00';
+				$modified = True;
+			} else if (isset($p['firstmac']) && isValidMac( $p['firstmac'])) {
+                                $this -> firstmac = (string) $p['firstmac'];
+                        } 
+			
 		}
 
 		if ($this -> type == 'docker') {
@@ -1039,6 +1054,16 @@ class Node {
 	public function getInterfaces() {
 		return $this -> ethernets + $this -> serials;
 	}
+
+        /**
+         * Method to get Management Mac ( Needed for F5 )
+         * 
+         * @return      Array                       Node management mac
+         */
+        public function getFirstMac() {
+                return $this -> firstmac;
+		printf("firstmac") ;
+        }
 
 	/**
 	 * Method to get left offset.
@@ -1607,8 +1632,9 @@ class Node {
 									return 40020;
 								}
 							}
-							// Setting CMD flags (virtual device and map to TAP device)
-							$this -> flags_eth .= ' -device %NICDRIVER%,netdev=net'.$i.',mac=50:'.sprintf('%02x', $this -> tenant).':'.sprintf('%02x', $this -> id / 512).':'.sprintf('%02x', $this -> id % 512).':00:'.sprintf('%02x', $i);
+							// Setting CMD flags (virtual device and map to TAP device) SPECIAL COMPUTING
+							//$this -> flags_eth .= ' -device %NICDRIVER%,netdev=net'.$i.',mac=50:'.sprintf('%02x', $this -> tenant).':'.sprintf('%02x', $this -> id / 512).':'.sprintf('%02x', $this -> id % 512).':00:'.sprintf('%02x', $i);
+							$this -> flags_eth .= ' -device %NICDRIVER%,netdev=net'.$i.',mac='.incMac($this->firstmac,$i);
 							$this -> flags_eth .= ' -netdev tap,id=net'.$i.',ifname=vunl'.$this -> tenant.'_'.$this -> id.'_'.$i.',script=no';
 						}
 						break;
