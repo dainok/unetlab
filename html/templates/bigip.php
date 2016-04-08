@@ -36,7 +36,7 @@ $p['icon'] = 'Load Balancer.png';
 $p['cpu'] = 1; 
 $p['ram'] = 2048;
 $p['ethernet'] = 4;
-$p['console'] = 'vnc'; 
+$p['console'] = 'telnet'; 
 $p['qemu_arch'] = 'x86_64';
-$p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -serial none -nographic -nodefconfig -nodefaults -display none -vga std -rtc base=utc';
+$p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -serial mon:stdio -nographic -nodefconfig -nodefaults -display none -vga std -rtc base=utc ';
 ?>
