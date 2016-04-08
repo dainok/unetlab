@@ -239,6 +239,9 @@ function apiGetLabNode($lab, $id) {
 			$output['data']['ethernet'] = $node -> getEthernetCount();
 			$output['data']['ram'] = $node -> getRam();
 			$output['data']['uuid'] = $node -> getUuid();
+			if ( $node -> getTemplate() == "bigip" )  {
+				$output['data']['firstmac'] = $node -> getFirstMac();
+			}
 		}
 
 		if ($node -> getNType() == 'docker') {
@@ -311,6 +314,9 @@ function apiGetLabNodes($lab) {
 				$output['data'][$node_id]['ethernet'] = $node -> getEthernetCount();
 				$output['data'][$node_id]['ram'] = $node -> getRam();
 				$output['data'][$node_id]['uuid'] = $node -> getUuid();
+				if ( $node -> getTemplate() == "bigip" ) {
+					$output['data'][$node_id]['firstmac'] = $node -> getFirstMac();
+				}
 			}
 
 			if ($node -> getNType() == 'docker') {
@@ -505,6 +511,14 @@ function apiGetLabNodeTemplate($p) {
 		'type' => 'input',
 		'value' => $p['ethernet']
 	);
+
+	// First Mac
+        if ($p['template'] == "bigip" ) $output['data']['options']['firstmac'] =  Array(
+                'name' => $GLOBALS['messages'][70021],
+                'type' => 'input',
+                'value' => ( isset($p['firstmac'])?$p['firstmac']:"") 
+        );
+
 	// Serial
 	if ($p['type'] == 'iol') $output['data']['options']['serial'] = Array(
 		'name' => $GLOBALS['messages'][70017],
@@ -555,7 +569,6 @@ function apiGetLabNodeTemplate($p) {
 		if (isset($p['qemu_nic'])) $output['data']['qemu']['nic'] = $p['qemu_nic'];
 		if (isset($p['qemu_options'])) $output['data']['qemu']['options'] = $p['qemu_options'];
 	}
-
 	return $output;
 }
 
