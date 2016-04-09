@@ -16,10 +16,10 @@ cat ${CONTROL} | sed "s/%VERSION%/${VERSION}/" | sed "s/%RELEASE%/${RELEASE}/" >
 # vpcs
 
 cd ${COMP_DIR}
-wget "https://sourceforge.net/code-snapshots/svn/v/vp/vpcs/code/vpcs-code-126-trunk.zip"
-unzip vpcs-code-126-trunk.zip
-cd vpcs-code-126-trunk
-patch -p 0 < ${PATCH_DIR}/vpcs-trunk-126.patch
+wget "https://sourceforge.net/projects/vpcs/files/0.8/vpcs-0.8-src.tbz"
+tar -jxvf vpcs-0.8-src.tbz
+cd vpcs-0.8
+patch -p 0 < ${PATCH_DIR}/vpcs-0-8b.patch
 cd src
 make -f Makefile.linux
 
