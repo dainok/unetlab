@@ -1,0 +1,192 @@
+diff -Nru ../vpcs.orig/src/command.c src/command.c
+--- ../vpcs.orig/src/command.c	2015-07-14 17:36:50.000000000 +0000
++++ src/command.c	2016-04-08 20:50:44.122959449 +0000
+@@ -67,6 +67,7 @@
+ extern int runStartup;
+ extern const char *default_startupfile;
+ extern int num_pths;
++extern char *tapname;
+ 
+ static const char *color_name[8] = {
+ 	"black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"};
+@@ -1065,7 +1066,7 @@
+ 	if (DEV_TAP == devtype) {
+ 		tip = (ntohl(rip) | (~ip_masks[icidr])) - 1;
+ 		in.s_addr = ntohl(tip);
+-		i = sprintf(buf, "ifconfig tap%d %s ", pcid, inet_ntoa(in));
++		i = sprintf(buf, "ifconfig %s %s ", tapname , inet_ntoa(in));
+ 		in.s_addr = ntohl(ip_masks[icidr]);	
+ 		sprintf(buf + i, " netmask %s up", inet_ntoa(in));
+ 		i = system(buf);
+@@ -1931,7 +1932,8 @@
+ 		"All rights reserved.\r\n\r\n"
+ 		"VPCS is free software, distributed under the terms of the \"BSD\" licence.\r\n"
+ 		"Source code and license can be found at vpcs.sf.net.\r\n"
+-		"For more information, please visit wiki.freecode.com.cn.\r\n", 
++		"For more information, please visit wiki.freecode.com.cn.\r\n" 
++		"Modified version supporting unetlab by unetlab team\r\n", 
+ 		ver, __DATE__, __TIME__ );
+ 	
+ 	return 1;	
+diff -Nru ../vpcs.orig/src/daemon.c src/daemon.c
+--- ../vpcs.orig/src/daemon.c	2016-02-24 12:43:26.000000000 +0000
++++ src/daemon.c	2016-04-08 20:54:25.098965197 +0000
+@@ -36,6 +36,7 @@
+ #include <sys/ioctl.h>
+ #include <signal.h>
+ #include <sys/socket.h>
++#include <netinet/tcp.h>
+ #include <netinet/in.h>
+ #include <arpa/inet.h>
+ #include <sys/select.h>
+@@ -139,6 +140,7 @@
+ 	(void) setsockopt(sock, SOL_SOCKET, SO_REUSEADDR,
+ 	    (char *)&on, sizeof(on));
+ 
++	(void) setsockopt(sock, IPPROTO_TCP , TCP_NODELAY, &on, sizeof(on));
+ 	bzero((char *) &serv, sizeof(serv));
+ 	serv.sin_family = AF_INET;
+ 	serv.sin_addr.s_addr = htonl(INADDR_ANY);
+@@ -323,18 +325,17 @@
+ }
+ 
+ static int 
+-set_telnet_mode(int s)
++set_telnet_mode(int s )
+ {
+ 	/* DO echo */
+-	char *neg =
+-	    "\xFF\xFD\x01"
+-	    "\xFF\xFB\x01"
+-	    "\xFF\xFD\x03"
+-	    "\xFF\xFB\x03";
++	char *pcname = "VPC";
++	char neg [ strlen(pcname)+17];
++	    sprintf ( neg , "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%s%c", 0xff,0xfb,0x1,0xff,0xfb,0x3,0xff,0xfb,0x0,0xff,0xfd,0x0,0x1b,0x5d,0x30,0x3b,pcname,0x7); 
++
+ 	u_char buf[512];
+ 	int n;
+ 	
+-	n = write(s, neg, strlen(neg));
++	n = write(s, neg, strlen(pcname)+17);
+ 	n = read(s, buf, sizeof(buf));
+ 	
+ 	return n;
+diff -Nru ../vpcs.orig/src/dev.c src/dev.c
+--- ../vpcs.orig/src/dev.c	2014-06-28 16:56:30.000000000 +0000
++++ src/dev.c	2016-04-08 20:42:03.562945907 +0000
+@@ -165,15 +165,14 @@
+ {
+ 	struct ifreq ifr;
+ 	int fd;
+-
+ 	char dev[IFNAMESIZ];
+-	
++
+ 	if (num_pths > 1)
+ 		sprintf(dev, "tap%d", id);
+ 	else
+ 		if (strlen(tapname) >= IFNAMSIZ)
+ 			return(-1);
+-		sprintf(dev, "%s", tapname);
++		strncpy(dev,tapname,IFNAMSIZ);
+ 
+ 	if ((fd = open("/dev/net/tun", O_RDWR)) < 0) {
+ 		return(-1);
+@@ -185,13 +184,14 @@
+ 	 * IFF_NO_PI - Do not provide packet information 
+ 	 *             TUNSLMODE | TUNSIFHEAD on the freebsd.
+ 	 */
+-	ifr.ifr_flags = IFF_TAP | IFF_NO_PI;
+-	strncpy(ifr.ifr_name, dev, IFNAMESIZ);
++	strncpy ( ifr.ifr_name, dev , IFNAMSIZ);
+ 
+-	if (ioctl(fd, TUNSETIFF, (void *) &ifr) < 0) {
+-		close(fd);
+-		return(-1);
+-	}
++        ifr.ifr_flags = IFF_TAP | IFF_NO_PI;
++
++        if (ioctl(fd, TUNSETIFF, (void *) &ifr) < 0) {
++                close(fd);
++                return(-1);
++        }
+ 	return(fd);
+ }
+ #endif
+diff -Nru ../vpcs.orig/src/Makefile.linux src/Makefile.linux
+--- ../vpcs.orig/src/Makefile.linux	2015-07-09 07:28:51.000000000 +0000
++++ src/Makefile.linux	2016-04-08 20:57:11.898969536 +0000
+@@ -5,7 +5,7 @@
+ HVOPT=-DHV
+ 
+ CFLAGS=-D$(OSTYPE) -D$(CPUTYPE) $(HVOPT) -Wall -I. -DTAP
+-LDFLAGS=-lpthread -lutil -s -static
++LDFLAGS=-lpthread -lutil -s
+ OBJS=vpcs.o \
+ 	daemon.o \
+ 	readline.o \
+diff -Nru ../vpcs.orig/src/vpcs.c src/vpcs.c
+--- ../vpcs.orig/src/vpcs.c	2016-02-24 12:43:26.000000000 +0000
++++ src/vpcs.c	2016-04-08 21:03:28.202979325 +0000
+@@ -88,6 +88,8 @@
+ int macaddr = 0; /* the last byte of ether address */
+ 
+ 
++char wname [256]; /* Window Name */
++
+ static void *pth_reader(void *devid);
+ static void *pth_output(void *devid);
+ static void *pth_writer(void *devid);
+@@ -154,12 +156,14 @@
+ 	pthread_t timer_pid, relay_pid, bgjob_pid;
+ 	int daemon_bg = 1;
+ 	char *cmd;
++	char *end;
++	strncpy ( wname , "VPC", 3 );
+ 
+ 	memset(&echoctl, 0, sizeof(struct echoctl));
+ 	rhost = inet_addr("127.0.0.1");
+ 	
+ 	devtype = DEV_UDP;		
+-	while ((c = getopt(argc, argv, "?c:efhm:p:r:Rs:t:uvFi:d:")) != -1) {
++	while ((c = getopt(argc, argv, "?c:efhm:p:r:Rs:t:o:g:N:uvFi:d:")) != -1) {
+ 		switch (c) {
+ 			case 'c':
+ 				rport_flag = 1;
+@@ -200,6 +204,9 @@
+ 			case 'F':
+ 				daemon_bg = 0;
+ 				break;
++			case 'N':
++				strncpy(wname,optarg,strlen(optarg)%256);
++				break;
+ 			case 'i':
+ 				num_pths = arg2int(optarg, 1, 9, 9);
+ 				break;
+@@ -279,6 +286,8 @@
+ 		loadhistory(histfile, rls);
+ 
+ 	while (1) {
++		printf ( "%c%c%c%c%s%c", 0x1b,0x5d,0x30,0x3b,wname,0x7);
++		fflush(stdout);
+ 		if (num_pths > 1)
+ 			snprintf(prompt, sizeof(prompt), "\n\r%s[%d]> ", vpc[pcid].xname, pcid + 1);
+ 		else
+@@ -301,7 +310,7 @@
+ 	int rc = 0;
+ 	char *pcmd;
+ 	int at = 0;
+-	
++
+ 	if (cmdstr[0] == '#' || cmdstr[0] == ';')
+ 		return;
+ 
+diff -Nru ../vpcs.orig/src/vpcs.hist src/vpcs.hist
+--- ../vpcs.orig/src/vpcs.hist	1970-01-01 00:00:00.000000000 +0000
++++ src/vpcs.hist	2016-04-05 05:13:47.000000000 +0000
+@@ -0,0 +1,4 @@
++help
++version
++exit
++quit

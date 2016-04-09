@@ -1,3 +1,5 @@
+#!/bin/sh
+#
 # Steps to use syncunl
 # 
 # type the following commands on a fresh UNL image:
@@ -13,8 +15,6 @@
 # 
 # /usr/src/unetlab/scripts/syncunl
 
-
-#!/bin/sh
 cd /usr/src/unetlab
 git pull
 cd scripts
