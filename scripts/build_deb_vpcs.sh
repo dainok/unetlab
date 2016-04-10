@@ -8,8 +8,8 @@ BUILD_DIR="/build"
 CONTROL_DIR="$(mktemp -dt)"
 COMP_DIR="$(mktemp -dt)"
 DATA_DIR="$(mktemp -dt)"
-VERSION="$(cat ${SRC_DIR}/VERSION | cut -d- -f1)"
-RELEASE="$(cat ${SRC_DIR}/VERSION | cut -d- -f2)"
+VERSION="0.8c"
+RELEASE="unetlab"
 
 cat ${CONTROL} | sed "s/%VERSION%/${VERSION}/" | sed "s/%RELEASE%/${RELEASE}/" > ${CONTROL_DIR}/control
 
