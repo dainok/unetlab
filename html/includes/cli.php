@@ -537,6 +537,7 @@ function export($node_id, $n, $lab) {
 	}
 
 	// Now save the config file within the lab
+	clearstatcache();
 	$fp = fopen($tmp, 'r');
 	if (!isset($fp)) {
 		// Cannot open file
