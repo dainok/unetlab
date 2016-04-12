@@ -137,6 +137,44 @@ function cfg_export(node_id) {
 	return deferred.promise();
 }
 
+// // Export node(s) config recursive
+function recursive_cfg_export (nodes,i) {
+        i = i-1
+        addMessage('info',  nodes[Object.keys(nodes)[i]]['name']  + ': ' + MESSAGES[138])
+        var deferred = $.Deferred();
+        var lab_filename = $('#lab-viewport').attr('data-path');
+        var url = '/api/labs' + lab_filename + '/nodes/' + Object.keys(nodes)[i] + '/export';
+        logger(1, 'DEBUG: ' + url );
+        var type = 'PUT';
+        $.ajax({
+                timeout: TIMEOUT * 10 * i,  // Takes a lot of time
+                type: type,
+                url: encodeURI(url),
+                dataType: 'json',
+                success: function(data) {
+                        if (data['status'] == 'success') {
+                                logger(1, 'DEBUG: config exported.');
+                                addMessage('success',  nodes[Object.keys(nodes)[i]]['name']  + ': ' + MESSAGES[79])
+                        } else {
+                                // Application error
+                                logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+                                addMessage('danger', nodes[Object.keys(nodes)[i]]['name'] +  data['message']   );
+                        }
+                        if ( i > 0 ) recursive_cfg_export (nodes,i)
+                },
+                error: function(data) {
+                        // Server error
+                        var message = getJsonMessage(data['responseText']);
+                        logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+                        logger(1, 'DEBUG: ' + message);
+                        addMessage('danger', nodes[Object.keys(nodes)[i]]['name'] +  message   );
+                        if ( i > 0 ) recursive_cfg_export (nodes,i)
+                }
+        });
+	if ( i == 0 ) addMessage('info',  'Export All: done');
+        return deferred.promise();
+}
+
 // Clone selected labs
 function cloneLab(form_data) {
 	var deferred = $.Deferred();

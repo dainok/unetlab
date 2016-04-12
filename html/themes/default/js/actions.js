@@ -1212,15 +1212,10 @@ $(document).on('click', '.action-nodeexport, .action-nodesexport, .action-nodeex
              * Parallel call for each node
              */
             nodesLenght = Object.keys(nodes).length;
-            $.each(nodes, function(key, values) {
-                addMessage('info', values['name'] + ': ' + MESSAGES[138]);
-                $.when(cfg_export(key)).done(function() {
-                    // Node exported -> print a small green message
-                    addMessage('success', values['name'] + ': ' + MESSAGES[79])
-                }).fail(function(message) {
-                    // Cannot exported
-                    addMessage('danger', values['name'] + ': ' + message);
-                });
+                        addMessage('info', 'Export all:  Starting');
+            $.when(recursive_cfg_export(nodes,nodesLenght)).done(function() {
+            }).fail(function(message) {
+                addMessage('danger', 'Export all: Error');
             });
         }
     }).fail(function(message) {
