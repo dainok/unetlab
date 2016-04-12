@@ -128,6 +128,10 @@ switch ($action) {
 		if (isset($node_id)) {
 			// Node ID is set, export a single node
 			$rc = export($node_id, $lab -> getNodes()[$node_id], $lab);
+			if ($rc == 80061 || $rc == 80084 ) {
+				error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][19]);
+				exit(19);
+			}
 			if ($rc !== 0) {
 				// Failed to export config
 				error_log(date('M d H:i:s ').date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][16]);
