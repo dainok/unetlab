@@ -51,7 +51,7 @@ if (!defined('FORCE_VM')) define('FORCE_VM', 'auto');
 if (!defined('MODE')) define('MODE', 'multi-user');
 if (!defined('SESSION')) define('SESSION', '3600');
 if (!defined('THEME')) define('THEME', 'default');
-if (!defined('TIMEOUT')) define('TIMEOUT', 60);
+if (!defined('TIMEOUT')) define('TIMEOUT', 25);
 if (!defined('TIMEZONE')) define('TIMEZONE', 'Europe/Rome');
 
 if (!isset($node_config)) {
