@@ -160,7 +160,11 @@ function recursive_cfg_export (nodes,i) {
                                 logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
                                 addMessage('danger', nodes[Object.keys(nodes)[i]]['name'] +  data['message']   );
                         }
-                        if ( i > 0 ) recursive_cfg_export (nodes,i)
+                        if ( i > 0 ) {
+				recursive_cfg_export (nodes,i);
+			} else {
+				addMessage('info',  'Export All: done');
+			}
                 },
                 error: function(data) {
                         // Server error
@@ -168,10 +172,13 @@ function recursive_cfg_export (nodes,i) {
                         logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
                         logger(1, 'DEBUG: ' + message);
                         addMessage('danger', nodes[Object.keys(nodes)[i]]['name'] +  message   );
-                        if ( i > 0 ) recursive_cfg_export (nodes,i)
+                        if ( i > 0 ) {
+				recursive_cfg_export (nodes,i);
+			} else {
+				addMessage('info',  'Export All: done');
+			}
                 }
         });
-	if ( i == 0 ) addMessage('info',  'Export All: done');
         return deferred.promise();
 }
 
