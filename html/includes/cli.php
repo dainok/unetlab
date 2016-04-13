@@ -526,7 +526,7 @@ function export($node_id, $n, $lab) {
 					return 80060;
 				}
 				// Add no shut
-				if ( ( $n->getTemplate() == "vios" || $n->getTemplate() == "viosl2" ) && is_file($tmp) ) file_put_contents($tmp,preg_replace('/(\ninterface.*)/','$1'.chr(10).' no shutdown',file_get_contents($tmp)));
+				if ( ( $n->getTemplate() == "vios" || $n->getTemplate() == "viosl2" || $n->getTemplate() == "xrv" ) && is_file($tmp) ) file_put_contents($tmp,preg_replace('/(\ninterface.*)/','$1'.chr(10).' no shutdown',file_get_contents($tmp)));
 			}
 	}
 

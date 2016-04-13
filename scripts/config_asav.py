@@ -196,7 +196,7 @@ def config_get(handler):
     # Getting the config
     handler.sendline('more system:running-config')
     try:
-        handler.expect('#', timeout = expctimeout)
+        handler.expect('#', timeout)
     except:
         print('ERROR: error waiting for "#" prompt.')
         node_quit(handler)
