@@ -188,3 +188,4 @@ MESSAGES[156] = 'Duplicated objects found.';
 MESSAGES[157] = 'Delete All';
 MESSAGES[158] = 'Config Script Timeout';
 MESSAGES[159] = 'Delete nodes startup-cfg';
+MESSAGES[160] = 'Deleted selected nodes startup-cfg';
