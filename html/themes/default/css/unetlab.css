@@ -1034,6 +1034,10 @@ map area:visited {
     overflow: hidden;
 }
 
+.customText p {
+	max-width: none;
+}
+
 .edit-custom-shape-form, .edit-custom-text-form{
     position: fixed;
     left: 0;
