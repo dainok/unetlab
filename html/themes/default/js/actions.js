@@ -1087,7 +1087,7 @@ $(document).on('click', '.action-nodesbootdelete, .action-nodesbootdelete-group'
                 // Config deleted
                 nodeLenght--;
                 if(nodeLenght < 1){
-                    addMessage('success', MESSAGES[142])
+                    addMessage('success', MESSAGES[160])
                 };
             }).fail(function(message) {
                 // Cannot delete config
