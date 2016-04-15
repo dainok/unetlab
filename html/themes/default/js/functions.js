@@ -3337,7 +3337,7 @@ function printFormEditCustomShape(id){
         '</div>'+
       '</div>'+
       '<div class="row col-md-3 btn-part">'+
-        '<button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button>' +
+        '<button type="button" class="btn btn-aqua edit-custom-shape-form-save" data-path="' + id + '">' + MESSAGES[47] + '</button>' +
         '<button type="button" class="btn btn-grey cancelForm" data-path="' + id + '">' + MESSAGES[18] + '</button>'+
       '</div>'+
       '<input type="hidden" class="firstShapeValues-z_index">' +
@@ -3458,7 +3458,7 @@ function printFormEditText(id){
       '</div>'+
     '</div>'+
     '<div class="row col-md-3 btn-part">'+
-      '<button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button>' +
+      '<button type="button" class="btn btn-aqua edit-custom-text-form-save" data-path="' + id + '">' + MESSAGES[47] + '</button>' +
       '<button type="button" class="btn btn-grey cancelForm" data-path="' + id + '">' + MESSAGES[18] + '</button>'+
     '</div>'+
     '<input type="text" class="hide firstTextValues-z_index">' +
