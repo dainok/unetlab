@@ -329,6 +329,9 @@ $(document).on('contextmenu', '.context-menu', function(e) {
             body += '' +
                 '<li role="separator" class="divider"></li>' +
                 '<li>' +
+                    '<a class="action-nodesbootdelete-group" href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[159] + '</a>' +
+                '</li>' +
+                '<li>' +
                     '<a class="action-nodedelete-group context-collapsible menu-manage" href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[157] + '</a>' +
                 '</li>' +
                 '';
@@ -1061,40 +1064,73 @@ $(document).on('click', '.action-selectedexport', function(e) {
 });
 
 // Delete all startup-config
-$(document).on('click', '.action-nodesbootdelete', function(e) {
-	$('#context-menu').remove();
-	$.when(getNodes(null)).done(function(nodes) {
-		var nodeLenght = Object.keys(nodes).length;
-		$.each(nodes, function(key, values) {
-			var lab_filename = $('#lab-viewport').attr('data-path');
-			var form_data = {};
-			form_data['id'] = key;
-			form_data['data'] = '';
-			var url = '/api/labs' + lab_filename + '/configs/' + key;
-			var type = 'PUT';
-			$.when($.ajax({
-				timeout: TIMEOUT,
-				type: type,
-				url: encodeURI(url),
-				dataType: 'json',
-				data: JSON.stringify(form_data)
-			})).done(function(message) {
-				// Config deleted
-				nodeLenght--;
-				if(nodeLenght < 1){
-					addMessage('success', MESSAGES[142])
-				};
-			}).fail(function(message) {
-				// Cannot delete config
-				nodeLenght--;
-				if(nodeLenght < 1){
-					addMessage('danger', values['name'] + ': ' + message);
-				};
-			});
-		});
-	}).fail(function(message) {
-		addModalError(message);
-	});
+$(document).on('click', '.action-nodesbootdelete, .action-nodesbootdelete-group', function(e) {
+    $('#context-menu').remove();
+    var isFreeSelectMode = $("#lab-viewport").hasClass("freeSelectMode")
+        ;
+    if (isFreeSelectMode) {
+        var nodeLenght = window.freeSelectedNodes.length;
+        var lab_filename = $('#lab-viewport').attr('data-path');
+        $.each(window.freeSelectedNodes, function(i, node) {
+            var form_data = {};
+            form_data['id'] = node.path;
+            form_data['data'] = '';
+            var url = '/api/labs' + lab_filename + '/configs/' + node.path;
+            var type = 'PUT';
+            $.when($.ajax({
+                timeout: TIMEOUT,
+                type: type,
+                url: encodeURI(url),
+                dataType: 'json',
+                data: JSON.stringify(form_data)
+            })).done(function(message) {
+                // Config deleted
+                nodeLenght--;
+                if(nodeLenght < 1){
+                    addMessage('success', MESSAGES[160])
+                };
+            }).fail(function(message) {
+                // Cannot delete config
+                nodeLenght--;
+                if(nodeLenght < 1){
+                    addMessage('danger', node.name + ': ' + message);
+                };
+            });
+        });
+    } else {
+        $.when(getNodes(null)).done(function(nodes) {
+            var nodeLenght = Object.keys(nodes).length;
+            $.each(nodes, function(key, values) {
+                var lab_filename = $('#lab-viewport').attr('data-path');
+                var form_data = {};
+                form_data['id'] = key;
+                form_data['data'] = '';
+                var url = '/api/labs' + lab_filename + '/configs/' + key;
+                var type = 'PUT';
+                $.when($.ajax({
+                    timeout: TIMEOUT,
+                    type: type,
+                    url: encodeURI(url),
+                    dataType: 'json',
+                    data: JSON.stringify(form_data)
+                })).done(function(message) {
+                    // Config deleted
+                    nodeLenght--;
+                    if(nodeLenght < 1){
+                        addMessage('success', MESSAGES[142])
+                    };
+                }).fail(function(message) {
+                    // Cannot delete config
+                    nodeLenght--;
+                    if(nodeLenght < 1){
+                        addMessage('danger', values['name'] + ': ' + message);
+                    };
+                });
+            });
+        }).fail(function(message) {
+            addModalError(message);
+        });
+    }
 });
 
 // Configure nodes to boot from scratch
