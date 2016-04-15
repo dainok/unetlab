@@ -2787,7 +2787,7 @@ $('body').on('click', '.edit-custom-text-form .cancelForm', function(e){
   $('.edit-custom-text-form').remove();
 });
 
-$('body').on('submit', '.edit-custom-text-form', function(e){
+$('body').on('click', '.edit-custom-text-form-save', function(e){
   logger(1, 'DEBUG: action = action-save new text values');
   var id = $(this).attr('data-path')
     , $selected_shape = $("#customText"+id)
@@ -3044,7 +3044,7 @@ $('body').on('change', '.edit-custom-shape-form .shape-rotation-input', function
   $("#customShape"+id).css("transform", "rotate("+angle+"deg)");
 });
 
-$('body').on('submit', '.edit-custom-shape-form', function(e){
+$('body').on('click', '.edit-custom-shape-form-save', function(e){
   logger(1, 'DEBUG: action = action-save new shape values');
   var id = $(this).attr('data-path')
     , $selected_shape = $("#customShape"+id)
