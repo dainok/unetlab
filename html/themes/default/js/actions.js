@@ -1308,7 +1308,13 @@ $(document).on('click', '.action-nodestart, .action-nodesstart, .action-nodestar
             });
         }
         else if (startAll) {
-            nodeLenght = Object.keys(nodes).length;
+            nodesLenght = Object.keys(nodes).length;
+                        addMessage('info', 'Start all...');
+            $.when(recursive_start(nodes,nodesLenght)).done(function() {
+            }).fail(function(message) {
+                addMessage('danger', 'Start all: Error');
+            });
+/*
             $.each(nodes, function(key, values) {
                 $.when(start(key)).done(function() {
                     // Node started -> print a small green message
@@ -1326,7 +1332,8 @@ $(document).on('click', '.action-nodestart, .action-nodesstart, .action-nodestar
                     }
                 });
             });
-        }
+*/ 
+       }
     }).fail(function(message) {
         addModalError(message);
     });

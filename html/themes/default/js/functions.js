@@ -1323,6 +1323,51 @@ function start(node_id) {
 	return deferred.promise();
 }
 
+// Start nodes recursive
+function recursive_start(nodes,i) {
+	i=i-1;
+        var deferred = $.Deferred();
+        var lab_filename = $('#lab-viewport').attr('data-path');
+        var url = '/api/labs' + lab_filename + '/nodes/' + Object.keys(nodes)[i] + '/start';
+        var type = 'GET';
+        $.ajax({
+		timeout: TIMEOUT,
+                type: type,
+                url: encodeURI(url),
+                dataType: 'json',
+                success: function(data) {
+                        if (data['status'] == 'success') {
+                                logger(1, 'DEBUG: node(s) started.');
+				addMessage('success',  nodes[Object.keys(nodes)[i]]['name']  + ': ' + MESSAGES[76]  );
+                        } else {
+                                // Application error
+                                logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+                                addMessage('danger',  nodes[Object.keys(nodes)[i]]['name']  + ': ' + MESSAGES[76] + 'failed' );
+                        }
+                        if ( i > 0 ) {
+                                recursive_start (nodes,i);
+			} else {
+                                addMessage('info',  'Start All: done');
+                        }
+                },
+                error: function(data) {
+                        // Server error
+                        var message = getJsonMessage(data['responseText']);
+                        logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+                        logger(1, 'DEBUG: ' + message);
+                        addMessage('danger', message );
+                        if ( i > 0 ) {
+                                recursive_start (nodes,i);
+                        } else {
+                                addMessage('info',  'Start All: done');
+                        }
+
+                }
+        });
+        return deferred.promise();
+}
+
+
 // Stop node(s)
 function stop(node_id) {
 	var deferred = $.Deferred();
