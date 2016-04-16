@@ -1222,15 +1222,10 @@ $(document).on('click', '.action-nodeexport, .action-nodesexport, .action-nodeex
     $.when(getNodes(null)).done(function(nodes) {
         if (isFreeSelectMode) {
             nodesLenght = window.freeSelectedNodes.length;
-            $.each(window.freeSelectedNodes, function(i, node) {
-                addMessage('info', node.name + ': ' + MESSAGES[138]);
-                $.when(cfg_export(node.path)).done(function() {
-                    // Node exported -> print a small green message
-                    addMessage('success', node.name + ': ' + MESSAGES[79])
-                }).fail(function(message) {
-                    // Cannot exported
-                    addMessage('danger', node.name + ': ' + message);
-                });
+	    addMessage('info', 'Export Selected:  Starting');
+            $.when(recursive_cfg_export(window.freeSelectedNodes,nodesLenght)).done(function() {
+            }).fail(function(message) {
+                addMessage('danger', 'Export Selected: Error');
             });
         }
         else if (node_id) {
@@ -1279,23 +1274,12 @@ $(document).on('click', '.action-nodestart, .action-nodesstart, .action-nodestar
     $.when(getNodes(null)).done(function(nodes) {
         if (isFreeSelectMode) {
             nodeLenght = window.freeSelectedNodes.length;
-            $.each(window.freeSelectedNodes, function(i, node) {
-                $.when(start(node.path)).done(function() {
-                    // Node started -> print a small green message
-                    addMessage('success', node.name + ': ' + MESSAGES[76]);
-                    nodeLenght--;
-                    if(nodeLenght < 1){
-                        printLabStatus();
-                    }
-                }).fail(function(message) {
-                    // Cannot start
-                    addMessage('danger', node.name + ': ' + message);
-                    nodeLenght--;
-                    if(nodeLenght < 1){
-                        printLabStatus();
-                    }
-                });
+            addMessage('info', 'Start selected nodes...');
+            $.when(recursive_start(window.freeSelectedNodes,nodeLenght)).done(function() {
+            }).fail(function(message) {
+                addMessage('danger', 'Start all: Error');
             });
+
         }
         else if (node_id != null) {
             $.when(start(node_id)).done(function() {
