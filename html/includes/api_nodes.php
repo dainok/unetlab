@@ -63,11 +63,13 @@ function apiAddLabNode($lab, $p, $o) {
  * @param   int     $id                 Node ID
  * @return  Array                       Return code (JSend data)
  */
-function apiDeleteLabNode($lab, $id) {
+function apiDeleteLabNode($lab, $id, $tenant) {
 	// Delete all tmp files for the node
 	$cmd = 'sudo /opt/unetlab/wrappers/unl_wrapper -a delete -T 0 -D '.$id.' -F "'.$lab -> getPath().'/'.$lab -> getFilename().'"';  // Tenant not required for delete operation
 	exec($cmd, $o, $rc);
-
+	// Stop the node
+	$output = apiStopLabNode($lab, $id, $tenant);
+	if ( $output['status'] == 400 ) return $output; 
 	// Deleting the node
 	$rc = $lab -> deleteNode($id);
 	if ($rc === 0) {
