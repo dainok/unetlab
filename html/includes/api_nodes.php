@@ -68,8 +68,13 @@ function apiDeleteLabNode($lab, $id, $tenant) {
 	$cmd = 'sudo /opt/unetlab/wrappers/unl_wrapper -a delete -T 0 -D '.$id.' -F "'.$lab -> getPath().'/'.$lab -> getFilename().'"';  // Tenant not required for delete operation
 	exec($cmd, $o, $rc);
 	// Stop the node
-	$output = apiStopLabNode($lab, $id, $tenant);
-	if ( $output['status'] == 400 ) return $output; 
+	foreach( scandir("/opt/unetlab/tmp/") as $value ) {	
+		if ( is_dir("/opt/unetlab/tmp/".$value) and intval($value) >= 0 ) {
+			$output=apiStopLabNode($lab, $id, intval($value)); 
+			file_put_contents("/tmp/ade",$value,FILE_APPEND);
+			if ($output['status'] == 400 ) return $output; 	
+		}
+	}
 	// Deleting the node
 	$rc = $lab -> deleteNode($id);
 	if ($rc === 0) {
