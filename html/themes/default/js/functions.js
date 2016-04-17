@@ -143,7 +143,11 @@ function recursive_cfg_export (nodes,i) {
         addMessage('info',  nodes[Object.keys(nodes)[i]]['name']  + ': ' + MESSAGES[138])
         var deferred = $.Deferred();
         var lab_filename = $('#lab-viewport').attr('data-path');
-        var url = '/api/labs' + lab_filename + '/nodes/' + Object.keys(nodes)[i] + '/export';
+	if ( typeof nodes[Object.keys(nodes)[i]]['path'] === 'undefined' ) {
+        	var url = '/api/labs' + lab_filename + '/nodes/' + Object.keys(nodes)[i] + '/export';
+	} else {
+		var url = '/api/labs' + lab_filename + '/nodes/' + nodes[Object.keys(nodes)[i]]['path'] + '/export';
+	}
         logger(1, 'DEBUG: ' + url );
         var type = 'PUT';
         $.ajax({
@@ -1328,7 +1332,11 @@ function recursive_start(nodes,i) {
 	i=i-1;
         var deferred = $.Deferred();
         var lab_filename = $('#lab-viewport').attr('data-path');
-        var url = '/api/labs' + lab_filename + '/nodes/' + Object.keys(nodes)[i] + '/start';
+	if ( typeof nodes[Object.keys(nodes)[i]]['path'] === 'undefined') { 
+        	var url = '/api/labs' + lab_filename + '/nodes/' + Object.keys(nodes)[i] + '/start';
+	} else { 
+		var url = '/api/labs' + lab_filename + '/nodes/' + nodes[Object.keys(nodes)[i]]['path'] + '/start';
+	}
         var type = 'GET';
         $.ajax({
 		timeout: TIMEOUT,
