@@ -66,7 +66,8 @@ function addMessage(severity, message) {
 	// Add the alert div to top (prepend()) or to bottom (append())
 	$('#alert_container .inner').prepend(msgalert);
 	
-	if (severity == "danger")
+	//if (severity == "danger" )
+	if (severity != "" )
 	{
 		var notification_alert = $('<div class="alert alert-' + severity.toLowerCase() + ' fade in">').append($('<button type="button" class="close" data-dismiss="alert">').append("&times;")).append(message);
 

@@ -970,7 +970,7 @@ $app -> delete('/api/labs/(:path+)', function($path = array()) use ($app, $db) {
 	if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/networks\/[0-9]+$/', $s)) {
 		$output = apiDeleteLabNetwork($lab, $id);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/nodes\/[0-9]+$/', $s)) {
-		$output = apiDeleteLabNode($lab, $id);
+		$output = apiDeleteLabNode($lab, $id,$tenant);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/textobjects\/[0-9]+$/', $s)) {
 		$output = apiDeleteLabTextObject($lab, $id);
 	} else if (preg_match('/^\/[A-Za-z0-9_+\/\\s-]+\.unl\/pictures\/[0-9]+$/', $s)) {
