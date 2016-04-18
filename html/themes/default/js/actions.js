@@ -1538,13 +1538,13 @@ $(document).on('dblclick', '.action-useredit', function(e) {
 // Load user management page
 $(document).on('click', '.action-update', function(e) {
 	logger(1, 'DEBUG: action = update');
-	addMessage('info', MESSAGES[133]);
+	addMessage('info', MESSAGES[133], true);
 	$.when(update()).done(function(message) {
 		// Got user
-		addMessage('success', message);
+		addMessage('success', message, true);
 	}).fail(function(message) {
 		// Cannot get user
-		addMessage('alert', message);
+		addMessage('alert', message, true);
 	});
 });
 
