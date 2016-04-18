@@ -45,37 +45,43 @@ function dirname(path) {
 }
 
 // Alert management
-function addMessage(severity, message) {
+function addMessage(severity, message, notFromLabviewport) {
 	// Severity can be success (green), info (blue), warning (yellow) and danger (red)
+	// Param 'notFromLabviewport' is used to filter notification
 
-	var timeout = 10000;		// by default close messages after 3 seconds
+	var timeout = 10000;		// by default close messages after 10 seconds
   if (severity == 'danger') timeout = 5000;
 	if (severity == 'alert') timeout = 10000;
 	if (severity == 'warning') timeout = 10000;
 
-	if (!$('#alert_container').length) {
-		// Add the frame container if not exists
-		$('body').append('<div id="alert_container"><b><i class="fa fa-bell-o"></i> Notifications</b><div class="inner"></div></div>');
-	}
-	if (!$('#notification_container').length) {
-		$('body').append('<div id="notification_container"></div>');
-	}
-	
-	var msgalert = $('<div class="alert alert-' + severity.toLowerCase() + ' fade in">').append($('<button type="button" class="close" data-dismiss="alert">').append("&times;")).append(message);
+	// Add notifications to #alert_container only when labview is open
+	if($("#lab-viewport").length) {
+		if (!$('#alert_container').length) {
+			// Add the frame container if not exists
+			$('body').append('<div id="alert_container"><b><i class="fa fa-bell-o"></i> Notifications</b><div class="inner"></div></div>');
+		}
+		var msgalert = $('<div class="alert alert-' + severity.toLowerCase() + ' fade in">').append($('<button type="button" class="close" data-dismiss="alert">').append("&times;")).append(message);
 
-	// Add the alert div to top (prepend()) or to bottom (append())
-	$('#alert_container .inner').prepend(msgalert);
-	
-	//if (severity == "danger" )
-	if (severity != "" )
-	{
-		var notification_alert = $('<div class="alert alert-' + severity.toLowerCase() + ' fade in">').append($('<button type="button" class="close" data-dismiss="alert">').append("&times;")).append(message);
+		// Add the alert div to top (prepend()) or to bottom (append())
+		$('#alert_container .inner').prepend(msgalert);
 
-		$('#notification_container').prepend(notification_alert);
-		if (timeout) {
-			window.setTimeout(function() {
-				notification_alert.alert("close");
-			}, timeout);
+	}
+
+	if ($("#lab-viewport").length || (!$("#lab-viewport").length && notFromLabviewport)){
+		if (!$('#notification_container').length) {
+			$('body').append('<div id="notification_container"></div>');
+		}
+
+		//if (severity == "danger" )
+		if (severity != "" ) {
+			var notification_alert = $('<div class="alert alert-' + severity.toLowerCase() + ' fade in">').append($('<button type="button" class="close" data-dismiss="alert">').append("&times;")).append(message);
+
+			$('#notification_container').prepend(notification_alert);
+			if (timeout) {
+				window.setTimeout(function() {
+					notification_alert.alert("close");
+				}, timeout);
+			}
 		}
 	}
 }
@@ -2661,6 +2667,8 @@ function printPageLabList(folder) {
 		url: encodeURI(url),
 		dataType: 'json',
 		success: function(data) {
+			// Clear the message container
+			$("#notification_container").empty()
 			if (data['status'] == 'success') {
 				logger(1, 'DEBUG: folder "' + folder + '" found.');
 
