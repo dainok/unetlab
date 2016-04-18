@@ -51,7 +51,7 @@ if (!defined('FORCE_VM')) define('FORCE_VM', 'auto');
 if (!defined('MODE')) define('MODE', 'multi-user');
 if (!defined('SESSION')) define('SESSION', '3600');
 if (!defined('THEME')) define('THEME', 'default');
-if (!defined('TIMEOUT')) define('TIMEOUT', 60);
+if (!defined('TIMEOUT')) define('TIMEOUT', 25);
 if (!defined('TIMEZONE')) define('TIMEZONE', 'Europe/Rome');
 
 if (!isset($node_config)) {
@@ -131,7 +131,7 @@ if (!isset($node_templates)) {
 }
 
 // Define parameters
-define('VERSION', '1.0.0-7.004-git');
+define('VERSION', '1.0.0-7.005-git');
 define('BASE_DIR', '/opt/unetlab');
 define('BASE_LAB', BASE_DIR.'/labs');
 define('BASE_TMP', BASE_DIR.'/tmp');

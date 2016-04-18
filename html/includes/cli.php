@@ -460,6 +460,14 @@ function export($node_id, $n, $lab) {
 				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80066]);
 				return 80066;
 			}
+			$cmd='/opt/unetlab/scripts/wrconf_iol_dyn_.py -p '.$n -> getPort().' -t 15';
+			exec($cmd, $o, $rc);
+			error_log(date('M d H:i:s ').'INFO: force write configuration '.$cmd);
+			if ($rc != 0) {
+				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80060]);
+				error_log(date('M d H:i:s ').(string) $o);
+				return 80060;
+			}
 			$cmd = '/usr/bin/nvram_export '.$nvram.' '.$tmp;
 			exec($cmd, $o, $rc);
 			error_log(date('M d H:i:s ').'INFO: exporting '.$cmd);
@@ -483,6 +491,14 @@ function export($node_id, $n, $lab) {
 				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80066]);
 				return 80066;
 			}
+                        $cmd='/opt/unetlab/scripts/wrconf_iol_dyn_.py -p '.$n -> getPort().' -t 15';
+                        exec($cmd, $o, $rc);
+                        error_log(date('M d H:i:s ').'INFO: force write configuration '.$cmd);
+                        if ($rc != 0) {
+                                error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80060]);
+                                error_log(date('M d H:i:s ').(string) $o);
+                                return 80060;
+                        }
 			$cmd = '/opt/unetlab/scripts/iou_export '.$nvram.' '.$tmp;
 			exec($cmd, $o, $rc);
 			usleep(1);
@@ -510,7 +526,7 @@ function export($node_id, $n, $lab) {
 					return 80060;
 				}
 				// Add no shut
-				if ( ( $n->getTemplate() == "vios" || $n->getTemplate() == "viosl2" ) && is_file($tmp) ) file_put_contents($tmp,preg_replace('/(\ninterface.*)/','$1'.chr(10).' no shutdown',file_get_contents($tmp)));
+				if ( ( $n->getTemplate() == "vios" || $n->getTemplate() == "viosl2" || $n->getTemplate() == "xrv" ) && is_file($tmp) ) file_put_contents($tmp,preg_replace('/(\ninterface.*)/','$1'.chr(10).' no shutdown',file_get_contents($tmp)));
 			}
 	}
 
@@ -521,6 +537,7 @@ function export($node_id, $n, $lab) {
 	}
 
 	// Now save the config file within the lab
+	clearstatcache();
 	$fp = fopen($tmp, 'r');
 	if (!isset($fp)) {
 		// Cannot open file

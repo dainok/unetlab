@@ -51,6 +51,7 @@ $messages[15] = 'Cannot remove UUID from exported labs (15).';
 $messages[16] = 'Failed to export config (16).';
 $messages[17] = 'Failed to upgrade UNetLab (17).';
 $messages[18] = 'Unable to connect to Internet (18).';
+$messages[19] = 'Export not supported (19).';
 
 /***************************************************************************
  * Classes

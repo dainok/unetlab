@@ -50,7 +50,7 @@ function addMessage(severity, message, notFromLabviewport) {
 	// Param 'notFromLabviewport' is used to filter notification
 
 	var timeout = 10000;		// by default close messages after 10 seconds
-  	if (severity == 'danger') timeout = 5000;
+  if (severity == 'danger') timeout = 5000;
 	if (severity == 'alert') timeout = 10000;
 	if (severity == 'warning') timeout = 10000;
 
@@ -66,12 +66,12 @@ function addMessage(severity, message, notFromLabviewport) {
 		$('#alert_container .inner').prepend(msgalert);
 
 	}
-	
+
 	if ($("#lab-viewport").length || (!$("#lab-viewport").length && notFromLabviewport)){
 		if (!$('#notification_container').length) {
 			$('body').append('<div id="notification_container"></div>');
 		}
-		
+
 		//if (severity == "danger" )
 		if (severity != "" ) {
 			var notification_alert = $('<div class="alert alert-' + severity.toLowerCase() + ' fade in">').append($('<button type="button" class="close" data-dismiss="alert">').append("&times;")).append(message);
@@ -142,6 +142,55 @@ function cfg_export(node_id) {
 		}
 	});
 	return deferred.promise();
+}
+
+// // Export node(s) config recursive
+function recursive_cfg_export (nodes,i) {
+        i = i-1
+        addMessage('info',  nodes[Object.keys(nodes)[i]]['name']  + ': ' + MESSAGES[138])
+        var deferred = $.Deferred();
+        var lab_filename = $('#lab-viewport').attr('data-path');
+	if ( typeof nodes[Object.keys(nodes)[i]]['path'] === 'undefined' ) {
+        	var url = '/api/labs' + lab_filename + '/nodes/' + Object.keys(nodes)[i] + '/export';
+	} else {
+		var url = '/api/labs' + lab_filename + '/nodes/' + nodes[Object.keys(nodes)[i]]['path'] + '/export';
+	}
+        logger(1, 'DEBUG: ' + url );
+        var type = 'PUT';
+        $.ajax({
+                timeout: TIMEOUT * 10 * i,  // Takes a lot of time
+                type: type,
+                url: encodeURI(url),
+                dataType: 'json',
+                success: function(data) {
+                        if (data['status'] == 'success') {
+                                logger(1, 'DEBUG: config exported.');
+                                addMessage('success',  nodes[Object.keys(nodes)[i]]['name']  + ': ' + MESSAGES[79])
+                        } else {
+                                // Application error
+                                logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+                                addMessage('danger', nodes[Object.keys(nodes)[i]]['name'] + ': ' + data['message']   );
+                        }
+                        if ( i > 0 ) {
+				recursive_cfg_export (nodes,i);
+			} else {
+				addMessage('info',  'Export All: done');
+			}
+                },
+                error: function(data) {
+                        // Server error
+                        var message = getJsonMessage(data['responseText']);
+                        logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+                        logger(1, 'DEBUG: ' + message);
+                        addMessage('danger', nodes[Object.keys(nodes)[i]]['name'] +  ': ' + message   );
+                        if ( i > 0 ) {
+				recursive_cfg_export (nodes,i);
+			} else {
+				addMessage('info',  'Export All: done');
+			}
+                }
+        });
+        return deferred.promise();
 }
 
 // Clone selected labs
@@ -1284,6 +1333,55 @@ function start(node_id) {
 	});
 	return deferred.promise();
 }
+
+// Start nodes recursive
+function recursive_start(nodes,i) {
+	i=i-1;
+        var deferred = $.Deferred();
+        var lab_filename = $('#lab-viewport').attr('data-path');
+	if ( typeof nodes[Object.keys(nodes)[i]]['path'] === 'undefined') { 
+        	var url = '/api/labs' + lab_filename + '/nodes/' + Object.keys(nodes)[i] + '/start';
+	} else { 
+		var url = '/api/labs' + lab_filename + '/nodes/' + nodes[Object.keys(nodes)[i]]['path'] + '/start';
+	}
+        var type = 'GET';
+        $.ajax({
+		timeout: TIMEOUT,
+                type: type,
+                url: encodeURI(url),
+                dataType: 'json',
+                success: function(data) {
+                        if (data['status'] == 'success') {
+                                logger(1, 'DEBUG: node(s) started.');
+				addMessage('success',  nodes[Object.keys(nodes)[i]]['name']  + ': ' + MESSAGES[76]  );
+                        } else {
+                                // Application error
+                                logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+                                addMessage('danger',  nodes[Object.keys(nodes)[i]]['name']  + ': ' + MESSAGES[76] + 'failed' );
+                        }
+                        if ( i > 0 ) {
+                                recursive_start (nodes,i);
+			} else {
+                                addMessage('info',  'Start All: done');
+                        }
+                },
+                error: function(data) {
+                        // Server error
+                        var message = getJsonMessage(data['responseText']);
+                        logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+                        logger(1, 'DEBUG: ' + message);
+                        addMessage('danger', message );
+                        if ( i > 0 ) {
+                                recursive_start (nodes,i);
+                        } else {
+                                addMessage('info',  'Start All: done');
+                        }
+
+                }
+        });
+        return deferred.promise();
+}
+
 
 // Stop node(s)
 function stop(node_id) {
@@ -2882,6 +2980,14 @@ function drawStatusInModal(data) {
     // QEMU running nodes
     $('#stats-graph ul', $statusModalBody).append('<li><div class="count count-qemu col-md-4 col-lg-4"></div></li>');
     $('.count-qemu', $statusModalBody).html('<strong>' + data['qemu'] + '</strong><br/><span>' + MESSAGES[43] + '</span>');
+
+    // Docker running nodes
+    $('#stats-graph ul', $statusModalBody).append('<li><div class="count count-docker col-md-4 col-lg-6"></div></li>');
+    $('.count-docker', $statusModalBody).html('<strong>' + data['docker'] + '</strong><br/><span>' + MESSAGES[161] + '</span>');
+
+    // VPCS running nodes
+    $('#stats-graph ul', $statusModalBody).append('<li><div class="count count-vpcs col-md-4 col-lg-6"></div></li>');
+    $('.count-vpcs', $statusModalBody).html('<strong>' + data['vpcs'] + '</strong><br/><span>' + MESSAGES[162] + '</span>');
 }
 
 // Update system status in modal
@@ -3009,6 +3115,15 @@ function printSystemStats(data) {
     // QEMU running nodes
     $('#stats-graph ul').append('<li><div class="count count-qemu col-md-4 col-lg-4"></div></li>');
     $('.count-qemu').html('<strong>' + data['qemu'] + '</strong><br/><span>' + MESSAGES[43] + '</span>');
+
+    // Docker running nodes
+    $('#stats-graph ul').append('<li><div class="count count-docker col-md-4 col-lg-6"></div></li>');
+    $('.count-docker').html('<strong>' + data['docker'] + '</strong><br/><span>' + MESSAGES[161] + '</span>');
+
+    // VPCS running nodes
+    $('#stats-graph ul').append('<li><div class="count count-vpcs col-md-4 col-lg-6"></div></li>');
+    $('.count-vpcs').html('<strong>' + data['vpcs'] + '</strong><br/><span>' + MESSAGES[162] + '</span>');
+
 }
 
 /*******************************************************************************

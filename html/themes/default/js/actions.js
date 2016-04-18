@@ -192,14 +192,17 @@ $(document).on('contextmenu', '#lab-viewport', function(e) {
 
         return;
     }
-
-    var body = '';
-    body += '<li><a class="action-nodeplace" href="#"><i class="glyphicon glyphicon-hdd"></i> ' + MESSAGES[81] + '</a></li>';
-    body += '<li><a class="action-networkplace" href="#"><i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[82] + '</a></li>';
-    body += '<li><a class="action-pictureadd" href="#"><i class="glyphicon glyphicon-picture"></i> ' + MESSAGES[83] + '</a></li>';
-    body += '<li><a class="action-customshapeadd" href="#"><i class="glyphicon glyphicon-unchecked"></i> ' + MESSAGES[145] + '</a></li>';
-    body += '<li><a class="action-textadd" href="#"><i class="glyphicon glyphicon-font"></i> ' + MESSAGES[146] + '</a></li>';
-    printContextMenu(MESSAGES[80], body, e.pageX, e.pageY);
+	
+	if (ROLE != "user")
+	{
+		var body = '';
+		body += '<li><a class="action-nodeplace" href="#"><i class="glyphicon glyphicon-hdd"></i> ' + MESSAGES[81] + '</a></li>';
+		body += '<li><a class="action-networkplace" href="#"><i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[82] + '</a></li>';
+		body += '<li><a class="action-pictureadd" href="#"><i class="glyphicon glyphicon-picture"></i> ' + MESSAGES[83] + '</a></li>';
+		body += '<li><a class="action-customshapeadd" href="#"><i class="glyphicon glyphicon-unchecked"></i> ' + MESSAGES[145] + '</a></li>';
+		body += '<li><a class="action-textadd" href="#"><i class="glyphicon glyphicon-font"></i> ' + MESSAGES[146] + '</a></li>';
+		printContextMenu(MESSAGES[80], body, e.pageX, e.pageY);
+	}
 });
 
 // Manage context menu
@@ -1001,6 +1004,8 @@ $(document).on('click', '.action-selectedclone', function(e) {
 $(document).on('click', '.action-selecteddelete', function(e) {
 	if ($('.selected').size() > 0) {
 		logger(1, 'DEBUG: action = selecteddelete');
+		if (!confirm('Are you sure ?'))
+ 			return;
 		$('.selected').each(function(id, object) {
 			var path = $(this).attr('data-path');
 			if ($(this).hasClass('folder')) {
@@ -1087,7 +1092,7 @@ $(document).on('click', '.action-nodesbootdelete, .action-nodesbootdelete-group'
                 // Config deleted
                 nodeLenght--;
                 if(nodeLenght < 1){
-                    addMessage('success', MESSAGES[142])
+                    addMessage('success', MESSAGES[160])
                 };
             }).fail(function(message) {
                 // Cannot delete config
@@ -1222,15 +1227,10 @@ $(document).on('click', '.action-nodeexport, .action-nodesexport, .action-nodeex
     $.when(getNodes(null)).done(function(nodes) {
         if (isFreeSelectMode) {
             nodesLenght = window.freeSelectedNodes.length;
-            $.each(window.freeSelectedNodes, function(i, node) {
-                addMessage('info', node.name + ': ' + MESSAGES[138]);
-                $.when(cfg_export(node.path)).done(function() {
-                    // Node exported -> print a small green message
-                    addMessage('success', node.name + ': ' + MESSAGES[79])
-                }).fail(function(message) {
-                    // Cannot exported
-                    addMessage('danger', node.name + ': ' + message);
-                });
+	    addMessage('info', 'Export Selected:  Starting');
+            $.when(recursive_cfg_export(window.freeSelectedNodes,nodesLenght)).done(function() {
+            }).fail(function(message) {
+                addMessage('danger', 'Export Selected: Error');
             });
         }
         else if (node_id) {
@@ -1248,15 +1248,10 @@ $(document).on('click', '.action-nodeexport, .action-nodesexport, .action-nodeex
              * Parallel call for each node
              */
             nodesLenght = Object.keys(nodes).length;
-            $.each(nodes, function(key, values) {
-                addMessage('info', values['name'] + ': ' + MESSAGES[138]);
-                $.when(cfg_export(key)).done(function() {
-                    // Node exported -> print a small green message
-                    addMessage('success', values['name'] + ': ' + MESSAGES[79])
-                }).fail(function(message) {
-                    // Cannot exported
-                    addMessage('danger', values['name'] + ': ' + message);
-                });
+                        addMessage('info', 'Export all:  Starting');
+            $.when(recursive_cfg_export(nodes,nodesLenght)).done(function() {
+            }).fail(function(message) {
+                addMessage('danger', 'Export all: Error');
             });
         }
     }).fail(function(message) {
@@ -1284,23 +1279,12 @@ $(document).on('click', '.action-nodestart, .action-nodesstart, .action-nodestar
     $.when(getNodes(null)).done(function(nodes) {
         if (isFreeSelectMode) {
             nodeLenght = window.freeSelectedNodes.length;
-            $.each(window.freeSelectedNodes, function(i, node) {
-                $.when(start(node.path)).done(function() {
-                    // Node started -> print a small green message
-                    addMessage('success', node.name + ': ' + MESSAGES[76]);
-                    nodeLenght--;
-                    if(nodeLenght < 1){
-                        printLabStatus();
-                    }
-                }).fail(function(message) {
-                    // Cannot start
-                    addMessage('danger', node.name + ': ' + message);
-                    nodeLenght--;
-                    if(nodeLenght < 1){
-                        printLabStatus();
-                    }
-                });
+            addMessage('info', 'Start selected nodes...');
+            $.when(recursive_start(window.freeSelectedNodes,nodeLenght)).done(function() {
+            }).fail(function(message) {
+                addMessage('danger', 'Start all: Error');
             });
+
         }
         else if (node_id != null) {
             $.when(start(node_id)).done(function() {
@@ -1313,7 +1297,13 @@ $(document).on('click', '.action-nodestart, .action-nodesstart, .action-nodestar
             });
         }
         else if (startAll) {
-            nodeLenght = Object.keys(nodes).length;
+            nodesLenght = Object.keys(nodes).length;
+                        addMessage('info', 'Start all...');
+            $.when(recursive_start(nodes,nodesLenght)).done(function() {
+            }).fail(function(message) {
+                addMessage('danger', 'Start all: Error');
+            });
+/*
             $.each(nodes, function(key, values) {
                 $.when(start(key)).done(function() {
                     // Node started -> print a small green message
@@ -1331,7 +1321,8 @@ $(document).on('click', '.action-nodestart, .action-nodesstart, .action-nodestar
                     }
                 });
             });
-        }
+*/ 
+       }
     }).fail(function(message) {
         addModalError(message);
     });
