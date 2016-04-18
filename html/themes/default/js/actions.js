@@ -1730,8 +1730,9 @@ $(document).on('submit', '#form-lab-add, #form-lab-edit', function(e) {
 				$(e.target).parents('.modal').modal('hide');
 				if (type == 'POST') {
 					// Reload the lab list
+					logger(1, 'DEBUG: lab "' + form_data['name'] + '" renamed.');
 					printPageLabList(form_data['path']);
-				} else if (basename(lab_filename) != form_data['name'] + '.unl') {
+				} else if (basename(form_data['path']) != form_data['name'] + '.unl') {
 					// Lab has been renamed, need to close it.
 					logger(1, 'DEBUG: lab "' + form_data['name'] + '" renamed.');
 					$.when(closeLab()).done(function() {
