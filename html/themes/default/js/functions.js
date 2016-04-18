@@ -2972,6 +2972,14 @@ function drawStatusInModal(data) {
     // QEMU running nodes
     $('#stats-graph ul', $statusModalBody).append('<li><div class="count count-qemu col-md-4 col-lg-4"></div></li>');
     $('.count-qemu', $statusModalBody).html('<strong>' + data['qemu'] + '</strong><br/><span>' + MESSAGES[43] + '</span>');
+
+    // Docker running nodes
+    $('#stats-graph ul', $statusModalBody).append('<li><div class="count count-docker col-md-4 col-lg-6"></div></li>');
+    $('.count-docker', $statusModalBody).html('<strong>' + data['docker'] + '</strong><br/><span>' + MESSAGES[161] + '</span>');
+
+    // VPCS running nodes
+    $('#stats-graph ul', $statusModalBody).append('<li><div class="count count-vpcs col-md-4 col-lg-6"></div></li>');
+    $('.count-vpcs', $statusModalBody).html('<strong>' + data['vpcs'] + '</strong><br/><span>' + MESSAGES[162] + '</span>');
 }
 
 // Update system status in modal
@@ -3099,6 +3107,15 @@ function printSystemStats(data) {
     // QEMU running nodes
     $('#stats-graph ul').append('<li><div class="count count-qemu col-md-4 col-lg-4"></div></li>');
     $('.count-qemu').html('<strong>' + data['qemu'] + '</strong><br/><span>' + MESSAGES[43] + '</span>');
+
+    // Docker running nodes
+    $('#stats-graph ul').append('<li><div class="count count-docker col-md-4 col-lg-6"></div></li>');
+    $('.count-docker').html('<strong>' + data['docker'] + '</strong><br/><span>' + MESSAGES[161] + '</span>');
+
+    // VPCS running nodes
+    $('#stats-graph ul').append('<li><div class="count count-vpcs col-md-4 col-lg-6"></div></li>');
+    $('.count-vpcs').html('<strong>' + data['vpcs'] + '</strong><br/><span>' + MESSAGES[162] + '</span>');
+
 }
 
 /*******************************************************************************
