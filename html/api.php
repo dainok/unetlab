@@ -202,7 +202,9 @@ $app -> get('/api/status', function() use ($app, $db) {
 	list(
 		$output['data']['iol'],
 		$output['data']['dynamips'],
-		$output['data']['qemu']
+		$output['data']['qemu'],
+		$output['data']['docker'],
+		$output['data']['vpcs']
 	) = apiGetRunningWrappers();
 
 	$app -> response -> setStatus($output['code']);

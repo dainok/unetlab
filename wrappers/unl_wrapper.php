@@ -193,6 +193,10 @@ switch ($action) {
 		exec($cmd, $o, $rc);
 		$cmd = 'pkill -TERM qemu_wrapper > /dev/null 2>&1';
 		exec($cmd, $o, $rc);
+		$cmd = 'pkill -TERM vpcs > /dev/null 2>&1';
+		exec($cmd, $o, $rc);
+		$cmd = 'docker -H=tcp://127.0.0.1:4243 stop $(docker -H=tcp://127.0.0.1:4243 ps -q)';
+		exec($cmd, $o, $rc);
 		$cmd = 'brctl show | grep vnet | sed \'s/^\(vnet[0-9]\+_[0-9]\+\).*/\1/g\' | while read line; do ifconfig $line down; brctl delbr $line; done';
 		exec($cmd, $o, $rc);
 		$cmd = 'ovs-vsctl list-br | while read line; do ovs-vsctl del-br $line; done';
