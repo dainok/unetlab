@@ -1,119 +1,119 @@
 // vim: syntax=javascript tabstop=4 softtabstop=0 noexpandtab laststatus=1 ruler
 
 /**
- * html/themes/default/js/actions.js
- *
- * Actions for HTML elements
- *
- * LICENSE:
- *
- * This file is part of UNetLab (Unified Networking Lab).
- *
- * UNetLab is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * UNetLab is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with UNetLab.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @author Andrea Dainese <andrea.dainese@gmail.com>
- * @copyright 2014-2016 Andrea Dainese
- * @license http://www.gnu.org/licenses/gpl.html
- * @link http://www.unetlab.com/
- * @version 20160125
- */
+* html/themes/default/js/actions.js
+*
+* Actions for HTML elements
+*
+* LICENSE:
+*
+* This file is part of UNetLab (Unified Networking Lab).
+*
+* UNetLab is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* UNetLab is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with UNetLab.  If not, see <http://www.gnu.org/licenses/>.
+*
+* @author Andrea Dainese <andrea.dainese@gmail.com>
+* @copyright 2014-2016 Andrea Dainese
+* @license http://www.gnu.org/licenses/gpl.html
+* @link http://www.unetlab.com/
+* @version 20160125
+*/
 
 var KEY_CODES = {
-    "tab": 9,
-    "enter": 13,
-    "shift": 16,
-    "ctrl":  17,
-    "alt": 18,
-    "escape": 27
+"tab": 9,
+"enter": 13,
+"shift": 16,
+"ctrl":  17,
+"alt": 18,
+"escape": 27
 };
 
 // Attach files
 $('body').on('change', 'input[type=file]', function(e) {
-	ATTACHMENTS = e.target.files;
+ATTACHMENTS = e.target.files;
 });
 
 // Add the selected filename to the proper input box
 $('body').on('change', 'input[name="import[file]"]', function(e) {
-	$('input[name="import[local]"]').val($(this).val());
+$('input[name="import[local]"]').val($(this).val());
 });
 
 // On escape remove mouse_frame
 $(document).on('keydown', 'body', function(e){
-    var $labViewport = $("#lab-viewport")
-        , isFreeSelectMode = $labViewport.hasClass("freeSelectMode")
-        , isEditCustomShape = $labViewport.has(".edit-custom-shape-form").length > 0
-        , isEditText = $labViewport.has(".edit-custom-text-form").length > 0
-        ;
+var $labViewport = $("#lab-viewport")
+, isFreeSelectMode = $labViewport.hasClass("freeSelectMode")
+, isEditCustomShape = $labViewport.has(".edit-custom-shape-form").length > 0
+, isEditText = $labViewport.has(".edit-custom-text-form").length > 0
+;
 
-    if(KEY_CODES.escape == e.which){
-        $('.lab-viewport-click-catcher').unbind('click');
-        $('#mouse_frame').remove();
-        $('#lab-viewport').removeClass('lab-viewport-click-catcher').data("prevent-contextmenu", false);
-    }
+if(KEY_CODES.escape == e.which){
+$('.lab-viewport-click-catcher').unbind('click');
+$('#mouse_frame').remove();
+$('#lab-viewport').removeClass('lab-viewport-click-catcher').data("prevent-contextmenu", false);
+}
 
-    if (isFreeSelectMode && KEY_CODES.escape == e.which) {
-        $(".action-freeselect").click();    // it will handle all the stuff
-    }
-    if (isEditCustomShape && KEY_CODES.escape == e.which) {
-        $(".edit-custom-shape-form button.cancelForm").click(); // it will handle all the stuff
-    }
-    if (isEditText && KEY_CODES.escape == e.which) {
-        $(".edit-custom-text-form button.cancelForm").click();  // it will handle all the stuff
-    }
+if (isFreeSelectMode && KEY_CODES.escape == e.which) {
+$(".action-freeselect").click();    // it will handle all the stuff
+}
+if (isEditCustomShape && KEY_CODES.escape == e.which) {
+$(".edit-custom-shape-form button.cancelForm").click(); // it will handle all the stuff
+}
+if (isEditText && KEY_CODES.escape == e.which) {
+$(".edit-custom-text-form button.cancelForm").click();  // it will handle all the stuff
+}
 });
 
 //Add picture MAP
 $('body').on('click', '.follower-wrapper', function(e) {
-  var data_x = $("#follower").data("data_x");
-  var data_y = $("#follower").data("data_y");
-  var y = parseInt((data_y).toFixed(0));
-  var x = parseInt((data_x).toFixed(0));
-  $('form textarea').val($('form textarea').val() +"<area shape='circle' alt='img' coords='" + x + "," + y + ",30' href='telnet://{{IP}}:{{NODE1}}'>\n");
+var data_x = $("#follower").data("data_x");
+var data_y = $("#follower").data("data_y");
+var y = parseInt((data_y).toFixed(0));
+var x = parseInt((data_x).toFixed(0));
+$('form textarea').val($('form textarea').val() +"<area shape='circle' alt='img' coords='" + x + "," + y + ",30' href='telnet://{{IP}}:{{NODE1}}'>\n");
 });
 
 // Accept privacy
 $(document).on('click', '#privacy', function () {
-	$.cookie('privacy', 'true', {
-		expires: 90,
-		path: '/'
-	});
-	if ($.cookie('privacy') == 'true') {
-		window.location.reload();
-	}
+$.cookie('privacy', 'true', {
+	expires: 90,
+	path: '/'
+});
+if ($.cookie('privacy') == 'true') {
+	window.location.reload();
+}
 });
 
 // Select folders, labs or users
 $(document).on('click', 'a.folder, a.lab, tr.user', function(e) {
-	logger(1, 'DEBUG: selected "' + $(this).attr('data-path') + '".');
-	if ($(this).hasClass('selected')) {
-		// Already selected -> unselect it
-		$(this).removeClass('selected');
-	} else {
-		// Selected it
-		$(this).addClass('selected');
-	}
+logger(1, 'DEBUG: selected "' + $(this).attr('data-path') + '".');
+if ($(this).hasClass('selected')) {
+	// Already selected -> unselect it
+	$(this).removeClass('selected');
+} else {
+	// Selected it
+	$(this).addClass('selected');
+}
 });
 
 // Remove modal on close
 $(document).on('hidden.bs.modal', '.modal', function (e) {
-	$(this).remove();
-	if($('body').children('.modal.fade.in')){
-		$('body').children('.modal.fade.in').focus();
-		$('body').children('.modal.fade.in').css("overflow-y", "auto");
-	}
-	if($(this).prop('skipRedraw') && !$(this).attr('skipRedraw')){
-		printLabTopology();
+$(this).remove();
+if($('body').children('.modal.fade.in')){
+	$('body').children('.modal.fade.in').focus();
+	$('body').children('.modal.fade.in').css("overflow-y", "auto");
+}
+if($(this).prop('skipRedraw') && !$(this).attr('skipRedraw')){
+	printLabTopology();
 	}
 	$(this).attr('skipRedraw', false);
 });
@@ -1656,7 +1656,7 @@ $(document).on('submit', '#form-import', function(e) {
 		form_data.append(key, value);
 	});
 	$.ajax({
-		timeout: TIMEOUT,
+		timeout: LONGTIMEOUT,
 		type: type,
 		url: encodeURI(url),
 		contentType: false, // Set content type to false as jQuery will tell the server its a query string request
@@ -1735,11 +1735,15 @@ $(document).on('submit', '#form-lab-add, #form-lab-edit', function(e) {
 				} else if (basename(form_data['path']) != form_data['name'] + '.unl') {
 					// Lab has been renamed, need to close it.
 					logger(1, 'DEBUG: lab "' + form_data['name'] + '" renamed.');
-					$.when(closeLab()).done(function() {
+					$('#lab-viewport').attr({'data-path' : dirname(form_data['path']) + '/' + form_data['name'] + '.unl'});
+					printLabTopology();
+					/*$.when(closeLab()).done(function() {
 						postLogin();
+					printPageLabTopology();
 					}).fail(function(message) {
 						addModalError(message);
 					});
+					*/
 				} else {
 					addMessage(data['status'], data['message']);
 				}

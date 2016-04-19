@@ -2530,6 +2530,8 @@ function printLabTopology() {
             addModalError(message2)
         }
         $("#loading-lab").remove();
+	$("#lab-sidebar ul").show();
+	$("#lab-sidebar ul li:lt(11)").hide();
     });
 }
 
@@ -2784,7 +2786,7 @@ function printPageLabOpen(lab) {
 
 	// Print topology
 	printLabTopology();
-
+	
 	// Read privileges and set specific actions/elements
 	if (ROLE == 'admin' || ROLE == 'editor') {
 		$('#lab-sidebar ul').append('<li><a class="action-labobjectadd" href="#" title="' + MESSAGES[56] + '"><i class="glyphicon glyphicon-plus"></i></a></li>');
@@ -2801,7 +2803,7 @@ function printPageLabOpen(lab) {
 	$('#lab-sidebar ul').append('<li><a class="action-labtopologyrefresh" href="#" title="' + MESSAGES[57] + '"><i class="glyphicon glyphicon-refresh"></i></a></li>');
 	$('#lab-sidebar ul').append('<li><a class="action-freeselect" href="#" title="' + MESSAGES[151] + '"><i class="glyphicon glyphicon-check"></i></a></li>');
 	$('#lab-sidebar ul').append('<li><a class="action-status" href="#" title="' + MESSAGES[13] + '"><i class="glyphicon glyphicon-info-sign"></i></a></li>');
-	$('#lab-sidebar ul').append('<li><a class="action-labclose" href="#" title="' + MESSAGES[60] + '"><i class="glyphicon glyphicon-off"></i></a></li>');
+	$('#lab-sidebar ul').append('<div id="action-labclose"><li><a class="action-labclose" href="#" title="' + MESSAGES[60] + '"><i class="glyphicon glyphicon-off"></i></a></li></div>');
 	$('#lab-sidebar ul').append('<li><a class="action-logout" href="#" title="' + MESSAGES[14] + '"><i class="glyphicon glyphicon-log-out"></i></a></li>');
 	$('#lab-sidebar ul a').each(function(){
 		var t = $(this).attr("title");
