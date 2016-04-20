@@ -1735,15 +1735,18 @@ $(document).on('submit', '#form-lab-add, #form-lab-edit', function(e) {
 				} else if (basename(form_data['path']) != form_data['name'] + '.unl') {
 					// Lab has been renamed, need to close it.
 					logger(1, 'DEBUG: lab "' + form_data['name'] + '" renamed.');
-					$('#lab-viewport').attr({'data-path' : dirname(form_data['path']) + '/' + form_data['name'] + '.unl'});
-					printLabTopology();
-					/*$.when(closeLab()).done(function() {
-						postLogin();
-					printPageLabTopology();
-					}).fail(function(message) {
-						addModalError(message);
-					});
-					*/
+					if ( $('#lab-viewport').length ) {
+						$('#lab-viewport').attr({'data-path' : dirname(form_data['path']) + '/' + form_data['name'] + '.unl'});
+						printLabTopology();
+					} else {
+						$.when(closeLab()).done(function() {
+							postLogin();
+							printPageLabTopology();
+						}).fail(function(message) {
+							addModalError(message);
+						});
+					}
+				
 				} else {
 					addMessage(data['status'], data['message']);
 				}
