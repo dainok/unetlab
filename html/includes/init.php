@@ -121,6 +121,7 @@ if (!isset($node_templates)) {
 		'mikrotik'		=>	'MikroTik RouterOS',
 		'ostinato'		=>	'Ostinato',
 		'paloalto'		=>	'Palo Alto VM-100 Firewall',
+		'pfsense'		=>	'pfSense Firewall',
 		//'riverbed'		=>	'Riverbed',
 		'sterra'		=>	'S-Terra',
 		'vyos'			=>	'VyOS',
@@ -164,3 +165,4 @@ if (php_sapi_name() === 'cli') {
 	//session_start();
 }
 ?>
+
