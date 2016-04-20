@@ -121,6 +121,7 @@ if (!isset($node_templates)) {
 		'mikrotik'		=>	'MikroTik RouterOS',
 		'ostinato'		=>	'Ostinato',
 		'paloalto'		=>	'Palo Alto VM-100 Firewall',
+		'pfsense'		=>	'pfSense Firewall',
 		//'riverbed'		=>	'Riverbed',
 		'sterra'		=>	'S-Terra',
 		'vyos'			=>	'VyOS',
@@ -131,7 +132,7 @@ if (!isset($node_templates)) {
 }
 
 // Define parameters
-define('VERSION', '1.0.0-7.005-git');
+define('VERSION', '1.0.0-9.1-git');
 define('BASE_DIR', '/opt/unetlab');
 define('BASE_LAB', BASE_DIR.'/labs');
 define('BASE_TMP', BASE_DIR.'/tmp');

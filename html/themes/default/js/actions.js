@@ -1741,7 +1741,6 @@ $(document).on('submit', '#form-lab-add, #form-lab-edit', function(e) {
 					} else {
 						$.when(closeLab()).done(function() {
 							postLogin();
-							printPageLabTopology();
 						}).fail(function(message) {
 							addModalError(message);
 						});
