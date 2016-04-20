@@ -32,7 +32,7 @@
 
 $p['type'] = 'qemu'; 
 $p['name'] = 'pfSense'; 
-$p['icon'] = 'Server.png'; 
+$p['icon'] = 'Firewall.png'; 
 $p['cpu'] = 1; 
 $p['ram'] = 2048; 
 $p['ethernet'] = 2; 
