@@ -29,6 +29,8 @@
  * @version 20160125
  */
 
+
+
 // Basename: given /a/b/c return c
 function basename(path) {
 	return path.replace(/\\/g,'/').replace( /.*\//, '');
@@ -1776,11 +1778,12 @@ function printFormNode(action, values) {
 function printFormNodeConfigs(values, cb) {
 	var title = values['name'] + ': ' + MESSAGES[123];
 	if (ROLE == 'admin' || ROLE == 'editor') {
-		var html = '<form id="form-node-config" class="form-horizontal"><input name="config[id]" value="' + values['id'] + '" type="hidden"/><div class="form-group"><div class="col-md-12"><textarea class="form-control autofocus" name="config[data]" rows="15">' + values['data'] + '</textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
+		var html = '<form id="form-node-config" class="form-horizontal"><input name="config[id]" value="' + values['id'] + '" type="hidden"/><div class="form-group"><div class="col-md-12"><textarea class="form-control autofocus" id="nodeconfig" name="config[data]" rows="15"></textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
 	} else {
 		var html = '<div class="col-md-12"><pre>' + values['data'] + '</pre></div>';
 	}
 	$('#config-data').html(html);
+	$('#nodeconfig').val(values['data']);
 	cb && cb();
 }
 

@@ -851,6 +851,11 @@ function prepareNode($n, $id, $t, $nets) {
 					case 'vpcs':
 						copy ($n -> getRunningPath().'/startup-config',  $n -> getRunningPath().'/startup.vpc');
 						break;
+					case 'pfsense':
+						copy (  $n -> getRunningPath().'/startup-config',  $n -> getRunningPath().'/config.xml');
+						$isocmd = 'mkisofs -o '.$n -> getRunningPath().'/config.iso -l --iso-level 2 '.$n -> getRunningPath().'/config.xml' ;
+						exec($isocmd, $o, $rc);
+						break;
 				}
 			}
 		}
@@ -935,7 +940,7 @@ function start($n, $id, $t, $nets, $scripttimeout) {
 			break;
 	}
 	// Special Case for xrv - csr1000v - vIOS - vIOSL - Docker
-	if ( ( $n->getTemplate() == 'xrv' || $n->getTemplate() == 'csr1000v' || $n->getTemplate() == 'asav' || $n->getTemplate() == 'titanium' )  && is_file($n -> getRunningPath().'/config.iso') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
+	if (( $n->getTemplate() == 'xrv' || $n->getTemplate() == 'csr1000v' || $n->getTemplate() == 'asav' || $n->getTemplate() == 'titanium' )  && is_file($n -> getRunningPath().'/config.iso') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
 		$flags .= ' -cdrom config.iso' ;
         }
 
@@ -951,7 +956,9 @@ function start($n, $id, $t, $nets, $scripttimeout) {
                 $flags .= ' -drive file=config.iso,if=ide,media=cdrom,index=2' ;
         }
 
-
+	if (( $n -> getTemplate() == 'pfsense')   && is_file($n -> getRunningPath().'/config.iso') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
+		$flags .= ' -cdrom config.iso' ;
+	}
 
 	if ( $n -> getNType() != 'docker' && $n -> getNType() != 'vpcs')  {
 		$cmd .= ' -- '.$flags.' > '.$n -> getRunningPath().'/wrapper.txt 2>&1 &';
@@ -960,6 +967,7 @@ function start($n, $id, $t, $nets, $scripttimeout) {
 	if ( $n -> getNType() == 'vpcs')  {
 		$cmd .= $flags.' > '.$n -> getRunningPath().'/wrapper.txt 2>&1 &';
 	}
+	
 
 	error_log(date('M d H:i:s ').'INFO: CWD is '.getcwd());
 	error_log(date('M d H:i:s ').'INFO: starting '.$cmd);

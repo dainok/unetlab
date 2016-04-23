@@ -72,7 +72,8 @@ if (!isset($node_config)) {
 		'vsrx'			=>	'config_vsrx.py',
 		'vsrxng'		=>	'config_vsrxng.py',
 		'vmx'			=>	'config_vmx.py',
-		'xrv'			=>	'config_xrv.py'
+		'xrv'			=>	'config_xrv.py',
+		'pfsense'		=>	'config_pfsense.py'
 	);
 }
 
@@ -132,7 +133,7 @@ if (!isset($node_templates)) {
 }
 
 // Define parameters
-define('VERSION', '1.0.0-9-001-git');
+define('VERSION', '1.0.0-9.1-git');
 define('BASE_DIR', '/opt/unetlab');
 define('BASE_LAB', BASE_DIR.'/labs');
 define('BASE_TMP', BASE_DIR.'/tmp');
@@ -165,4 +166,3 @@ if (php_sapi_name() === 'cli') {
 	//session_start();
 }
 ?>
-
