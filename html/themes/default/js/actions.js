@@ -1741,9 +1741,11 @@ $(document).on('submit', '#form-lab-add, #form-lab-edit', function(e) {
 					} else {
 						$.when(closeLab()).done(function() {
 							postLogin();
+							printLabPreview(dirname(form_data['path']) + '/' + form_data['name'] + '.unl');
 						}).fail(function(message) {
 							addModalError(message);
 						});
+						
 					}
 				
 				} else {
