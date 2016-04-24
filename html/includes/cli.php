@@ -75,14 +75,16 @@ function addBridge($s) {
 			error_log(date('M d H:i:s ').implode("\n", $o));
 			return 80071;
 		}
-		$cmd = 'brctl setageing '.$s.' 0 2>&1';
-        	exec($cmd, $o, $rc);
-        	if ($rc != 0) {
-                	error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80055]);
-                	error_log(date('M d H:i:s ').implode("\n", $o));
-                	return 80055;
-        	}	
+	} else {
+	        $cmd = 'brctl setageing '.$s.' 0 2>&1';
+                exec($cmd, $o, $rc);
+                if ($rc != 0) {
+                        error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80055]);
+                        error_log(date('M d H:i:s ').implode("\n", $o));
+                        return 80055;
+                }
 	}
+
 	return 0;
 }
 
@@ -172,9 +174,7 @@ function addNetwork($p) {
 function addOvs($s) {
 	$cmd = 'ovs-vsctl add-br '.$s.' 2>&1';
 	exec($cmd, $o, $rc);
-	if ($rc == 0) {
-		return 0;
-	} else {
+	if ($rc != 0) {
 		// Failed to add the OVS
 		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80023]);
 		error_log(date('M d H:i:s ').implode("\n", $o));
