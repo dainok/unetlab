@@ -75,15 +75,13 @@ function addBridge($s) {
 			error_log(date('M d H:i:s ').implode("\n", $o));
 			return 80071;
 		}
-	}
-
-	$cmd = 'brctl setageing '.$s.' 0 2>&1';
-	exec($cmd, $o, $rc);
-	if ($rc != 0) {
-		// Failed to set ageing on bridge (need for portmirroring)
-		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80055]);
-		error_log(date('M d H:i:s ').implode("\n", $o));
-		return 80055;
+		$cmd = 'brctl setageing '.$s.' 0 2>&1';
+        	exec($cmd, $o, $rc);
+        	if ($rc != 0) {
+                	error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80055]);
+                	error_log(date('M d H:i:s ').implode("\n", $o));
+                	return 80055;
+        	}	
 	}
 	return 0;
 }
@@ -182,6 +180,18 @@ function addOvs($s) {
 		error_log(date('M d H:i:s ').implode("\n", $o));
 		return 80023;
 	}
+	// ADD BPDU CDP option
+	$cmd = "ovs-vsctl set bridge ".$s." other-config:forward-bpdu=true"
+	exec($cmd, $o, $rc);
+        if ($rc == 0) {
+                return 0;
+        } else {
+                // Failed to add  OVS OPTION
+                error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80023]);
+                error_log(date('M d H:i:s ').implode("\n", $o));
+                return 80023;
+        }
+
 }
 
 /**
@@ -526,7 +536,7 @@ function export($node_id, $n, $lab) {
 					return 80060;
 				}
 				// Add no shut
-				if ( ( $n->getTemplate() == "vios" || $n->getTemplate() == "viosl2" || $n->getTemplate() == "xrv" ) && is_file($tmp) ) file_put_contents($tmp,preg_replace('/(\ninterface.*)/','$1'.chr(10).' no shutdown',file_get_contents($tmp)));
+				if ( ( $n->getTemplate() == "crv" || $n->getTemplate() == "vios" || $n->getTemplate() == "viosl2" || $n->getTemplate() == "xrv" ) && is_file($tmp) ) file_put_contents($tmp,preg_replace('/(\ninterface.*)/','$1'.chr(10).' no shutdown',file_get_contents($tmp)));
 			}
 	}
 
