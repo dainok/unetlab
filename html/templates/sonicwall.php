@@ -2,9 +2,9 @@
 # vim: syntax=php tabstop=4 softtabstop=0 noexpandtab laststatus=1 ruler
 
 /**
- * html/templates/iol.php
+ * html/templates/sonicwall.php
  *
- * iol template for UNetLab.
+ * paloalto template for UNetLab.
  *
  * LICENSE:
  *
@@ -27,14 +27,16 @@
  * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20151218
+ * @version 20151116
  */
 
-$p['type'] = 'iol'; 
-$p['name'] = 'R'; 
-$p['icon'] = 'Router.png';
-$p['nvram'] = 1024; 
-$p['ram'] = 1024;
-$p['ethernet'] = 1; 
-$p['serial'] = 0; 
+$p['type'] = 'qemu';
+$p['name'] = 'SonicWall';
+$p['icon'] = 'Firewall.png';
+$p['cpu'] = 2;
+$p['ram'] = 2048; 
+$p['ethernet'] = 2; 
+$p['console'] = 'vnc';
+$p['qemu_arch'] = 'x86_64';
+$p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -nographic -rtc base=utc';
 ?>
