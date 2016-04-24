@@ -108,6 +108,7 @@ if (!isset($node_templates)) {
 		'coeus'			=>	'Cisco Web Security Appliance',
 		'xrv'			=>	'Cisco XRv',
 		'nsvpx'			=>	'Citrix Netscaler',
+		'sonicwall'            	=>      'Dell SonicWall',
 		'cumulus'		=>	'Cumulus VX',
 		'extremexos'		=>	'ExtremeXOS',
 		'bigip'			=>	'F5 BIG-IP LTM VE',
