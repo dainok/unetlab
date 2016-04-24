@@ -181,7 +181,7 @@ function addOvs($s) {
 		return 80023;
 	}
 	// ADD BPDU CDP option
-	$cmd = "ovs-vsctl set bridge ".$s." other-config:forward-bpdu=true"
+	$cmd = "ovs-vsctl set bridge ".$s." other-config:forward-bpdu=true";
 	exec($cmd, $o, $rc);
         if ($rc == 0) {
                 return 0;
