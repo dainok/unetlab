@@ -2221,7 +2221,18 @@ function printFormUser(action, values) {
 		}
 		$('.selectpicker').selectpicker();
 		$('.expiration').datepicker({dateFormat : 'yy-mm-dd'});
-		$(".expiration").on("blur", function(e) { $(this).datepicker("hide"); });
+		//$(".expiration").on("blur", function(e) { $(this).datepicker("hide"); });
+
+        //datepicker forced to close on click
+		$('.modal-dialog').on('click', function(e){
+			if(!$(e.target).hasClass('expiration'))
+		    $('.expiration').datepicker('hide');
+		});
+
+		 $('.modal').on('hidden.bs.modal', function () {
+		    $('.expiration').datepicker('hide');
+		})
+
 		validateUser();
 	}).fail(function(message) {
 		// Cannot get data
