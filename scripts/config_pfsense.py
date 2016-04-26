@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-# scripts/config_vsrx.py
+# scripts/config_pfsense.py
 #
-# Import/Export script for vsrx.
+# Import/Export script for vIOS.
 #
 # LICENSE:
 #
@@ -21,16 +21,14 @@
 # You should have received a copy of the GNU General Public License
 # along with UNetLab. If not, see <http://www.gnu.org/licenses/>.
 #
-# @author Andrea Dainese <andrea.dainese@gmail.com>
-# @copyright 2014-2016 Andrea Dainese
+# @author Alain Degreffe <eczema@ecze.com>
+# @copyright 2016 Alain Degreffe
 # @license http://www.gnu.org/licenses/gpl.html
 # @link http://www.unetlab.com/
-# @version 20160125
+# @version 20160422
 
 import getopt, multiprocessing, os, pexpect, re, sys, time
 
-username = 'root'
-password = 'password1'
 conntimeout = 3     # Maximum time for console connection
 expctimeout = 3     # Maximum time for each short expect
 longtimeout = 30    # Maximum time for each long expect
@@ -43,71 +41,24 @@ def node_login(handler):
         try:
             handler.sendline('\r\n')
             i = handler.expect([
-                'login:',
-                'root@.*%',
-                'root>',
-                'root@.*>',
-                'root#',
-                'root@.*#'], timeout = 5)
+                'Enter an option:',
+                '.*root.*:'], timeout = 5)
         except:
             i = -1
 
     if i == 0:
         # Need to send username and password
-        handler.sendline(username)
+        handler.sendline('8')
         try:
-            j = handler.expect(['root@.*%', 'Password:'], timeout = longtimeout)
+            handler.expect('.*root.*:', timeout = expctimeout)
+            return True
         except:
-            print('ERROR: error waiting for ["root@.*%", "password:"] prompt.')
+            print('ERROR: error waiting for "root:" prompt.')
             node_quit(handler)
             return False
 
-        if j == 0:
-            # Nothing to do
-            return True
-        elif j == 1:
-            handler.sendline(password)
-            try:
-                handler.expect('root@.*%', timeout = longtimeout)
-            except:
-                print('ERROR: error waiting for "root@.*%" prompt.')
-                node_quit(handler)
-                return False
-            return True
-        else:
-            # Unexpected output
-            node_quit(handler)
-            return False
     elif i == 1:
-        # Nothing to do
-        return True
-    elif i == 2 or i == 3:
-        # Exit from CLI mode
-        handler.sendline('exit')
-        try:
-            handler.expect('root@.*%', timeout = expctimeout)
-        except:
-            print('ERROR: error waiting for "root@.*%" prompt.')
-            node_quit(handler)
-            return False
-        return True
-    elif i == 4 or i == 5:
-        # Exit from configuration mode
-        handler.sendline('exit')
-        try:
-            handler.expect(['root>', 'root@.*>'], timeout = expctimeout)
-        except:
-            print('ERROR: error waiting for ["root>", "root@.*>"] prompt.')
-            node_quit(handler)
-            return False
-        # Exit from CLI mode
-        handler.sendline('exit')
-        try:
-            handler.expect('root.*%', timeout = expctimeout)
-        except:
-            print('ERROR: error waiting for "root@.*%" prompt.')
-            node_quit(handler)
-            return False
+        # nothing to do
         return True
     else:
         # Unexpected output
@@ -120,113 +71,43 @@ def node_quit(handler):
     handler.close()
 
 def config_get(handler):
-    # Clearing all "expect" buffer
-    while True:
-        try:
-            handler.expect('root@.*%', timeout = 0.1)
-        except:
-            break
-
-    # Go into CLI mode
-    handler.sendline('cli')
-    try:
-        handler.expect(['root>', 'root@.*>'], timeout = longtimeout)
-    except:
-        print('ERROR: error waiting for ["root>", "root@.*>"] prompt.')
-        node_quit(handler)
-        return False
-
-    # Disable paging
-    handler.sendline('set cli screen-length 0')
-    try:
-        handler.expect(['root>', 'root@.*>'], timeout = longtimeout)
-    except:
-        print('ERROR: error waiting for ["root>", "root@.*>"] prompt.')
-        node_quit(handler)
-        return False
 
     # Getting the config
-    handler.sendline('show configuration | display set')
+    handler.setwinsize(100, 120)
+    handler.sendline('cat /conf/config.xml | awk \'{print $0}\'\n')
+    #handler.sendline('cat `ls -rt /conf/backup/config-* | tail -1 `\n')
     try:
-        handler.expect(['root>', 'root@.*>'], timeout = longtimeout)
+        handler.expect('</pfsense>', timeout = longtimeout)
     except:
-        print('ERROR: error waiting for ["root>", "root@.*>"] prompt.')
+        print('ERROR: error waiting for "#" prompt.')
         node_quit(handler)
         return False
-
     config = handler.before.decode()
-
-    # Exit from config mode
-    handler.sendline('exit')
-    try:
-        handler.expect('root@.*%', timeout = longtimeout)
-    except:
-        print('ERROR: error waiting for "root@.*%" prompt.')
-        node_quit(handler)
-        return False
-    
     # Manipulating the config
-    config = re.sub('\r', '', config, flags=re.DOTALL)                                      # Unix style
-    config = re.sub('.*show configuration \| display set', '', config, flags=re.DOTALL)          # Header
-    config = re.sub('\nroot.*>.*', '\n', config, flags=re.DOTALL)                        # Footer
-
+    config = re.sub('\r', '', config, flags=re.DOTALL)                             # Unix style
+    config = config + '</pfsense>\n';
+    config = re.sub('.*<\?xml version=\"1.0\"\?>', '<?xml version=\"1.0\"?>', config, flags=re.DOTALL)          # Header
     return config
 
-def config_put(handler, config):
-    # mount drive
-    handler.sendline('mount -t cd9660 /dev/vtbd1 /mnt')
-    try:
-        handler.expect(['root>', 'root@.*%'], timeout = longtimeout)
-    except:
-        print('ERROR: error waiting for ["root>", "root@.*%"] prompt.')
-        node_quit(handler)
-        return False
+def config_put(handler):
+    while True:
+        try:
+           i = handler.expect('Do you want to set up VLANs now.*', timeout)
+           break
+        except:
+           return False
+    handler.sendline('')
+    handler.sendline('\n')
+    handler.sendline('mount -t cd9660 /dev/cd0 /mnt\n')
+    handler.sendline('cp /mnt/config.xml /conf/\n')
+    handler.sendline('exit\n')
+    while True:
+        try:
+           i = handler.expect('option:', timeout)
+        except:
+           return False  
 
-    # Go into CLI mode
-    handler.sendline('cli')
-    try:
-        handler.expect(['root>', 'root@.*>'], timeout = longtimeout)
-    except:
-        print('ERROR: error waiting for ["root>", "root@.*>"] prompt.')
-        node_quit(handler)
-        return False
-
-    # Got to configure mode
-    handler.sendline('configure')
-    try:
-        handler.expect(['root#', 'root@.*#'], timeout = longtimeout)
-    except:
-        print('ERROR: error waiting for ["root#", "root@.*#"] prompt.')
-        node_quit(handler)
-        return False
-    # Start the load mode
-
-    handler.sendline('load set /mnt/juniper.conf')
-    try:
-        handler.expect('load complete', timeout = longtimeout)
-    except:
-        print('ERROR: error waiting for "load complete" prompt.')
-        node_quit(handler)
-        return False
-
-    # Save
-    handler.sendline('commit')
-    try:
-        handler.expect(['root#', 'root@.*#'], timeout = longtimeout)
-    except:
-        print('ERROR: error waiting for ["root#", "root@.*#"] prompt.')
-        node_quit(handler)
-        return False
-
-    handler.sendline('exit')
-    try:
-        handler.expect(['root>', 'root@.*>'], timeout = longtimeout)
-    except:
-        print('ERROR: error waiting for ["root>", "root@.*>"] prompt.')
-        node_quit(handler)
-        return False
-
-    return True
+        return True
 
 def usage():
     print('Usage: %s <standard options>' %(sys.argv[0]));
@@ -259,14 +140,12 @@ def main(action, fiename, port):
             node_quit(handler)
             sys.exit(1)
 
-        # Login to the device and get a privileged prompt
-        rc = node_login(handler)
-        if rc != True:
-            print('ERROR: failed to login.')
-            node_quit(handler)
-            sys.exit(1)
-
         if action == 'get':
+            rc = node_login(handler)
+            if rc != True:
+               print('ERROR: failed to login.')
+               node_quit(handler)
+               sys.exit(1)
             config = config_get(handler)
             if config in [False, None]:
                 print('ERROR: failed to retrieve config.')
@@ -282,16 +161,7 @@ def main(action, fiename, port):
                 node_quit(handler)
                 sys.exit(1)
         elif action == 'put':
-            try:
-                fd = open(filename, 'r')
-                config = fd.read()
-                fd.close()
-            except:
-                print('ERROR: cannot read config from file.')
-                node_quit(handler)
-                sys.exit(1)
-
-            rc = config_put(handler, config)
+            rc = config_put(handler)
             if rc != True:
                 print('ERROR: failed to push config.')
                 node_quit(handler)

@@ -1,0 +1,13 @@
+Package: unetlab-vpcs
+Version: %VERSION%-%RELEASE%
+Name: Unetlab Virtual PC
+Architecture: amd64
+Section: devel
+Priority: optional
+Maintainer: Alain Degreffe <eczema@ecze.com>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.4
+Homepage: http://www.unetlab.com
+Description: vpcs unetlab compatible
+ vpcs is a small virtual pc with ping traceroute for integration
+ in Labs Unetlab

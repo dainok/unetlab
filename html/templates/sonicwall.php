@@ -2,9 +2,9 @@
 # vim: syntax=php tabstop=4 softtabstop=0 noexpandtab laststatus=1 ruler
 
 /**
- * html/templates/bigip.php
+ * html/templates/sonicwall.php
  *
- * bigip template for UNetLab.
+ * paloalto template for UNetLab.
  *
  * LICENSE:
  *
@@ -30,13 +30,13 @@
  * @version 20151116
  */
 
-$p['type'] = 'qemu'; 
-$p['name'] = 'BIGIP';
-$p['icon'] = 'Load Balancer.png';
-$p['cpu'] = 1; 
-$p['ram'] = 2048;
-$p['ethernet'] = 4;
-$p['console'] = 'telnet'; 
+$p['type'] = 'qemu';
+$p['name'] = 'SonicWall';
+$p['icon'] = 'Firewall.png';
+$p['cpu'] = 2;
+$p['ram'] = 2048; 
+$p['ethernet'] = 2; 
+$p['console'] = 'vnc';
 $p['qemu_arch'] = 'x86_64';
-$p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -serial mon:stdio -nographic -nodefconfig -nodefaults -display none -vga std -rtc base=utc ';
+$p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -nographic -rtc base=utc';
 ?>

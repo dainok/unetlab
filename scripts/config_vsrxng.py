@@ -119,6 +119,15 @@ def node_quit(handler):
         handler.sendline('exit\n')
     handler.close()
 
+def config_put(handler):
+    while True:
+        try:
+           i = handler.expect('\nlogin: ', timeout)
+           return True
+        except:
+           return False
+
+
 def config_get(handler):
     # Clearing all "expect" buffer
     while True:
@@ -146,7 +155,7 @@ def config_get(handler):
         return False
 
     # Getting the config
-    handler.sendline('show configuration | display set')
+    handler.sendline('show configuration')
     try:
         handler.expect(['root>', 'root@.*>'], timeout = longtimeout)
     except:
@@ -167,66 +176,11 @@ def config_get(handler):
     
     # Manipulating the config
     config = re.sub('\r', '', config, flags=re.DOTALL)                                      # Unix style
-    config = re.sub('.*show configuration \| display set', '', config, flags=re.DOTALL)          # Header
+    #config = re.sub('.*show configuration \| display set', '', config, flags=re.DOTALL)          # Header
+    config = re.sub('.*show configuration', '', config, flags=re.DOTALL)          # Header
     config = re.sub('\nroot.*>.*', '\n', config, flags=re.DOTALL)                        # Footer
 
     return config
-
-def config_put(handler, config):
-    # mount drive
-    handler.sendline('mount -t cd9660 /dev/vtbd1 /mnt')
-    try:
-        handler.expect(['root>', 'root@.*%'], timeout = longtimeout)
-    except:
-        print('ERROR: error waiting for ["root>", "root@.*%"] prompt.')
-        node_quit(handler)
-        return False
-
-    # Go into CLI mode
-    handler.sendline('cli')
-    try:
-        handler.expect(['root>', 'root@.*>'], timeout = longtimeout)
-    except:
-        print('ERROR: error waiting for ["root>", "root@.*>"] prompt.')
-        node_quit(handler)
-        return False
-
-    # Got to configure mode
-    handler.sendline('configure')
-    try:
-        handler.expect(['root#', 'root@.*#'], timeout = longtimeout)
-    except:
-        print('ERROR: error waiting for ["root#", "root@.*#"] prompt.')
-        node_quit(handler)
-        return False
-    # Start the load mode
-
-    handler.sendline('load set /mnt/juniper.conf')
-    try:
-        handler.expect('load complete', timeout = longtimeout)
-    except:
-        print('ERROR: error waiting for "load complete" prompt.')
-        node_quit(handler)
-        return False
-
-    # Save
-    handler.sendline('commit')
-    try:
-        handler.expect(['root#', 'root@.*#'], timeout = longtimeout)
-    except:
-        print('ERROR: error waiting for ["root#", "root@.*#"] prompt.')
-        node_quit(handler)
-        return False
-
-    handler.sendline('exit')
-    try:
-        handler.expect(['root>', 'root@.*>'], timeout = longtimeout)
-    except:
-        print('ERROR: error waiting for ["root>", "root@.*>"] prompt.')
-        node_quit(handler)
-        return False
-
-    return True
 
 def usage():
     print('Usage: %s <standard options>' %(sys.argv[0]));
@@ -260,13 +214,13 @@ def main(action, fiename, port):
             sys.exit(1)
 
         # Login to the device and get a privileged prompt
-        rc = node_login(handler)
-        if rc != True:
-            print('ERROR: failed to login.')
-            node_quit(handler)
-            sys.exit(1)
-
         if action == 'get':
+            rc = node_login(handler)
+            if rc != True:
+                print('ERROR: failed to login.')
+                node_quit(handler)
+                sys.exit(1)
+
             config = config_get(handler)
             if config in [False, None]:
                 print('ERROR: failed to retrieve config.')
@@ -281,17 +235,9 @@ def main(action, fiename, port):
                 print('ERROR: cannot write config to file.')
                 node_quit(handler)
                 sys.exit(1)
+            node_quit(handler)
         elif action == 'put':
-            try:
-                fd = open(filename, 'r')
-                config = fd.read()
-                fd.close()
-            except:
-                print('ERROR: cannot read config from file.')
-                node_quit(handler)
-                sys.exit(1)
-
-            rc = config_put(handler, config)
+            rc = config_put(handler)
             if rc != True:
                 print('ERROR: failed to push config.')
                 node_quit(handler)
@@ -308,7 +254,6 @@ def main(action, fiename, port):
             if not os.path.exists(configured):
                 open(configured, 'a').close()
 
-        node_quit(handler)
         sys.exit(0)
 
     except Exception as e:

@@ -221,6 +221,14 @@ class Lab {
 				} else {
 					$config_data = base64_decode($result);
 				}
+				// F5 needs a first mac address
+                                if ( $n['template']  == "bigip" ) {
+                                        if (isset($node -> attributes() -> firstmac)) {
+                                                $n['firstmac'] = (string) $node -> attributes() -> firstmac;
+                                        } else {
+                                                $n['firstmac'] = (string) '00:'.sprintf('%02x', $this -> tenant).':'.sprintf('%02x', $this -> id / 512).':'.sprintf('%02x', $this -> id % 512).':00:10';
+                                        }
+                                }
 
 				try {
 					$this -> nodes[$n['id']] = new Node($n, $n['id'], $this -> tenant, $this -> id);
@@ -231,6 +239,7 @@ class Lab {
 					continue;
 				}
 
+	
 				// Slot must be loaded before interfaces
 				foreach ($node -> slot as $slot) {
 					// Loading configured slots for this node
@@ -1041,6 +1050,9 @@ class Lab {
 								$s -> addAttribute('module', $module);
 							}
 							break;
+						case 'vpcs':
+							$d -> addAttribute('ethernet', $node -> getEthernetCount());
+							break;
 						case 'docker':
 							// Docker specific parameters
 							$d -> addAttribute('ethernet', $node -> getEthernetCount());
@@ -1053,6 +1065,7 @@ class Lab {
 							$d -> addAttribute('ram', $node -> getRam());
 							$d -> addAttribute('ethernet', $node -> getEthernetCount());
 							$d -> addAttribute('uuid', $node -> getUuid());
+							if ( $node -> getTemplate() == "bigip" ) $d -> addAttribute('firstmac', $node -> getFirstMac());
 							break;
 					}
 

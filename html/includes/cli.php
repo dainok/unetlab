@@ -61,7 +61,7 @@ function addBridge($s) {
 		exec($cmd, $o, $rc);
 		if ($rc != 0) {
 			// Failed to configure forward mask
-			error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80028]);
+			error_log(date('M d H:i:s ').'ERROR: '.$cmd." --- ".$GLOBALS['messages'][80028]);
 			error_log(date('M d H:i:s ').implode("\n", $o));
 			return 80028;
 		}
@@ -75,16 +75,16 @@ function addBridge($s) {
 			error_log(date('M d H:i:s ').implode("\n", $o));
 			return 80071;
 		}
+	} else {
+	        $cmd = 'brctl setageing '.$s.' 0 2>&1';
+                exec($cmd, $o, $rc);
+                if ($rc != 0) {
+                        error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80055]);
+                        error_log(date('M d H:i:s ').implode("\n", $o));
+                        return 80055;
+                }
 	}
 
-	$cmd = 'brctl setageing '.$s.' 0 2>&1';
-	exec($cmd, $o, $rc);
-	if ($rc != 0) {
-		// Failed to set ageing on bridge (need for portmirroring)
-		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80055]);
-		error_log(date('M d H:i:s ').implode("\n", $o));
-		return 80055;
-	}
 	return 0;
 }
 
@@ -174,14 +174,24 @@ function addNetwork($p) {
 function addOvs($s) {
 	$cmd = 'ovs-vsctl add-br '.$s.' 2>&1';
 	exec($cmd, $o, $rc);
-	if ($rc == 0) {
-		return 0;
-	} else {
+	if ($rc != 0) {
 		// Failed to add the OVS
 		error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80023]);
 		error_log(date('M d H:i:s ').implode("\n", $o));
 		return 80023;
 	}
+	// ADD BPDU CDP option
+	$cmd = "ovs-vsctl set bridge ".$s." other-config:forward-bpdu=true";
+	exec($cmd, $o, $rc);
+        if ($rc == 0) {
+                return 0;
+        } else {
+                // Failed to add  OVS OPTION
+                error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80023]);
+                error_log(date('M d H:i:s ').implode("\n", $o));
+                return 80023;
+        }
+
 }
 
 /**
@@ -193,6 +203,7 @@ function addOvs($s) {
 function addTap($s, $u) {
 	// TODO if already exist should fail?
 	$cmd = 'tunctl -u '.$u.' -g root -t '.$s.' 2>&1';
+	error_log(date('M d H:i:s ').'INFO: '.$cmd);
 	exec($cmd, $o, $rc);
 	if ($rc != 0) {
 		// Failed to add the TAP interface
@@ -459,6 +470,14 @@ function export($node_id, $n, $lab) {
 				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80066]);
 				return 80066;
 			}
+			$cmd='/opt/unetlab/scripts/wrconf_iol_dyn_.py -p '.$n -> getPort().' -t 15';
+			exec($cmd, $o, $rc);
+			error_log(date('M d H:i:s ').'INFO: force write configuration '.$cmd);
+			if ($rc != 0) {
+				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80060]);
+				error_log(date('M d H:i:s ').(string) $o);
+				return 80060;
+			}
 			$cmd = '/usr/bin/nvram_export '.$nvram.' '.$tmp;
 			exec($cmd, $o, $rc);
 			error_log(date('M d H:i:s ').'INFO: exporting '.$cmd);
@@ -468,6 +487,13 @@ function export($node_id, $n, $lab) {
 				return 80060;
 			}
 			break;
+		case 'vpcs':
+			if (!is_file($n->getRunningPath().'/startup.vpc')) {
+				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80062]);
+			} else {
+				copy($n->getRunningPath().'/startup.vpc',$tmp);
+			}
+			break;
 		case 'iol':
 			$nvram = $n -> getRunningPath().'/nvram_'.sprintf('%05u', $node_id);
 			if (!is_file($nvram)) {
@@ -475,6 +501,14 @@ function export($node_id, $n, $lab) {
 				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80066]);
 				return 80066;
 			}
+                        $cmd='/opt/unetlab/scripts/wrconf_iol_dyn_.py -p '.$n -> getPort().' -t 15';
+                        exec($cmd, $o, $rc);
+                        error_log(date('M d H:i:s ').'INFO: force write configuration '.$cmd);
+                        if ($rc != 0) {
+                                error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80060]);
+                                error_log(date('M d H:i:s ').(string) $o);
+                                return 80060;
+                        }
 			$cmd = '/opt/unetlab/scripts/iou_export '.$nvram.' '.$tmp;
 			exec($cmd, $o, $rc);
 			usleep(1);
@@ -484,6 +518,8 @@ function export($node_id, $n, $lab) {
 				error_log(date('M d H:i:s ').implode("\n", $o));
 				return 80060;
 			}
+			// Add no shut
+			if (is_file($tmp)) file_put_contents($tmp,preg_replace('/(\ninterface.*)/','$1'.chr(10).' no shutdown',file_get_contents($tmp)));
 			break;
 		case 'qemu':
 			if ($n -> getStatus() < 2 || !isset($GLOBALS['node_config'][$n -> getTemplate()])) {
@@ -499,6 +535,8 @@ function export($node_id, $n, $lab) {
 					error_log(date('M d H:i:s ').implode("\n", $o));
 					return 80060;
 				}
+				// Add no shut
+				if ( ( $n->getTemplate() == "crv" || $n->getTemplate() == "vios" || $n->getTemplate() == "viosl2" || $n->getTemplate() == "xrv" ) && is_file($tmp) ) file_put_contents($tmp,preg_replace('/(\ninterface.*)/','$1'.chr(10).' no shutdown',file_get_contents($tmp)));
 			}
 	}
 
@@ -509,6 +547,7 @@ function export($node_id, $n, $lab) {
 	}
 
 	// Now save the config file within the lab
+	clearstatcache();
 	$fp = fopen($tmp, 'r');
 	if (!isset($fp)) {
 		// Cannot open file
@@ -731,6 +770,12 @@ function prepareNode($n, $id, $t, $nets) {
 					}
 				}
 				break;
+			case 'vpcs':
+				if (!is_file('/opt/vpcsu/bin/vpcs')) {
+                                        error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80088]);
+                                        return 80082;
+                                }
+				break;
 			case 'dynamips':
 				// Nothing to do
 				break;
@@ -798,15 +843,28 @@ function prepareNode($n, $id, $t, $nets) {
                                                 break;
 					case 'vios':
 					case 'viosl2':
-					case 'vmx':
-					case 'vsrx':
 						copy (  $n -> getRunningPath().'/startup-config',  $n -> getRunningPath().'/ios_config.txt');
 	                                        $diskcmd = '/opt/unetlab/scripts/createdosdisk.sh '.$n -> getRunningPath() ;
         	                                exec($diskcmd, $o, $rc);
 						break;
+					case 'vsrxng':
+					case 'vmx':
+					case 'vsrx':
+						copy (  $n -> getRunningPath().'/startup-config',  $n -> getRunningPath().'/juniper.conf');
+						$isocmd = 'mkisofs -o '.$n -> getRunningPath().'/config.iso -l --iso-level 2 '.$n -> getRunningPath().'/juniper.conf' ;
+						exec($isocmd, $o, $rc);
+                                                break;
 					case 'veos':
 						$diskcmd = '/opt/unetlab/scripts/veos_diskmod.sh '.$n -> getRunningPath() ;
 						exec($diskcmd, $o, $rc);
+						break;
+					case 'vpcs':
+						copy ($n -> getRunningPath().'/startup-config',  $n -> getRunningPath().'/startup.vpc');
+						break;
+					case 'pfsense':
+						copy (  $n -> getRunningPath().'/startup-config',  $n -> getRunningPath().'/config.xml');
+						$isocmd = 'mkisofs -o '.$n -> getRunningPath().'/config.iso -l --iso-level 2 '.$n -> getRunningPath().'/config.xml' ;
+						exec($isocmd, $o, $rc);
 						break;
 				}
 			}
@@ -877,6 +935,9 @@ function start($n, $id, $t, $nets, $scripttimeout) {
 		case 'docker':
 			$cmd = 'docker -H=tcp://127.0.0.1:4243 start '.$n -> getUuid();
 			break;
+		case 'vpcs':
+			$cmd ='/opt/vpcsu/bin/vpcs -m '.$id.' -N '.$n -> getName();
+			break;
 		case 'dynamips':
 			$cmd = '/opt/unetlab/wrappers/dynamips_wrapper -T '.$t.' -D '.$id.' -t "'.$n -> getName().'" -F /opt/unetlab/addons/dynamips/'.$n -> getImage().' -d '.$n -> getDelay();
 			break;
@@ -889,24 +950,35 @@ function start($n, $id, $t, $nets, $scripttimeout) {
 			break;
 	}
 	// Special Case for xrv - csr1000v - vIOS - vIOSL - Docker
-	if ( ( $n->getTemplate() == 'xrv' || $n->getTemplate() == 'csr1000v' || $n->getTemplate() == 'asav' || $n->getTemplate() == 'titanium' )  && is_file($n -> getRunningPath().'/config.iso') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
+	if (( $n->getTemplate() == 'xrv' || $n->getTemplate() == 'csr1000v' || $n->getTemplate() == 'asav' || $n->getTemplate() == 'titanium' )  && is_file($n -> getRunningPath().'/config.iso') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
 		$flags .= ' -cdrom config.iso' ;
-                touch($n -> getRunningPath().'/.lock') ;
         }
 
 	if (( $n->getTemplate() == 'vios'  || $n->getTemplate() == 'viosl2') && is_file($n -> getRunningPath().'/minidisk') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
 		$flags .= ' -drive file=minidisk,if=virtio,bus=0,unit=1,cache=none' ;
-		touch($n -> getRunningPath().'/.lock') ;
 	}
 
-	if (( $n->getTemplate() == 'vmx'  || $n->getTemplate() == 'vsrx') && is_file($n -> getRunningPath().'/minidisk') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
-		$flags .= ' -hdb minidisk' ;
-		touch($n -> getRunningPath().'/.lock') ;
+	if (( $n->getTemplate() == 'vmx'  || $n->getTemplate() == 'vsrx') && is_file($n -> getRunningPath().'/config.iso') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
+		$flags .= ' -drive file=config.iso,if=virtio,media=cdrom,index=2' ;
 	}
 
-	if ( $n -> getNType() != 'docker')  {
+        if ((  $n->getTemplate() == 'vsrxng') && is_file($n -> getRunningPath().'/config.iso') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
+                $flags .= ' -drive file=config.iso,if=ide,media=cdrom,index=2' ;
+        }
+
+	if (( $n -> getTemplate() == 'pfsense')   && is_file($n -> getRunningPath().'/config.iso') && !is_file($n -> getRunningPath().'/.configured') && $n -> getConfig() != 0)  {
+		$flags .= ' -cdrom config.iso' ;
+	}
+
+	if ( $n -> getNType() != 'docker' && $n -> getNType() != 'vpcs')  {
 		$cmd .= ' -- '.$flags.' > '.$n -> getRunningPath().'/wrapper.txt 2>&1 &';
 	}
+
+	if ( $n -> getNType() == 'vpcs')  {
+		$cmd .= $flags.' > '.$n -> getRunningPath().'/wrapper.txt 2>&1 &';
+	}
+	
+
 	error_log(date('M d H:i:s ').'INFO: CWD is '.getcwd());
 	error_log(date('M d H:i:s ').'INFO: starting '.$cmd);
 	exec($cmd, $o, $rc);

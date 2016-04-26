@@ -20,9 +20,11 @@ cat html/includes/init.php | sed "s/define('VERSION', .*/define('VERSION', '${VE
 cp -a scripts/remove_uuid.sh ${DATA_DIR}/opt/unetlab/scripts/
 cp -a scripts/fix_iol_nvram.sh ${DATA_DIR}/opt/unetlab/scripts/
 cp -a scripts/config_* ${DATA_DIR}/opt/unetlab/scripts/
+cp -a scripts/wrconf_iol_dyn_.py ${DATA_DIR}/opt/unetlab/scripts/
 cp -a scripts/veos_diskmod.sh ${DATA_DIR}/opt/unetlab/scripts/
 cp -a scripts/minidisk.bz2 ${DATA_DIR}/opt/unetlab/scripts/
 cp -a scripts/createdosdisk.sh ${DATA_DIR}/opt/unetlab/scripts/
+cp -a scripts/createjundisk.sh ${DATA_DIR}/opt/unetlab/scripts/
 cp -a IOUtools/iou_export ${DATA_DIR}/opt/unetlab/scripts/
 chown -R root:root ${DATA_DIR}/opt/unetlab
 chown -R www-data:www-data ${DATA_DIR}/opt/unetlab/data ${DATA_DIR}/opt/unetlab/labs

@@ -34,7 +34,7 @@ $p['type'] = 'iol';
 $p['name'] = 'R'; 
 $p['icon'] = 'Router.png';
 $p['nvram'] = 1024; 
-$p['ram'] = 256;
+$p['ram'] = 1024;
 $p['ethernet'] = 1; 
-$p['serial'] = 1; 
+$p['serial'] = 0; 
 ?>

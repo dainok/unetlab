@@ -60,6 +60,7 @@ if (!isset($node_config)) {
 		'c1710'			=>	'embedded',
 		'c3725'			=>	'embedded',
 		'c7200'			=>	'embedded',
+		'vpcs'			=>	'embedded',
 		'asa'			=>	'config_asa.py',
 		'asav'			=>	'config_asav.py',
 		'csr1000v'		=>	'config_csr1000v.py',
@@ -69,8 +70,10 @@ if (!isset($node_config)) {
 		'viosl2'		=>	'config_viosl2.py',
 		'vios'			=>	'config_vios.py',
 		'vsrx'			=>	'config_vsrx.py',
+		'vsrxng'		=>	'config_vsrxng.py',
 		'vmx'			=>	'config_vmx.py',
-		'xrv'			=>	'config_xrv.py'
+		'xrv'			=>	'config_xrv.py',
+		'pfsense'		=>	'config_pfsense.py'
 	);
 }
 
@@ -105,6 +108,7 @@ if (!isset($node_templates)) {
 		'coeus'			=>	'Cisco Web Security Appliance',
 		'xrv'			=>	'Cisco XRv',
 		'nsvpx'			=>	'Citrix Netscaler',
+		'sonicwall'            	=>      'Dell SonicWall',
 		'cumulus'		=>	'Cumulus VX',
 		'extremexos'		=>	'ExtremeXOS',
 		'bigip'			=>	'F5 BIG-IP LTM VE',
@@ -119,16 +123,18 @@ if (!isset($node_templates)) {
 		'mikrotik'		=>	'MikroTik RouterOS',
 		'ostinato'		=>	'Ostinato',
 		'paloalto'		=>	'Palo Alto VM-100 Firewall',
+		'pfsense'		=>	'pfSense Firewall',
 		//'riverbed'		=>	'Riverbed',
 		'sterra'		=>	'S-Terra',
 		'vyos'			=>	'VyOS',
 		//'esxi'		=>	'VMware ESXi',
-		'win'			=>	'Windows'
+		'win'			=>	'Windows',
+		'vpcs'			=>	'Virtual PC'
 	);
 }
 
 // Define parameters
-define('VERSION', '1.0.0-2');
+define('VERSION', '1.0.0-9.1-git');
 define('BASE_DIR', '/opt/unetlab');
 define('BASE_LAB', BASE_DIR.'/labs');
 define('BASE_TMP', BASE_DIR.'/tmp');

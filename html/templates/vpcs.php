@@ -2,9 +2,9 @@
 # vim: syntax=php tabstop=4 softtabstop=0 noexpandtab laststatus=1 ruler
 
 /**
- * html/templates/bigip.php
+ * html/templates/vpcs.php
  *
- * bigip template for UNetLab.
+ * vpcs template for UNetLab.
  *
  * LICENSE:
  *
@@ -27,16 +27,11 @@
  * @copyright 2014-2016 Andrea Dainese
  * @license http://www.gnu.org/licenses/gpl.html
  * @link http://www.unetlab.com/
- * @version 20151116
+ * @version 20160304
  */
 
-$p['type'] = 'qemu'; 
-$p['name'] = 'BIGIP';
-$p['icon'] = 'Load Balancer.png';
-$p['cpu'] = 1; 
-$p['ram'] = 2048;
-$p['ethernet'] = 4;
-$p['console'] = 'telnet'; 
-$p['qemu_arch'] = 'x86_64';
-$p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -serial mon:stdio -nographic -nodefconfig -nodefaults -display none -vga std -rtc base=utc ';
+$p['type'] = 'vpcs'; 
+$p['name'] = 'VPC'; 
+$p['icon'] = 'Desktop.png';
+$p['ethernet'] = 1;
 ?>

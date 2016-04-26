@@ -36,7 +36,7 @@ $p['icon'] = 'Router.png';
 $p['cpu'] = 2;
 $p['ram'] = 4096;
 $p['ethernet'] = 4;
-$p['console'] = 'vnc';
+$p['console'] = 'telnet';
 $p['qemu_arch'] = 'x86_64';
-$p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -vga std -nodefconfig -nodefaults -rtc base=utc';
+$p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -cpu qemu64,+ssse3,+sse4.1,+sse4.2,+x2apic,+aes,pclmulqdq  -serial mon:stdio -nographic   -nodefconfig -nodefaults -rtc base=utc';
 ?>

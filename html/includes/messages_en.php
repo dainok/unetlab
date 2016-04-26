@@ -51,6 +51,7 @@ $messages[15] = 'Cannot remove UUID from exported labs (15).';
 $messages[16] = 'Failed to export config (16).';
 $messages[17] = 'Failed to upgrade UNetLab (17).';
 $messages[18] = 'Unable to connect to Internet (18).';
+$messages[19] = 'Export not supported (19).';
 
 /***************************************************************************
  * Classes
@@ -260,6 +261,7 @@ $messages[70017] = 'Serial portgroups (4 int each)';
 $messages[70018] = 'Ethernet portgroups (4 int each)';
 $messages[70019] = 'Exported';
 $messages[70020] = 'None';
+$messages[70021] = 'First Eth MAC Address';
 
 // CLI (80000-89999)
 $messages[80009] = 'Failed to add the username (80009).';
@@ -340,6 +342,7 @@ $messages[80084] = 'Skipping powered off and unsupported nodes (80084).';
 $messages[80085] = 'Failed to set MTU 9000 on interface (80085).';
 $messages[80086] = 'Cannot import iou-web file (80086).';
 $messages[80087] = 'iou-web file imported (80087).';
+$messages[80088] = 'Cannot find vpcs installation (80088).';
 
 // Authentication (90000-99999)
 $messages[90001] = 'User is not authenticated or session timed out (90001).';

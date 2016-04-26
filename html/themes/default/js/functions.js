@@ -29,6 +29,8 @@
  * @version 20160125
  */
 
+
+
 // Basename: given /a/b/c return c
 function basename(path) {
 	return path.replace(/\\/g,'/').replace( /.*\//, '');
@@ -45,36 +47,43 @@ function dirname(path) {
 }
 
 // Alert management
-function addMessage(severity, message) {
+function addMessage(severity, message, notFromLabviewport) {
 	// Severity can be success (green), info (blue), warning (yellow) and danger (red)
+	// Param 'notFromLabviewport' is used to filter notification
 
-	var timeout = 10000;		// by default close messages after 3 seconds
+	var timeout = 10000;		// by default close messages after 10 seconds
   if (severity == 'danger') timeout = 5000;
 	if (severity == 'alert') timeout = 10000;
 	if (severity == 'warning') timeout = 10000;
 
-	if (!$('#alert_container').length) {
-		// Add the frame container if not exists
-		$('body').append('<div id="alert_container"><b><i class="fa fa-bell-o"></i> Notifications</b><div class="inner"></div></div>');
-	}
-	if (!$('#notification_container').length) {
-		$('body').append('<div id="notification_container"></div>');
-	}
-	
-	var msgalert = $('<div class="alert alert-' + severity.toLowerCase() + ' fade in">').append($('<button type="button" class="close" data-dismiss="alert">').append("&times;")).append(message);
+	// Add notifications to #alert_container only when labview is open
+	if($("#lab-viewport").length) {
+		if (!$('#alert_container').length) {
+			// Add the frame container if not exists
+			$('body').append('<div id="alert_container"><b><i class="fa fa-bell-o"></i> Notifications</b><div class="inner"></div></div>');
+		}
+		var msgalert = $('<div class="alert alert-' + severity.toLowerCase() + ' fade in">').append($('<button type="button" class="close" data-dismiss="alert">').append("&times;")).append(message);
 
-	// Add the alert div to top (prepend()) or to bottom (append())
-	$('#alert_container .inner').prepend(msgalert);
-	
-	if (severity == "danger")
-	{
-		var notification_alert = $('<div class="alert alert-' + severity.toLowerCase() + ' fade in">').append($('<button type="button" class="close" data-dismiss="alert">').append("&times;")).append(message);
+		// Add the alert div to top (prepend()) or to bottom (append())
+		$('#alert_container .inner').prepend(msgalert);
 
-		$('#notification_container').prepend(notification_alert);
-		if (timeout) {
-			window.setTimeout(function() {
-				notification_alert.alert("close");
-			}, timeout);
+	}
+
+	if ($("#lab-viewport").length || (!$("#lab-viewport").length && notFromLabviewport)){
+		if (!$('#notification_container').length) {
+			$('body').append('<div id="notification_container"></div>');
+		}
+
+		//if (severity == "danger" )
+		if (severity != "" ) {
+			var notification_alert = $('<div class="alert alert-' + severity.toLowerCase() + ' fade in">').append($('<button type="button" class="close" data-dismiss="alert">').append("&times;")).append(message);
+
+			$('#notification_container').prepend(notification_alert);
+			if (timeout) {
+				window.setTimeout(function() {
+					notification_alert.alert("close");
+				}, timeout);
+			}
 		}
 	}
 }
@@ -135,6 +144,55 @@ function cfg_export(node_id) {
 		}
 	});
 	return deferred.promise();
+}
+
+// // Export node(s) config recursive
+function recursive_cfg_export (nodes,i) {
+        i = i-1
+        addMessage('info',  nodes[Object.keys(nodes)[i]]['name']  + ': ' + MESSAGES[138])
+        var deferred = $.Deferred();
+        var lab_filename = $('#lab-viewport').attr('data-path');
+	if ( typeof nodes[Object.keys(nodes)[i]]['path'] === 'undefined' ) {
+        	var url = '/api/labs' + lab_filename + '/nodes/' + Object.keys(nodes)[i] + '/export';
+	} else {
+		var url = '/api/labs' + lab_filename + '/nodes/' + nodes[Object.keys(nodes)[i]]['path'] + '/export';
+	}
+        logger(1, 'DEBUG: ' + url );
+        var type = 'PUT';
+        $.ajax({
+                timeout: TIMEOUT * 10 * i,  // Takes a lot of time
+                type: type,
+                url: encodeURI(url),
+                dataType: 'json',
+                success: function(data) {
+                        if (data['status'] == 'success') {
+                                logger(1, 'DEBUG: config exported.');
+                                addMessage('success',  nodes[Object.keys(nodes)[i]]['name']  + ': ' + MESSAGES[79])
+                        } else {
+                                // Application error
+                                logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+                                addMessage('danger', nodes[Object.keys(nodes)[i]]['name'] + ': ' + data['message']   );
+                        }
+                        if ( i > 0 ) {
+				recursive_cfg_export (nodes,i);
+			} else {
+				addMessage('info',  'Export All: done');
+			}
+                },
+                error: function(data) {
+                        // Server error
+                        var message = getJsonMessage(data['responseText']);
+                        logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+                        logger(1, 'DEBUG: ' + message);
+                        addMessage('danger', nodes[Object.keys(nodes)[i]]['name'] +  ': ' + message   );
+                        if ( i > 0 ) {
+				recursive_cfg_export (nodes,i);
+			} else {
+				addMessage('info',  'Export All: done');
+			}
+                }
+        });
+        return deferred.promise();
 }
 
 // Clone selected labs
@@ -1278,6 +1336,55 @@ function start(node_id) {
 	return deferred.promise();
 }
 
+// Start nodes recursive
+function recursive_start(nodes,i) {
+	i=i-1;
+        var deferred = $.Deferred();
+        var lab_filename = $('#lab-viewport').attr('data-path');
+	if ( typeof nodes[Object.keys(nodes)[i]]['path'] === 'undefined') { 
+        	var url = '/api/labs' + lab_filename + '/nodes/' + Object.keys(nodes)[i] + '/start';
+	} else { 
+		var url = '/api/labs' + lab_filename + '/nodes/' + nodes[Object.keys(nodes)[i]]['path'] + '/start';
+	}
+        var type = 'GET';
+        $.ajax({
+		timeout: TIMEOUT,
+                type: type,
+                url: encodeURI(url),
+                dataType: 'json',
+                success: function(data) {
+                        if (data['status'] == 'success') {
+                                logger(1, 'DEBUG: node(s) started.');
+				addMessage('success',  nodes[Object.keys(nodes)[i]]['name']  + ': ' + MESSAGES[76]  );
+                        } else {
+                                // Application error
+                                logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+                                addMessage('danger',  nodes[Object.keys(nodes)[i]]['name']  + ': ' + MESSAGES[76] + 'failed' );
+                        }
+                        if ( i > 0 ) {
+                                recursive_start (nodes,i);
+			} else {
+                                addMessage('info',  'Start All: done');
+                        }
+                },
+                error: function(data) {
+                        // Server error
+                        var message = getJsonMessage(data['responseText']);
+                        logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+                        logger(1, 'DEBUG: ' + message);
+                        addMessage('danger', message );
+                        if ( i > 0 ) {
+                                recursive_start (nodes,i);
+                        } else {
+                                addMessage('info',  'Start All: done');
+                        }
+
+                }
+        });
+        return deferred.promise();
+}
+
+
 // Stop node(s)
 function stop(node_id) {
 	var deferred = $.Deferred();
@@ -1487,7 +1594,7 @@ function printFormLab(action, values) {
 	}
 	var name = (values['name'] != null) ? values['name'] : '';
 	var version = (values['version'] != null) ? values['version'] : '';
-	var scripttimeout = (values['scripttimeout'] != null) ? values['scripttimeout'] : '600';
+	var scripttimeout = (values['scripttimeout'] != null) ? values['scripttimeout'] : '300';
 	var author = (values['author'] != null) ? values['author'] : '';
 	var description = (values['description'] != null) ? values['description'] : '';
 	var body = (values['body'] != null) ? values['body'] : '';
@@ -1671,11 +1778,12 @@ function printFormNode(action, values) {
 function printFormNodeConfigs(values, cb) {
 	var title = values['name'] + ': ' + MESSAGES[123];
 	if (ROLE == 'admin' || ROLE == 'editor') {
-		var html = '<form id="form-node-config" class="form-horizontal"><input name="config[id]" value="' + values['id'] + '" type="hidden"/><div class="form-group"><div class="col-md-12"><textarea class="form-control autofocus" name="config[data]" rows="15">' + values['data'] + '</textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
+		var html = '<form id="form-node-config" class="form-horizontal"><input name="config[id]" value="' + values['id'] + '" type="hidden"/><div class="form-group"><div class="col-md-12"><textarea class="form-control autofocus" id="nodeconfig" name="config[data]" rows="15"></textarea></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form>';
 	} else {
 		var html = '<div class="col-md-12"><pre>' + values['data'] + '</pre></div>';
 	}
 	$('#config-data').html(html);
+	$('#nodeconfig').val(values['data']);
 	cb && cb();
 }
 
@@ -2425,6 +2533,8 @@ function printLabTopology() {
             addModalError(message2)
         }
         $("#loading-lab").remove();
+	$("#lab-sidebar ul").show();
+	$("#lab-sidebar ul li:lt(11)").hide();
     });
 }
 
@@ -2562,6 +2672,8 @@ function printPageLabList(folder) {
 		url: encodeURI(url),
 		dataType: 'json',
 		success: function(data) {
+			// Clear the message container
+			$("#notification_container").empty()
 			if (data['status'] == 'success') {
 				logger(1, 'DEBUG: folder "' + folder + '" found.');
 
@@ -2677,7 +2789,7 @@ function printPageLabOpen(lab) {
 
 	// Print topology
 	printLabTopology();
-
+	
 	// Read privileges and set specific actions/elements
 	if (ROLE == 'admin' || ROLE == 'editor') {
 		$('#lab-sidebar ul').append('<li><a class="action-labobjectadd" href="#" title="' + MESSAGES[56] + '"><i class="glyphicon glyphicon-plus"></i></a></li>');
@@ -2694,7 +2806,7 @@ function printPageLabOpen(lab) {
 	$('#lab-sidebar ul').append('<li><a class="action-labtopologyrefresh" href="#" title="' + MESSAGES[57] + '"><i class="glyphicon glyphicon-refresh"></i></a></li>');
 	$('#lab-sidebar ul').append('<li><a class="action-freeselect" href="#" title="' + MESSAGES[151] + '"><i class="glyphicon glyphicon-check"></i></a></li>');
 	$('#lab-sidebar ul').append('<li><a class="action-status" href="#" title="' + MESSAGES[13] + '"><i class="glyphicon glyphicon-info-sign"></i></a></li>');
-	$('#lab-sidebar ul').append('<li><a class="action-labclose" href="#" title="' + MESSAGES[60] + '"><i class="glyphicon glyphicon-off"></i></a></li>');
+	$('#lab-sidebar ul').append('<div id="action-labclose"><li><a class="action-labclose" href="#" title="' + MESSAGES[60] + '"><i class="glyphicon glyphicon-off"></i></a></li></div>');
 	$('#lab-sidebar ul').append('<li><a class="action-logout" href="#" title="' + MESSAGES[14] + '"><i class="glyphicon glyphicon-log-out"></i></a></li>');
 	$('#lab-sidebar ul a').each(function(){
 		var t = $(this).attr("title");
@@ -2873,6 +2985,14 @@ function drawStatusInModal(data) {
     // QEMU running nodes
     $('#stats-graph ul', $statusModalBody).append('<li><div class="count count-qemu col-md-4 col-lg-4"></div></li>');
     $('.count-qemu', $statusModalBody).html('<strong>' + data['qemu'] + '</strong><br/><span>' + MESSAGES[43] + '</span>');
+
+    // Docker running nodes
+    $('#stats-graph ul', $statusModalBody).append('<li><div class="count count-docker col-md-4 col-lg-6"></div></li>');
+    $('.count-docker', $statusModalBody).html('<strong>' + data['docker'] + '</strong><br/><span>' + MESSAGES[161] + '</span>');
+
+    // VPCS running nodes
+    $('#stats-graph ul', $statusModalBody).append('<li><div class="count count-vpcs col-md-4 col-lg-6"></div></li>');
+    $('.count-vpcs', $statusModalBody).html('<strong>' + data['vpcs'] + '</strong><br/><span>' + MESSAGES[162] + '</span>');
 }
 
 // Update system status in modal
@@ -3000,6 +3120,15 @@ function printSystemStats(data) {
     // QEMU running nodes
     $('#stats-graph ul').append('<li><div class="count count-qemu col-md-4 col-lg-4"></div></li>');
     $('.count-qemu').html('<strong>' + data['qemu'] + '</strong><br/><span>' + MESSAGES[43] + '</span>');
+
+    // Docker running nodes
+    $('#stats-graph ul').append('<li><div class="count count-docker col-md-4 col-lg-6"></div></li>');
+    $('.count-docker').html('<strong>' + data['docker'] + '</strong><br/><span>' + MESSAGES[161] + '</span>');
+
+    // VPCS running nodes
+    $('#stats-graph ul').append('<li><div class="count count-vpcs col-md-4 col-lg-6"></div></li>');
+    $('.count-vpcs').html('<strong>' + data['vpcs'] + '</strong><br/><span>' + MESSAGES[162] + '</span>');
+
 }
 
 /*******************************************************************************
@@ -3292,7 +3421,7 @@ function printFormEditCustomShape(id){
         '</div>'+
       '</div>'+
       '<div class="row col-md-3 btn-part">'+
-        '<button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button>' +
+        '<button type="button" class="btn btn-aqua edit-custom-shape-form-save" data-path="' + id + '">' + MESSAGES[47] + '</button>' +
         '<button type="button" class="btn btn-grey cancelForm" data-path="' + id + '">' + MESSAGES[18] + '</button>'+
       '</div>'+
       '<input type="hidden" class="firstShapeValues-z_index">' +
@@ -3413,7 +3542,7 @@ function printFormEditText(id){
       '</div>'+
     '</div>'+
     '<div class="row col-md-3 btn-part">'+
-      '<button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button>' +
+      '<button type="button" class="btn btn-aqua edit-custom-text-form-save" data-path="' + id + '">' + MESSAGES[47] + '</button>' +
       '<button type="button" class="btn btn-grey cancelForm" data-path="' + id + '">' + MESSAGES[18] + '</button>'+
     '</div>'+
     '<input type="text" class="hide firstTextValues-z_index">' +
