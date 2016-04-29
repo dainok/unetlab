@@ -38,5 +38,5 @@ $p['ram'] = 3072;
 $p['ethernet'] = 4; 
 $p['console'] = 'telnet'; 
 $p['qemu_arch'] = 'x86_64';
-$p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -serial mon:stdio -nographic -nodefconfig -nodefaults -rtc base=utc';
+$p['qemu_options'] = '-machine type=pc-1.0,accel=kvm,usb=off -realtime mlock=off -serial mon:stdio -nographic -nodefconfig -nodefaults -display none -vga std -rtc base=utc,driftfix=slew -global kvm-pit.lost_tick_policy=discard -no-hpet -no-shutdown -boot strict=on -device piix3-usb-uhci,id=usb,bus=pci.0,addr=0x1.0x2';
 ?>
