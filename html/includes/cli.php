@@ -37,7 +37,7 @@
  * @return  int                         0 means ok
  */
 function addBridge($s) {
-	$cmd = 'brctl addbr '.$s.' 2>&1';
+	$cmd = 'brctl addbr '.$s['name'].' 2>&1';
 	exec($cmd, $o, $rc);
 	if ($rc != 0) {
 		// Failed to add the bridge
@@ -46,7 +46,7 @@ function addBridge($s) {
 		return 80026;
 	}
 
-	$cmd = 'ip link set dev '.$s.' up 2>&1';
+	$cmd = 'ip link set dev '.$s['name'].' up 2>&1';
 	exec($cmd, $o, $rc);
 	if ($rc != 0) {
 		// Failed to activate it
@@ -55,9 +55,9 @@ function addBridge($s) {
 		return 80027;
 	}
 
-	if (!preg_match('/^pnet[0-9]+$/', $s)) {
+	if (!preg_match('/^pnet[0-9]+$/', $s['name'])) {
 		// Forward all frames on non-cloud bridges
-		$cmd = 'echo 65535 > /sys/class/net/'.$s.'/bridge/group_fwd_mask 2>&1';
+		$cmd = 'echo 65535 > /sys/class/net/'.$s['name'].'/bridge/group_fwd_mask 2>&1';
 		exec($cmd, $o, $rc);
 		if ($rc != 0) {
 			// Failed to configure forward mask
@@ -67,7 +67,7 @@ function addBridge($s) {
 		}
 
 		// Disable multicast_snooping
-		$cmd = 'echo 0 > /sys/devices/virtual/net/'.$s.'/bridge/multicast_snooping 2>&1';
+		$cmd = 'echo 0 > /sys/devices/virtual/net/'.$s['name'].'/bridge/multicast_snooping 2>&1';
 		exec($cmd, $o, $rc);
 		if ($rc != 0) {
 			// Failed to configure multicast_snooping
@@ -75,8 +75,9 @@ function addBridge($s) {
 			error_log(date('M d H:i:s ').implode("\n", $o));
 			return 80071;
 		}
-	} else {
-	        $cmd = 'brctl setageing '.$s.' 0 2>&1';
+	} 
+	if ( $s['count'] < 3 ) {
+	        $cmd = 'brctl setageing '.$s['name'].' 0 2>&1';
                 exec($cmd, $o, $rc);
                 if ($rc != 0) {
                         error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80055]);
@@ -118,7 +119,7 @@ function addNetwork($p) {
 		case 'bridge':
 			if (!isInterface($p['name'])) {
 				// Interface does not exist -> create bridge
-				return addBridge($p['name']);
+				return addBridge($p);
 			} else if (isBridge($p['name'])) {
 				// Bridge already present
 				return 0;
@@ -127,7 +128,7 @@ function addNetwork($p) {
 				$rc = delOvs($p['name']);
 				if ($rc == 0) {
 					// OVS deleted, create the bridge
-					return addBridge($p['name']);
+					return addBridge($p);
 				} else {
 					// Failed to delete OVS
 					return $rc;
@@ -470,7 +471,7 @@ function export($node_id, $n, $lab) {
 				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80066]);
 				return 80066;
 			}
-			$cmd='/opt/unetlab/scripts/wrconf_iol_dyn_.py -p '.$n -> getPort().' -t 15';
+			$cmd='/opt/unetlab/scripts/wrconf_dyn_.py -p '.$n -> getPort().' -t 15';
 			exec($cmd, $o, $rc);
 			error_log(date('M d H:i:s ').'INFO: force write configuration '.$cmd);
 			if ($rc != 0) {

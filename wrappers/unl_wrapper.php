@@ -231,7 +231,8 @@ switch ($action) {
 					// Create attached networks only
 					$p = Array(
 						'name' => 'vnet'.$lab -> getTenant().'_'.$interface -> getNetworkId(),
-						'type' => $lab -> getNetworks()[$interface -> getNetworkId()] -> getNType()
+						'type' => $lab -> getNetworks()[$interface -> getNetworkId()] -> getNType(),
+						'count' => $lab -> getNetworks()[$interface -> getNetworkId()] -> getCount()
 					);
 					$rc = addNetwork($p);
 					if ($rc !== 0) {
