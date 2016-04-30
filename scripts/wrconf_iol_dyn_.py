@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-# scripts/config_vios.py
+# scripts/wrconf_iol_dyn_.py
 #
-# Import/Export script for vIOS.
+# Auto config write for iol and dynamis on export
 #
 # LICENSE:
 #
