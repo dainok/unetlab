@@ -460,7 +460,7 @@ function apiGetLabNodeTemplate($p) {
 	if ($p['type'] == 'qemu') $output['data']['options']['uuid'] = Array(
 		'name' => $GLOBALS['messages'][70008],
 		'type' => 'input',
-		'value' => genUuid()
+		'value' => ''
 	);
 
 	// CPU
