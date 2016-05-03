@@ -73,6 +73,7 @@ if (!isset($node_config)) {
 		'vsrxng'		=>	'config_vsrxng.py',
 		'vmx'			=>	'config_vmx.py',
 		'xrv'			=>	'config_xrv.py',
+		//'xrv9k'		=>	'config_xrv9k.py',
 		'pfsense'		=>	'config_pfsense.py'
 	);
 }
@@ -107,6 +108,7 @@ if (!isset($node_templates)) {
 		'vwaas'			=>	'Cisco vWAAS',
 		'coeus'			=>	'Cisco Web Security Appliance',
 		'xrv'			=>	'Cisco XRv',
+		'xrv9k'	                =>      'Cisco XRv 9000',
 		'nsvpx'			=>	'Citrix Netscaler',
 		'sonicwall'            	=>      'Dell SonicWall',
 		'cumulus'		=>	'Cumulus VX',
