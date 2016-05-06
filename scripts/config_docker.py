@@ -37,7 +37,7 @@ expctimeout = 3     # Maximum time for each short expect
 longtimeout = 30    # Maximum time for each long expect
 timeout = 60        # Maximum run time (conntimeout is included)
 
-def config_put(docker_pid, config, firstboot):
+def config_put(docker_pid, config):
     for line in config.split(os.linesep):
         m = re.match(r'^ip ', line, re.M|re.I)
         if m:
@@ -76,17 +76,11 @@ def main(action, fiename, docker_id):
                 print('ERROR: cannot read config from file.')
                 sys.exit(1)
 
-            configured = '%s/.configured' %(os.path.dirname(filename))
-            if os.path.exists(configured):
-                firtboot = False
-            else:
-                firstboot = True
-
             p1 = subprocess.Popen(["/usr/bin/docker -H=tcp://127.0.0.1:4243 inspect --format '{{ .State.Pid }}' %s" %(docker_id)], stdout=subprocess.PIPE, shell=True)
             p1.wait()
             output, error = p1.communicate()
             docker_pid = output.decode("utf-8").rstrip()
-            rc = config_put(docker_pid, config, firstboot)
+            rc = config_put(docker_pid, config)
             if rc != True:
                 print('ERROR: failed to push config.')
                 sys.exit(1)
@@ -98,6 +92,7 @@ def main(action, fiename, docker_id):
                 os.remove(lock)
 
             # Mark as configured
+            configured = '%s/.configured' %(os.path.dirname(filename))
             if not os.path.exists(configured):
                 open(configured, 'a').close()
 
