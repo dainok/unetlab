@@ -227,6 +227,10 @@ tbody td .glyphicon-trash {
 
 }
 
+#main-modal{
+	height: 100%;
+}
+
 body.folders #main{
 	height: auto;
 }
