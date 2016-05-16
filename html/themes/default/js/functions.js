@@ -1794,7 +1794,7 @@ function printFormCustomShape(values){
       left = (values == null || values['left'] == null) ? null : values['left'],
       top = (values == null || values['top'] == null) ? null : values['top'];
 
-  var html = '<form id="main" class="container col-md-12 col-lg-12 custom-shape-form">' +
+  var html = '<form id="main-modal" class="container col-md-12 col-lg-12 custom-shape-form">' +
                '<div class="row">'+
                   '<div class="col-md-8 col-md-offset-1 form-group">'+
                    '<label class="col-md-3 control-label form-group-addon">Type</label>'+
@@ -1834,7 +1834,7 @@ function printFormCustomShape(values){
                      '<input type="color" class="form-control shape_background_color">'+
                    '</div>'+
                  '</div> <br>'+
-                  '<button type="submit" class="btn btn-aqua col-md-offset-7">' + MESSAGES[47] + '</button>' +
+                  '<button type="submit" class="btn btn-aqua col-md-offset-1">' + MESSAGES[47] + '</button>' +
                   '<button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button>'+
                '</div>'+
                '<input  type="text" class="hide left-coordinate" value="' + left + '">' +
@@ -1862,7 +1862,7 @@ function printFormText(values){
     , fontStyles = ['normal', 'bold', 'italic']
     ;
 
-  var html = '<form id="main" class="container col-md-12 col-lg-12 add-text-form">' +
+  var html = '<form id="main-modal" class="container col-md-12 col-lg-12 add-text-form">' +
                 '<div class="row">'+
                   '<div class="col-md-12 col-md-offset-0 form-group">'+
                     '<label class="col-md-3 control-label form-group-addon">Text</label>'+
@@ -1896,7 +1896,7 @@ function printFormText(values){
                       '<input type="color" class="form-control text_background_color">'+
                     '</div>'+
                   '</div> <br>'+
-                  '<button type="submit" class="btn btn-aqua col-md-offset-7">' + MESSAGES[47] + '</button>' +
+                  '<button type="submit" class="btn btn-aqua col-md-offset-1">' + MESSAGES[47] + '</button>' +
                   '<button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button>'+
                 '</div>'+
                 '<input  type="text" class="hide left-coordinate" value="' + left + '">' +
@@ -3403,7 +3403,7 @@ function printFormEditCustomShape(id){
     , colorDigits
     , bgColor
     , html =
-    '<form id="main" class="container col-md-12 col-lg-12 edit-custom-shape-form" data-path="' + id + '">' +
+    '<form id="main-modal-edit" class="container col-md-12 col-lg-12 edit-custom-shape-form" data-path="' + id + '">' +
       '<div class="row col-md-9 top-part">'+
         '<label class="edit-custom-shape-label">Edit: '+ id + '</label><br>'+
         '<div class="form-group">'+
@@ -3518,7 +3518,7 @@ function printFormEditText(id){
     , colorDigits
     , bgColor
     , html =
-  '<form id="main" class="container col-md-12 col-lg-12 edit-custom-text-form"  data-path="' + id + '">' +
+  '<form id="main-modal-edit" class="container col-md-12 col-lg-12 edit-custom-text-form"  data-path="' + id + '">' +
     '<div class="row col-md-9  top-part">'+
       '<label class="edit-custom-text-label">Edit: '+ id + '</label><br>'+
       '<div class="form-group">'+
