@@ -471,7 +471,7 @@ function export($node_id, $n, $lab) {
 				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80066]);
 				return 80066;
 			}
-			$cmd='/opt/unetlab/scripts/wrconf_dyn_.py -p '.$n -> getPort().' -t 15';
+			$cmd='/opt/unetlab/scripts/wrconf_dyn.py -p '.$n -> getPort().' -t 15';
 			exec($cmd, $o, $rc);
 			error_log(date('M d H:i:s ').'INFO: force write configuration '.$cmd);
 			if ($rc != 0) {
@@ -502,7 +502,7 @@ function export($node_id, $n, $lab) {
 				error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80066]);
 				return 80066;
 			}
-                        $cmd='/opt/unetlab/scripts/wrconf_iol_dyn_.py -p '.$n -> getPort().' -t 15';
+                        $cmd='/opt/unetlab/scripts/wrconf_iol.py -p '.$n -> getPort().' -t 15';
                         exec($cmd, $o, $rc);
                         error_log(date('M d H:i:s ').'INFO: force write configuration '.$cmd);
                         if ($rc != 0) {

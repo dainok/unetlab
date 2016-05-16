@@ -38,20 +38,24 @@ longtimeout = 30    # Maximum time for each long expect
 timeout = 60        # Maximum run time (conntimeout is included)
 
 def node_login(handler):
+    # clear buffer
     # Send an empty line, and wait for the login prompt
     i = -1
+    handler.sendline('\r\n')
+    handler.after
     while i == -1:
         try:
             handler.sendline('\r\n')
             i = handler.expect([
                 'Username:',
-                '\(config',
-                '>',
-                '#',
+                '\(config\)#$',
+                '>$',
+                '#$',
                 'Would you like to enter the'], timeout = 5)
         except:
             i = -1
 
+    print ( i,"\n" )
     if i == 0:
         # Need to send username and password
         handler.sendline(username)
@@ -99,11 +103,28 @@ def node_login(handler):
         return True
     elif i == 2:
         # Need higher privilege
-        handler.sendline('exit\r\n')
+        handler.sendline('enable\r\n')
         try:
-            j = handler.expect('#')
+            j = handler.expect(['Password:', '#'])
         except:
-            print('ERROR: error waiting for "#" prompt.')
+            print('ERROR: error waiting for ["Password:", "#"] prompt.')
+            node_quit(handler)
+            return False
+        if j == 0:
+            # Need do provide secret
+            handler.sendline(secret)
+            try:
+                handler.expect('#', timeout = expctimeout)
+            except:
+                print('ERROR: error waiting for "#" prompt.')
+                node_quit(handler)
+                return False
+            return True
+        elif j == 1:
+            # Nothing to do
+            return True
+        else:
+            # Unexpected output
             node_quit(handler)
             return False
         return True
