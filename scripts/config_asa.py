@@ -224,7 +224,7 @@ def config_put(handler, config):
     for line in config.splitlines():
         handler.sendline(line)
         try:
-            handler.expect('\r\n', timeout = expctimeout)
+            handler.expect('\r\n', timeout = longtimeout)
         except:
             print('ERROR: error waiting for EOL.')
             node_quit(handler)
