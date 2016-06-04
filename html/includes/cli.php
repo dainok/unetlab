@@ -84,6 +84,13 @@ function addBridge($s) {
                         error_log(date('M d H:i:s ').implode("\n", $o));
                         return 80055;
                 }
+                $cmd = 'echo 2 > /sys/class/net/'.$s['name'].'/bridge/multicast_router  2>&1';
+                exec($cmd, $o, $rc);
+                if ($rc != 0) {
+                        error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80055]);
+                        error_log(date('M d H:i:s ').implode("\n", $o));
+                        return 80055;
+                }
 	}
 
 	return 0;
