@@ -356,6 +356,7 @@ function apiGetLabNodeInterfaces($lab, $id) {
 		$output['message'] = $GLOBALS['messages'][60025];
 		$output['data'] = Array();
 		// Addint node type to properly sort IOL interfaces
+		$output['data']['id'] = (int)$id;
 		$output['data']['sort'] = $lab -> getNodes()[$id] -> getNType();
 
 		// Getting interfaces
@@ -368,10 +369,13 @@ function apiGetLabNodeInterfaces($lab, $id) {
 		}
 		$serials = Array();
 		foreach ($lab -> getNodes()[$id] -> getSerials() as $interface_id => $interface) {
+			$remoteId = $interface -> getRemoteId();
+			$remoteIf = $interface -> getRemoteIf();
 			$serials[$interface_id] = Array(
 				'name' => $interface -> getName(),
-				'remote_id' => $interface -> getRemoteId(),
-				'remote_if' => $interface -> getRemoteIf()
+				'remote_id' =>$remoteId,
+				'remote_if' => $remoteIf,
+				'remote_if_name' => $remoteId?$lab -> getNodes()[$remoteId]-> getSerials()[$remoteIf]-> getName():'',
 			);
 		}
 

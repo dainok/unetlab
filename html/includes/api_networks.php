@@ -40,7 +40,9 @@
  */
 function apiAddLabNetwork($lab, $p, $o) {
 	// Adding network_id to network_name if required
-	if ($o == True && isset($p['name'])) $p['name'] = $p['name'].$lab -> getFreeNetworkId();
+
+	$id = $lab -> getFreeNetworkId();
+	if ($o == True && isset($p['name'])) $p['name'] = $p['name'].$id;
 
 	// Adding the network
 	$rc = $lab -> addNetwork($p);
@@ -50,6 +52,9 @@ function apiAddLabNetwork($lab, $p, $o) {
 		$output['code'] = 201;
 		$output['status'] = 'success';
 		$output['message'] = $GLOBALS['messages'][60006];
+		$output['data'] = array(
+			'id'=>$id
+		);
 	} else {
 		// Failed to add network
 		$output['code'] = 400;
@@ -68,12 +73,21 @@ function apiAddLabNetwork($lab, $p, $o) {
  */
 function apiDeleteLabNetwork($lab, $id) {
 	// Deleting the network
+	$network = $lab->getNetworks()[$id];
 	$rc = $lab -> deleteNetwork($id);
 
 	if ($rc === 0) {
 		$output['code'] = 200;
 		$output['status'] = 'success';
 		$output['message'] = $GLOBALS['messages'][60023];
+		$output['data'] = Array(
+			'id'=>$id,
+			'count' => $network -> getCount(),
+			'left' => $network -> getLeft(),
+			'name' => $network -> getName(),
+			'top' => $network -> getTop(),
+			'type' => $network -> getNType()
+		);
 	} else {
 		$output['code'] = 400;
 		$output['status'] = 'fail';
