@@ -48,11 +48,11 @@ body.login .full-height{
 	overflow:hidden;
 	padding:3px;
 	color:#fff;
-	max-height:31px;			
+	max-height:31px;
 	overflow:hidden;
 }
 #alert_container .inner{
-	max-height:0px;	
+	max-height:0px;
 	overflow:hidden;
 }
 #alert_container:hover {
@@ -93,7 +93,7 @@ body.login .full-height{
 	max-width:400px;
 }
 .navbar-item-aqua{
-	
+
 }
 #navbar-top .navbar-right{
 	margin-right:0;
@@ -128,7 +128,13 @@ body.login .full-height{
 	aoverflow-y: auto;
 }
 
+.dropdown-menu li:hover{
+	background: #ccc;
+}
 
+.dropdown-menu > li > a:focus, .dropdown-menu > li > a:hover{
+	background: #ccc;
+}
 #navbar-main {
 	margin-bottom:0;
 	margin-top:23px;
@@ -161,7 +167,7 @@ body.login .full-height{
 	margin-top: -63px;
 }
 #navbar-main  .item-first a{
-	
+
 }
 #navbar-main .item{
 	margin-right:5px;
@@ -269,7 +275,7 @@ body.login .full-height{
 	display:block;
 	padding:4px 0 4px 6px;
 	vertical-align:middle;
-	
+
 }
 #lab-sidebar ul li i{
 	margin-right:7px;
@@ -303,11 +309,11 @@ body.login .full-height{
 	top: 0px;
 	white-space: nowrap;
 	z-index:2;
-	height:100vh;
 }
 
 #lab-viewport .network, #lab-viewport .node {
 	position: absolute;
+	cursor: pointer;
 }
 
 #lab-viewport .network, #lab-viewport .node {
@@ -315,6 +321,7 @@ body.login .full-height{
 	font-size: 0.8em;
 	font-weight: bold;
 	text-align: center;
+
 }
 
 #lab-viewport .node_interface {
@@ -328,7 +335,7 @@ body.login .full-height{
 }
 #lab-viewport .node_interface:hover {
     z-index: 9000;
-	
+
 }
 
 [class*="node"], [class*="network"] {
@@ -410,7 +417,7 @@ body.login .full-height{
 
 #list-title-info {
 	color: #333;
-	
+
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -456,7 +463,7 @@ body.login .full-height{
 
 #mouse_frame {
 	position: absolute;
-	
+
 }
 
 #main.row {
@@ -974,7 +981,7 @@ input[name='login[username]'], input[name='login[password]']{
 	font-weight: bold;
 	text-decoration: none !important;
 	width: 100%;
-	
+
 }
 
 .lab.ui-draggable-dragging {
@@ -1144,3 +1151,34 @@ a:focus{
 	text-decoration:none;
 	outline:none;
 }
+
+/** active link */
+.action-nodelink-li{
+	padding: 3px 20px;
+
+}
+.dropdown-menu > li.action-nodelink-li > a {
+	padding: 0;
+	padding-right: 10px;
+	display: inline !important;
+}
+.dropdown-menu > li.action-nodelink-li > a{
+	padding-right: 5px;
+}
+.dropdown-menu > li.action-nodelink-li > a:last-child{
+	padding-right: 0;
+}
+
+.link_selected{
+	box-shadow: 0 0 10px 10px rgba(70, 166, 182, 0.5);
+
+}
+#inner{
+	
+}
+/*connector png size*/
+#inner img{
+	width: 64px;
+	height: 64px;
+}
+
