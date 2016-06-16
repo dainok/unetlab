@@ -1921,7 +1921,7 @@ function printFormCustomShape(values) {
         left = (values == null || values['left'] == null) ? null : values['left'],
         top = (values == null || values['top'] == null) ? null : values['top'];
 
-    var html = '<form id="main" class="container col-md-12 col-lg-12 custom-shape-form">' +
+  var html = '<form id="main-modal" class="container col-md-12 col-lg-12 custom-shape-form">' +
         '<div class="row">' +
         '<div class="col-md-8 col-md-offset-1 form-group">' +
         '<label class="col-md-3 control-label form-group-addon">Type</label>' +
@@ -1961,7 +1961,7 @@ function printFormCustomShape(values) {
         '<input type="color" class="form-control shape_background_color">' +
         '</div>' +
         '</div> <br>' +
-        '<button type="submit" class="btn btn-aqua col-md-offset-7">' + MESSAGES[47] + '</button>' +
+                  '<button type="submit" class="btn btn-aqua col-md-offset-1">' + MESSAGES[47] + '</button>' +
         '<button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button>' +
         '</div>' +
         '<input  type="text" class="hide left-coordinate" value="' + left + '">' +
@@ -1989,7 +1989,7 @@ function printFormText(values) {
         , fontStyles = ['normal', 'bold', 'italic']
         ;
 
-    var html = '<form id="main" class="container col-md-12 col-lg-12 add-text-form">' +
+  var html = '<form id="main-modal" class="container col-md-12 col-lg-12 add-text-form">' +
         '<div class="row">' +
         '<div class="col-md-12 col-md-offset-0 form-group">' +
         '<label class="col-md-3 control-label form-group-addon">Text</label>' +
@@ -2023,7 +2023,7 @@ function printFormText(values) {
         '<input type="color" class="form-control text_background_color">' +
         '</div>' +
         '</div> <br>' +
-        '<button type="submit" class="btn btn-aqua col-md-offset-7">' + MESSAGES[47] + '</button>' +
+                  '<button type="submit" class="btn btn-aqua col-md-offset-1">' + MESSAGES[47] + '</button>' +
         '<button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button>' +
         '</div>' +
         '<input  type="text" class="hide left-coordinate" value="' + left + '">' +
@@ -2760,7 +2760,7 @@ function printListNetworks(networks) {
     logger(1, 'DEBUG: printing network list');
     var body = '<div class="table-responsive"><table class="table"><thead><tr><th>' + MESSAGES[92] + '</th><th>' + MESSAGES[19] + '</th><th>' + MESSAGES[95] + '</th><th>' + MESSAGES[97] + '</th><th>' + MESSAGES[99] + '</th></tr></thead><tbody>';
     $.each(networks, function (key, value) {
-        body += '<tr class="network' + value['id'] + '"><td>' + value['id'] + '</td><td>' + value['name'] + '</td><td>' + value['type'] + '</td><td>' + value['count'] + '</td><td><a class="action-networkedit" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[71] + '"><i class="glyphicon glyphicon-edit"></i></a><a class="action-networkdelete" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[65] + '"><i class="glyphicon glyphicon-trash"></i></a></td></tr>';
+		body += '<tr class="network' + value['id'] + '"><td>' + value['id'] + '</td><td>' + value['name'] + '</td><td>' + value['type'] + '</td><td>' + value['count'] + '</td><td><a class="action-networkedit" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="javascript:void(0)" title="' + MESSAGES[71] + '"><i class="glyphicon glyphicon-edit"></i></a><a class="action-networkdelete" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="javascript:void(0)" title="' + MESSAGES[65] + '"><i class="glyphicon glyphicon-trash"></i></a></td></tr>';
     });
     body += '</tbody></table></div>';
 
@@ -2783,11 +2783,11 @@ function printListNodes(nodes) {
         var image = (value['image'] != null) ? value['image'] : '';
         var nvram = (value['nvram'] != null) ? value['nvram'] : '';
         var serial = (value['serial'] != null) ? value['serial'] : '';
-        body += '<tr class="node' + value['id'] + '"><td>' + value['id'] + '</td><td>' + value['name'] + '</td><td>' + value['template'] + '</td><td>' + value['image'] + '</td><td>' + cpu + '</td><td>' + idlepc + '</td><td>' + nvram + '</td><td>' + value['ram'] + '</td><td>' + ethernet + '</td><td>' + serial + '</td><td>' + value['console'] + '</td><td><a class="action-nodestart" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[66] + '"><i class="glyphicon glyphicon-play"></i></a> <a class="action-nodestop" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[67] + '"><i class="glyphicon glyphicon-stop"></i></a> <a class="action-nodewipe" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[68] + '"><i class="glyphicon glyphicon-erase"></i></a>';
+		body += '<tr class="node' + value['id'] + '"><td>' + value['id'] + '</td><td>' + value['name'] + '</td><td>' + value['template'] + '</td><td>' + value['image'] + '</td><td>' + cpu + '</td><td>' + idlepc + '</td><td>' + nvram + '</td><td>' + value['ram'] + '</td><td>' + ethernet + '</td><td>' + serial + '</td><td>' + value['console'] + '</td><td><a class="action-nodestart" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="javascript:void(0)" title="' + MESSAGES[66] + '"><i class="glyphicon glyphicon-play"></i></a> <a class="action-nodestop" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="javascript:void(0)" title="' + MESSAGES[67] + '"><i class="glyphicon glyphicon-stop"></i></a> <a class="action-nodewipe" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="javascript:void(0)" title="' + MESSAGES[68] + '"><i class="glyphicon glyphicon-erase"></i></a>';
 
         // Read privileges and set specific actions/elements
         if (ROLE == 'admin' || ROLE == 'editor') {
-            body += ' <a class="action-nodeexport" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[69] + '"><i class="glyphicon glyphicon-save"></i></a> <a class="action-nodeinterfaces" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[72] + '"><i class="glyphicon glyphicon-transfer"></i></a> <a class="action-nodeedit" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[71] + '"><i class="glyphicon glyphicon-edit"></i></a> <a class="action-nodedelete" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[65] + '"><i class="glyphicon glyphicon-trash"></i></a>';
+			body += ' <a class="action-nodeexport" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="javascript:void(0)" title="' + MESSAGES[69] + '"><i class="glyphicon glyphicon-save"></i></a> <a class="action-nodeinterfaces" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="javascript:void(0)" title="' + MESSAGES[72] + '"><i class="glyphicon glyphicon-transfer"></i></a> <a class="action-nodeedit" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="javascript:void(0)" title="' + MESSAGES[71] + '"><i class="glyphicon glyphicon-edit"></i></a> <a class="action-nodedelete" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="javascript:void(0)" title="' + MESSAGES[65] + '"><i class="glyphicon glyphicon-trash"></i></a>';
         }
         body += '</td></tr>';
     });
@@ -2828,10 +2828,10 @@ function printListTextobjects(textobjects) {
             '<td>' + text + '</td>' +
             '<td>';
         if (ROLE != "user") {
-            body += '<a class="action-textobjectedit" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[71] + '">' +
+             body +=       '<a class="action-textobjectedit" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="javascript:void(0)" title="' + MESSAGES[71] + '">' +
                 '<i class="glyphicon glyphicon-edit"></i>' +
                 '</a>' +
-                '<a class="action-textobjectdelete" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="#" title="' + MESSAGES[65] + '">' +
+                    '<a class="action-textobjectdelete" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="javascript:void(0)" title="' + MESSAGES[65] + '">' +
                 '<i class="glyphicon glyphicon-trash"></i>' +
                 '</a>'
         }
@@ -2847,6 +2847,7 @@ function printPageAuthentication() {
     var html = new EJS({url: '/themes/default/ejs/login.ejs'}).render()
     $('#body').html(html);
     $("#form-login input:eq(0)").focus();
+	bodyAddClass('login');
 }
 
 // Print lab list page
@@ -2879,35 +2880,27 @@ function printPageLabList(folder) {
 
                 // Adding all folders
                 $.each(data['data']['folders'], function (id, object) {
-                    $('#list-folders > ul').append('<li><a class="folder action-folderopen" data-path="' + object['path'] + '" href="#" title="Double click to open, single click to select.">' + object['name'] + '</a></li>');
+					$('#list-folders > ul').append('<li><a class="folder action-folderopen" data-path="' + object['path'] + '" href="javascript:void(0)" title="Double click to open, single click to select.">' + object['name'] + '</a></li>');
                 });
 
                 // Adding all labs
                 $.each(data['data']['labs'], function (id, object) {
-                    $('#list-labs > ul').append('<li><a class="lab action-labpreview" data-path="' + object['path'] + '" href="#" title="Double click to open, single click to select.">' + object['file'] + '</a></li>');
+					$('#list-labs > ul').append('<li><a class="lab action-labpreview" data-path="' + object['path'] + '" href="javascript:void(0)" title="Double click to open, single click to select.">' + object['file'] + '</a></li>');
                 });
 
 
-                // Extend height to the bottom if shorter
-                autoHeight();
-
-                $(window).resize(function () {
-                    autoHeight()
-                })
-
-                
 
                 // Read privileges and set specific actions/elements
                 if (ROLE == 'admin' || ROLE == 'editor') {
                     // Adding actions
                     $('#actions-menu').empty();
-                    $('#actions-menu').append('<li><a class="action-folderadd" href="#"><i class="glyphicon glyphicon-folder-close"></i> ' + MESSAGES[4] + '</a></li>');
-                    $('#actions-menu').append('<li><a class="action-labadd" href="#"><i class="glyphicon glyphicon-file"></i> ' + MESSAGES[5] + '</a></li>');
-                    $('#actions-menu').append('<li><a class="action-selectedclone" href="#"><i class="glyphicon glyphicon-copy"></i> ' + MESSAGES[6] + '</a></li>');
-                    $('#actions-menu').append('<li><a class="action-selectedexport" href="#"><i class="glyphicon glyphicon-export"></i> ' + MESSAGES[8] + '</a></li>');
-                    $('#actions-menu').append('<li><a class="action-import" href="#"><i class="glyphicon glyphicon-import"></i> ' + MESSAGES[9] + '</a></li>');
-                    $('#actions-menu').append('<li><a class="action-folderrename" href="#"><i class="glyphicon glyphicon-pencil"></i> ' + MESSAGES[10] + '</a></li>');
-                    $('#actions-menu').append('<li><a class="action-selecteddelete" href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[7] + '</a></li>');
+					$('#actions-menu').append('<li><a class="action-folderadd" href="javascript:void(0)"><i class="glyphicon glyphicon-folder-close"></i> ' + MESSAGES[4] + '</a></li>');
+					$('#actions-menu').append('<li><a class="action-labadd" href="javascript:void(0)"><i class="glyphicon glyphicon-file"></i> ' + MESSAGES[5] + '</a></li>');
+					$('#actions-menu').append('<li><a class="action-selectedclone" href="javascript:void(0)"><i class="glyphicon glyphicon-copy"></i> ' + MESSAGES[6] + '</a></li>');
+					$('#actions-menu').append('<li><a class="action-selectedexport" href="javascript:void(0)"><i class="glyphicon glyphicon-export"></i> ' + MESSAGES[8] + '</a></li>');
+					$('#actions-menu').append('<li><a class="action-import" href="javascript:void(0)"><i class="glyphicon glyphicon-import"></i> ' + MESSAGES[9] + '</a></li>');
+					$('#actions-menu').append('<li><a class="action-folderrename" href="javascript:void(0)"><i class="glyphicon glyphicon-pencil"></i> ' + MESSAGES[10] + '</a></li>');
+					$('#actions-menu').append('<li><a class="action-selecteddelete" href="javascript:void(0)"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[7] + '</a></li>');
 
                     // Make labs draggable (to move inside folders)
                     $('.lab').draggable({
@@ -2964,7 +2957,7 @@ function printPageLabList(folder) {
                     });
                 } else {
                     $('#actions-menu').empty();
-                    $('#actions-menu').append('<li><a href="#">&lt;' + MESSAGES[3] + '&gt;</a></li>');
+					$('#actions-menu').append('<li><a href="javascript:void()">&lt;' + MESSAGES[3] + '&gt;</a></li>');
                 }
             } else {
                 // Application error
@@ -2972,9 +2965,9 @@ function printPageLabList(folder) {
                 addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
             }
 
-            //sed id to body
-            setBodyId('folders');
-
+			bodyAddClass('folders');
+			// Extend height to the bottom if shorter
+			autoheight();
             
         },
         error: function (data) {
@@ -2998,22 +2991,22 @@ function printPageLabOpen(lab) {
 
     // Read privileges and set specific actions/elements
     if (ROLE == 'admin' || ROLE == 'editor') {
-        $('#lab-sidebar ul').append('<li><a class="action-labobjectadd" href="#" title="' + MESSAGES[56] + '"><i class="glyphicon glyphicon-plus"></i></a></li>');
-        $('#lab-sidebar ul').append('<li><a class="action-nodelink" href="#" title="' + MESSAGES[115] + '"><i class="glyphicon glyphicon-link"></i></a></li>');
+        $('#lab-sidebar ul').append('<li><a class="action-labobjectadd" href="javascript:void(0)" title="' + MESSAGES[56] + '"><i class="glyphicon glyphicon-plus"></i></a></li>');
+        $('#lab-sidebar ul').append('<li><a class="action-nodelink" href="javascript:void(0)" title="' + MESSAGES[115] + '"><i class="glyphicon glyphicon-link"></i></a></li>');
     }
 
-    $('#lab-sidebar ul').append('<li><a class="action-labbodyget" href="#" title="' + MESSAGES[64] + '"><i class="glyphicon glyphicon-list-alt"></i></a></li>');
-    $('#lab-sidebar ul').append('<li><a class="action-nodesget" href="#" title="' + MESSAGES[62] + '"><i class="glyphicon glyphicon-hdd"></i></a></li>');
-    $('#lab-sidebar ul').append('<li><a class="action-networksget" href="#" title="' + MESSAGES[61] + '"><i class="glyphicon glyphicon-transfer"></i></a></li>');
-    $('#lab-sidebar ul').append('<li><a class="action-configsget" href="#" title="' + MESSAGES[58] + '"><i class="glyphicon glyphicon-align-left"></i></a></li>');
-    $('#lab-sidebar ul').append('<li><a class="action-picturesget" href="#" title="' + MESSAGES[59] + '"><i class="glyphicon glyphicon-picture"></i></a></li>');
-    $('#lab-sidebar ul').append('<li><a class="action-textobjectsget" href="#" title="' + MESSAGES[150] + '"><i class="glyphicon glyphicon-text-background"></i></a></li>');
-    $('#lab-sidebar ul').append('<li><a class="action-moreactions" href="#" title="' + MESSAGES[125] + '"><i class="glyphicon glyphicon-th"></i></a></li>');
-    $('#lab-sidebar ul').append('<li><a class="action-labtopologyrefresh" href="#" title="' + MESSAGES[57] + '"><i class="glyphicon glyphicon-refresh"></i></a></li>');
-    $('#lab-sidebar ul').append('<li><a class="action-freeselect" href="#" title="' + MESSAGES[151] + '"><i class="glyphicon glyphicon-check"></i></a></li>');
-    $('#lab-sidebar ul').append('<li><a class="action-status" href="#" title="' + MESSAGES[13] + '"><i class="glyphicon glyphicon-info-sign"></i></a></li>');
-    $('#lab-sidebar ul').append('<div id="action-labclose"><li><a class="action-labclose" href="#" title="' + MESSAGES[60] + '"><i class="glyphicon glyphicon-off"></i></a></li></div>');
-    $('#lab-sidebar ul').append('<li><a class="action-logout" href="#" title="' + MESSAGES[14] + '"><i class="glyphicon glyphicon-log-out"></i></a></li>');
+	$('#lab-sidebar ul').append('<li><a class="action-labbodyget" href="javascript:void(0)" title="' + MESSAGES[64] + '"><i class="glyphicon glyphicon-list-alt"></i></a></li>');
+	$('#lab-sidebar ul').append('<li><a class="action-nodesget" href="javascript:void(0)" title="' + MESSAGES[62] + '"><i class="glyphicon glyphicon-hdd"></i></a></li>');
+	$('#lab-sidebar ul').append('<li><a class="action-networksget" href="javascript:void(0)" title="' + MESSAGES[61] + '"><i class="glyphicon glyphicon-transfer"></i></a></li>');
+	$('#lab-sidebar ul').append('<li><a class="action-configsget" href="javascript:void(0)" title="' + MESSAGES[58] + '"><i class="glyphicon glyphicon-align-left"></i></a></li>');
+	$('#lab-sidebar ul').append('<li><a class="action-picturesget" href="javascript:void(0)" title="' + MESSAGES[59] + '"><i class="glyphicon glyphicon-picture"></i></a></li>');
+	$('#lab-sidebar ul').append('<li><a class="action-textobjectsget" href="javascript:void(0)" title="' + MESSAGES[150] + '"><i class="glyphicon glyphicon-text-background"></i></a></li>');
+	$('#lab-sidebar ul').append('<li><a class="action-moreactions" href="javascript:void(0)" title="' + MESSAGES[125] + '"><i class="glyphicon glyphicon-th"></i></a></li>');
+	$('#lab-sidebar ul').append('<li><a class="action-labtopologyrefresh" href="javascript:void(0)" title="' + MESSAGES[57] + '"><i class="glyphicon glyphicon-refresh"></i></a></li>');
+	$('#lab-sidebar ul').append('<li><a class="action-freeselect" href="javascript:void(0)" title="' + MESSAGES[151] + '"><i class="glyphicon glyphicon-check"></i></a></li>');
+	$('#lab-sidebar ul').append('<li><a class="action-status" href="javascript:void(0)" title="' + MESSAGES[13] + '"><i class="glyphicon glyphicon-info-sign"></i></a></li>');
+	$('#lab-sidebar ul').append('<div id="action-labclose"><li><a class="action-labclose" href="javascript:void(0)" title="' + MESSAGES[60] + '"><i class="glyphicon glyphicon-off"></i></a></li></div>');
+	$('#lab-sidebar ul').append('<li><a class="action-logout" href="javascript:void(0)" title="' + MESSAGES[14] + '"><i class="glyphicon glyphicon-log-out"></i></a></li>');
     $('#lab-sidebar ul a').each(function () {
         var t = $(this).attr("title");
         $(this).append(t);
@@ -3041,11 +3034,11 @@ function printUserManagement() {
         if (ROLE == 'admin') {
             // Adding actions
             $('#actions-menu').empty();
-            $('#actions-menu').append('<li><a class="action-useradd" href="#"><i class="glyphicon glyphicon-plus"></i> ' + MESSAGES[34] + '</a></li>');
-            $('#actions-menu').append('<li><a class="action-selecteddelete" href="#"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[35] + '</a></li>');
+			$('#actions-menu').append('<li><a class="action-useradd" href="javascript:void(0)"><i class="glyphicon glyphicon-plus"></i> ' + MESSAGES[34] + '</a></li>');
+			$('#actions-menu').append('<li><a class="action-selecteddelete" href="javascript:void(0)"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[35] + '</a></li>');
         } else {
             $('#actions-menu').empty();
-            $('#actions-menu').append('<li><a href="#">&lt;' + MESSAGES[3] + '&gt;</a></li>');
+			$('#actions-menu').append('<li><a href="javascript:void()">&lt;' + MESSAGES[3] + '&gt;</a></li>');
         }
 
         // Adding all users
@@ -3086,6 +3079,8 @@ function printUserManagement() {
             if (object['pod'] >= 0) {
                 $('#pods tbody').append('<tr class="action-useredit user" data-path="' + username + '"><td class="username">' + username + '</td><td class="pod">' + pod + '</td><td class="pexpiration">' + pexpiration + '</td><td class="">' + lab + '</td></tr>');
             }
+
+			bodyAddClass('users');
         });
     }).fail(function (message) {
         addModalError(message);
@@ -3102,9 +3097,9 @@ function drawStatusInModal(data) {
 
     // Read privileges and set specific actions/elements
     $('#actions-menu', $statusModalBody).empty();
-    $('#actions-menu', $statusModalBody).append('<li><a class="action-sysstatus" href="#"><i class="glyphicon glyphicon-refresh"></i> ' + MESSAGES[40] + '</a></li>');
-    $('#actions-menu', $statusModalBody).append('<li><a class="action-stopall" href="#"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[50] + '</a></li>');
-    //$('#actions-menu', $statusModalBody).append('<li><a class="action-update" href="#"><i class="glyphicon glyphicon-repeat"></i> ' + MESSAGES[132] + '</a></li>');
+    $('#actions-menu', $statusModalBody).append('<li><a class="action-sysstatus" href="javascript:void(0)"><i class="glyphicon glyphicon-refresh"></i> ' + MESSAGES[40] + '</a></li>');
+    $('#actions-menu', $statusModalBody).append('<li><a class="action-stopall" href="javascript:void(0)"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[50] + '</a></li>');
+    //$('#actions-menu', $statusModalBody).append('<li><a class="action-update" href="javascript:void(0)"><i class="glyphicon glyphicon-repeat"></i> ' + MESSAGES[132] + '</a></li>');
 
     // Adding all stats
 
@@ -3238,9 +3233,9 @@ function printSystemStats(data) {
     }
     // Read privileges and set specific actions/elements
     $('#actions-menu').empty();
-    $('#actions-menu').append('<li><a class="action-sysstatus" href="#"><i class="glyphicon glyphicon-refresh"></i> ' + MESSAGES[40] + '</a></li>');
-    $('#actions-menu').append('<li><a class="action-stopall" href="#"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[50] + '</a></li>');
-    //$('#actions-menu').append('<li><a class="action-update" href="#"><i class="glyphicon glyphicon-repeat"></i> ' + MESSAGES[132] + '</a></li>');
+    $('#actions-menu').append('<li><a class="action-sysstatus" href="javascript:void(0)"><i class="glyphicon glyphicon-refresh"></i> ' + MESSAGES[40] + '</a></li>');
+    $('#actions-menu').append('<li><a class="action-stopall" href="javascript:void(0)"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[50] + '</a></li>');
+    //$('#actions-menu').append('<li><a class="action-update" href="javascript:void(0)"><i class="glyphicon glyphicon-repeat"></i> ' + MESSAGES[132] + '</a></li>');
 
     // Adding all stats
 
@@ -3595,7 +3590,7 @@ function printFormEditCustomShape(id) {
         , colorDigits
         , bgColor
         , html =
-        '<form id="main" class="container col-md-12 col-lg-12 edit-custom-shape-form" data-path="' + id + '">' +
+    '<form id="main-modal-edit" class="container col-md-12 col-lg-12 edit-custom-shape-form" data-path="' + id + '">' +
         '<div class="row col-md-9 top-part">' +
         '<label class="edit-custom-shape-label">Edit: ' + id + '</label><br>' +
         '<div class="form-group">' +
@@ -3710,7 +3705,7 @@ function printFormEditText(id) {
         , colorDigits
         , bgColor
         , html =
-        '<form id="main" class="container col-md-12 col-lg-12 edit-custom-text-form"  data-path="' + id + '">' +
+  '<form id="main-modal-edit" class="container col-md-12 col-lg-12 edit-custom-text-form"  data-path="' + id + '">' +
         '<div class="row col-md-9  top-part">' +
         '<label class="edit-custom-text-label">Edit: ' + id + '</label><br>' +
         '<div class="form-group">' +
@@ -3906,6 +3901,8 @@ function getLogs(file, per_page, search) {
                 '</div>';
             $('#main-title').html(html_title);
             $('#main-title').show();
+
+			bodyAddClass('logs');
         },
         error: function (data) {
             // Server error
@@ -3941,13 +3938,21 @@ function printLogs(file, per_page, search) {
     });
 }
 
-//page class
-function setBodyId(id) {
-
-    $('body').attr('id', id);
+/**
+ * add class to body
+ */
+function bodyAddClass(cl){
+	$('body').attr('class',cl);
 }
 
-function autoHeight() {
-
+/**
+ *
+ */
+function autoheight()
+{
+	if ($('#main').height() < window.innerHeight - $('#main').offset().top) {
+		$('#main').height(function(index, height) {
+			return window.innerHeight - $(this).offset().top;
+		});
+    }
 }
-
