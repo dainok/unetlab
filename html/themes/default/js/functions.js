@@ -1997,7 +1997,7 @@ function printFormText(values) {
         '<div class="col-md-12 col-md-offset-0 form-group">' +
         '<label class="col-md-3 control-label form-group-addon">Text</label>' +
         '<div class="col-md-9">' +
-        '<textarea class="form-control main-text">' +
+        '<textarea class="form-control main-text autofocus">' +
         '</textarea>' +
         '</div>' +
         '</div> <br>' +
@@ -2034,7 +2034,7 @@ function printFormText(values) {
         '</form>';
 
     addModal("ADD TEXT", html, '');
-
+    $('.autofocus').focus();
     $('.add-text-form .text_background_color').val('#ffffff');
 
     for (var i = 0; i < fontStyles.length; i++) {
