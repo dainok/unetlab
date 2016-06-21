@@ -106,7 +106,10 @@ function addModalError(message) {
 function addModalWide(title, body, footer, property) {
     var prop = property || "";
     var addittionalHeaderBtns = "";
-    if (title.toUpperCase() == "STARTUP-CONFIGS" || title.toUpperCase() == "CONFIGURED NODES" || title.toUpperCase() == "CONFIGURED TEXT OBJECTS") {
+    if (title.toUpperCase() == "STARTUP-CONFIGS" || title.toUpperCase() == "CONFIGURED NODES" || 
+        title.toUpperCase() == "CONFIGURED TEXT OBJECTS" || 
+        // title.toUpperCase() == "CONFIGURED NETWORKS" || title.toUpperCase() == "CONFIGURED NODES" ||
+        title.toUpperCase() == "STATUS" || title.toUpperCase() == "PICTURES") {
         addittionalHeaderBtns = '<i title="Make transparent" class="glyphicon glyphicon-certificate pull-right action-changeopacity"></i>'
     }
     var html = '<div aria-hidden="false" style="display: block;" class="modal modal-wide ' + prop + ' fade in" tabindex="-1" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"></i><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' + addittionalHeaderBtns + '<h4 class="modal-title">' + title + '</h4></div><div class="modal-body">' + body + '</div><div class="modal-footer">' + footer + '</div></div></div></div>';
