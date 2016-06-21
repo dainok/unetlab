@@ -551,7 +551,7 @@ $(document).on('click', '.action-networkedit', function (e) {
     $.when(getNetworks(id)).done(function (values) {
         values['id'] = id;
         printFormNetwork('edit', values)
-        window.closeModal = true;
+        // window.closeModal = true;
     }).fail(function (message) {
         addModalError(message);
     });
@@ -1929,7 +1929,8 @@ $(document).on('submit', '#form-network-add, #form-network-edit', function (e) {
                     // Close the modal
 
                     $('body').children('.modal').attr('skipRedraw', true);
-                    $('body').children('.modal').modal('hide');
+                    $('body').children('.modal.second-win').modal('hide');
+                    $('body').children('.modal.fade.in').focus();
                     addMessage(data['status'], data['message']);
                 } else {
                     // Application error
