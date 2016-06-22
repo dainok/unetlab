@@ -3571,7 +3571,7 @@ function selected_active(element) {
         var conn = lab_topology.connect({
             source: source,       // Must attach to the IMG's parent or not printed correctly
             target: $(destination).attr('id'),  // Must attach to the IMG's parent or not printed correctly
-            cssClass: source + ' ' + destination + ' frame_ethernet',
+            cssClass: source + ' ' + destination + ' frame_ethernet new_network',
             isSource: true
         });
 

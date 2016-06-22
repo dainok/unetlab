@@ -1173,8 +1173,12 @@ a:focus{
 	box-shadow: 0 0 10px 10px rgba(70, 166, 182, 0.5);
 
 }
+.frame_ethernet.new_network{
+	z-index: 5201;
+}
 #inner{
-	
+	z-index: 5201;
+	pointer-events: none;
 }
 /*connector png size*/
 #inner img{

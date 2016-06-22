@@ -108,7 +108,7 @@ function addModalWide(title, body, footer, property) {
     var addittionalHeaderBtns = "";
     if (title.toUpperCase() == "STARTUP-CONFIGS" || title.toUpperCase() == "CONFIGURED NODES" || 
         title.toUpperCase() == "CONFIGURED TEXT OBJECTS" || 
-        // title.toUpperCase() == "CONFIGURED NETWORKS" || title.toUpperCase() == "CONFIGURED NODES" ||
+        title.toUpperCase() == "CONFIGURED NETWORKS" || title.toUpperCase() == "CONFIGURED NODES" ||
         title.toUpperCase() == "STATUS" || title.toUpperCase() == "PICTURES") {
         addittionalHeaderBtns = '<i title="Make transparent" class="glyphicon glyphicon-certificate pull-right action-changeopacity"></i>'
     }
@@ -1650,7 +1650,7 @@ function printContextMenu(title, body, pageX, pageY) {
     var menu = '<div id="context-menu" class="collapse clearfix dropdown">';
     menu += '<ul class="dropdown-menu" role="menu"><li role="presentation" class="dropdown-header">' + title + '</li>' + body + '</ul></div>';
 
-    $('body').append(menu);
+    $('#lab-viewport').append(menu);
 
     // Set initial status
     $('.menu-interface, .menu-edit').slideToggle();
@@ -1680,7 +1680,7 @@ function printContextMenu(title, body, pageX, pageY) {
 
     // Setting position via CSS
     $('#context-menu').css({
-        left: left + 'px',
+        left: left - 30 + 'px',
         maxHeight: max_height,
         top: top + 'px'
     });
