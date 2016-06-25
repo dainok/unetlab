@@ -32,7 +32,7 @@
 
 $p['type'] = 'qemu';
 $p['name'] = 'vEOS';
-$p['icon'] = 'Switch L3.png';
+$p['icon'] = 'AristaSW.png';
 $p['cpu'] = 1;
 $p['ram'] = 2048;
 $p['ethernet'] = 4;
