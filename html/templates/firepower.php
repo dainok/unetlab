@@ -1,8 +1,8 @@
 <?php
 /**
- * html/templates/sourcefire.php
+ * html/templates/firepower.php
  *
- * sourcefire template for UNetLab.
+ * firepower template for UNetLab.
  *
  * LICENSE:
  *
@@ -29,7 +29,7 @@
  */
 
 $p['type'] = 'qemu';
-$p['name'] = 'Sourcefire';
+$p['name'] = 'FirePower';
 $p['icon'] = 'Server.png';
 $p['cpu'] = 4;
 $p['ram'] = 4096;
