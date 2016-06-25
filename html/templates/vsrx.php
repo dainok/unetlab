@@ -32,7 +32,7 @@
 
 $p['type'] = 'qemu';
 $p['name'] = 'vSRX';
-$p['icon'] = 'Router.png';
+$p['icon'] = 'JuniperSRX.png';
 $p['cpu'] = 2;
 $p['ram'] = 2048;
 $p['ethernet'] = 4;
