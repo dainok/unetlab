@@ -99,7 +99,7 @@ if (!isset($node_templates)) {
 		'c7200'			=>	'Cisco IOS 7206VXR (Dynamips)',
 		'iol'			=>	'Cisco IOL',
 		'titanium'		=>	'Cisco NX-OSv (Titanium)',
-		'sourcefire'		=>	'Cisco Sourcefire',
+		'firepower'		=>	'Cisco FirePower',
 		'ucspe'			=>	'Cisco UCS-PE',
 		'vios'			=>	'Cisco vIOS',
 		'viosl2'		=>	'Cisco vIOS L2',
