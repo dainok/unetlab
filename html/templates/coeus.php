@@ -32,7 +32,7 @@
 
 $p['type'] = 'qemu';
 $p['name'] = 'WSA'; 
-$p['icon'] = 'Firewall.png';
+$p['icon'] = 'WSA.png';
 $p['cpu'] = 1;
 $p['ram'] = 4096; 
 $p['ethernet'] = 1; 
