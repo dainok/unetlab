@@ -32,7 +32,7 @@
 
 $p['type'] = 'qemu';
 $p['name'] = 'vMX';
-$p['icon'] = 'Router.png';
+$p['icon'] = 'JuniperMX.png';
 $p['cpu'] = 1;
 $p['ram'] = 2048;
 $p['ethernet'] = 6;
