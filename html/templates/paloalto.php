@@ -32,7 +32,7 @@
 
 $p['type'] = 'qemu';
 $p['name'] = 'PaloAlto';
-$p['icon'] = 'Firewall.png';
+$p['icon'] = 'PaloAlto.png';
 $p['cpu'] = 2;
 $p['ram'] = 4096; 
 $p['ethernet'] = 4; 
