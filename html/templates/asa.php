@@ -32,7 +32,7 @@
 
 $p['type'] = 'qemu';
 $p['name'] = 'ASA';
-$p['icon'] = 'Firewall.png';
+$p['icon'] = 'ASA.png';
 $p['cpu'] = 1;
 $p['ram'] = 512;
 $p['ethernet'] = 4;
