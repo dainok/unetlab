@@ -51,7 +51,7 @@ function addMessage(severity, message, notFromLabviewport) {
     // Severity can be success (green), info (blue), warning (yellow) and danger (red)
     // Param 'notFromLabviewport' is used to filter notification
 
-    var timeout = 10000;		// by default close messages after 10 seconds
+    var timeout = 10000;        // by default close messages after 10 seconds
     if (severity == 'danger') timeout = 5000;
     if (severity == 'alert') timeout = 10000;
     if (severity == 'warning') timeout = 10000;
@@ -105,8 +105,12 @@ function addModalError(message) {
 // Add Modal
 function addModalWide(title, body, footer, property) {
     var prop = property || "";
+    console.log("### title is", title);
     var addittionalHeaderBtns = "";
-    if (title.toUpperCase() == "STARTUP-CONFIGS" || title.toUpperCase() == "CONFIGURED NODES" || title.toUpperCase() == "CONFIGURED TEXT OBJECTS") {
+    if (title.toUpperCase() == "STARTUP-CONFIGS" || title.toUpperCase() == "CONFIGURED NODES" || 
+        title.toUpperCase() == "CONFIGURED TEXT OBJECTS" || 
+        title.toUpperCase() == "CONFIGURED NETWORKS" || title.toUpperCase() == "CONFIGURED NODES" ||
+        title.toUpperCase() == "STATUS" || title.toUpperCase() == "PICTURES") {
         addittionalHeaderBtns = '<i title="Make transparent" class="glyphicon glyphicon-certificate pull-right action-changeopacity"></i>'
     }
     var html = '<div aria-hidden="false" style="display: block;" class="modal modal-wide ' + prop + ' fade in" tabindex="-1" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"></i><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' + addittionalHeaderBtns + '<h4 class="modal-title">' + title + '</h4></div><div class="modal-body">' + body + '</div><div class="modal-footer">' + footer + '</div></div></div></div>';
@@ -121,7 +125,7 @@ function cfg_export(node_id) {
     var url = '/api/labs' + lab_filename + '/nodes/' + node_id + '/export';
     var type = 'PUT';
     $.ajax({
-        timeout: TIMEOUT * 10,	// Takes a lot of time
+        timeout: TIMEOUT * 10,  // Takes a lot of time
         type: type,
         url: encodeURI(url),
         dataType: 'json',
@@ -493,6 +497,17 @@ function exportObjects(form_data) {
 function form2Array(form_name) {
     var form_array = {};
     $('form :input[name^="' + form_name + '["]').each(function (id, object) {
+        // INPUT name is in the form of "form_name[value]", get value only
+        form_array[$(this).attr('name').substr(form_name.length + 1, $(this).attr('name').length - form_name.length - 2)] = $(this).val();
+    });
+    return form_array;
+}
+
+// HTML Form to array by row
+function form2ArrayByRow(form_name, id) {
+    var form_array = {};
+    
+    $('form :input[name^="' + form_name + '["][data-path="' + id +'"]').each(function (id, object) {
         // INPUT name is in the form of "form_name[value]", get value only
         form_array[$(this).attr('name').substr(form_name.length + 1, $(this).attr('name').length - form_name.length - 2)] = $(this).val();
     });
@@ -1386,7 +1401,55 @@ function setNodePosition(node_id, left, top) {
     });
     return deferred.promise();
 }
+// Update node data from node list
+function setNodeData(id){
+    var lab_filename = $('#lab-viewport').attr('data-path');
+    var form_data = form2ArrayByRow('node', id);
+    var promises = [];
+    logger(1, 'DEBUG: posting form-node-edit form.');
+    var url = '/api/labs' + lab_filename + '/nodes/' + id;
+    var type = 'PUT';
+    form_data['id'] = id;
+    form_data['count'] = 1;
+    form_data['postfix'] = 0;
+    for (var i = 0; i < form_data['count']; i++) {
+        form_data['left'] = parseInt(form_data['left']) + i * 10;
+        form_data['top'] = parseInt(form_data['top']) + i * 10;
+        var request = $.ajax({
+            timeout: TIMEOUT,
+            type: type,
+            url: encodeURI(url),
+            dataType: 'json',
+            data: JSON.stringify(form_data),
+            success: function (data) {
+                if (data['status'] == 'success') {
+                    logger(1, 'DEBUG: node "' + form_data['name'] + '" saved.');
+                    // Close the modal
+                    $("#node" + id + " .node_name").html('<i class="node2_status glyphicon glyphicon-stop"></i>' + form_data['name'])
+                    $("#node" + id + " a img").attr("src", "/images/icons/" + form_data['icon'])
+                    addMessage(data['status'], data['message']);
+                } else {
+                    // Application error
+                    logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+                    addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+                }
+            },
+            error: function (data) {
+                // Server error
+                var message = getJsonMessage(data['responseText']);
+                logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+                logger(1, 'DEBUG: ' + message);
+                addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+            }
+        });
+        promises.push(request);
+    }
 
+    $.when.apply(null, promises).done(function () {
+        logger(1,"data is sent");
+    });
+    return false;
+}
 
 //set note interface
 function setNodeInterface(node_id,network_id,interface_id){
@@ -1643,11 +1706,15 @@ function wipe(node_id) {
  * Print forms and pages
  **************************************************************************/
 // Context menu
-function printContextMenu(title, body, pageX, pageY) {
+function printContextMenu(title, body, pageX, pageY, addToBody) {
     var menu = '<div id="context-menu" class="collapse clearfix dropdown">';
     menu += '<ul class="dropdown-menu" role="menu"><li role="presentation" class="dropdown-header">' + title + '</li>' + body + '</ul></div>';
 
-    $('body').append(menu);
+    if(addToBody){
+        $('body').append(menu);
+    } else {
+        $('#lab-viewport').append(menu);
+    }
 
     // Set initial status
     $('.menu-interface, .menu-edit').slideToggle();
@@ -1677,7 +1744,7 @@ function printContextMenu(title, body, pageX, pageY) {
 
     // Setting position via CSS
     $('#context-menu').css({
-        left: left + 'px',
+        left: left - 30 + 'px',
         maxHeight: max_height,
         top: top + 'px'
     });
@@ -1805,7 +1872,7 @@ function printFormNetwork(action, values) {
         html += '</select></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[93] + '</label><div class="col-md-5"><input class="form-control" name="network[left]" value="' + left + '" type="text"/></div></div><div class="form-group"><label class="col-md-3 control-label">' + MESSAGES[94] + '</label><div class="col-md-5"><input class="form-control" name="network[top]" value="' + top + '" type="text"/></div></div><div class="form-group"><div class="col-md-5 col-md-offset-3"><button type="submit" class="btn btn-aqua">' + MESSAGES[47] + '</button> <button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button></div></div></form></form>';
 
         // Show the form
-        addModal(title, html, '');
+        addModal(title, html, '', 'second-win');
         $('.selectpicker').selectpicker();
         $('.autofocus').focus();
     });
@@ -1835,7 +1902,7 @@ function printFormNode(action, values) {
         $('.selectpicker').selectpicker();
 
         $('#form-node-template').change(function (e2) {
-            id = (id == '') ? null : id;	// Ugly fix for change template after selection
+            id = (id == '') ? null : id;    // Ugly fix for change template after selection
             template = $(this).find("option:selected").val();
             if (template != '') {
                 // Getting template only if a valid option is selected (to avoid requests during typewriting)
@@ -1994,7 +2061,7 @@ function printFormText(values) {
         '<div class="col-md-12 col-md-offset-0 form-group">' +
         '<label class="col-md-3 control-label form-group-addon">Text</label>' +
         '<div class="col-md-9">' +
-        '<textarea class="form-control main-text">' +
+        '<textarea class="form-control main-text autofocus" >' +
         '</textarea>' +
         '</div>' +
         '</div> <br>' +
@@ -2031,7 +2098,7 @@ function printFormText(values) {
         '</form>';
 
     addModal("ADD TEXT", html, '');
-
+    $('.autofocus').focus();
     $('.add-text-form .text_background_color').val('#ffffff');
 
     for (var i = 0; i < fontStyles.length; i++) {
@@ -2760,7 +2827,7 @@ function printListNetworks(networks) {
     logger(1, 'DEBUG: printing network list');
     var body = '<div class="table-responsive"><table class="table"><thead><tr><th>' + MESSAGES[92] + '</th><th>' + MESSAGES[19] + '</th><th>' + MESSAGES[95] + '</th><th>' + MESSAGES[97] + '</th><th>' + MESSAGES[99] + '</th></tr></thead><tbody>';
     $.each(networks, function (key, value) {
-		body += '<tr class="network' + value['id'] + '"><td>' + value['id'] + '</td><td>' + value['name'] + '</td><td>' + value['type'] + '</td><td>' + value['count'] + '</td><td><a class="action-networkedit" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="javascript:void(0)" title="' + MESSAGES[71] + '"><i class="glyphicon glyphicon-edit"></i></a><a class="action-networkdelete" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="javascript:void(0)" title="' + MESSAGES[65] + '"><i class="glyphicon glyphicon-trash"></i></a></td></tr>';
+        body += '<tr class="network' + value['id'] + '"><td>' + value['id'] + '</td><td>' + value['name'] + '</td><td>' + value['type'] + '</td><td>' + value['count'] + '</td><td><a class="action-networkedit" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="javascript:void(0)" title="' + MESSAGES[71] + '"><i class="glyphicon glyphicon-edit"></i></a><a class="action-networkdelete" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="javascript:void(0)" title="' + MESSAGES[65] + '"><i class="glyphicon glyphicon-trash"></i></a></td></tr>';
     });
     body += '</tbody></table></div>';
 
@@ -2772,27 +2839,166 @@ function printListNetworks(networks) {
     addModalWide(MESSAGES[96], body.html(), '');
 }
 
+// check template's options that field's exists
+function checkTemplateValue(template_options, field){
+    if(template_options[field]){
+        return template_options[field].value;
+    } else {
+        return "";
+    }
+}
+
+function createNodeListRow(template, id){
+    var html_data = "";
+    var defer = $.Deferred();
+
+    $.when(getTemplates(template), getNodes(id)).done(function (template_values, node_values) {
+        var value_set = "";
+        var readonlyAttr = "";
+
+        // TODO: this event is called twice
+        id = (id == null) ? '' : id;
+        var html_data = '<tr><input name="node[type]" data-path="' + id + '" value="' + template_values['type'] + '" type="hidden"/>';
+        html_data += '<input name="node[left]" data-path="' + id + '" value="' + node_values['left'] + '" type="hidden"/>';
+        html_data += '<input name="node[top]" data-path="' + id + '" value="' + node_values['top'] + '" type="hidden"/>';
+
+        // node id
+        html_data += '<td><input class="hide-border" style="width: 20px;" value="' + id + '" readonly/></td>';
+        
+        //node name
+        html_data += '<td><input class="configured-nodes-input" data-path="' + id + '" name="node[name]" value="' + node_values['name'] + '" type="text" /></td>';
+        
+        //node template
+        html_data += '<td><input class="hide-border" data-path="' + id + '" name="node[template]" value="' + template + '" readonly/></td>';
+
+        //node image
+        html_data += '<td><select class="configured-nods-select form-control" data-path="' + id + '" name="node[image]">'
+        value_set = (node_values != null && node_values['image'] != null) ? node_values['image'] : value['value'];
+        $.each(template_values['options']['image']['list'], function (list_key, list_value) {
+            var selected = (list_key == value_set) ? 'selected ' : '';
+            html_data += '<option ' + selected + 'value="' + list_key + '">' + list_value + '</option>';
+        });
+        html_data += '</select></td>';
+
+        //node cpu
+        readonlyAttr = checkTemplateValue(template_values['options'],'cpu') ? "" : "readonly";
+        html_data += '<td><input class="configured-nodes-input short-input" data-path="' + id + '" name="node[cpu]" value="' + checkTemplateValue(template_values['options'],'cpu') + '" type="text" ' + readonlyAttr + ' /></td>';
+
+        //node idle
+        readonlyAttr = checkTemplateValue(template_values['options'],'idlepc') ? "" : "readonly";
+        html_data += '<td><input class="configured-nodes-input" data-path="' + id + '" name="node[idlepc]" value="' + checkTemplateValue(template_values['options'], 'idlepc') + '" type="text" ' + readonlyAttr + ' /></td>';
+
+        //node nvram
+        readonlyAttr = checkTemplateValue(template_values['options'],'nvram') ? "" : "readonly";
+        html_data += '<td><input class="configured-nodes-input short-input" data-path="' + id + '" name="node[nvram]" value="' + checkTemplateValue(template_values['options'], 'nvram') + '" type="text" ' + readonlyAttr + ' /></td>';
+
+        //node ram
+        readonlyAttr = checkTemplateValue(template_values['options'],'ram') ? "" : "readonly";
+        html_data += '<td><input class="configured-nodes-input short-input" data-path="' + id + '" name="node[ram]" value="' + checkTemplateValue(template_values['options'], 'ram') + '" type="text" ' + readonlyAttr + ' /></td>';
+
+        //node ethernet
+        readonlyAttr = checkTemplateValue(template_values['options'],'ethernet') ? "" : "readonly";
+        html_data += '<td><input class="configured-nodes-input short-input" data-path="' + id + '" name="node[ethernet]" value="' + checkTemplateValue(template_values['options'],'ethernet') + '" type="text" ' + readonlyAttr + ' /></td>';
+
+        //node serial
+        readonlyAttr = checkTemplateValue(template_values['options'],'serial') ? "" : "readonly";
+        var serial = (checkTemplateValue(template_values['options'],'serial') || node_values['serial']) ? checkTemplateValue(template_values['options'],'serial') || node_values['serial'] : "";
+        html_data += '<td><input class="configured-nodes-input short-input" data-path="' + id + '" name="node[serial]" value="' + serial + '" type="text" '  + readonlyAttr + '/></td>';
+
+        //node console
+        if(template == "iol"){
+            html_data += '<td><input class="hide-border"  data-path="' + id + '" value="telnet" readonly/></td>';
+        } else if(template_values['options']['console']){
+            html_data += '<td><select class="configured-nods-select form-control" name="node[console]" data-path="' + id + '" >'
+            value_set = (node_values != null && node_values['console'] != null) ? node_values['console'] : value['value'];
+            $.each(template_values['options']['console']['list'], function (list_key, list_value) {
+                var selected = (list_key == value_set) ? 'selected ' : '';
+                html_data += '<option ' + selected + 'value="' + list_key + '">' + list_value + '</option>';
+            });
+            html_data += '</select></td>';
+        } else {
+            var console_val = checkTemplateValue(template_values['options'],'console') || node_values['console'];
+            html_data += '<td><input class="hide-border" name="node[console]" value="' + console_val + '" type="text" readonly/></td>';
+        }
+
+        //node icons
+        html_data += '<td><select class="configured-nods-select form-control" data-path="' + id + '" name="node[icon]" >'
+        value_set = (node_values != null && node_values['icon'] != null) ? node_values['icon'] : value['value'];
+        $.each(template_values['options']['icon']['list'], function (list_key, list_value) {
+            var selected = (list_key == value_set) ? 'selected ' : '';
+            html_data += '<option ' + selected + 'value="' + list_key + '">' + list_value + '</option>';
+        });
+        html_data += '</select></td>';
+
+        //node startup-configs
+        html_data += '<td><select class="configured-nods-select form-control" data-path="' + id + '" name="node[config]">'
+        value_set = (node_values != null && node_values['config'] != null) ? node_values['config'] : value['value'];
+        $.each(template_values['options']['config']['list'], function (list_key, list_value) {
+            var selected = (list_key == value_set) ? 'selected ' : '';
+            html_data += '<option ' + selected + 'value="' + list_key + '">' + list_value + '</option>';
+        });
+        html_data += '</select></td>';
+
+        //node actions
+        html_data += '<td><div class="action-controls">'+
+                         '<a class="action-nodestart" data-path="' + id + '" data-name="' + checkTemplateValue(template_values['options'],'name') + '" href="javascript:void(0)" title="' + MESSAGES[66] + '"><i class="glyphicon glyphicon-play"></i></a>'+
+                         '<a class="action-nodestop" data-path="' + id + '" data-name="' + checkTemplateValue(template_values['options'],'name') + '" href="javascript:void(0)" title="' + MESSAGES[67] + '"><i class="glyphicon glyphicon-stop"></i></a>'+
+                         '<a class="action-nodewipe" data-path="' + id + '" data-name="' + checkTemplateValue(template_values['options'],'name') + '" href="javascript:void(0)" title="' + MESSAGES[68] + '"><i class="glyphicon glyphicon-erase"></i></a>'
+        if (ROLE == 'admin' || ROLE == 'editor') {
+            html_data += '<a class="action-nodeexport" data-path="' + id + '" data-name="' + checkTemplateValue(template_values['options'],'name') + '" href="javascript:void(0)" title="' + MESSAGES[69] + '"><i class="glyphicon glyphicon-save"></i></a> '+
+                         '<a class="action-nodeinterfaces" data-path="' + id + '" data-name="' + checkTemplateValue(template_values['options'],'name') + '" href="javascript:void(0)" title="' + MESSAGES[72] + '"><i class="glyphicon glyphicon-transfer"></i></a>'+
+                         '<a class="action-nodeedit" data-path="' + id + '" data-name="' + checkTemplateValue(template_values['options'],'name') + '" href="javascript:void(0)" title="' + MESSAGES[71] + '"><i class="glyphicon glyphicon-edit"></i></a>'+
+                         '<a class="action-nodedelete" data-path="' + id + '" data-name="' + checkTemplateValue(template_values['options'],'name') + '" href="javascript:void(0)" title="' + MESSAGES[65] + '"><i class="glyphicon glyphicon-trash"></i></a>';
+        } 
+        html_data += '</div></td></tr>';
+        defer.resolve(html_data);
+    }).fail(function (message1, message2) {
+        // Cannot get data
+        if (message1 != null) {
+            addModalError(message1);
+        } else {
+            addModalError(message2)
+        }
+        // return html_data;
+        defer.resolve(html_data);
+    });
+
+    return defer;
+}
+
 // Display all nodes in a table
 function printListNodes(nodes) {
     logger(1, 'DEBUG: printing node list');
-    var body = '<div class="table-responsive"><table class="table"><thead><tr><th>' + MESSAGES[92] + '</th><th>' + MESSAGES[19] + '</th><th>' + MESSAGES[111] + '</th><th>' + MESSAGES[119] + '</th><th>' + MESSAGES[105] + '</th><th>' + MESSAGES[106] + '</th><th>' + MESSAGES[107] + '</th><th>' + MESSAGES[108] + '</th><th>' + MESSAGES[109] + '</th><th>' + MESSAGES[110] + '</th><th>' + MESSAGES[112] + '</th><th>' + MESSAGES[99] + '</th></tr></thead><tbody>';
-    $.each(nodes, function (key, value) {
+    var body = '<div class="table-responsive"><form id="form-node-edit-table" ><table class="configured-nodes table"><thead><tr><th>' + MESSAGES[92] + '</th><th>' + MESSAGES[19] + '</th><th>' + MESSAGES[111] + '</th><th>' + MESSAGES[163] + '</th><th>' + MESSAGES[105] + '</th><th>' + MESSAGES[106] + '</th><th>' + MESSAGES[107] + '</th><th>' + MESSAGES[108] + '</th><th>' + MESSAGES[109] + '</th><th>' + MESSAGES[110] + '</th><th>' + MESSAGES[112] + '</th><th>' + MESSAGES[164] + '</th><th>' + MESSAGES[123] + '</th><th>' + MESSAGES[99] + '</th></tr></thead><tbody>';
+    var promises = [];
+
+    var composePromise = function (key, value) {
+        var defer = $.Deferred();
         var cpu = (value['cpu'] != null) ? value['cpu'] : '';
         var ethernet = (value['ethernet'] != null) ? value['ethernet'] : '';
         var idlepc = (value['idlepc'] != null) ? value['idlepc'] : '';
         var image = (value['image'] != null) ? value['image'] : '';
         var nvram = (value['nvram'] != null) ? value['nvram'] : '';
         var serial = (value['serial'] != null) ? value['serial'] : '';
-		body += '<tr class="node' + value['id'] + '"><td>' + value['id'] + '</td><td>' + value['name'] + '</td><td>' + value['template'] + '</td><td>' + value['image'] + '</td><td>' + cpu + '</td><td>' + idlepc + '</td><td>' + nvram + '</td><td>' + value['ram'] + '</td><td>' + ethernet + '</td><td>' + serial + '</td><td>' + value['console'] + '</td><td><a class="action-nodestart" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="javascript:void(0)" title="' + MESSAGES[66] + '"><i class="glyphicon glyphicon-play"></i></a> <a class="action-nodestop" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="javascript:void(0)" title="' + MESSAGES[67] + '"><i class="glyphicon glyphicon-stop"></i></a> <a class="action-nodewipe" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="javascript:void(0)" title="' + MESSAGES[68] + '"><i class="glyphicon glyphicon-erase"></i></a>';
 
-        // Read privileges and set specific actions/elements
-        if (ROLE == 'admin' || ROLE == 'editor') {
-			body += ' <a class="action-nodeexport" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="javascript:void(0)" title="' + MESSAGES[69] + '"><i class="glyphicon glyphicon-save"></i></a> <a class="action-nodeinterfaces" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="javascript:void(0)" title="' + MESSAGES[72] + '"><i class="glyphicon glyphicon-transfer"></i></a> <a class="action-nodeedit" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="javascript:void(0)" title="' + MESSAGES[71] + '"><i class="glyphicon glyphicon-edit"></i></a> <a class="action-nodedelete" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="javascript:void(0)" title="' + MESSAGES[65] + '"><i class="glyphicon glyphicon-trash"></i></a>';
-        }
-        body += '</td></tr>';
-    });
-    body += '</tbody></table></div>';
-    addModalWide(MESSAGES[118], body, '');
+        $.when(createNodeListRow(value['template'], value['id'])).done(function (html_data) {
+            body += html_data;
+            
+            defer.resolve();
+        });
+        return defer;
+    };
+
+    $.each(nodes, function (key, value) {
+        promises.push(composePromise(key, value));
+    })
+
+    $.when.apply($, promises).done(function () {
+        body += '</tbody></table></form></div>';
+
+        addModalWide(MESSAGES[118], body, '');
+        $('.selectpicker').selectpicker();
+    })
 }
 
 // Display all text objects in a table
@@ -2847,7 +3053,7 @@ function printPageAuthentication() {
     var html = new EJS({url: '/themes/default/ejs/login.ejs'}).render()
     $('#body').html(html);
     $("#form-login input:eq(0)").focus();
-	bodyAddClass('login');
+    bodyAddClass('login');
 }
 
 // Print lab list page
@@ -2880,12 +3086,12 @@ function printPageLabList(folder) {
 
                 // Adding all folders
                 $.each(data['data']['folders'], function (id, object) {
-					$('#list-folders > ul').append('<li><a class="folder action-folderopen" data-path="' + object['path'] + '" href="javascript:void(0)" title="Double click to open, single click to select.">' + object['name'] + '</a></li>');
+                    $('#list-folders > ul').append('<li><a class="folder action-folderopen" data-path="' + object['path'] + '" href="javascript:void(0)" title="Double click to open, single click to select.">' + object['name'] + '</a></li>');
                 });
 
                 // Adding all labs
                 $.each(data['data']['labs'], function (id, object) {
-					$('#list-labs > ul').append('<li><a class="lab action-labpreview" data-path="' + object['path'] + '" href="javascript:void(0)" title="Double click to open, single click to select.">' + object['file'] + '</a></li>');
+                    $('#list-labs > ul').append('<li><a class="lab action-labpreview" data-path="' + object['path'] + '" href="javascript:void(0)" title="Double click to open, single click to select.">' + object['file'] + '</a></li>');
                 });
 
 
@@ -2894,13 +3100,13 @@ function printPageLabList(folder) {
                 if (ROLE == 'admin' || ROLE == 'editor') {
                     // Adding actions
                     $('#actions-menu').empty();
-					$('#actions-menu').append('<li><a class="action-folderadd" href="javascript:void(0)"><i class="glyphicon glyphicon-folder-close"></i> ' + MESSAGES[4] + '</a></li>');
-					$('#actions-menu').append('<li><a class="action-labadd" href="javascript:void(0)"><i class="glyphicon glyphicon-file"></i> ' + MESSAGES[5] + '</a></li>');
-					$('#actions-menu').append('<li><a class="action-selectedclone" href="javascript:void(0)"><i class="glyphicon glyphicon-copy"></i> ' + MESSAGES[6] + '</a></li>');
-					$('#actions-menu').append('<li><a class="action-selectedexport" href="javascript:void(0)"><i class="glyphicon glyphicon-export"></i> ' + MESSAGES[8] + '</a></li>');
-					$('#actions-menu').append('<li><a class="action-import" href="javascript:void(0)"><i class="glyphicon glyphicon-import"></i> ' + MESSAGES[9] + '</a></li>');
-					$('#actions-menu').append('<li><a class="action-folderrename" href="javascript:void(0)"><i class="glyphicon glyphicon-pencil"></i> ' + MESSAGES[10] + '</a></li>');
-					$('#actions-menu').append('<li><a class="action-selecteddelete" href="javascript:void(0)"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[7] + '</a></li>');
+                    $('#actions-menu').append('<li><a class="action-folderadd" href="javascript:void(0)"><i class="glyphicon glyphicon-folder-close"></i> ' + MESSAGES[4] + '</a></li>');
+                    $('#actions-menu').append('<li><a class="action-labadd" href="javascript:void(0)"><i class="glyphicon glyphicon-file"></i> ' + MESSAGES[5] + '</a></li>');
+                    $('#actions-menu').append('<li><a class="action-selectedclone" href="javascript:void(0)"><i class="glyphicon glyphicon-copy"></i> ' + MESSAGES[6] + '</a></li>');
+                    $('#actions-menu').append('<li><a class="action-selectedexport" href="javascript:void(0)"><i class="glyphicon glyphicon-export"></i> ' + MESSAGES[8] + '</a></li>');
+                    $('#actions-menu').append('<li><a class="action-import" href="javascript:void(0)"><i class="glyphicon glyphicon-import"></i> ' + MESSAGES[9] + '</a></li>');
+                    $('#actions-menu').append('<li><a class="action-folderrename" href="javascript:void(0)"><i class="glyphicon glyphicon-pencil"></i> ' + MESSAGES[10] + '</a></li>');
+                    $('#actions-menu').append('<li><a class="action-selecteddelete" href="javascript:void(0)"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[7] + '</a></li>');
 
                     // Make labs draggable (to move inside folders)
                     $('.lab').draggable({
@@ -2957,7 +3163,7 @@ function printPageLabList(folder) {
                     });
                 } else {
                     $('#actions-menu').empty();
-					$('#actions-menu').append('<li><a href="javascript:void()">&lt;' + MESSAGES[3] + '&gt;</a></li>');
+                    $('#actions-menu').append('<li><a href="javascript:void()">&lt;' + MESSAGES[3] + '&gt;</a></li>');
                 }
             } else {
                 // Application error
@@ -2965,9 +3171,9 @@ function printPageLabList(folder) {
                 addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
             }
 
-			bodyAddClass('folders');
-			// Extend height to the bottom if shorter
-			autoheight();
+            bodyAddClass('folders');
+            // Extend height to the bottom if shorter
+            autoheight();
             
         },
         error: function (data) {
@@ -2995,18 +3201,18 @@ function printPageLabOpen(lab) {
         $('#lab-sidebar ul').append('<li><a class="action-nodelink" href="javascript:void(0)" title="' + MESSAGES[115] + '"><i class="glyphicon glyphicon-link"></i></a></li>');
     }
 
-	$('#lab-sidebar ul').append('<li><a class="action-labbodyget" href="javascript:void(0)" title="' + MESSAGES[64] + '"><i class="glyphicon glyphicon-list-alt"></i></a></li>');
-	$('#lab-sidebar ul').append('<li><a class="action-nodesget" href="javascript:void(0)" title="' + MESSAGES[62] + '"><i class="glyphicon glyphicon-hdd"></i></a></li>');
-	$('#lab-sidebar ul').append('<li><a class="action-networksget" href="javascript:void(0)" title="' + MESSAGES[61] + '"><i class="glyphicon glyphicon-transfer"></i></a></li>');
-	$('#lab-sidebar ul').append('<li><a class="action-configsget" href="javascript:void(0)" title="' + MESSAGES[58] + '"><i class="glyphicon glyphicon-align-left"></i></a></li>');
-	$('#lab-sidebar ul').append('<li><a class="action-picturesget" href="javascript:void(0)" title="' + MESSAGES[59] + '"><i class="glyphicon glyphicon-picture"></i></a></li>');
-	$('#lab-sidebar ul').append('<li><a class="action-textobjectsget" href="javascript:void(0)" title="' + MESSAGES[150] + '"><i class="glyphicon glyphicon-text-background"></i></a></li>');
-	$('#lab-sidebar ul').append('<li><a class="action-moreactions" href="javascript:void(0)" title="' + MESSAGES[125] + '"><i class="glyphicon glyphicon-th"></i></a></li>');
-	$('#lab-sidebar ul').append('<li><a class="action-labtopologyrefresh" href="javascript:void(0)" title="' + MESSAGES[57] + '"><i class="glyphicon glyphicon-refresh"></i></a></li>');
-	$('#lab-sidebar ul').append('<li><a class="action-freeselect" href="javascript:void(0)" title="' + MESSAGES[151] + '"><i class="glyphicon glyphicon-check"></i></a></li>');
-	$('#lab-sidebar ul').append('<li><a class="action-status" href="javascript:void(0)" title="' + MESSAGES[13] + '"><i class="glyphicon glyphicon-info-sign"></i></a></li>');
-	$('#lab-sidebar ul').append('<div id="action-labclose"><li><a class="action-labclose" href="javascript:void(0)" title="' + MESSAGES[60] + '"><i class="glyphicon glyphicon-off"></i></a></li></div>');
-	$('#lab-sidebar ul').append('<li><a class="action-logout" href="javascript:void(0)" title="' + MESSAGES[14] + '"><i class="glyphicon glyphicon-log-out"></i></a></li>');
+    $('#lab-sidebar ul').append('<li><a class="action-labbodyget" href="javascript:void(0)" title="' + MESSAGES[64] + '"><i class="glyphicon glyphicon-list-alt"></i></a></li>');
+    $('#lab-sidebar ul').append('<li><a class="action-nodesget" href="javascript:void(0)" title="' + MESSAGES[62] + '"><i class="glyphicon glyphicon-hdd"></i></a></li>');
+    $('#lab-sidebar ul').append('<li><a class="action-networksget" href="javascript:void(0)" title="' + MESSAGES[61] + '"><i class="glyphicon glyphicon-transfer"></i></a></li>');
+    $('#lab-sidebar ul').append('<li><a class="action-configsget" href="javascript:void(0)" title="' + MESSAGES[58] + '"><i class="glyphicon glyphicon-align-left"></i></a></li>');
+    $('#lab-sidebar ul').append('<li><a class="action-picturesget" href="javascript:void(0)" title="' + MESSAGES[59] + '"><i class="glyphicon glyphicon-picture"></i></a></li>');
+    $('#lab-sidebar ul').append('<li><a class="action-textobjectsget" href="javascript:void(0)" title="' + MESSAGES[150] + '"><i class="glyphicon glyphicon-text-background"></i></a></li>');
+    $('#lab-sidebar ul').append('<li><a class="action-moreactions" href="javascript:void(0)" title="' + MESSAGES[125] + '"><i class="glyphicon glyphicon-th"></i></a></li>');
+    $('#lab-sidebar ul').append('<li><a class="action-labtopologyrefresh" href="javascript:void(0)" title="' + MESSAGES[57] + '"><i class="glyphicon glyphicon-refresh"></i></a></li>');
+    $('#lab-sidebar ul').append('<li><a class="action-freeselect" href="javascript:void(0)" title="' + MESSAGES[151] + '"><i class="glyphicon glyphicon-check"></i></a></li>');
+    $('#lab-sidebar ul').append('<li><a class="action-status" href="javascript:void(0)" title="' + MESSAGES[13] + '"><i class="glyphicon glyphicon-info-sign"></i></a></li>');
+    $('#lab-sidebar ul').append('<div id="action-labclose"><li><a class="action-labclose" href="javascript:void(0)" title="' + MESSAGES[60] + '"><i class="glyphicon glyphicon-off"></i></a></li></div>');
+    $('#lab-sidebar ul').append('<li><a class="action-logout" href="javascript:void(0)" title="' + MESSAGES[14] + '"><i class="glyphicon glyphicon-log-out"></i></a></li>');
     $('#lab-sidebar ul a').each(function () {
         var t = $(this).attr("title");
         $(this).append(t);
@@ -3034,11 +3240,11 @@ function printUserManagement() {
         if (ROLE == 'admin') {
             // Adding actions
             $('#actions-menu').empty();
-			$('#actions-menu').append('<li><a class="action-useradd" href="javascript:void(0)"><i class="glyphicon glyphicon-plus"></i> ' + MESSAGES[34] + '</a></li>');
-			$('#actions-menu').append('<li><a class="action-selecteddelete" href="javascript:void(0)"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[35] + '</a></li>');
+            $('#actions-menu').append('<li><a class="action-useradd" href="javascript:void(0)"><i class="glyphicon glyphicon-plus"></i> ' + MESSAGES[34] + '</a></li>');
+            $('#actions-menu').append('<li><a class="action-selecteddelete" href="javascript:void(0)"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[35] + '</a></li>');
         } else {
             $('#actions-menu').empty();
-			$('#actions-menu').append('<li><a href="javascript:void()">&lt;' + MESSAGES[3] + '&gt;</a></li>');
+            $('#actions-menu').append('<li><a href="javascript:void()">&lt;' + MESSAGES[3] + '&gt;</a></li>');
         }
 
         // Adding all users
@@ -3080,7 +3286,7 @@ function printUserManagement() {
                 $('#pods tbody').append('<tr class="action-useredit user" data-path="' + username + '"><td class="username">' + username + '</td><td class="pod">' + pod + '</td><td class="pexpiration">' + pexpiration + '</td><td class="">' + lab + '</td></tr>');
             }
 
-			bodyAddClass('users');
+            bodyAddClass('users');
         });
     }).fail(function (message) {
         addModalError(message);
@@ -3902,7 +4108,7 @@ function getLogs(file, per_page, search) {
             $('#main-title').html(html_title);
             $('#main-title').show();
 
-			bodyAddClass('logs');
+            bodyAddClass('logs');
         },
         error: function (data) {
             // Server error
@@ -3942,7 +4148,7 @@ function printLogs(file, per_page, search) {
  * add class to body
  */
 function bodyAddClass(cl){
-	$('body').attr('class',cl);
+    $('body').attr('class',cl);
 }
 
 /**
@@ -3950,9 +4156,9 @@ function bodyAddClass(cl){
  */
 function autoheight()
 {
-	if ($('#main').height() < window.innerHeight - $('#main').offset().top) {
-		$('#main').height(function(index, height) {
-			return window.innerHeight - $(this).offset().top;
-		});
+    if ($('#main').height() < window.innerHeight - $('#main').offset().top) {
+        $('#main').height(function(index, height) {
+            return window.innerHeight - $(this).offset().top;
+        });
     }
 }

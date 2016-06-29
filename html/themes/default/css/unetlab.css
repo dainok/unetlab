@@ -18,6 +18,10 @@ body{
 	background: #fff;
 }
 
+.hide-border {
+	border: none;
+}
+
 body.login .full-height{
 	height:100vh !important;
 }
@@ -783,6 +787,10 @@ body.login .full-height{
 	width: 100%;
 }
 
+.selectpicker-white {
+	background: #fff
+}
+
 #form-login img, #form-login input[type='image'] {
 	max-width: 400px;
 	width: 100%;
@@ -1173,8 +1181,12 @@ a:focus{
 	box-shadow: 0 0 10px 10px rgba(70, 166, 182, 0.5);
 
 }
+.frame_ethernet.new_network{
+	z-index: 5201;
+}
 #inner{
-	
+	z-index: 5201;
+	pointer-events: none;
 }
 /*connector png size*/
 #inner img{
@@ -1182,3 +1194,46 @@ a:focus{
 	height: 12px;
 }
 
+.action-pointer{
+	cursor: pointer;
+}
+
+.action-controls {
+	width: 120px;
+}
+
+.configured-nodes-input{
+	width: 70px;
+	border: none;
+}
+
+.short-input{
+	width: 40px;
+}
+
+table.configured-nodes .bootstrap-select {
+	height: 20px;
+}
+
+table.configured-nodes .bootstrap-select button {
+	background: #fff;
+	border: 1px solid #cfcfcf;
+    padding: 0px 10px;
+    margin-top: -1px;
+}
+
+table.configured-nodes select.configured-nods-select {
+	height: 20px;
+}
+table.configured-nodes select.configured-nods-select,
+table.configured-nodes select.configured-nods-select option {
+	font-size: 12px;
+}
+
+table.configured-nodes tbody td {
+	vertical-align: middle;
+}
+
+table.configured-nodes tbody td label {
+	margin-bottom: 0px;
+}

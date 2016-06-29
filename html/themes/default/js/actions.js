@@ -135,7 +135,7 @@ $(document).on('shown.bs.modal', '.modal', function () {
 $(document).on('dragstop', '.node_frame, .network_frame', function (e) {
     var that = this,
         offset = $(this).offset(),
-        left = Math.round(offset.left - 30 + $('#lab-viewport').scrollLeft()),	// 30 is the sidebar
+        left = Math.round(offset.left - 30 + $('#lab-viewport').scrollLeft()),  // 30 is the sidebar
         top = Math.round(offset.top + $('#lab-viewport').scrollTop()),
         id = $(this).attr('data-path');
     if (left >= 0 && top >= 0) {
@@ -204,11 +204,11 @@ $(document).on('contextmenu', '#lab-viewport', function (e) {
 
     if (ROLE != "user") {
         var body = '';
-		body += '<li><a class="action-nodeplace" href="javascript:void(0)"><i class="glyphicon glyphicon-hdd"></i> ' + MESSAGES[81] + '</a></li>';
-		body += '<li><a class="action-networkplace" href="javascript:void(0)"><i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[82] + '</a></li>';
-		body += '<li><a class="action-pictureadd" href="javascript:void(0)"><i class="glyphicon glyphicon-picture"></i> ' + MESSAGES[83] + '</a></li>';
-		body += '<li><a class="action-customshapeadd" href="javascript:void(0)"><i class="glyphicon glyphicon-unchecked"></i> ' + MESSAGES[145] + '</a></li>';
-		body += '<li><a class="action-textadd" href="javascript:void(0)"><i class="glyphicon glyphicon-font"></i> ' + MESSAGES[146] + '</a></li>';
+        body += '<li><a class="action-nodeplace" href="javascript:void(0)"><i class="glyphicon glyphicon-hdd"></i> ' + MESSAGES[81] + '</a></li>';
+        body += '<li><a class="action-networkplace" href="javascript:void(0)"><i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[82] + '</a></li>';
+        body += '<li><a class="action-pictureadd" href="javascript:void(0)"><i class="glyphicon glyphicon-picture"></i> ' + MESSAGES[83] + '</a></li>';
+        body += '<li><a class="action-customshapeadd" href="javascript:void(0)"><i class="glyphicon glyphicon-unchecked"></i> ' + MESSAGES[145] + '</a></li>';
+        body += '<li><a class="action-textadd" href="javascript:void(0)"><i class="glyphicon glyphicon-font"></i> ' + MESSAGES[146] + '</a></li>';
         printContextMenu(MESSAGES[80], body, e.pageX, e.pageY);
     }
 });
@@ -451,7 +451,7 @@ $(document).on('click', '.action-configsget', function (e) {
         var body = '<div class="row"><div class="config-list col-md-2 col-lg-2"><ul>';
         $.each(configs, function (key, config) {
             var title = (config['config'] == 0) ? MESSAGES[122] : MESSAGES[121];
-			body += '<li><a class="action-configget" data-path="' + key + '" href="javascript:void(0)" title="' + title + '">' + config['name'];
+            body += '<li><a class="action-configget" data-path="' + key + '" href="javascript:void(0)" title="' + title + '">' + config['name'];
             if (config['config'] == 1) {
                 body += ' <i class="glyphicon glyphicon-floppy-saved"></i>';
             }
@@ -551,7 +551,7 @@ $(document).on('click', '.action-networkedit', function (e) {
     $.when(getNetworks(id)).done(function (values) {
         values['id'] = id;
         printFormNetwork('edit', values)
-        window.closeModal = true;
+        // window.closeModal = true;
     }).fail(function (message) {
         addModalError(message);
     });
@@ -780,17 +780,17 @@ $(document).on('dblclick', '.action-labpreview', function (e) {
 $(document).on('click', '.action-moreactions', function (e) {
     logger(1, 'DEBUG: action = moreactions');
     var body = '';
-	body += '<li><a class="action-nodesstart" href="javascript:void(0)"><i class="glyphicon glyphicon-play"></i> ' + MESSAGES[126] + '</a></li>';
-	body += '<li><a class="action-nodesstop" href="javascript:void(0)"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[127] + '</a></li>';
-	body += '<li><a class="action-nodeswipe" href="javascript:void(0)"><i class="glyphicon glyphicon-erase"></i> ' + MESSAGES[128] + '</a></li>';
+    body += '<li><a class="action-nodesstart" href="javascript:void(0)"><i class="glyphicon glyphicon-play"></i> ' + MESSAGES[126] + '</a></li>';
+    body += '<li><a class="action-nodesstop" href="javascript:void(0)"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[127] + '</a></li>';
+    body += '<li><a class="action-nodeswipe" href="javascript:void(0)"><i class="glyphicon glyphicon-erase"></i> ' + MESSAGES[128] + '</a></li>';
     if (ROLE == 'admin' || ROLE == 'editor') {
-		body += '<li><a class="action-nodesexport" href="javascript:void(0)"><i class="glyphicon glyphicon-save"></i> ' + MESSAGES[129] + '</a></li>';
-		body += '<li><a class="action-labedit" href="javascript:void(0)"><i class="glyphicon glyphicon-pencil"></i> ' + MESSAGES[87] + '</a></li>';
-		body += '<li><a class="action-nodesbootsaved" href="javascript:void(0)"><i class="glyphicon glyphicon-floppy-saved"></i> ' + MESSAGES[139] + '</a></li>';
-		body += '<li><a class="action-nodesbootscratch" href="javascript:void(0)"><i class="glyphicon glyphicon-floppy-save"></i> ' + MESSAGES[140] + '</a></li>';
-		body += '<li><a class="action-nodesbootdelete" href="javascript:void(0)"><i class="glyphicon glyphicon-floppy-remove"></i> ' + MESSAGES[141] + '</a></li>';
+        body += '<li><a class="action-nodesexport" href="javascript:void(0)"><i class="glyphicon glyphicon-save"></i> ' + MESSAGES[129] + '</a></li>';
+        body += '<li><a class="action-labedit" href="javascript:void(0)"><i class="glyphicon glyphicon-pencil"></i> ' + MESSAGES[87] + '</a></li>';
+        body += '<li><a class="action-nodesbootsaved" href="javascript:void(0)"><i class="glyphicon glyphicon-floppy-saved"></i> ' + MESSAGES[139] + '</a></li>';
+        body += '<li><a class="action-nodesbootscratch" href="javascript:void(0)"><i class="glyphicon glyphicon-floppy-save"></i> ' + MESSAGES[140] + '</a></li>';
+        body += '<li><a class="action-nodesbootdelete" href="javascript:void(0)"><i class="glyphicon glyphicon-floppy-remove"></i> ' + MESSAGES[141] + '</a></li>';
     }
-    printContextMenu(MESSAGES[125], body, e.pageX + 3, e.pageY + 3);
+    printContextMenu(MESSAGES[125], body, e.pageX + 3, e.pageY + 3, true);
 });
 
 // Redraw topology
@@ -816,12 +816,12 @@ $(document).on('click', '.action-logout', function (e) {
 $(document).on('click', '.action-labobjectadd', function (e) {
     logger(1, 'DEBUG: action = labobjectadd');
     var body = '';
-	body += '<li><a class="action-nodeplace" href="javascript:void(0)"><i class="glyphicon glyphicon-hdd"></i> ' + MESSAGES[81] + '</a></li>';
-	body += '<li><a class="action-networkplace" href="javascript:void(0)"><i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[82] + '</a></li>';
-	body += '<li><a class="action-pictureadd" href="javascript:void(0)"><i class="glyphicon glyphicon-picture"></i> ' + MESSAGES[83] + '</a></li>';
+    body += '<li><a class="action-nodeplace" href="javascript:void(0)"><i class="glyphicon glyphicon-hdd"></i> ' + MESSAGES[81] + '</a></li>';
+    body += '<li><a class="action-networkplace" href="javascript:void(0)"><i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[82] + '</a></li>';
+    body += '<li><a class="action-pictureadd" href="javascript:void(0)"><i class="glyphicon glyphicon-picture"></i> ' + MESSAGES[83] + '</a></li>';
   body += '<li><a class="action-customshapeadd" href="javascript:void(0)"><i class="glyphicon glyphicon-unchecked"></i> ' + MESSAGES[145] + '</a></li>';
   body += '<li><a class="action-textadd" href="javascript:void(0)"><i class="glyphicon glyphicon-font"></i> ' + MESSAGES[146] + '</a></li>';
-    printContextMenu(MESSAGES[80], body, e.pageX, e.pageY);
+    printContextMenu(MESSAGES[80], body, e.pageX, e.pageY, true);
 });
 
 // Add network
@@ -1034,8 +1034,8 @@ $(document).on('click', '.action-picturesget', function (e) {
                 var title = picture['name'] || "pic name";
                 body += '<li>';
                 if (ROLE != "user")
-					body += '<a class="delete-picture" href="javascript:void(0)" data-path="' + key + '"><i class="glyphicon glyphicon-trash delete-picture" title="Delete"></i> ';
-				body += '<a class="action-pictureget" data-path="' + key + '" href="javascript:void(0)" title="' + title + '">' + picture['name'].split(' ')[0] + '</a>';
+                    body += '<a class="delete-picture" href="javascript:void(0)" data-path="' + key + '"><i class="glyphicon glyphicon-trash delete-picture" title="Delete"></i> ';
+                body += '<a class="action-pictureget" data-path="' + key + '" href="javascript:void(0)" title="' + title + '">' + picture['name'].split(' ')[0] + '</a>';
                 body += '</a></li>';
             });
             body += '</ul></div><div id="config-data" class="col-md-11 col-lg-11"></div></div>';
@@ -1055,7 +1055,7 @@ $(document).on('click', '.action-picturesget-stop', function (e) {
         if (!$.isEmptyObject(pictures)) {
             var body = '';
             $.each(pictures, function (key, picture) {
-				body += '<li><a class="action-pictureget" data-path="' + key + '" href="javascript:void(0)" title="' + picture['name'] + '"><i class="glyphicon glyphicon-picture"></i> ' + picture['name'] + '</a></li>';
+                body += '<li><a class="action-pictureget" data-path="' + key + '" href="javascript:void(0)" title="' + picture['name'] + '"><i class="glyphicon glyphicon-picture"></i> ' + picture['name'] + '</a></li>';
             });
             printContextMenu(MESSAGES[59], body, e.pageX, e.pageY);
         } else {
@@ -1929,7 +1929,8 @@ $(document).on('submit', '#form-network-add, #form-network-edit', function (e) {
                     // Close the modal
 
                     $('body').children('.modal').attr('skipRedraw', true);
-                    $('body').children('.modal').modal('hide');
+                    $('body').children('.modal.second-win').modal('hide');
+                    $('body').children('.modal.fade.in').focus();
                     addMessage(data['status'], data['message']);
                 } else {
                     // Application error
@@ -2069,6 +2070,20 @@ $(document).on('submit', '#form-node-add, #form-node-edit', function (e) {
         printLabTopology();
     });
     return false;  // Stop to avoid POST
+});
+
+// submit nodeList form by input focusout
+$(document).on('focusout', '.configured-nodes-input', function(e){
+    e.preventDefault();  // Prevent default behaviour
+    var id = $(this).attr('data-path')
+    setNodeData(id);
+});
+
+// submit nodeList form
+$(document).on('change', '.configured-nods-select', function(e){
+    e.preventDefault();  // Prevent default behaviour
+    var id = $(this).attr('data-path')
+    setNodeData(id);
 });
 
 // Submit config form
@@ -3548,7 +3563,7 @@ function selected_active(element) {
         var offset = $(element).offset()
 
         var destination = $("<div/>", {id: "inner"}).draggable().appendTo('#lab-viewport');
-        destination.css({"position": "absolute", 'top': offset.top, 'left': offset.left, 'opacity': 0.7});
+        destination.css({"position": "absolute", 'top': offset.top, 'left': offset.left, 'opacity': 1});
         destination.html('<img class="selector" src="/images/link_selector.png">')
 
 
@@ -3570,7 +3585,7 @@ function selected_active(element) {
         var conn = lab_topology.connect({
             source: source,       // Must attach to the IMG's parent or not printed correctly
             target: $(destination).attr('id'),  // Must attach to the IMG's parent or not printed correctly
-            cssClass: source + ' ' + destination + ' frame_ethernet',
+            cssClass: source + ' ' + destination + ' frame_ethernet new_network',
             isSource: true
         });
 
