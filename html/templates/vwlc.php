@@ -32,7 +32,7 @@
 
 $p['type'] = 'qemu';
 $p['name'] = 'vWLC';
-$p['icon'] = 'Network Analyzer.png';
+$p['icon'] = 'vWLC.png';
 $p['cpu'] = 1;
 $p['ram'] = 2048;
 $p['ethernet'] = 2;

@@ -32,7 +32,7 @@
   
  $p['type'] = 'qemu'; 
  $p['name'] = 'xrv9k'; 
- $p['icon'] = 'Router.png'; 
+ $p['icon'] = 'XR.png'; 
  $p['cpu'] = 4; 
  $p['ram'] = 16384; 
  $p['qemu_nic'] = 'virtio-net-pci'; 

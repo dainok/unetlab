@@ -32,7 +32,7 @@
 
 $p['type'] = 'qemu';
 $p['name'] = 'CSR'; 
-$p['icon'] = 'Router.png';
+$p['icon'] = 'CSRv1000.png';
 $p['cpu'] = 1;
 $p['ram'] = 3072; 
 $p['ethernet'] = 4; 

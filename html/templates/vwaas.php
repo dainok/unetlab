@@ -32,7 +32,7 @@
 
 $p['type'] = 'qemu';
 $p['name'] = 'WAAS';
-$p['icon'] = 'WAN Optimizer.png';
+$p['icon'] = 'Cisco WAAS.png';
 $p['cpu'] = 1;
 $p['ram'] = 2048;
 $p['ethernet'] = 2;
