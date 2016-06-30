@@ -1277,6 +1277,7 @@ table.configured-nodes tbody td label {
     border-radius: 10px;
     height: 90px;
     width: 250px;
+    z-index: 5203;
 }
 
 .loader,
