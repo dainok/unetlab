@@ -696,6 +696,7 @@ $(document).on('click', '.action-nodeedit', function (e) {
 // Print lab nodes
 $(document).on('click', '.action-nodesget', function (e) {
     logger(1, 'DEBUG: action = nodesget');
+    $("#lab-viewport").append("<div id='nodelist-loader'><label style='float:left'>Generating node list...</label><div class='loader'></div></div>")
     $.when(getNodes(null)).done(function (nodes) {
         printListNodes(nodes);
     }).fail(function (message) {

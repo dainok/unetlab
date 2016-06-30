@@ -2995,7 +2995,7 @@ function printListNodes(nodes) {
 
     $.when.apply($, promises).done(function () {
         body += '</tbody></table></form></div>';
-
+        $("#nodelist-loader").remove();
         addModalWide(MESSAGES[118], body, '');
         $('.selectpicker').selectpicker();
     })
