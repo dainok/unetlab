@@ -1210,11 +1210,16 @@ a:focus{
 
 .configured-nodes-input{
 	width: 70px;
-	border: none;
+	border: 1px solid #ddd;
 }
 
 .short-input{
 	width: 40px;
+	border: 1px solid #ddd;
+}
+
+.readonly {
+	border: none;
 }
 
 table.configured-nodes .bootstrap-select {

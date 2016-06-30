@@ -2882,28 +2882,28 @@ function createNodeListRow(template, id){
 
         //node cpu
         readonlyAttr = checkTemplateValue(template_values['options'],'cpu') ? "" : "readonly";
-        html_data += '<td><input class="configured-nodes-input short-input" data-path="' + id + '" name="node[cpu]" value="' + checkTemplateValue(template_values['options'],'cpu') + '" type="text" ' + readonlyAttr + ' /></td>';
+        html_data += '<td><input class="configured-nodes-input short-input ' + readonlyAttr + '" data-path="' + id + '" name="node[cpu]" value="' + checkTemplateValue(template_values['options'],'cpu') + '" type="text" ' + readonlyAttr + ' /></td>';
 
         //node idle
         readonlyAttr = checkTemplateValue(template_values['options'],'idlepc') ? "" : "readonly";
-        html_data += '<td><input class="configured-nodes-input" data-path="' + id + '" name="node[idlepc]" value="' + checkTemplateValue(template_values['options'], 'idlepc') + '" type="text" ' + readonlyAttr + ' /></td>';
+        html_data += '<td><input class="configured-nodes-input ' + readonlyAttr + '" data-path="' + id + '" name="node[idlepc]" value="' + checkTemplateValue(template_values['options'], 'idlepc') + '" type="text" ' + readonlyAttr + ' /></td>';
 
         //node nvram
         readonlyAttr = checkTemplateValue(template_values['options'],'nvram') ? "" : "readonly";
-        html_data += '<td><input class="configured-nodes-input short-input" data-path="' + id + '" name="node[nvram]" value="' + checkTemplateValue(template_values['options'], 'nvram') + '" type="text" ' + readonlyAttr + ' /></td>';
+        html_data += '<td><input class="configured-nodes-input short-input ' + readonlyAttr + '" data-path="' + id + '" name="node[nvram]" value="' + checkTemplateValue(template_values['options'], 'nvram') + '" type="text" ' + readonlyAttr + ' /></td>';
 
         //node ram
         readonlyAttr = checkTemplateValue(template_values['options'],'ram') ? "" : "readonly";
-        html_data += '<td><input class="configured-nodes-input short-input" data-path="' + id + '" name="node[ram]" value="' + checkTemplateValue(template_values['options'], 'ram') + '" type="text" ' + readonlyAttr + ' /></td>';
+        html_data += '<td><input class="configured-nodes-input short-input ' + readonlyAttr + '" data-path="' + id + '" name="node[ram]" value="' + checkTemplateValue(template_values['options'], 'ram') + '" type="text" ' + readonlyAttr + ' /></td>';
 
         //node ethernet
         readonlyAttr = checkTemplateValue(template_values['options'],'ethernet') ? "" : "readonly";
-        html_data += '<td><input class="configured-nodes-input short-input" data-path="' + id + '" name="node[ethernet]" value="' + checkTemplateValue(template_values['options'],'ethernet') + '" type="text" ' + readonlyAttr + ' /></td>';
+        html_data += '<td><input class="configured-nodes-input short-input ' + readonlyAttr + '" data-path="' + id + '" name="node[ethernet]" value="' + checkTemplateValue(template_values['options'],'ethernet') + '" type="text" ' + readonlyAttr + ' /></td>';
 
         //node serial
-        readonlyAttr = checkTemplateValue(template_values['options'],'serial') ? "" : "readonly";
+        readonlyAttr = (checkTemplateValue(template_values['options'],'serial') || node_values['serial']) ? "" : "readonly";
         var serial = (checkTemplateValue(template_values['options'],'serial') || node_values['serial']) ? checkTemplateValue(template_values['options'],'serial') || node_values['serial'] : "";
-        html_data += '<td><input class="configured-nodes-input short-input" data-path="' + id + '" name="node[serial]" value="' + serial + '" type="text" '  + readonlyAttr + '/></td>';
+        html_data += '<td><input class="configured-nodes-input short-input ' + readonlyAttr + '" data-path="' + id + '" name="node[serial]" value="' + serial + '" type="text" '  + readonlyAttr + '/></td>';
 
         //node console
         if(template == "iol"){

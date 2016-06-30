@@ -2076,8 +2076,10 @@ $(document).on('submit', '#form-node-add, #form-node-edit', function (e) {
 // submit nodeList form by input focusout
 $(document).on('focusout', '.configured-nodes-input', function(e){
     e.preventDefault();  // Prevent default behaviour
-    var id = $(this).attr('data-path')
-    setNodeData(id);
+    if(!$(this).attr("readonly")){
+        var id = $(this).attr('data-path')
+        setNodeData(id);
+    }
 });
 
 // submit nodeList form
