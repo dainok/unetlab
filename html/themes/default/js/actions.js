@@ -1998,6 +1998,7 @@ $(document).on('submit', '#form-node-connect', function (e) {
 // Submit node form
 $(document).on('submit', '#form-node-add, #form-node-edit', function (e) {
     e.preventDefault();  // Prevent default behaviour
+    var self = $(this);
     var lab_filename = $('#lab-viewport').attr('data-path');
     var form_data = form2Array('node');
     var promises = [];
@@ -2050,6 +2051,18 @@ $(document).on('submit', '#form-node-add, #form-node-edit', function (e) {
                     $(".modal .node" + form_data['id'] + " td:nth-child(9)").text(form_data["ethernet"]);
                     $(".modal .node" + form_data['id'] + " td:nth-child(10)").text(form_data["serial"]);
                     $(".modal .node" + form_data['id'] + " td:nth-child(11)").text(form_data["console"]);
+
+                    $("#node" + form_data['id'] + " .node_name").html('<i class="node2_status glyphicon glyphicon-stop"></i>' + form_data['name'])
+                    $("#node" + form_data['id'] + " a img").attr("src", "/images/icons/" + form_data['icon'])
+
+                    $("#form-node-edit-table input[name='node[name]'][data-path='" + form_data['id'] + "']").val(form_data["name"])
+                    $("#form-node-edit-table select[name='node[image]'][data-path='" + form_data['id'] + "']").val(form_data["image"])
+                    $("#form-node-edit-table input[name='node[cpu]'][data-path='" + form_data['id'] + "']").val(form_data["cpu"])
+                    $("#form-node-edit-table input[name='node[nvram]'][data-path='" + form_data['id'] + "']").val(form_data["nvram"])
+                    $("#form-node-edit-table input[name='node[serial]'][data-path='" + form_data['id'] + "']").val(form_data["serial"])
+                    $("#form-node-edit-table input[name='node[ethernet]'][data-path='" + form_data['id'] + "']").val(form_data["ethernet"])
+                    $("#form-node-edit-table select[name='node[console]'][data-path='" + form_data['id'] + "']").val(form_data["console"])
+                    $("#form-node-edit-table select[name='node[icon]'][data-path='" + form_data['id'] + "']").val(form_data["icon"])
                 } else {
                     // Application error
                     logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
@@ -2068,7 +2081,9 @@ $(document).on('submit', '#form-node-add, #form-node-edit', function (e) {
     }
 
     $.when.apply(null, promises).done(function () {
-        printLabTopology();
+        if (self.attr('id') == 'form-node-add') {
+            printLabTopology();
+        }
     });
     return false;  // Stop to avoid POST
 });

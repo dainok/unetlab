@@ -1210,6 +1210,7 @@ a:focus{
 
 .configured-nodes-input{
 	width: 70px;
+	padding-left: 4px;
 	border: 1px solid #ddd;
 }
 
