@@ -2842,7 +2842,9 @@ function printListNetworks(networks) {
 // check template's options that field's exists
 function checkTemplateValue(template_options, field){
     if(template_options[field]){
-        return template_options[field].value;
+        return template_options[field].value.toString();
+    } else if(!template_options[field] && parseInt(template_options[field]) === 0) {
+        return template_options[field].value.toString();
     } else {
         return "";
     }
@@ -2855,7 +2857,22 @@ function createNodeListRow(template, id){
     $.when(getTemplates(template), getNodes(id)).done(function (template_values, node_values) {
         var value_set = "";
         var readonlyAttr = "";
-
+        var value_name      = node_values['name'];
+        var value_cpu       = node_values['cpu'] || "n/a";
+        var value_idlepc    = node_values['idlepc'] || "n/a";
+        var value_nvram     = node_values['nvram'] || "n/a";
+        var value_ram       = node_values['ram'] || "n/a";
+        var value_ethernet  = node_values['ethernet'] || "n/a";
+        var value_console   = checkTemplateValue(template_values,'console') || node_values['console'] || ""
+        var value_serial    = "";
+        if(node_values['serial']){
+            value_serial = node_values['serial'];
+        } else if(!node_values['serial'] && parseInt(node_values['serial']) === 0){
+            value_serial = node_values['serial'].toString();
+        } else{
+            value_serial = "n/a";
+        }
+        
         // TODO: this event is called twice
         id = (id == null) ? '' : id;
         var html_data = '<tr><input name="node[type]" data-path="' + id + '" value="' + template_values['type'] + '" type="hidden"/>';
@@ -2866,44 +2883,44 @@ function createNodeListRow(template, id){
         html_data += '<td><input class="hide-border" style="width: 20px;" value="' + id + '" readonly/></td>';
         
         //node name
-        html_data += '<td><input class="configured-nodes-input" data-path="' + id + '" name="node[name]" value="' + node_values['name'] + '" type="text" /></td>';
+        html_data += '<td><input class="configured-nodes-input" data-path="' + id + '" name="node[name]" value="' + value_name + '" type="text" /></td>';
         
         //node template
         html_data += '<td><input class="hide-border" data-path="' + id + '" name="node[template]" value="' + template + '" readonly/></td>';
 
         //node image
         html_data += '<td><select class="configured-nods-select form-control" data-path="' + id + '" name="node[image]">'
-        value_set = (node_values != null && node_values['image'] != null) ? node_values['image'] : value['value'];
-        $.each(template_values['options']['image']['list'], function (list_key, list_value) {
+        value_set = (node_values != null && template_values['options']['image'] && template_values['options']['image']['list']) ? node_values['image'] : "";
+        var options_arr = template_values['options']['image'] && template_values['options']['image']['list'] ? template_values['options']['image']['list'] : [];
+        $.each(options_arr, function (list_key, list_value) {
             var selected = (list_key == value_set) ? 'selected ' : '';
             html_data += '<option ' + selected + 'value="' + list_key + '">' + list_value + '</option>';
         });
         html_data += '</select></td>';
 
         //node cpu
-        readonlyAttr = checkTemplateValue(template_values['options'],'cpu') ? "" : "readonly";
-        html_data += '<td><input class="configured-nodes-input short-input ' + readonlyAttr + '" data-path="' + id + '" name="node[cpu]" value="' + checkTemplateValue(template_values['options'],'cpu') + '" type="text" ' + readonlyAttr + ' /></td>';
+        readonlyAttr = (value_cpu && value_cpu != "n/a") ? "" : "readonly";
+        html_data += '<td><input class="configured-nodes-input short-input ' + readonlyAttr + '" data-path="' + id + '" name="node[cpu]" value="' + value_cpu + '" type="text" ' + readonlyAttr + ' /></td>';
 
         //node idle
-        readonlyAttr = checkTemplateValue(template_values['options'],'idlepc') ? "" : "readonly";
-        html_data += '<td><input class="configured-nodes-input ' + readonlyAttr + '" data-path="' + id + '" name="node[idlepc]" value="' + checkTemplateValue(template_values['options'], 'idlepc') + '" type="text" ' + readonlyAttr + ' /></td>';
+        readonlyAttr = (value_idlepc && value_idlepc != "n/a") ? "" : "readonly";
+        html_data += '<td><input class="configured-nodes-input ' + readonlyAttr + '" data-path="' + id + '" name="node[idlepc]" value="' + value_idlepc + '" type="text" ' + readonlyAttr + ' /></td>';
 
         //node nvram
-        readonlyAttr = checkTemplateValue(template_values['options'],'nvram') ? "" : "readonly";
-        html_data += '<td><input class="configured-nodes-input short-input ' + readonlyAttr + '" data-path="' + id + '" name="node[nvram]" value="' + checkTemplateValue(template_values['options'], 'nvram') + '" type="text" ' + readonlyAttr + ' /></td>';
+        readonlyAttr = (value_nvram && value_nvram != "n/a") ? "" : "readonly";
+        html_data += '<td><input class="configured-nodes-input short-input ' + readonlyAttr + '" data-path="' + id + '" name="node[nvram]" value="' + value_nvram + '" type="text" ' + readonlyAttr + ' /></td>';
 
         //node ram
-        readonlyAttr = checkTemplateValue(template_values['options'],'ram') ? "" : "readonly";
-        html_data += '<td><input class="configured-nodes-input short-input ' + readonlyAttr + '" data-path="' + id + '" name="node[ram]" value="' + checkTemplateValue(template_values['options'], 'ram') + '" type="text" ' + readonlyAttr + ' /></td>';
+        readonlyAttr = (value_ram && value_ram != "n/a") ? "" : "readonly";
+        html_data += '<td><input class="configured-nodes-input short-input ' + readonlyAttr + '" data-path="' + id + '" name="node[ram]" value="' + value_ram + '" type="text" ' + readonlyAttr + ' /></td>';
 
         //node ethernet
-        readonlyAttr = checkTemplateValue(template_values['options'],'ethernet') ? "" : "readonly";
-        html_data += '<td><input class="configured-nodes-input short-input ' + readonlyAttr + '" data-path="' + id + '" name="node[ethernet]" value="' + checkTemplateValue(template_values['options'],'ethernet') + '" type="text" ' + readonlyAttr + ' /></td>';
+        readonlyAttr = (value_ethernet && value_ethernet != "n/a") ? "" : "readonly";
+        html_data += '<td><input class="configured-nodes-input short-input ' + readonlyAttr + '" data-path="' + id + '" name="node[ethernet]" value="' + value_ethernet + '" type="text" ' + readonlyAttr + ' /></td>';
 
         //node serial
-        readonlyAttr = (checkTemplateValue(template_values['options'],'serial') || node_values['serial']) ? "" : "readonly";
-        var serial = (checkTemplateValue(template_values['options'],'serial') || node_values['serial']) ? checkTemplateValue(template_values['options'],'serial') || node_values['serial'] : "";
-        html_data += '<td><input class="configured-nodes-input short-input ' + readonlyAttr + '" data-path="' + id + '" name="node[serial]" value="' + serial + '" type="text" '  + readonlyAttr + '/></td>';
+        readonlyAttr = (value_serial && value_serial != "n/a") ? "" : "readonly";
+        html_data += '<td><input class="configured-nodes-input short-input ' + readonlyAttr + '" data-path="' + id + '" name="node[serial]" value="' + value_serial + '" type="text" '  + readonlyAttr + '/></td>';
 
         //node console
         if(template == "iol"){
@@ -2917,8 +2934,7 @@ function createNodeListRow(template, id){
             });
             html_data += '</select></td>';
         } else {
-            var console_val = checkTemplateValue(template_values['options'],'console') || node_values['console'];
-            html_data += '<td><input class="hide-border" name="node[console]" value="' + console_val + '" type="text" readonly/></td>';
+            html_data += '<td><input class="hide-border" name="node[console]" value="' + value_console + '" type="text" readonly/></td>';
         }
 
         //node icons
@@ -2951,7 +2967,7 @@ function createNodeListRow(template, id){
                          '<a class="action-nodedelete" data-path="' + id + '" data-name="' + checkTemplateValue(template_values['options'],'name') + '" href="javascript:void(0)" title="' + MESSAGES[65] + '"><i class="glyphicon glyphicon-trash"></i></a>';
         } 
         html_data += '</div></td></tr>';
-        defer.resolve(html_data);
+        defer.resolve({"html": html_data, "id": id});
     }).fail(function (message1, message2) {
         // Cannot get data
         if (message1 != null) {
@@ -2960,7 +2976,7 @@ function createNodeListRow(template, id){
             addModalError(message2)
         }
         // return html_data;
-        defer.resolve(html_data);
+        defer.resolve({"html": html_data, "id": id});
     });
 
     return defer;
@@ -2970,6 +2986,7 @@ function createNodeListRow(template, id){
 function printListNodes(nodes) {
     logger(1, 'DEBUG: printing node list');
     var body = '<div class="table-responsive"><form id="form-node-edit-table" ><table class="configured-nodes table"><thead><tr><th>' + MESSAGES[92] + '</th><th>' + MESSAGES[19] + '</th><th>' + MESSAGES[111] + '</th><th>' + MESSAGES[163] + '</th><th>' + MESSAGES[105] + '</th><th>' + MESSAGES[106] + '</th><th>' + MESSAGES[107] + '</th><th>' + MESSAGES[108] + '</th><th>' + MESSAGES[109] + '</th><th>' + MESSAGES[110] + '</th><th>' + MESSAGES[112] + '</th><th>' + MESSAGES[164] + '</th><th>' + MESSAGES[123] + '</th><th>' + MESSAGES[99] + '</th></tr></thead><tbody>';
+    var html_rows = [];
     var promises = [];
 
     var composePromise = function (key, value) {
@@ -2981,8 +2998,8 @@ function printListNodes(nodes) {
         var nvram = (value['nvram'] != null) ? value['nvram'] : '';
         var serial = (value['serial'] != null) ? value['serial'] : '';
 
-        $.when(createNodeListRow(value['template'], value['id'])).done(function (html_data) {
-            body += html_data;
+        $.when(createNodeListRow(value['template'], value['id'])).done(function (data) {
+            html_rows.push(data);
             
             defer.resolve();
         });
@@ -2994,6 +3011,12 @@ function printListNodes(nodes) {
     })
 
     $.when.apply($, promises).done(function () {
+        var html_data = html_rows.sort(function(a, b){
+            return (a.id < b.id) ? -1 : (a.id > b.id) ? 1 : 0
+        })
+        $.each(html_data, function(key, value){
+            body += value.html;
+        });
         body += '</tbody></table></form></div>';
         $("#nodelist-loader").remove();
         addModalWide(MESSAGES[118], body, '');
