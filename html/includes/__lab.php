@@ -403,7 +403,9 @@ class Lab {
 	 */
 	public function addTextObject($p) {
 		$p['id'] = 1;
-
+		$object = new stdClass();
+		$object->id = -1;
+		$object->status = 0;
 		// Finding a free object ID
 		while (True) {
 			if (!isset($this -> textobjects[$p['id']])) {
@@ -416,12 +418,16 @@ class Lab {
 		// Adding the object
 		try {
 			$this -> textobjects[$p['id']] = new TextObject($p, $p['id']);
-			return $this -> save();
+			$this -> save();
+			$object->id = $p['id'];
+			$object->status = 0;
+			return $object;
 		} catch (Exception $e) {
 			// Failed to create the picture
 			error_log(date('M d H:i:s ').'ERROR: '.$this -> path .'/'.$this -> filename.'?pic='.$p['id'].' '.$GLOBALS['messages'][20042]);
 			error_log(date('M d H:i:s ').(string) $e);
-			return 20042;
+			$object->status = 20042;
+			return $object;
 		}
 	}
 

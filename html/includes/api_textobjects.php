@@ -40,8 +40,9 @@
 function apiAddLabTextObject($lab, $p) {
 	// Adding the object
 	$rc = $lab -> addTextObject($p);
-	if ($rc === 0) {
+	if ($rc -> status === 0) {
 		$output['code'] = 201;
+		$output['result'] = $rc;
 		$output['status'] = 'success';
 		$output['message'] = $GLOBALS['messages'][60023];
 	} else {
