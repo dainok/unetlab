@@ -32,7 +32,7 @@
 
 $p['type'] = 'qemu';
 $p['name'] = 'Olive'; 
-$p['icon'] = 'Router.png';
+$p['icon'] = 'JuniperMX.png';
 $p['cpu'] = 1;
 $p['ram'] = 4096; 
 $p['ethernet'] = 4; 
