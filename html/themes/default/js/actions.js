@@ -238,27 +238,27 @@ $(document).on('contextmenu', '.context-menu', function (e) {
         var node_id = $(this).attr('data-path')
             , title = $(this).attr('data-name') + " (" + node_id + ")"
             , body = '<li>' +
-                        '<a class="menu-collapse" data-path="menu-manage" href="javascript:void(0)"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[75] + '</a>' +
+                '<a class="menu-collapse" data-path="menu-manage" href="javascript:void(0)"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[75] + '</a>' +
                 '</li>' +
                 '<li>' +
-                        '<a class="action-nodestart context-collapsible menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="javascript:void(0)">' +
+                '<a class="action-nodestart context-collapsible menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="javascript:void(0)">' +
                 '<i class="glyphicon glyphicon-play"></i> ' + MESSAGES[66] +
                 '</a>' +
                 '</li>' +
                 '<li>' +
-                        '<a class="action-nodestop context-collapsible menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="javascript:void(0)">' +
+                '<a class="action-nodestop context-collapsible menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="javascript:void(0)">' +
                 '<i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[67] +
                 '</a>' +
                 '</li>' +
                 '<li>' +
-                        '<a class="action-nodewipe context-collapsible menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="javascript:void(0)">' +
+                '<a class="action-nodewipe context-collapsible menu-manage" data-path="' + node_id + '" data-name="' + title + '" href="javascript:void(0)">' +
                 '<i class="glyphicon glyphicon-erase"></i> ' + MESSAGES[68] +
                 '</a>' +
                 '</li>' +
                 '<li role="separator" class="divider">' +
                 '</li>' +
                 '<li id="menu-node-interfaces">' +
-                        '<a class="menu-collapse" data-path="menu-interface" href="javascript:void(0)">' +
+                '<a class="menu-collapse" data-path="menu-interface" href="javascript:void(0)">' +
                 '<i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[70] +
                 '</a>' +
                 '</li>'
@@ -270,32 +270,32 @@ $(document).on('contextmenu', '.context-menu', function (e) {
 
 
             body += '<li role="separator" class="divider">' +
-                '</li>' +
-                '<li>' +
-                      '<a class="menu-collapse" data-path="menu-edit" href="javascript:void(0)">' +
-                '<i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[73] +
-                '</a>' +
-                '</li>' +
-                '<li>' +
-                      '<a class="action-nodeexport context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="javascript:void(0)">' +
-                '<i class="glyphicon glyphicon-save"></i> ' + MESSAGES[69] +
-                '</a>' +
-                '</li>' +
-                '<li>' +
-                      '<a class="action-nodeinterfaces context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="javascript:void(0)">' +
-                '<i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[72] +
-                '</a>' +
-                '</li>' +
-                '<li>' +
-                      '<a class="action-nodeedit context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="javascript:void(0)">' +
-                '<i class="glyphicon glyphicon-edit"></i> ' + MESSAGES[71] +
-                '</a>' +
-                '</li>' +
-                '<li>' +
-                      '<a class="action-nodedelete context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="javascript:void(0)">' +
-                '<i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[65] +
-                '</a>' +
-                '</li>'
+            '</li>' +
+            '<li>' +
+            '<a class="menu-collapse" data-path="menu-edit" href="javascript:void(0)">' +
+            '<i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[73] +
+            '</a>' +
+            '</li>' +
+            '<li>' +
+            '<a class="action-nodeexport context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="javascript:void(0)">' +
+            '<i class="glyphicon glyphicon-save"></i> ' + MESSAGES[69] +
+            '</a>' +
+            '</li>' +
+            '<li>' +
+            '<a class="action-nodeinterfaces context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="javascript:void(0)">' +
+            '<i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[72] +
+            '</a>' +
+            '</li>' +
+            '<li>' +
+            '<a class="action-nodeedit context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="javascript:void(0)">' +
+            '<i class="glyphicon glyphicon-edit"></i> ' + MESSAGES[71] +
+            '</a>' +
+            '</li>' +
+            '<li>' +
+            '<a class="action-nodedelete context-collapsible menu-edit" data-path="' + node_id + '" data-name="' + title + '" href="javascript:void(0)">' +
+            '<i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[65] +
+            '</a>' +
+            '</li>'
             ;
         }
         ;
@@ -317,44 +317,44 @@ $(document).on('contextmenu', '.context-menu', function (e) {
 
         if (isFreeSelectMode) {
             body = '' +
-                '<li>' +
-                    '<a class="menu-collapse" data-path="menu-manage" href="javascript:void(0)"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[75] + '</a>' +
-                '</li>' +
-                '<li>' +
-                    '<a class="action-nodestart-group context-collapsible menu-manage" href="javascript:void(0)"><i class="glyphicon glyphicon-play"></i> ' + MESSAGES[153] + '</a>' +
-                '</li>' +
-                '<li>' +
-                    '<a class="action-nodestop-group context-collapsible menu-manage" href="javascript:void(0)"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[154] + '</a>' +
-                '</li>' +
-                '<li>' +
-                    '<a class="action-nodewipe-group context-collapsible menu-manage" href="javascript:void(0)"><i class="glyphicon glyphicon-erase"></i> ' + MESSAGES[155] + '</a>' +
-                '</li>';
+            '<li>' +
+            '<a class="menu-collapse" data-path="menu-manage" href="javascript:void(0)"><i class="glyphicon glyphicon-chevron-down"></i> ' + MESSAGES[75] + '</a>' +
+            '</li>' +
+            '<li>' +
+            '<a class="action-nodestart-group context-collapsible menu-manage" href="javascript:void(0)"><i class="glyphicon glyphicon-play"></i> ' + MESSAGES[153] + '</a>' +
+            '</li>' +
+            '<li>' +
+            '<a class="action-nodestop-group context-collapsible menu-manage" href="javascript:void(0)"><i class="glyphicon glyphicon-stop"></i> ' + MESSAGES[154] + '</a>' +
+            '</li>' +
+            '<li>' +
+            '<a class="action-nodewipe-group context-collapsible menu-manage" href="javascript:void(0)"><i class="glyphicon glyphicon-erase"></i> ' + MESSAGES[155] + '</a>' +
+            '</li>';
             if (ROLE == 'admin' || ROLE == 'editor') {
                 body += '' +
-                    '<li role="separator" class="divider"></li>' +
-                    '<li>' +
-                        '<a class="action-nodeexport-group context-collapsible menu-manage" href="javascript:void(0)"><i class="glyphicon glyphicon-save"></i> ' + MESSAGES[129] + '</a>' +
-                    '</li>' +
-                    '<li>' +
-                        '<a class="action-nodesbootsaved-group" href="javascript:void(0)"><i class="glyphicon glyphicon-floppy-saved"></i> ' + MESSAGES[139] + '</a>' +
-                    '</li>' +
-                    '<li>' +
-                        '<a class="action-nodesbootscratch-group" href="javascript:void(0)"><i class="glyphicon glyphicon-floppy-save"></i> ' + MESSAGES[140] + '</a>' +
-                    '</li>';
-            }
-            body += '' +
                 '<li role="separator" class="divider"></li>' +
                 '<li>' +
-                    '<a class="action-nodesbootdelete-group" href="javascript:void(0)"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[159] + '</a>' +
+                '<a class="action-nodeexport-group context-collapsible menu-manage" href="javascript:void(0)"><i class="glyphicon glyphicon-save"></i> ' + MESSAGES[129] + '</a>' +
                 '</li>' +
                 '<li>' +
-                    '<a class="action-nodedelete-group context-collapsible menu-manage" href="javascript:void(0)"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[157] + '</a>' +
+                '<a class="action-nodesbootsaved-group" href="javascript:void(0)"><i class="glyphicon glyphicon-floppy-saved"></i> ' + MESSAGES[139] + '</a>' +
                 '</li>' +
-                '';
+                '<li>' +
+                '<a class="action-nodesbootscratch-group" href="javascript:void(0)"><i class="glyphicon glyphicon-floppy-save"></i> ' + MESSAGES[140] + '</a>' +
+                '</li>';
+            }
+            body += '' +
+            '<li role="separator" class="divider"></li>' +
+            '<li>' +
+            '<a class="action-nodesbootdelete-group" href="javascript:void(0)"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[159] + '</a>' +
+            '</li>' +
+            '<li>' +
+            '<a class="action-nodedelete-group context-collapsible menu-manage" href="javascript:void(0)"><i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[157] + '</a>' +
+            '</li>' +
+            '';
 
             title = 'Group of ' + window.freeSelectedNodes.map(function (node) {
-                    return node.name;
-                }).join(", ").slice(0, 16);
+                return node.name;
+            }).join(", ").slice(0, 16);
             title += title.length > 24 ? "..." : "";
 
         }
@@ -374,31 +374,31 @@ $(document).on('contextmenu', '.context-menu', function (e) {
             var textObject_id = $(this).attr('data-path')
                 , title = 'Edit: ' + $(this).attr('data-path')
                 , body =
-                '<li>' +
-                      '<a class="context-collapsible  action-textobjectduplicate" href="javascript:void(0)" data-path="' + textObject_id + '">' +
-                '<i class="glyphicon glyphicon-duplicate"></i> ' + MESSAGES[149] +
-                '</a>' +
-                '</li>' +
-                '<li>' +
-                      '<a class="context-collapsible  action-textobjecttoback" href="javascript:void(0)" data-path="' + textObject_id + '">' +
-                '<i class="glyphicon glyphicon-save"></i> ' + MESSAGES[147] +
-                '</a>' +
-                '</li>' +
-                '<li>' +
-                      '<a class="context-collapsible  action-textobjecttofront" href="javascript:void(0)" data-path="' + textObject_id + '">' +
-                '<i class="glyphicon glyphicon-open"></i> ' + MESSAGES[148] +
-                '</a>' +
-                '</li>' +
-                '<li>' +
-                      '<a class="context-collapsible  action-textobjectedit" href="javascript:void(0)" data-path="' + textObject_id + '">' +
-                '<i class="glyphicon glyphicon-edit"></i> ' + MESSAGES[71] +
-                '</a>' +
-                '</li>' +
-                '<li>' +
-                      '<a class="context-collapsible  action-textobjectdelete" href="javascript:void(0)" data-path="' + textObject_id + '">' +
-                '<i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[65] +
-                '</a>' +
-                '</li>';
+                    '<li>' +
+                    '<a class="context-collapsible  action-textobjectduplicate" href="javascript:void(0)" data-path="' + textObject_id + '">' +
+                    '<i class="glyphicon glyphicon-duplicate"></i> ' + MESSAGES[149] +
+                    '</a>' +
+                    '</li>' +
+                    '<li>' +
+                    '<a class="context-collapsible  action-textobjecttoback" href="javascript:void(0)" data-path="' + textObject_id + '">' +
+                    '<i class="glyphicon glyphicon-save"></i> ' + MESSAGES[147] +
+                    '</a>' +
+                    '</li>' +
+                    '<li>' +
+                    '<a class="context-collapsible  action-textobjecttofront" href="javascript:void(0)" data-path="' + textObject_id + '">' +
+                    '<i class="glyphicon glyphicon-open"></i> ' + MESSAGES[148] +
+                    '</a>' +
+                    '</li>' +
+                    '<li>' +
+                    '<a class="context-collapsible  action-textobjectedit" href="javascript:void(0)" data-path="' + textObject_id + '">' +
+                    '<i class="glyphicon glyphicon-edit"></i> ' + MESSAGES[71] +
+                    '</a>' +
+                    '</li>' +
+                    '<li>' +
+                    '<a class="context-collapsible  action-textobjectdelete" href="javascript:void(0)" data-path="' + textObject_id + '">' +
+                    '<i class="glyphicon glyphicon-trash"></i> ' + MESSAGES[65] +
+                    '</a>' +
+                    '</li>';
         }
     } else {
         // Context menu not defined for this object
@@ -570,8 +570,8 @@ $(document).on('click', '.action-networkdeatach', function (e) {
 
             window.location.reload();
         }).fail(function (message) {
-        addModalError(message);
-    });
+            addModalError(message);
+        });
 });
 
 // Print lab networks
@@ -820,8 +820,8 @@ $(document).on('click', '.action-labobjectadd', function (e) {
     body += '<li><a class="action-nodeplace" href="javascript:void(0)"><i class="glyphicon glyphicon-hdd"></i> ' + MESSAGES[81] + '</a></li>';
     body += '<li><a class="action-networkplace" href="javascript:void(0)"><i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[82] + '</a></li>';
     body += '<li><a class="action-pictureadd" href="javascript:void(0)"><i class="glyphicon glyphicon-picture"></i> ' + MESSAGES[83] + '</a></li>';
-  body += '<li><a class="action-customshapeadd" href="javascript:void(0)"><i class="glyphicon glyphicon-unchecked"></i> ' + MESSAGES[145] + '</a></li>';
-  body += '<li><a class="action-textadd" href="javascript:void(0)"><i class="glyphicon glyphicon-font"></i> ' + MESSAGES[146] + '</a></li>';
+    body += '<li><a class="action-customshapeadd" href="javascript:void(0)"><i class="glyphicon glyphicon-unchecked"></i> ' + MESSAGES[145] + '</a></li>';
+    body += '<li><a class="action-textadd" href="javascript:void(0)"><i class="glyphicon glyphicon-font"></i> ' + MESSAGES[146] + '</a></li>';
     printContextMenu(MESSAGES[80], body, e.pageX, e.pageY, true);
 });
 
@@ -3348,7 +3348,7 @@ function nodeClicked(title, node_id, e) {
                     iol_interfc[4 * x + y] = interfc;
                 });
 
-                 nodeInterfaces['ethernet']=iol_interfc;
+                nodeInterfaces['ethernet']=iol_interfc;
 
                 // IOL nodes need to reorder interfaces
                 // i = x/y with x = i % 16 and y = (i - x) / 16
@@ -3361,7 +3361,7 @@ function nodeClicked(title, node_id, e) {
 
                 });
 
-                 nodeInterfaces['serial']=iol_interfc1;
+                nodeInterfaces['serial']=iol_interfc1;
             }
 
 
@@ -3381,14 +3381,14 @@ function nodeClicked(title, node_id, e) {
 
                         if (networks[object['network_id']]) {
                             network = ' <i class="glyphicon glyphicon-transfer" title="Connected"></i> ' +
-                                networks[object['network_id']].name;
+                            networks[object['network_id']].name;
 
                             network +=
                                 //edit
                                 '<a class="action-networkedit" data-path="' + object['network_id'] + '" ' +
                                 'data-name="' + object['name'] + '" href="#" title="Edit network">' +
                                 '<i class="glyphicon glyphicon-pencil"></i></a>' +
-                                //deatach
+                                    //deatach
                                 '<a class="action-networkdeatach" data-path="' + object['network_id'] + '" ' +
                                 'data-name="' + object['name'] + '" href="#" title="Detach interface"' +
                                 'node-id="' + node_id + '"' +
@@ -3411,29 +3411,29 @@ function nodeClicked(title, node_id, e) {
                         if (key == 'ethernet') {
 
                             interfaces += '<li class="action-nodelink-li">' +
-                                '<a class="context-collapsible interfaces" ' +
-                                'href="#" interface-name="' + object['name'] + '" ' +
-                                'node-id="' + node_id + '" ' +
-                                'interface-id="' + object.id + '" ' +
-                                'network-id="' + networkId + '" ' +
-                                '>' +
-                                '<i class="glyphicon glyphicon-link"></i>' + object['name'] +
-                                network +
-                                '</a>' +
-                                '</li>';
+                            '<a class="context-collapsible interfaces" ' +
+                            'href="#" interface-name="' + object['name'] + '" ' +
+                            'node-id="' + node_id + '" ' +
+                            'interface-id="' + object.id + '" ' +
+                            'network-id="' + networkId + '" ' +
+                            '>' +
+                            '<i class="glyphicon glyphicon-link"></i>' + object['name'] +
+                            network +
+                            '</a>' +
+                            '</li>';
                         }
                         else {
 
                             interfaces += '<li class="action-nodelink-li">' +
-                                '<a class="action-nodeinterfaces context-collapsible menu-edit" ' +
-                                'href="#"' +
-                                'data-path="' + node_id + '" ' +
-                                'data-name="' + object['name'] + '"' +
-                                '>' +
-                                '<i class="glyphicon glyphicon-link"></i>' + object['name'] +
-                                remoteIf +
-                                ' </a>' +
-                                '</li>';
+                            '<a class="action-nodeinterfaces context-collapsible menu-edit" ' +
+                            'href="#"' +
+                            'data-path="' + node_id + '" ' +
+                            'data-name="' + object['name'] + '"' +
+                            '>' +
+                            '<i class="glyphicon glyphicon-link"></i>' + object['name'] +
+                            remoteIf +
+                            ' </a>' +
+                            '</li>';
                         }
 
                     });
@@ -3525,7 +3525,7 @@ function networkClicked(title, node_id, e) {
                     delete window.startNode
                     // var pos = result.data;
                     // return $.when(setNetworkPosition(network_id,pos.left,pos.top));
-                   // return $.when(setNodeInterface(start_node, network_id, interface_id))
+                    // return $.when(setNodeInterface(start_node, network_id, interface_id))
 
 
                     window.location.reload();
@@ -3722,7 +3722,7 @@ $(document).on('click', 'a.interfaces', function (e) {
 
 
             $.when(setNetwork(node_name, offset.left + 20, offset.top + 40))
-            //step 1
+                //step 1
                 .then(function (response) {
                     var networkId = response.data.id;
 
@@ -3794,7 +3794,7 @@ $(document).on('click', '.node.node_frame a', function (e) {
                 var network = '<li><a class="action-nodestart menu-manage" data-path="' + node_id +
                     '" data-name="' + node.name + '" href="#"><i class="glyphicon glyphicon-play"></i> Start</a></li>';
                 network += '<li><a style="display: block;" class="action-nodeedit " data-path="' + node_id +
-                    '" data-name="' + node.name + '" href="#"><i class="glyphicon glyphicon-edit"></i> Edit</a></li>';
+                '" data-name="' + node.name + '" href="#"><i class="glyphicon glyphicon-edit"></i> Edit</a></li>';
 
                 printContextMenu(node.name, network, e.pageX, e.pageY);
             })
@@ -3813,15 +3813,15 @@ $(document).on('click', '.node.node_frame a', function (e) {
  */
 function detachNodeLink() {
 
-            if (window.conn || window.startNode) {
-                var source = $('#inner').attr('data-source');
-                $('#inner').remove();
-                $('.link_selected').removeClass('link_selected');
-                $('.startNode').removeClass('startNode');
-                jsPlumb.detach(window.conn);
-                delete window.startNode;
-                delete window.conn;
-            }
+    if (window.conn || window.startNode) {
+        var source = $('#inner').attr('data-source');
+        $('#inner').remove();
+        $('.link_selected').removeClass('link_selected');
+        $('.startNode').removeClass('startNode');
+        jsPlumb.detach(window.conn);
+        delete window.startNode;
+        delete window.conn;
+    }
 
 
 }
