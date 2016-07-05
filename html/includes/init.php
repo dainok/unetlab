@@ -132,7 +132,7 @@ if (!isset($node_templates)) {
 		'vyos'			=>	'VyOS',
 		//'esxi'		=>	'VMware ESXi',
 		'win'			=>	'Windows',
-		'vpcs'			=>	'Virtual PC'
+		'vpcs'			=>	'Virtual PC (VPCS)'
 	);
 }
 
