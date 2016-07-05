@@ -107,8 +107,8 @@ function addModalWide(title, body, footer, property) {
     var prop = property || "";
     console.log("### title is", title);
     var addittionalHeaderBtns = "";
-    if (title.toUpperCase() == "STARTUP-CONFIGS" || title.toUpperCase() == "CONFIGURED NODES" ||
-        title.toUpperCase() == "CONFIGURED TEXT OBJECTS" ||
+    if (title.toUpperCase() == "STARTUP-CONFIGS" || title.toUpperCase() == "CONFIGURED NODES" || 
+        title.toUpperCase() == "CONFIGURED TEXT OBJECTS" || 
         title.toUpperCase() == "CONFIGURED NETWORKS" || title.toUpperCase() == "CONFIGURED NODES" ||
         title.toUpperCase() == "STATUS" || title.toUpperCase() == "PICTURES") {
         addittionalHeaderBtns = '<i title="Make transparent" class="glyphicon glyphicon-certificate pull-right action-changeopacity"></i>'
@@ -506,7 +506,7 @@ function form2Array(form_name) {
 // HTML Form to array by row
 function form2ArrayByRow(form_name, id) {
     var form_array = {};
-
+    
     $('form :input[name^="' + form_name + '["][data-path="' + id +'"]').each(function (id, object) {
         // INPUT name is in the form of "form_name[value]", get value only
         form_array[$(this).attr('name').substr(form_name.length + 1, $(this).attr('name').length - form_name.length - 2)] = $(this).val();
@@ -674,7 +674,7 @@ function deleteSingleNetworks() {
     var deferred = $.Deferred();
     var networksArr=[];
 
-    $.when(getNetworks())
+     $.when(getNetworks())
         .then(function (networks) {
             var deleted = [];
             networksArr = networks;
@@ -687,13 +687,13 @@ function deleteSingleNetworks() {
                 }
             });
 
-            return $.when.apply(this, deleted)
+              return $.when.apply(this, deleted)
         }).done(function(){
 
-            deferred.resolve(networksArr);
-        }).fail(function (message) {
-            deferred.reject(message);
-        });
+         deferred.resolve(networksArr);
+     }).fail(function (message) {
+         deferred.reject(message);
+     });
 
     return deferred.promise();
 }
@@ -1541,7 +1541,7 @@ function recursive_start(nodes, i) {
             if (data['status'] == 'success') {
                 logger(1, 'DEBUG: node(s) started.');
                 addMessage('success', nodes[Object.keys(nodes)[i]]['name'] + ': ' + MESSAGES[76]);
-
+                
                 //set start status
             } else {
                 // Application error
@@ -2000,7 +2000,7 @@ function printFormCustomShape(values) {
         '<div class="col-md-8 col-md-offset-1 form-group">' +
         '<label class="col-md-3 control-label form-group-addon">Name</label>' +
         '<div class="col-md-5">' +
-        '<input type="text" class="form-control shape_name" placeholder="Name" required>' +
+        '<input type="text" class="form-control shape_name" placeholder="Name">' +
         '</div>' +
         '</div> <br>' +
         '<div class="col-md-8 col-md-offset-1 form-group">' +
@@ -2056,7 +2056,7 @@ function printFormText(values) {
         , fontStyles = ['normal', 'bold', 'italic']
         ;
 
-    var html = '<form id="main-modal" class="container col-md-12 col-lg-12 add-text-form">' +
+  var html = '<form id="main-modal" class="container col-md-12 col-lg-12 add-text-form">' +
         '<div class="row">' +
         '<div class="col-md-12 col-md-offset-0 form-group">' +
         '<label class="col-md-3 control-label form-group-addon">Text</label>' +
@@ -2090,7 +2090,7 @@ function printFormText(values) {
         '<input type="color" class="form-control text_background_color">' +
         '</div>' +
         '</div> <br>' +
-        '<button type="submit" class="btn btn-aqua col-md-offset-1">' + MESSAGES[47] + '</button>' +
+         '<button type="submit" class="btn btn-aqua col-md-offset-1">' + MESSAGES[47] + '</button>' +
         '<button type="button" class="btn btn-grey" data-dismiss="modal">' + MESSAGES[18] + '</button>' +
         '</div>' +
         '<input  type="text" class="hide left-coordinate" value="' + left + '">' +
@@ -2482,7 +2482,7 @@ function printLabTopology() {
     $("#lab-sidebar *").hide();
 
 
-    $.when(
+     $.when(
         getNetworks(null),
         getNodes(null),
         getTopology(),
@@ -2490,276 +2490,276 @@ function printLabTopology() {
     ).done(function (networks, nodes, topology, textObjects) {
 
 
-            var networkImgs = []
-                , nodesImgs = []
-                , textObjectsCount = Object.keys(textObjects).length
-                ;
+        var networkImgs = []
+            , nodesImgs = []
+            , textObjectsCount = Object.keys(textObjects).length
+            ;
 
-            progressbarMax = Object.keys(networks).length + Object.keys(nodes).length + Object.keys(textObjects).length;
-            $(".progress-bar").attr("aria-valuemax", progressbarMax);
+        progressbarMax = Object.keys(networks).length + Object.keys(nodes).length + Object.keys(textObjects).length;
+        $(".progress-bar").attr("aria-valuemax", progressbarMax);
 
-            $.each(networks, function (key, value) {
-                var icon;
-                var unusedClass='';
+        $.each(networks, function (key, value) {
+            var icon;
+            var unusedClass='';
 
-                if (value['type'] == 'bridge') {
-                    icon = 'lan.png';
-                    unusedClass = ' unused ';
-                } else if (value['type'] == 'ovs') {
-                    icon = 'lan.png';
+            if (value['type'] == 'bridge') {
+                icon = 'lan.png';
+                unusedClass = ' unused ';
+            } else if (value['type'] == 'ovs') {
+                icon = 'lan.png';
 
-                } else {
-                    icon = 'cloud.png';
-                }
-
-
-                $labViewport.append(
-                    '<div id="network' + value['id'] + '" ' +
-                    'class="context-menu network network' + value['id'] + ' network_frame '+unusedClass+' " ' +
-                    'style="top: ' + value['top'] + 'px; left: ' + value['left'] + 'px" ' +
-                    'data-path="' + value['id'] + '" ' +
-                    'data-name="' + value['name'] + '">' +
-                    '<div class="network_name">' + value['name'] + '</div>' +
-                    '</div>');
-
-                networkImgs.push($.Deferred(function (defer) {
-                    var img = new Image();
-
-                    img.onload = resolve;
-                    img.onerror = resolve;
-                    img.onabort = resolve;
-
-                    img.src = "/images/" + icon;
-
-                    $(img).prependTo("#network" + value['id']);
-
-                    function resolve(image) {
-                        img.onload = null;
-                        img.onerror = null;
-                        img.onabort = null;
-                        defer.resolve(image);
-                    }
-                }));
-
-                $(".progress-bar").css("width", ++progressbarValue / progressbarMax * 100 + "%");
-
-
-
-            });
-            $.each(nodes, function (key, value) {
-                $labViewport.append(
-                    '<div id="node' + value['id'] + '" ' +
-                    'class="context-menu node node' + value['id'] + ' node_frame" ' +
-                    'style="top: ' + value['top'] + 'px; left: ' + value['left'] + 'px;" ' +
-                    'data-path="' + value['id'] + '" ' +
-                    'data-status="' + value['status'] + '" ' +
-                    'data-name="' + value['name'] + '">' +
-                    '<a href="' + value['url'] + '">' +
-                    '</a>' +
-                    '<div class="node_name"><i class="node' + value['id'] + '_status"></i> ' + value['name'] + '</div>' +
-                    '</div>');
-
-                nodesImgs.push($.Deferred(function (defer) {
-                    var img = new Image();
-
-                    img.onload = resolve;
-                    img.onerror = resolve;
-                    img.onabort = resolve;
-
-                    img.src = "/images/icons/" + value['icon'];
-
-                    $(img).appendTo("#node" + value['id'] + " a");
-
-                    function resolve(image) {
-                        img.onload = null;
-                        img.onerror = null;
-                        img.onabort = null;
-                        defer.resolve(image);
-                    }
-                }));
-
-                $(".progress-bar").css("width", ++progressbarValue / progressbarMax * 100 + "%");
-            });
-
-            //add shapes from server to viewport
-            $.each(textObjects, function (key, value) {
-                getTextObject(value['id']).done(function (textObject) {
-                    $(".progress-bar").css("width", ++progressbarValue / progressbarMax * 100 + "%");
-                    if (--textObjectsCount === 0) {
-                        labTextObjectsResolver.resolve();
-                    }
-
-                    var $newTextObject = $(textObject['data']);
-
-                    if ($newTextObject.attr("id").indexOf("customShape") !== -1) {
-                        $newTextObject.attr("id", "customShape" + textObject.id);
-                        $newTextObject.attr("data-path", textObject.id);
-                        $labViewport.prepend($newTextObject);
-
-                        $newTextObject
-                            .draggable({
-                                stop: textObjectDragStop
-                            })
-                            .resizable().resizable("destroy")
-                            .resizable({
-                                autoHide: true,
-                                resize: function (event, ui) {
-                                    textObjectResize(event, ui, {"shape_border_width": 5});
-                                },
-                                stop: textObjectDragStop
-                            });
-                    }
-                    else if ($newTextObject.attr("id").indexOf("customText") !== -1) {
-                        $newTextObject.attr("id", "customText" + textObject.id);
-                        $newTextObject.attr("data-path", textObject.id);
-                        $labViewport.prepend($newTextObject);
-
-                        $newTextObject
-                            .draggable({
-                                stop: textObjectDragStop
-                            })
-                            .resizable().resizable('destroy')
-                            .resizable({
-                                autoHide: true,
-                                resize: function (event, ui) {
-                                    textObjectResize(event, ui, {"shape_border_width": 5});
-                                },
-                                stop: textObjectDragStop
-                            });
-                    }
-                    else {
-                        return void 0;
-                    }
-                }).fail(function () {
-                    logger(1, 'DEBUG: Failed to load Text Object' + value['name'] + '!');
-                });
-            });
-            if (Object.keys(textObjects).length === 0) {
-                labTextObjectsResolver.resolve();
+            } else {
+                icon = 'cloud.png';
             }
 
-            $.when.apply($, networkImgs.concat(nodesImgs)).done(function () {
-                // Drawing topology
-                jsPlumb.ready(function () {
-                    // Defaults
-                    jsPlumb.importDefaults({
-                        Anchor: 'Continuous',
-                        Connector: ['Straight'],
-                        Endpoint: 'Blank',
-                        PaintStyle: {lineWidth: 2, strokeStyle: '#58585a'},
-                        cssClass: 'link'
-                    });
 
-                    // Create jsPlumb topology
-                    var lab_topology = jsPlumb.getInstance();
-                    lab_topology.setContainer($("#lab-viewport"));
-                    lab_topology.importDefaults({
-                        Anchor: 'Continuous',
-                        Connector: ['Straight'],
-                        Endpoint: 'Blank',
-                        PaintStyle: {lineWidth: 2, strokeStyle: '#58585a'},
-                        cssClass: 'link'
-                    });
+            $labViewport.append(
+                '<div id="network' + value['id'] + '" ' +
+                'class="context-menu network network' + value['id'] + ' network_frame '+unusedClass+' " ' +
+                'style="top: ' + value['top'] + 'px; left: ' + value['left'] + 'px" ' +
+                'data-path="' + value['id'] + '" ' +
+                'data-name="' + value['name'] + '">' +
+                '<div class="network_name">' + value['name'] + '</div>' +
+                '</div>');
 
-                    // Read privileges and set specific actions/elements
-                    if (ROLE == 'admin' || ROLE == 'editor') {
-                        // Nodes and networks are draggable within a grid
-                        lab_topology.draggable($('.node_frame, .network_frame'), {grid: [10, 10]});
-                    }
+            networkImgs.push($.Deferred(function (defer) {
+                var img = new Image();
 
-                    $.each(topology, function (id, link) {
-                        var type = link['type'],
-                            source = link['source'],
-                            source_label = link['source_label'],
-                            destination = link['destination'],
-                            destination_label = link['destination_label'],
-                            src_label = ["Label"],
-                            dst_label = ["Label"];
+                img.onload = resolve;
+                img.onerror = resolve;
+                img.onabort = resolve;
 
-                        if (type == 'ethernet') {
-                            if (source_label != '') {
-                                src_label.push({
-                                    label: source_label,
-                                    location: 0.15,
-                                    cssClass: 'node_interface ' + source + ' ' + destination
-                                });
-                            } else {
-                                src_label.push(Object());
-                            }
-                            if (destination_label != '') {
-                                dst_label.push({
-                                    label: destination_label,
-                                    location: 0.85,
-                                    cssClass: 'node_interface ' + source + ' ' + destination
-                                });
-                            } else {
-                                dst_label.push(Object());
-                            }
+                img.src = "/images/" + icon;
+
+                $(img).prependTo("#network" + value['id']);
+
+                function resolve(image) {
+                    img.onload = null;
+                    img.onerror = null;
+                    img.onabort = null;
+                    defer.resolve(image);
+                }
+            }));
+
+            $(".progress-bar").css("width", ++progressbarValue / progressbarMax * 100 + "%");
 
 
-                            lab_topology.connect({
-                                source: source,       // Must attach to the IMG's parent or not printed correctly
-                                target: destination,  // Must attach to the IMG's parent or not printed correctly
-                                cssClass: source + ' ' + destination + ' frame_ethernet',
-                                overlays: [src_label, dst_label]
-                            });
-                        } else {
+
+        });
+        $.each(nodes, function (key, value) {
+            $labViewport.append(
+                '<div id="node' + value['id'] + '" ' +
+                'class="context-menu node node' + value['id'] + ' node_frame" ' +
+                'style="top: ' + value['top'] + 'px; left: ' + value['left'] + 'px;" ' +
+                'data-path="' + value['id'] + '" ' +
+                'data-status="' + value['status'] + '" ' +
+                'data-name="' + value['name'] + '">' +
+                '<a href="' + value['url'] + '">' +
+                '</a>' +
+                '<div class="node_name"><i class="node' + value['id'] + '_status"></i> ' + value['name'] + '</div>' +
+                '</div>');
+
+            nodesImgs.push($.Deferred(function (defer) {
+                var img = new Image();
+
+                img.onload = resolve;
+                img.onerror = resolve;
+                img.onabort = resolve;
+
+                img.src = "/images/icons/" + value['icon'];
+
+                $(img).appendTo("#node" + value['id'] + " a");
+
+                function resolve(image) {
+                    img.onload = null;
+                    img.onerror = null;
+                    img.onabort = null;
+                    defer.resolve(image);
+                }
+            }));
+
+            $(".progress-bar").css("width", ++progressbarValue / progressbarMax * 100 + "%");
+        });
+
+        //add shapes from server to viewport
+        $.each(textObjects, function (key, value) {
+            getTextObject(value['id']).done(function (textObject) {
+                $(".progress-bar").css("width", ++progressbarValue / progressbarMax * 100 + "%");
+                if (--textObjectsCount === 0) {
+                    labTextObjectsResolver.resolve();
+                }
+
+                var $newTextObject = $(textObject['data']);
+
+                if ($newTextObject.attr("id").indexOf("customShape") !== -1) {
+                    $newTextObject.attr("id", "customShape" + textObject.id);
+                    $newTextObject.attr("data-path", textObject.id);
+                    $labViewport.prepend($newTextObject);
+
+                    $newTextObject
+                        .draggable({
+                            stop: textObjectDragStop
+                        })
+                        .resizable().resizable("destroy")
+                        .resizable({
+                            autoHide: true,
+                            resize: function (event, ui) {
+                                textObjectResize(event, ui, {"shape_border_width": 5});
+                            },
+                            stop: textObjectDragStop
+                        });
+                }
+                else if ($newTextObject.attr("id").indexOf("customText") !== -1) {
+                    $newTextObject.attr("id", "customText" + textObject.id);
+                    $newTextObject.attr("data-path", textObject.id);
+                    $labViewport.prepend($newTextObject);
+
+                    $newTextObject
+                        .draggable({
+                            stop: textObjectDragStop
+                        })
+                        .resizable().resizable('destroy')
+                        .resizable({
+                            autoHide: true,
+                            resize: function (event, ui) {
+                                textObjectResize(event, ui, {"shape_border_width": 5});
+                            },
+                            stop: textObjectDragStop
+                        });
+                }
+                else {
+                    return void 0;
+                }
+            }).fail(function () {
+                logger(1, 'DEBUG: Failed to load Text Object' + value['name'] + '!');
+            });
+        });
+        if (Object.keys(textObjects).length === 0) {
+            labTextObjectsResolver.resolve();
+        }
+
+        $.when.apply($, networkImgs.concat(nodesImgs)).done(function () {
+            // Drawing topology
+            jsPlumb.ready(function () {
+                // Defaults
+                jsPlumb.importDefaults({
+                    Anchor: 'Continuous',
+                    Connector: ['Straight'],
+                    Endpoint: 'Blank',
+                    PaintStyle: {lineWidth: 2, strokeStyle: '#58585a'},
+                    cssClass: 'link'
+                });
+
+                // Create jsPlumb topology
+                var lab_topology = jsPlumb.getInstance();
+                lab_topology.setContainer($("#lab-viewport"));
+                lab_topology.importDefaults({
+                    Anchor: 'Continuous',
+                    Connector: ['Straight'],
+                    Endpoint: 'Blank',
+                    PaintStyle: {lineWidth: 2, strokeStyle: '#58585a'},
+                    cssClass: 'link'
+                });
+
+                // Read privileges and set specific actions/elements
+                if (ROLE == 'admin' || ROLE == 'editor') {
+                    // Nodes and networks are draggable within a grid
+                    lab_topology.draggable($('.node_frame, .network_frame'), {grid: [10, 10]});
+                }
+
+                $.each(topology, function (id, link) {
+                    var type = link['type'],
+                        source = link['source'],
+                        source_label = link['source_label'],
+                        destination = link['destination'],
+                        destination_label = link['destination_label'],
+                        src_label = ["Label"],
+                        dst_label = ["Label"];
+
+                    if (type == 'ethernet') {
+                        if (source_label != '') {
                             src_label.push({
                                 label: source_label,
                                 location: 0.15,
                                 cssClass: 'node_interface ' + source + ' ' + destination
                             });
+                        } else {
+                            src_label.push(Object());
+                        }
+                        if (destination_label != '') {
                             dst_label.push({
                                 label: destination_label,
                                 location: 0.85,
                                 cssClass: 'node_interface ' + source + ' ' + destination
                             });
-
-                            lab_topology.connect({
-                                source: source,       // Must attach to the IMG's parent or not printed correctly
-                                target: destination,  // Must attach to the IMG's parent or not printed correctly
-                                cssClass: source + " " + destination + ' frame_serial',
-                                paintStyle: {lineWidth: 2, strokeStyle: "#ffcc00"},
-                                overlays: [src_label, dst_label]
-                            });
+                        } else {
+                            dst_label.push(Object());
                         }
 
-                        // If destination is a network, remove the 'unused' class
-                        if (destination.substr(0, 7) == 'network') {
-                            $('.' + destination).removeClass('unused');
-                        }
+                     
+                        lab_topology.connect({
+                            source: source,       // Must attach to the IMG's parent or not printed correctly
+                            target: destination,  // Must attach to the IMG's parent or not printed correctly
+                            cssClass: source + ' ' + destination + ' frame_ethernet',
+                            overlays: [src_label, dst_label]
+                        });
+                    } else {
+                        src_label.push({
+                            label: source_label,
+                            location: 0.15,
+                            cssClass: 'node_interface ' + source + ' ' + destination
+                        });
+                        dst_label.push({
+                            label: destination_label,
+                            location: 0.85,
+                            cssClass: 'node_interface ' + source + ' ' + destination
+                        });
+
+                        lab_topology.connect({
+                            source: source,       // Must attach to the IMG's parent or not printed correctly
+                            target: destination,  // Must attach to the IMG's parent or not printed correctly
+                            cssClass: source + " " + destination + ' frame_serial',
+                            paintStyle: {lineWidth: 2, strokeStyle: "#ffcc00"},
+                            overlays: [src_label, dst_label]
+                        });
+                    }
+
+                    // If destination is a network, remove the 'unused' class
+                    if (destination.substr(0, 7) == 'network') {
+                        $('.' + destination).removeClass('unused');
+                    }
 
 
-                    });
-
-                    // Remove unused elements
-                    $('.unused').remove();
-
-                    printLabStatus();
-
-                    // Move elements under the topology node
-                    $('._jsPlumb_connector, ._jsPlumb_overlay, ._jsPlumb_endpoint_anchor_').detach().appendTo('#lab-viewport');
-                    $labViewport.data('refreshing', false);
-                    labNodesResolver.resolve();
                 });
-            }).fail(function () {
-                logger(1, "DEBUG: not all images of networks or nodes loaded");
-                $('#lab-viewport').data('refreshing', false);
-                labNodesResolver.reject();
-                labTextObjectsResolver.reject();
+
+                // Remove unused elements
+                $('.unused').remove();
+
+                printLabStatus();
+
+                // Move elements under the topology node
+                $('._jsPlumb_connector, ._jsPlumb_overlay, ._jsPlumb_endpoint_anchor_').detach().appendTo('#lab-viewport');
+                $labViewport.data('refreshing', false);
+                labNodesResolver.resolve();
             });
-        }).fail(function (message1, message2, message3) {
-            if (message1 != null) {
-                addModalError(message1);
-            } else if (message2 != null) {
-                addModalError(message2)
-            } else {
-                addModalError(message3)
-            }
+        }).fail(function () {
+            logger(1, "DEBUG: not all images of networks or nodes loaded");
             $('#lab-viewport').data('refreshing', false);
             labNodesResolver.reject();
             labTextObjectsResolver.reject();
         });
+    }).fail(function (message1, message2, message3) {
+        if (message1 != null) {
+            addModalError(message1);
+        } else if (message2 != null) {
+            addModalError(message2)
+        } else {
+            addModalError(message3)
+        }
+        $('#lab-viewport').data('refreshing', false);
+        labNodesResolver.reject();
+        labTextObjectsResolver.reject();
+    });
 
 
     $.when(labNodesResolver, labTextObjectsResolver).done(function () {
@@ -2771,7 +2771,7 @@ function printLabTopology() {
 
             var active = localStorage.getItem('action-nodelink');
 
-            $('.action-nodelink').toggleClass('active',(active=='true'));
+           $('.action-nodelink').toggleClass('active',(active=='true'));
 
         })
 
@@ -2872,7 +2872,7 @@ function createNodeListRow(template, id){
         } else{
             value_serial = "n/a";
         }
-
+        
         // TODO: this event is called twice
         id = (id == null) ? '' : id;
         var html_data = '<tr><input name="node[type]" data-path="' + id + '" value="' + template_values['type'] + '" type="hidden"/>';
@@ -2881,10 +2881,10 @@ function createNodeListRow(template, id){
 
         // node id
         html_data += '<td><input class="hide-border" style="width: 20px;" value="' + id + '" readonly/></td>';
-
+        
         //node name
         html_data += '<td><input class="configured-nodes-input" data-path="' + id + '" name="node[name]" value="' + value_name + '" type="text" /></td>';
-
+        
         //node template
         html_data += '<td><input class="hide-border" data-path="' + id + '" name="node[template]" value="' + template + '" readonly/></td>';
 
@@ -2957,15 +2957,15 @@ function createNodeListRow(template, id){
 
         //node actions
         html_data += '<td><div class="action-controls">'+
-        '<a class="action-nodestart" data-path="' + id + '" data-name="' + checkTemplateValue(template_values['options'],'name') + '" href="javascript:void(0)" title="' + MESSAGES[66] + '"><i class="glyphicon glyphicon-play"></i></a>'+
-        '<a class="action-nodestop" data-path="' + id + '" data-name="' + checkTemplateValue(template_values['options'],'name') + '" href="javascript:void(0)" title="' + MESSAGES[67] + '"><i class="glyphicon glyphicon-stop"></i></a>'+
-        '<a class="action-nodewipe" data-path="' + id + '" data-name="' + checkTemplateValue(template_values['options'],'name') + '" href="javascript:void(0)" title="' + MESSAGES[68] + '"><i class="glyphicon glyphicon-erase"></i></a>'
+                         '<a class="action-nodestart" data-path="' + id + '" data-name="' + checkTemplateValue(template_values['options'],'name') + '" href="javascript:void(0)" title="' + MESSAGES[66] + '"><i class="glyphicon glyphicon-play"></i></a>'+
+                         '<a class="action-nodestop" data-path="' + id + '" data-name="' + checkTemplateValue(template_values['options'],'name') + '" href="javascript:void(0)" title="' + MESSAGES[67] + '"><i class="glyphicon glyphicon-stop"></i></a>'+
+                         '<a class="action-nodewipe" data-path="' + id + '" data-name="' + checkTemplateValue(template_values['options'],'name') + '" href="javascript:void(0)" title="' + MESSAGES[68] + '"><i class="glyphicon glyphicon-erase"></i></a>'
         if (ROLE == 'admin' || ROLE == 'editor') {
             html_data += '<a class="action-nodeexport" data-path="' + id + '" data-name="' + checkTemplateValue(template_values['options'],'name') + '" href="javascript:void(0)" title="' + MESSAGES[69] + '"><i class="glyphicon glyphicon-save"></i></a> '+
-            '<a class="action-nodeinterfaces" data-path="' + id + '" data-name="' + checkTemplateValue(template_values['options'],'name') + '" href="javascript:void(0)" title="' + MESSAGES[72] + '"><i class="glyphicon glyphicon-transfer"></i></a>'+
-            '<a class="action-nodeedit" data-path="' + id + '" data-name="' + checkTemplateValue(template_values['options'],'name') + '" href="javascript:void(0)" title="' + MESSAGES[71] + '"><i class="glyphicon glyphicon-edit"></i></a>'+
-            '<a class="action-nodedelete" data-path="' + id + '" data-name="' + checkTemplateValue(template_values['options'],'name') + '" href="javascript:void(0)" title="' + MESSAGES[65] + '"><i class="glyphicon glyphicon-trash"></i></a>';
-        }
+                         '<a class="action-nodeinterfaces" data-path="' + id + '" data-name="' + checkTemplateValue(template_values['options'],'name') + '" href="javascript:void(0)" title="' + MESSAGES[72] + '"><i class="glyphicon glyphicon-transfer"></i></a>'+
+                         '<a class="action-nodeedit" data-path="' + id + '" data-name="' + checkTemplateValue(template_values['options'],'name') + '" href="javascript:void(0)" title="' + MESSAGES[71] + '"><i class="glyphicon glyphicon-edit"></i></a>'+
+                         '<a class="action-nodedelete" data-path="' + id + '" data-name="' + checkTemplateValue(template_values['options'],'name') + '" href="javascript:void(0)" title="' + MESSAGES[65] + '"><i class="glyphicon glyphicon-trash"></i></a>';
+        } 
         html_data += '</div></td></tr>';
         defer.resolve({"html": html_data, "id": id});
     }).fail(function (message1, message2) {
@@ -3000,7 +3000,7 @@ function printListNodes(nodes) {
 
         $.when(createNodeListRow(value['template'], value['id'])).done(function (data) {
             html_rows.push(data);
-
+            
             defer.resolve();
         });
         return defer;
@@ -3057,15 +3057,12 @@ function printListTextobjects(textobjects) {
             '<td>' + text + '</td>' +
             '<td>';
         if (ROLE != "user") {
-            body +=       '<a class="action-textobjectedit" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="javascript:void(0)" title="' + MESSAGES[71] + '">' +
-            '<i class="glyphicon glyphicon-edit"></i>' +
-            '</a>' +
-            '<a class="action-textobjectdelete" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="javascript:void(0)" title="' + MESSAGES[65] + '">' +
-            '<i class="glyphicon glyphicon-trash"></i>' +
-            '</a>'
+             body += '<a class="action-textobjectdelete" data-path="' + value['id'] + '" data-name="' + value['name'] + '" href="javascript:void(0)" title="' + MESSAGES[65] + '">' +
+                '<i class="glyphicon glyphicon-trash" style="margin-left:20px;"></i>' +
+                '</a>'
         }
         body += '</td>' +
-        '</tr>';
+            '</tr>';
     });
     body += '</tbody></table></div>';
     addModalWide(MESSAGES[150], body, '');
@@ -3197,7 +3194,7 @@ function printPageLabList(folder) {
             bodyAddClass('folders');
             // Extend height to the bottom if shorter
             autoheight();
-
+            
         },
         error: function (data) {
             // Server error
@@ -3658,7 +3655,7 @@ function createTextObject(newData) {
         success: function (data) {
             if (data['status'] == 'success') {
                 logger(1, 'DEBUG: create shape ' + 'for lab "' + lab_filename + '".');
-                deferred.resolve(data['data']);
+                deferred.resolve(data['result']);
             } else {
                 // Application error
                 logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
@@ -3811,15 +3808,15 @@ function printFormEditCustomShape(id) {
     $('.customShape').each(function (index) {
         $(this).removeClass('in-editing');
     });
-
-    var borderTypes = ['solid', 'dashed']
+    getTextObject(id).done(function(res){
+        var borderTypes = ['solid', 'dashed']
         , firstShapeValues = {}
         , shape
         , transparent = false
         , colorDigits
         , bgColor
         , html =
-            '<form id="main-modal-edit" class="container col-md-12 col-lg-12 edit-custom-shape-form" data-path="' + id + '">' +
+        '<form id="main-modal-edit" class="container col-md-12 col-lg-12 edit-custom-shape-form" data-path="' + id + '">' +
             '<div class="row col-md-9 top-part">' +
             '<label class="edit-custom-shape-label">Edit: ' + id + '</label><br>' +
             '<div class="form-group">' +
@@ -3851,6 +3848,10 @@ function printFormEditCustomShape(id) {
             '<label class="control-label form-group-addon">Rotate</label>' +
             '<input type="number" class="form-control shape-rotation-input" data-path="' + id + '" min="-360" max="360" step="1">' +
             '</div>' +
+            '<div class="form-group">' +
+            '<label class="control-label form-group-addon">Name</label>' +
+            '<input type="text" class="form-control shape-name-input" data-path="' + id + '" >' +
+            '</div>' +
             '</div>' +
             '<div class="row col-md-3 btn-part">' +
             '<button type="button" class="btn btn-aqua edit-custom-shape-form-save" data-path="' + id + '">' + MESSAGES[47] + '</button>' +
@@ -3864,61 +3865,66 @@ function printFormEditCustomShape(id) {
             '<input type="hidden" class="firstShapeValues-rotation">' +
             '</form>';
 
-    $('#lab-viewport').append(html);
+        $('#lab-viewport').append(html);
 
-    for (var i = 0; i < borderTypes.length; i++) {
-        $('.edit-custom-shape-form .border-type-select').append($('<option></option>').val(borderTypes[i]).html(borderTypes[i]));
-    }
-
-    if ($("#customShape" + id + " svg").children().attr('stroke-dasharray')) {
-        $('.edit-custom-shape-form .border-type-select').val(borderTypes[1]);
-        firstShapeValues['border-types'] = borderTypes[1];
-    } else {
-        $('.edit-custom-shape-form .border-type-select').val(borderTypes[0]);
-        firstShapeValues['border-types'] = borderTypes[0];
-    }
-
-    bgColor = $("#customShape" + id + " svg").children().attr('fill');
-    colorDigits = /(.*?)rgba{0,1}\((\d+), (\d+), (\d+)\)/.exec(bgColor);
-    if (colorDigits === null) {
-        var ifHex = bgColor.indexOf('#');
-        if (ifHex < 0) {
-            transparent = true;
+        for (var i = 0; i < borderTypes.length; i++) {
+            $('.edit-custom-shape-form .border-type-select').append($('<option></option>').val(borderTypes[i]).html(borderTypes[i]));
         }
-    }
 
-    if (transparent) {
-        $('.edit-custom-shape-form .shape_background_transparent').addClass('active  btn-success').text('On');
-    } else {
-        $('.edit-custom-shape-form .shape_background_transparent').removeClass('active  btn-success').text('Off');
-    }
+        if ($("#customShape" + id + " svg").children().attr('stroke-dasharray')) {
+            $('.edit-custom-shape-form .border-type-select').val(borderTypes[1]);
+            firstShapeValues['border-types'] = borderTypes[1];
+        } else {
+            $('.edit-custom-shape-form .border-type-select').val(borderTypes[0]);
+            firstShapeValues['border-types'] = borderTypes[0];
+        }
 
-    firstShapeValues['shape-z-index'] = $('#customShape' + id).css('z-index');
-    firstShapeValues['shape-background-color'] = rgb2hex($("#customShape" + id + " svg").children().attr('fill'));
-    firstShapeValues['shape-border-color'] = rgb2hex($("#customShape" + id + " svg ").children().attr('stroke'));
-    firstShapeValues['shape-border-width'] = $("#customShape" + id + " svg").children().attr('stroke-width');
-    firstShapeValues['shape-rotation'] = getElementsAngle("#customShape" + id);
+        bgColor = $("#customShape" + id + " svg").children().attr('fill');
+        colorDigits = /(.*?)rgba{0,1}\((\d+), (\d+), (\d+)\)/.exec(bgColor);
+        if (colorDigits === null) {
+            var ifHex = bgColor.indexOf('#');
+            if (ifHex < 0) {
+                transparent = true;
+            }
+        }
 
-    // fill inputs
-    $('.edit-custom-shape-form .shape-z_index-input').val(firstShapeValues['shape-z-index'] - 1000);
-    $('.edit-custom-shape-form .shape_background_color').val(firstShapeValues['shape-background-color']);
-    $('.edit-custom-shape-form .shape_border_color').val(firstShapeValues['shape-border-color']);
-    $('.edit-custom-shape-form .shape_border_width').val(firstShapeValues['shape-border-width']);
-    $('.edit-custom-shape-form .shape-rotation-input').val(firstShapeValues['shape-rotation']);
+        if (transparent) {
+            $('.edit-custom-shape-form .shape_background_transparent').addClass('active  btn-success').text('On');
+        } else {
+            $('.edit-custom-shape-form .shape_background_transparent').removeClass('active  btn-success').text('Off');
+        }
 
-    // fill backup
-    $('.edit-custom-shape-form .firstShapeValues-z_index').val(firstShapeValues['shape-z-index']);
-    $('.edit-custom-shape-form .firstShapeValues-border-color').val(firstShapeValues['shape-border-color']);
-    $('.edit-custom-shape-form .firstShapeValues-background-color').val(firstShapeValues['shape-background-color']);
-    $('.edit-custom-shape-form .firstShapeValues-border-type').val(firstShapeValues['border-types']);
-    $('.edit-custom-shape-form .firstShapeValues-border-width').val(firstShapeValues['shape-border-width']);
-    $('.edit-custom-shape-form .firstShapeValues-rotation').val(firstShapeValues['shape-rotation']);
+        firstShapeValues['shape-name'] = res.name;
+        firstShapeValues['shape-z-index'] = $('#customShape' + id).css('z-index');
+        firstShapeValues['shape-background-color'] = rgb2hex($("#customShape" + id + " svg").children().attr('fill'));
+        firstShapeValues['shape-border-color'] = rgb2hex($("#customShape" + id + " svg ").children().attr('stroke'));
+        firstShapeValues['shape-border-width'] = $("#customShape" + id + " svg").children().attr('stroke-width');
+        firstShapeValues['shape-rotation'] = getElementsAngle("#customShape" + id);
+        // $("#customShape" + id ).attr('name');
 
-    if ($("#customShape" + id + " svg").children().attr('cx')) {
-        $('.edit-custom-shape-form .shape_border_width').val(firstShapeValues['shape-border-width'] * 2);
-        $('.edit-custom-shape-form .firstShapeValues-border-width').val(firstShapeValues['shape-border-width'] * 2);
-    }
-    $("#customShape" + id).addClass('in-editing');
+        // fill inputs
+        $('.edit-custom-shape-form .shape-z_index-input').val(firstShapeValues['shape-z-index'] - 1000);
+        $('.edit-custom-shape-form .shape_background_color').val(firstShapeValues['shape-background-color']);
+        $('.edit-custom-shape-form .shape_border_color').val(firstShapeValues['shape-border-color']);
+        $('.edit-custom-shape-form .shape_border_width').val(firstShapeValues['shape-border-width']);
+        $('.edit-custom-shape-form .shape-rotation-input').val(firstShapeValues['shape-rotation']);
+        $('.edit-custom-shape-form .shape-name-input').val(firstShapeValues['shape-name']);
+
+        // fill backup
+        $('.edit-custom-shape-form .firstShapeValues-z_index').val(firstShapeValues['shape-z-index']);
+        $('.edit-custom-shape-form .firstShapeValues-border-color').val(firstShapeValues['shape-border-color']);
+        $('.edit-custom-shape-form .firstShapeValues-background-color').val(firstShapeValues['shape-background-color']);
+        $('.edit-custom-shape-form .firstShapeValues-border-type').val(firstShapeValues['border-types']);
+        $('.edit-custom-shape-form .firstShapeValues-border-width').val(firstShapeValues['shape-border-width']);
+        $('.edit-custom-shape-form .firstShapeValues-rotation').val(firstShapeValues['shape-rotation']);
+
+        if ($("#customShape" + id + " svg").children().attr('cx')) {
+            $('.edit-custom-shape-form .shape_border_width').val(firstShapeValues['shape-border-width'] * 2);
+            $('.edit-custom-shape-form .firstShapeValues-border-width').val(firstShapeValues['shape-border-width'] * 2);
+        }
+        $("#customShape" + id).addClass('in-editing');
+    });
+    
 }
 
 // Edit Form: Text
@@ -3934,57 +3940,61 @@ function printFormEditText(id) {
         , colorDigits
         , bgColor
         , html =
-            '<form id="main-modal-edit" class="container col-md-12 col-lg-12 edit-custom-text-form"  data-path="' + id + '">' +
-            '<div class="row col-md-9  top-part">' +
-            '<label class="edit-custom-text-label">Edit: ' + id + '</label><br>' +
-            '<div class="form-group">' +
-            '<label class="control-label form-group-addon">Z-Index</label>' +
-            '<input type="number" class="form-control text-z_index-input" min="-100" max="100" step="1" data-path="' + id + '">' +
-            '</div>' +
-            '<div class="form-group">' +
-            '<label class="control-label form-group-addon">Text-align</label>' +
-            '<div class="btn-group">' +
-            '<button type="button" class="btn btn-default btn-align-left" data-path="' + id + '"><i class="glyphicon glyphicon-align-left"></i></button>' +
-            '<button type="button" class="btn btn-default btn-align-center" data-path="' + id + '"><i class="glyphicon glyphicon-align-center"></i></button>' +
-            '<button type="button" class="btn btn-default btn-align-right" data-path="' + id + '"><i class="glyphicon glyphicon-align-right"></i></button>' +
-            '</div>' +
-            '</div>' +
-            '<div class="form-group">' +
-            '<label class="control-label form-group-addon">Text-type</label>' +
-            '<div class="btn-group">' +
-            '<button type="button" class="btn btn-default btn-text-bold" data-path="' + id + '"><i class="glyphicon glyphicon-bold"></i></button>' +
-            '<button type="button" class="btn btn-default btn-text-italic" data-path="' + id + '"><i class="glyphicon glyphicon-italic"></i></button>' +
-            '</div>' +
-            '</div>' +
-            '<div class="form-group">' +
-            '<label class="control-label form-group-addon">Text-color</label>' +
-            '<input type="color" class="form-control text_color"  data-path="' + id + '">' +
-            '</div>' +
-            '<div class="form-group">' +
-            '<label class="control-label form-group-addon">Background-color</label> ' +
-            '<input type="color" class="form-control text_background_color"  data-path="' + id + '">' +
-            '</div>' +
-            '<div class="form-group">' +
-            '<label class="control-label form-group-addon">Transparent</label> ' +
-            '<button type="button" class="btn btn-default text_background_transparent" data-path="' + id + '"></button>' +
-            '</div>' +
-            '<div class="form-group">' +
-            '<label class="control-label form-group-addon">Rotate</label>' +
-            '<input type="number" class="form-control text-rotation-input"  data-path="' + id + '" min="-360" max="360" step="1">' +
-            '</div>' +
-            '</div>' +
-            '<div class="row col-md-3 btn-part">' +
-            '<button type="button" class="btn btn-aqua edit-custom-text-form-save" data-path="' + id + '">' + MESSAGES[47] + '</button>' +
-            '<button type="button" class="btn btn-grey cancelForm" data-path="' + id + '">' + MESSAGES[18] + '</button>' +
-            '</div>' +
-            '<input type="text" class="hide firstTextValues-z_index">' +
-            '<input type="text" class="hide firstTextValues-color">' +
-            '<input type="text" class="hide firstTextValues-background-color">' +
-            '<input type="text" class="hide firstTextValues-italic">' +
-            '<input type="text" class="hide firstTextValues-bold">' +
-            '<input type="text" class="hide firstTextValues-align">' +
-            '<input type="text" class="hide firstTextValues-rotation">' +
-            '</form>';
+  '<form id="main-modal-edit" class="container col-md-12 col-lg-12 edit-custom-text-form"  data-path="' + id + '">' +
+        '<div class="row col-md-9  top-part">' +
+        '<label class="edit-custom-text-label">Edit: ' + id + '</label><br>' +
+        '<div class="form-group">' +
+        '<label class="control-label form-group-addon">Z-Index</label>' +
+        '<input type="number" class="form-control text-z_index-input" min="-100" max="100" step="1" data-path="' + id + '">' +
+        '</div>' +
+        '<div class="form-group">' +
+        '<label class="control-label form-group-addon">Text-align</label>' +
+        '<div class="btn-group">' +
+        '<button type="button" class="btn btn-default btn-align-left" data-path="' + id + '"><i class="glyphicon glyphicon-align-left"></i></button>' +
+        '<button type="button" class="btn btn-default btn-align-center" data-path="' + id + '"><i class="glyphicon glyphicon-align-center"></i></button>' +
+        '<button type="button" class="btn btn-default btn-align-right" data-path="' + id + '"><i class="glyphicon glyphicon-align-right"></i></button>' +
+        '</div>' +
+        '</div>' +
+        '<div class="form-group">' +
+        '<label class="control-label form-group-addon">Text-type</label>' +
+        '<div class="btn-group">' +
+        '<button type="button" class="btn btn-default btn-text-bold" data-path="' + id + '"><i class="glyphicon glyphicon-bold"></i></button>' +
+        '<button type="button" class="btn btn-default btn-text-italic" data-path="' + id + '"><i class="glyphicon glyphicon-italic"></i></button>' +
+        '</div>' +
+        '</div>' +
+        '<div class="form-group">' +
+        '<label class="control-label form-group-addon">Text-color</label>' +
+        '<input type="color" class="form-control text_color"  data-path="' + id + '">' +
+        '</div>' +
+        '<div class="form-group">' +
+        '<label class="control-label form-group-addon">Background-color</label> ' +
+        '<input type="color" class="form-control text_background_color"  data-path="' + id + '">' +
+        '</div>' +
+        '<div class="form-group">' +
+        '<label class="control-label form-group-addon">Transparent</label> ' +
+        '<button type="button" class="btn btn-default text_background_transparent" data-path="' + id + '"></button>' +
+        '</div>' +
+        '<div class="form-group">' +
+        '<label class="control-label form-group-addon">Rotate</label>' +
+        '<input type="number" class="form-control text-rotation-input"  data-path="' + id + '" min="-360" max="360" step="1">' +
+        '</div>' +
+        '<div class="form-group">' +
+        '<label class="control-label form-group-addon">Name</label>' +
+        '<input type="text" class="form-control shape-name-input" data-path="' + id + '">' +
+        '</div>' +
+        '</div>' +
+        '<div class="row col-md-3 btn-part">' +
+        '<button type="button" class="btn btn-aqua edit-custom-text-form-save" data-path="' + id + '">' + MESSAGES[47] + '</button>' +
+        '<button type="button" class="btn btn-grey cancelForm" data-path="' + id + '">' + MESSAGES[18] + '</button>' +
+        '</div>' +
+        '<input type="text" class="hide firstTextValues-z_index">' +
+        '<input type="text" class="hide firstTextValues-color">' +
+        '<input type="text" class="hide firstTextValues-background-color">' +
+        '<input type="text" class="hide firstTextValues-italic">' +
+        '<input type="text" class="hide firstTextValues-bold">' +
+        '<input type="text" class="hide firstTextValues-align">' +
+        '<input type="text" class="hide firstTextValues-rotation">' +
+        '</form>';
 
     $('#lab-viewport').append(html);
 
@@ -4077,11 +4087,11 @@ function getElementsAngle(selector) {
     var el = document.querySelector(selector)
         , st = window.getComputedStyle(el, null)
         , tr = st.getPropertyValue("-webkit-transform") ||
-            st.getPropertyValue("-moz-transform") ||
-            st.getPropertyValue("-ms-transform") ||
-            st.getPropertyValue("-o-transform") ||
-            st.getPropertyValue("transform") ||
-            "FAIL";
+        st.getPropertyValue("-moz-transform") ||
+        st.getPropertyValue("-ms-transform") ||
+        st.getPropertyValue("-o-transform") ||
+        st.getPropertyValue("transform") ||
+        "FAIL";
 
     if (tr === "FAIL" || tr === "none") {
         return 0;
