@@ -2888,15 +2888,19 @@ function createNodeListRow(template, id){
         //node template
         html_data += '<td><input class="hide-border" data-path="' + id + '" name="node[template]" value="' + template + '" readonly/></td>';
 
-        //node image
-        html_data += '<td><select class="configured-nods-select form-control" data-path="' + id + '" name="node[image]">'
-        value_set = (node_values != null && template_values['options']['image'] && template_values['options']['image']['list']) ? node_values['image'] : "";
-        var options_arr = template_values['options']['image'] && template_values['options']['image']['list'] ? template_values['options']['image']['list'] : [];
-        $.each(options_arr, function (list_key, list_value) {
-            var selected = (list_key == value_set) ? 'selected ' : '';
-            html_data += '<option ' + selected + 'value="' + list_key + '">' + list_value + '</option>';
-        });
-        html_data += '</select></td>';
+        //node boot image
+        if(template == "vpcs"){
+            html_data += '<td><input class="configured-nodes-input short-input readonly" data-path="' + id + '" name="node[cpu]" value="n/a" type="text" readonly /></td>';
+        } else {
+            html_data += '<td><select class="configured-nods-select form-control" data-path="' + id + '" name="node[image]">'
+            value_set = (node_values != null && template_values['options']['image'] && template_values['options']['image']['list']) ? node_values['image'] : "";
+            var options_arr = template_values['options']['image'] && template_values['options']['image']['list'] ? template_values['options']['image']['list'] : [];
+            $.each(options_arr, function (list_key, list_value) {
+                var selected = (list_key == value_set) ? 'selected ' : '';
+                html_data += '<option ' + selected + 'value="' + list_key + '">' + list_value + '</option>';
+            });
+            html_data += '</select></td>';
+        }
 
         //node cpu
         readonlyAttr = (value_cpu && value_cpu != "n/a") ? "" : "readonly";
