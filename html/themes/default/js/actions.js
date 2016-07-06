@@ -1927,8 +1927,10 @@ $(document).on('submit', '#form-network-add, #form-network-edit', function (e) {
             success: function (data) {
                 if (data['status'] == 'success') {
                     logger(1, 'DEBUG: network "' + form_data['name'] + '" saved.');
+                    $(".network" + form_data['id'] + " td:nth-child(2)").text(form_data['name']);
+                    $(".network" + form_data['id'] + " td:nth-child(3)").text(form_data['type']);
+                    
                     // Close the modal
-
                     $('body').children('.modal').attr('skipRedraw', true);
                     $('body').children('.modal.second-win').modal('hide');
                     $('body').children('.modal.fade.in').focus();
