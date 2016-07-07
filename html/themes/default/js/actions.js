@@ -2054,7 +2054,7 @@ $(document).on('submit', '#form-node-add, #form-node-edit', function (e) {
                     $(".modal .node" + form_data['id'] + " td:nth-child(10)").text(form_data["serial"]);
                     $(".modal .node" + form_data['id'] + " td:nth-child(11)").text(form_data["console"]);
 
-                    $("#node" + form_data['id'] + " .node_name").html('<i class="node2_status glyphicon glyphicon-stop"></i>' + form_data['name'])
+                    $("#node" + form_data['id'] + " .node_name").html('<i class="node' + form_data['id'] + '_status glyphicon glyphicon-stop"></i>' + form_data['name'])
                     $("#node" + form_data['id'] + " a img").attr("src", "/images/icons/" + form_data['icon'])
 
                     $("#form-node-edit-table input[name='node[name]'][data-path='" + form_data['id'] + "']").val(form_data["name"])
