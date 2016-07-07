@@ -2919,7 +2919,11 @@ function createNodeListRow(template, id){
         html_data += '<td><input class="configured-nodes-input short-input ' + readonlyAttr + '" data-path="' + id + '" name="node[ram]" value="' + value_ram + '" type="text" ' + readonlyAttr + ' /></td>';
 
         //node ethernet
-        readonlyAttr = (value_ethernet && value_ethernet != "n/a") ? "" : "readonly";
+        if(template == "vpcs"){
+            readonlyAttr = "readonly";
+        } else {
+            readonlyAttr = (value_ethernet && value_ethernet != "n/a") ? "" : "readonly";
+        }
         html_data += '<td><input class="configured-nodes-input short-input ' + readonlyAttr + '" data-path="' + id + '" name="node[ethernet]" value="' + value_ethernet + '" type="text" ' + readonlyAttr + ' /></td>';
 
         //node serial
