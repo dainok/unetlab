@@ -35,7 +35,7 @@ $p['name'] = 'WSA';
 $p['icon'] = 'WSA.png';
 $p['cpu'] = 1;
 $p['ram'] = 4096; 
-$p['ethernet'] = 1; 
+$p['ethernet'] = 3; 
 $p['console'] = 'telnet'; 
 $p['qemu_arch'] = 'x86_64';
 $p['qemu_options'] = '-machine type=pc-1.0,accel=kvm -nographic -rtc base=utc';
