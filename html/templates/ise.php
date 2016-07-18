@@ -32,7 +32,7 @@
 
 $p['type'] = 'qemu';
 $p['name'] = 'ISE';
-$p['icon'] = 'Server.png';
+$p['icon'] = 'ISE.png';
 $p['cpu'] = 2;
 $p['ram'] = 4096; 
 $p['ethernet'] = 1; 
