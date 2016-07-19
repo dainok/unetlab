@@ -5,7 +5,7 @@ FILES=$(fgrep -Rl "@author Andrea Dainese" html wrappers scripts)
 
 AUTHOR="Andrea Dainese \<andrea.dainese@gmail.com\>"
 COPYRIGHT="2014-2016 Andrea Dainese"
-LICENSE="http:\/\/www.gnu.org\/licenses\/gpl.html"
+LICENSE="https:\/\/opensource.org\/licenses\/BSD-3-Clause"
 LINK="http:\/\/www.unetlab.com\/"
 
 #TODO  exiftool -owner='Andrea Dainese <andrea.dainese@gmail.com>' -copyright='Andrea Dainese <andrea.dainese@gmail.com>' -author='Eugenia Paffile <eugenia.paffile@gmail.com>' -comment='Part of UNetLab software (http://www.unetlab.com/)' *
