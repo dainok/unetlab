@@ -10,9 +10,9 @@
  * 
  * @author Andrea Dainese <andrea.dainese@gmail.com>
  * @copyright 2014-2016 Andrea Dainese
- * @license https://opensource.org/licenses/BSD-3-Clause
+ * @license BSD-3-Clause https://github.com/dainok/unetlab/blob/master/LICENSE
  * @link http://www.unetlab.com/
- * @version 20151019
+ * @version 20160719
  */ 
   
 $p['type'] = 'qemu'; 

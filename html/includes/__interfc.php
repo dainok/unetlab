@@ -8,9 +8,9 @@
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
  * @copyright 2014-2016 Andrea Dainese
- * @license https://opensource.org/licenses/BSD-3-Clause
+ * @license BSD-3-Clause https://github.com/dainok/unetlab/blob/master/LICENSE
  * @link http://www.unetlab.com/
- * @version 20151020
+ * @version 20160719
  * @property type $id Interface ID. It's mandatory and automatically set during contruction phase.
  * @property type $name Name of the interface. It's optional.
  * @property type $network_id Remote network ID for Ethernet interfaces. If not set, it's automatically set to 0.

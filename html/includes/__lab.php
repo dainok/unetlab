@@ -8,9 +8,9 @@
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
  * @copyright 2014-2016 Andrea Dainese
- * @license https://opensource.org/licenses/BSD-3-Clause
+ * @license BSD-3-Clause https://github.com/dainok/unetlab/blob/master/LICENSE
  * @link http://www.unetlab.com/
- * @version 20160706
+ * @version 20160719
  * @property type $author Author name of the lab. It's optional.
  * @property type $body Long text for lab usage. It's optional.
  * @property type $description Description of the lab. It's optional

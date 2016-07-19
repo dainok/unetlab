@@ -8,9 +8,9 @@
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
  * @copyright 2014-2016 Andrea Dainese
- * @license https://opensource.org/licenses/BSD-3-Clause
+ * @license BSD-3-Clause https://github.com/dainok/unetlab/blob/master/LICENSE
  * @link http://www.unetlab.com/
- * @version 20151113
+ * @version 20160719
  * @property type $count Total of connected nodes to this network. If not set, it's automatically set to 0.
  * @property type $id Network ID. Mandatory and set during construction phase.
  * @property type $left Left margin for visual position. It's optional.

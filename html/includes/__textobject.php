@@ -8,9 +8,9 @@
  *
  * @author Andrea Dainese <andrea.dainese@gmail.com>
  * @copyright 2014-2016 Andrea Dainese
- * @license https://opensource.org/licenses/BSD-3-Clause
+ * @license BSD-3-Clause https://github.com/dainok/unetlab/blob/master/LICENSE
  * @link http://www.unetlab.com/
- * @version 20160204
+ * @version 20160719
  * @property type $data of the object. It's mandatory.
  * @property type $id ID of the object. It's mandatory and automatically set during contruction phase.
  * @property type $name Name of the object. It's optional but suggested.
