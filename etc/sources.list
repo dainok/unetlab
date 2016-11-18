@@ -1,1 +1,1 @@
-deb http://www.unetlab.com/apt trusty rrlabs
+deb [arch=amd64] http://www.unetlab.com/apt trusty rrlabs
