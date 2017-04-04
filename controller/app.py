@@ -24,18 +24,33 @@ __copyright__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
 __license__ = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
 __revision__ = '20170403'
 
-import flask
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask.ext.restful import Api, Resource
 from config import *
-
-config_file = '/data/etc/controller.ini'
-
-app = flask.Flask(__name__)
+from models import *
 
 # Loading configuration from file
+config_file = '/data/etc/controller.ini'
 config = loadConfig(config_file)
+config_files = [ config_file ]
 
-print(config)
+# Creating the Flask app
+app = Flask(__name__)
+app.config.update(
+    DEBUG = config['app']['debug'],
+    TESTING = config['app']['testing'],
+    SQLALCHEMY_DATABASE_URI = config['app']['database_uri']
+)
+api = Api(app)
+db = SQLAlchemy(app)
+
+#api.add_resource(UserAPI, '/users/<int:id>', endpoint = 'user')
+
+@app.route('/api/users', methods = ['GET'])
+def apiUsers():
+    return User.query.get_or_404('username')
 
 if __name__ == '__main__':
-    app.run(host = '0.0.0.0', port = 5000, extra_files = [config_file], debug = True)
+    app.run(host = '0.0.0.0', port = config['app']['port'], extra_files = config_files)
 

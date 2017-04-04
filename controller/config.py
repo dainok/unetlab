@@ -14,13 +14,20 @@ def loadConfig(config_file):
             # Write an empty file
             open(config_file, 'a').close()
         except Exception as err:
-            # Cannot write the configuration file
+            # Cannot write configuration file
             sys.stderr.write('Cannot create configuration file "{}"\n'.format(config_file))
             sys.exit(1)
 
     # Loading Config
     config = configparser.ConfigParser()
     need_to_save = False
+    try:
+        # Loading configuration file
+        config.read(config_file)
+    except Exception as err:
+        # Cannot load configuration file
+        sys.stderr.write('Cannot load configuration file "{}"\n'.format(config_file))
+        sys.exit(1)
 
     # Setting default values
     if not config.has_section('app'):
@@ -33,7 +40,7 @@ def loadConfig(config_file):
         config.add_section('advanced')
         need_to_save = True
     if not config.has_option('app', 'database_uri'):
-        config['app']['database_uri'] = 'mysql://root:eve-ng@localhost/unetlab'
+        config['app']['database_uri'] = 'mysql://root:unetlab@localhost/unetlab'
         need_to_save = True
     if not config.has_option('app', 'debug'):
         config['app']['debug'] = 'False'
@@ -70,7 +77,7 @@ def loadConfig(config_file):
                 config.write(config_fd)
                 config_fd.close()
         except Exception as err:
-            # Cannot update the configuration file
+            # Cannot update configuration file
             sys.stderr.write('Cannot update configuration file "{}"\n'.format(config_file))
             sys.exit(1)
 
