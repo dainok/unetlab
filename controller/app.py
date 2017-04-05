@@ -26,9 +26,10 @@ __revision__ = '20170403'
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask.ext.restful import Api, Resource
+from flask_restful import Api, Resource
 from config import *
 from models import *
+from parsers import *
 
 # Loading configuration from file
 config_file = '/data/etc/controller.ini'
@@ -38,6 +39,7 @@ config_files = [ config_file ]
 # Creating the Flask app
 app = Flask(__name__)
 app.config.update(
+    BUNDLE_ERRORS = True,
     DEBUG = config['app']['debug'],
     TESTING = config['app']['testing'],
     SQLALCHEMY_DATABASE_URI = config['app']['database_uri']
@@ -45,11 +47,53 @@ app.config.update(
 api = Api(app)
 db = SQLAlchemy(app)
 
-#api.add_resource(UserAPI, '/users/<int:id>', endpoint = 'user')
+class User(Resource):
+    def get(self, username = None, page = 1):
+        if not username:
+            # List all users
+            users = UserTable.query.paginate(page, 10).items
+        else:
+            # List a single user if exists, else 404
+            users = [ UserTable.query.get_or_404(username) ]
+        data = {}
+        for user in users:
+            # Print each user and roles
+            data[user.username] = {
+                'username': user.username,
+                'name': user.name,
+                'email': user.email,
+                'labels': user.labels,
+                'roles': []
+            }
+            for role in user.roles:
+                data[user.username]['roles'].append(role.role)
+        return {
+            'status': 'success',
+            'data': data
+        }
+    def post(self):
+        args = user_parser.parse_args(strict=True)
+        user = {
+            'username': args['username'],
+            'password': args['password'],
+            'name': args['name'],
+            'email': args['email'],
+            'labels': args['labels'],
+            'roles': args['roles']
+        }
+        return {
+            'status': 'success',
+        }
 
-@app.route('/api/users', methods = ['GET'])
-def apiUsers():
-    return User.query.get_or_404('username')
+        
+        
+
+api.add_resource(User, '/api/v1/users', '/api/v1/users/<string:username>')
+
+
+#@app.route('/api/users', methods = ['GET'])
+#def apiUsers():
+#    return User.query.get_or_404('username')
 
 if __name__ == '__main__':
     app.run(host = '0.0.0.0', port = config['app']['port'], extra_files = config_files)

@@ -14,7 +14,7 @@ roles_to_users = db.Table(
     db.Column('username', db.String(255), db.ForeignKey('users.username')),
 )
 
-class ActiveNode(db.Model):
+class ActiveNodeTable(db.Model):
     __tablename__ = 'active_nodes'
     username = db.Column(db.String(255), db.ForeignKey('users.username'), primary_key = True)
     lab_id = db.Column(db.String(255), db.ForeignKey('labs.id'), primary_key = True)
@@ -24,7 +24,7 @@ class ActiveNode(db.Model):
     def __repr__(self):
         return '<ActiveNode(lab_id={},node_id={})>'.format(self.lab_id, self.node_id)
 
-class ActiveTopology(db.Model):
+class ActiveTopologyTable(db.Model):
     __tablename__ = 'active_topologies'
     username = db.Column(db.String(255), db.ForeignKey('users.username'), db.ForeignKey('users.username'))
     lab_id = db.Column(db.String(255), db.ForeignKey('users.username'), db.ForeignKey('labs.id'))
@@ -35,7 +35,7 @@ class ActiveTopology(db.Model):
     def __repr__(self):
         return '<Topology(src_id={}:{},dst_id={}:{}>'.format(self.src_id, self_src_if, self.dst_id, self.dst_if)
 
-class Controller(db.Model):
+class ControllerTable(db.Model):
     __tablename__ = 'controllers'
     id = db.Column(db.String(255), primary_key = True)
     inside_ip = db.Column(db.String(255))
@@ -44,7 +44,7 @@ class Controller(db.Model):
     def __repr__(self):
         return '<Controller(id={})>'.format(self.id)
 
-class Lab(db.Model):
+class LabTable(db.Model):
     __tablename__ = 'labs'
     id = db.Column(db.String(255), primary_key = True)
     name = db.Column(db.String(255))
@@ -53,23 +53,23 @@ class Lab(db.Model):
     def __repr__(self):
         return '<Lab(id={})>'.format(self.id)
 
-class Role(db.Model):
+class RoleTable(db.Model):
     __tablename__ = 'roles'
     role = db.Column(db.String(255), primary_key = True)
     access_to = db.Column(db.String(255))
     can_write = db.Column(db.Boolean())
-    users = db.relationship('User', secondary = roles_to_users, back_populates = 'roles')
+    users = db.relationship('UserTable', secondary = roles_to_users, back_populates = 'roles')
     def __repr__(self):
         return '<Role({})>'.format(self.role)
 
-class User(db.Model):
+class UserTable(db.Model):
     __tablename__ = 'users'
     username = db.Column(db.String(255), primary_key = True)
     password = db.Column(db.String(255))
     name = db.Column(db.String(255))
     email = db.Column(db.String(255), unique = True)
     labels = db.Column(db.Integer)
-    roles = db.relationship('Role', secondary = roles_to_users, back_populates = 'users')
+    roles = db.relationship('RoleTable', secondary = roles_to_users, back_populates = 'users')
     def __repr__(self):
         return '<User({})>'.format(self.username)
 
@@ -82,9 +82,9 @@ except Exception as err:
     sys.exit(1)
 
 # Adding admin role if not exist
-role = Role.query.get('admin')
+role = RoleTable.query.get('admin')
 if not role:
-    role = Role(
+    role = RoleTable(
         role = 'admin',
         access_to = '*',
         can_write = True
@@ -93,15 +93,15 @@ if not role:
     db.session.commit()
 
 # Adding admin user if not exists
-user = User.query.get('admin')
+user = UserTable.query.get('admin')
 if not user:
-    user = User(
+    user = UserTable(
         username = 'admin',
         password = hashlib.sha256('admin'.encode('utf-8')).hexdigest(),
         name = 'Default Administrator',
         email = 'admin@example.com',
         labels = -1,
-        roles = [Role.query.get('admin')]
+        roles = [RoleTable.query.get('admin')]
     )
     db.session.add(user)
     db.session.commit()
