@@ -6,6 +6,7 @@ __license__ = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
 __revision__ = '20170403'
 
 from flask_restful import reqparse
+from controller.catalog.models import *
 
 def type_label(arg):
     try:
@@ -28,7 +29,6 @@ def type_roles(arg):
     else:
         raise ValueError
 
-
 user_parser = reqparse.RequestParser()
 user_parser.add_argument('username', type = str, required = True, location = 'json', help = 'username cannot be blank')
 user_parser.add_argument('password', type = str, required = True, location = 'json', help = 'password cannot be blank')
@@ -36,4 +36,3 @@ user_parser.add_argument('name', type = str, required = True, location = 'json',
 user_parser.add_argument('email', type = str, required = True, location = 'json', help = 'email cannot be blank')
 user_parser.add_argument('labels', type = type_label, required = False, location = 'json', help = 'labels must be integer and greater than -1')
 user_parser.add_argument('roles', type = type_roles, required = False, location = 'json', help = 'roles must be a list of valid roles')
-

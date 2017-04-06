@@ -4,7 +4,6 @@ __copyright__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
 __license__ = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
 __revision__ = '20170403'
 
-
 def loadConfig(config_file):
     import configparser, os, sys
 
@@ -92,4 +91,3 @@ def loadConfig(config_file):
     result['advanced']['controller_length'] = config.getint('advanced', 'controller_length')
 
     return result
-
