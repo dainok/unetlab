@@ -12,14 +12,8 @@ from controller.catalog.models import *
 from controller.catalog.parsers import *
 
 class User(Resource):
-    decorator_auth = checkAuth(request.authorization.username, request.authorization.password)
-    decorator_authz = checkAuthz(request.authorization.username, ['admin'])
-    method_decorators = {
-        'get': [decorator_auth, decorator_authz],
-        'post': [decorator_auth, decorator_authz]
-    }
     def get(self, username = None, page = 1):
-        print(request.authorization)
+        checkAuthz(request, 'admin')
         if not username:
             # List all users
             users = UserTable.query.paginate(page, 10).items
