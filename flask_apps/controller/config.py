@@ -5,7 +5,7 @@ __license__ = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
 __revision__ = '20170403'
 
 def loadConfig(config_file):
-    import configparser, os, sys
+    import configparser, os, random, sys
 
     if not os.path.isfile(config_file):
         # File is not present
@@ -38,8 +38,14 @@ def loadConfig(config_file):
     if not config.has_section('advanced'):
         config.add_section('advanced')
         need_to_save = True
+    if not config.has_option('app', 'api_key'):
+        config['app']['api_key'] = ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(40))
+        need_to_save = True
     if not config.has_option('app', 'database_uri'):
         config['app']['database_uri'] = 'mysql://root:unetlab@localhost/unetlab'
+        need_to_save = True
+    if not config.has_option('app', 'memcache_server'):
+        config['app']['memcache_server'] = '127.0.0.1:11211'
         need_to_save = True
     if not config.has_option('app', 'debug'):
         config['app']['debug'] = 'False'
