@@ -10,29 +10,41 @@ from flask import abort
 from controller import api_key, cache
 from controller.catalog.models import UserTable
 
-def checkAuth(username, password):
-    if cache.get(username):
-        user = cache.get(username)
-    else:
-        user = UserTable.query.get(username)
-    if user and user.password == hashlib.sha256(password.encode('utf-8')).hexdigest():
-        cache.set(username, user)
-        return user
-    abort(401)
-
-def checkAuthz(request, roles):
-    if request.args.get('api_key') == api_key:
-        # Correct API KEY: authenticated and authorized
-        return True
+def checkAuth(request):
+    if request.args.get('api_key') and request.args.get('api_key') == api_key:
+        # Correct API KEY: authenticated and authorized as admin user
+        username = 'admin'
+        password = UserTable.query.get('admin').password
     elif request.args.get('api_key'):
         # Wrong API KEY: not authenticated
         abort(401)
     else:
         # User Authentication
-        user = checkAuth(request.authorization.username, request.authorization.password)
-        print(user)
-        print(user.roles)
-    for role in user.roles:
+        username = request.authorization.username
+        password = hashlib.sha256(request.authorization.password.encode('utf-8')).hexdigest()
+
+    # Caching user
+    if not cache.get(username):
+        # User not found in cache
+        user = UserTable.query.get(username)
+        if not user:
+            # User does not exist
+            abort(404)
+        cache.set(username, {
+            'password': user.password,
+            'roles': user.roles
+        })
+
+    # Checking user authentication
+    user = cache.get(username)
+    if user['password'] == password:
+        return user
+    abort(401)
+
+def checkAuthz(request, roles):
+    # User Authentication
+    user = checkAuth(request)
+    for role in user['roles']:
         if role.role in roles:
             # A user role match the required one
             return True
