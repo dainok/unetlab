@@ -5,13 +5,14 @@ __copyright__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
 __license__ = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
 __revision__ = '20170403'
 
-from flask import request
+from flask import abort, request
 from flask_restful import Resource
 from controller.catalog.aaa import checkAuth, checkAuthz
 from controller.catalog.models import *
 from controller.catalog.parsers import *
 
 class User(Resource):
+
     def get(self, username = None, page = 1):
         checkAuthz(request, 'admin')
         if not username:
@@ -36,16 +37,24 @@ class User(Resource):
             'status': 'success',
             'data': data
         }
+
     def post(self):
-        args = user_parser.parse_args(strict=True)
-        user = {
-            'username': args['username'],
-            'password': args['password'],
-            'name': args['name'],
-            'email': args['email'],
-            'labels': args['labels'],
-            'roles': args['roles']
-        }
+        args = user_parser.parse_args()
+        if UserTable.query.get(args['username']):
+            # Username already exists
+            abort(409)
+        user = UserTable(
+            username = args['username'],
+            password = args['password'],
+            name = args['name'],
+            email = args['email'],
+            labels = args['labels']
+        )
+        for role in args['roles']:
+            # Adding all roles
+            user.roles.append = RoleTable.query.get(role)
+        db.session.add(user)
+        db.session.commit()
         return {
             'status': 'success',
         }

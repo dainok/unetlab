@@ -21,6 +21,7 @@ class ActiveNodeTable(db.Model):
     node_id = db.Column(db.Integer, primary_key = True, autoincrement = False)
     state = db.Column(db.String(128))
     label = db.Column(db.Integer, unique = True)
+
     def __repr__(self):
         return '<ActiveNode(lab_id={},node_id={})>'.format(self.lab_id, self.node_id)
 
@@ -32,6 +33,7 @@ class ActiveTopologyTable(db.Model):
     src_if = db.Column(db.Integer)
     dst_id = db.Column(db.Integer, db.ForeignKey('active_nodes.label'), primary_key = True)
     dst_if = db.Column(db.Integer)
+
     def __repr__(self):
         return '<Topology(src_id={}:{},dst_id={}:{}>'.format(self.src_id, self_src_if, self.dst_id, self.dst_if)
 
@@ -41,6 +43,7 @@ class ControllerTable(db.Model):
     inside_ip = db.Column(db.String(128))
     outside_ip = db.Column(db.String(128))
     master = db.Column(db.Boolean)
+
     def __repr__(self):
         return '<Controller(id={})>'.format(self.id)
 
@@ -50,6 +53,7 @@ class LabTable(db.Model):
     name = db.Column(db.String(128))
     filename = db.Column(db.String(128))
     path = db.Column(db.String(128))
+
     def __repr__(self):
         return '<Lab(id={})>'.format(self.id)
 
@@ -59,6 +63,7 @@ class RoleTable(db.Model):
     access_to = db.Column(db.String(128))
     can_write = db.Column(db.Boolean())
     users = db.relationship('UserTable', secondary = roles_to_users, back_populates = 'roles')
+
     def __repr__(self):
         return '<Role({})>'.format(self.role)
 
@@ -70,5 +75,6 @@ class UserTable(db.Model):
     email = db.Column(db.String(128), unique = True)
     labels = db.Column(db.Integer)
     roles = db.relationship('RoleTable', secondary = roles_to_users, back_populates = 'users')
+
     def __repr__(self):
         return '<User({})>'.format(self.username)
