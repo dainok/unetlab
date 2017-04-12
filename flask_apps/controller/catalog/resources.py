@@ -11,6 +11,54 @@ from controller.catalog.aaa import checkAuth, checkAuthz
 from controller.catalog.models import *
 from controller.catalog.parsers import *
 
+class Role(Resource):
+
+    #def delete(self, role = None):
+
+    def get(self, role = None, page = 1):
+        checkAuthz(request, 'admin')
+        if not role:
+            # List all roles
+            roles = RoleTable.query.paginate(page, 10).items
+        else:
+            # List a single role if exists, else 404
+            roles = [RoleTable.query.get_or_404(role)]
+        data = {}
+        for role in roles:
+            # Print each role
+            data[role.role] = {
+                'role': role.role,
+                'access_to': role.acces_to,
+                'can_write': role.can_write
+            }
+        return {
+            'status': 'success',
+            'data': data
+        }
+
+    def post(self):
+        args = role_parser.parse_args()
+        if RoleTable.query.get(args['role']):
+            # Role eady exists
+            abort(409)
+        user = RoleTable(
+            username = args['username'],
+            password = args['password'],
+            name = args['name'],
+            email = args['email'],
+            labels = args['labels']
+        )
+        for role in args['roles']:
+            # Adding all roles
+            user.roles.append = RoleTable.query.get(role)
+        db.session.add(user)
+        db.session.commit()
+        return {
+            'status': 'success',
+        }
+    #def patch???
+    #def put
+
 class User(Resource):
 
     def get(self, username = None, page = 1):
@@ -20,7 +68,7 @@ class User(Resource):
             users = UserTable.query.paginate(page, 10).items
         else:
             # List a single user if exists, else 404
-            users = [ UserTable.query.get_or_404(username) ]
+            users = [UserTable.query.get_or_404(username)]
         data = {}
         for user in users:
             # Print each user and roles
