@@ -20,8 +20,13 @@ def checkAuth(request):
         abort(401)
     else:
         # User Authentication
-        username = request.authorization.username
-        password = hashlib.sha256(request.authorization.password.encode('utf-8')).hexdigest()
+        try:
+            username = request.authorization.username
+            password = hashlib.sha256(request.authorization.password.encode('utf-8')).hexdigest()
+        except:
+            # Invalid authentication
+            abort(401)
+
 
     # Caching user
     if not cache.get(username):

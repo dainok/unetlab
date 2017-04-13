@@ -27,10 +27,16 @@ def type_roles(arg):
                 return arg
     raise ValueError
 
-user_parser = reqparse.RequestParser()
-user_parser.add_argument('username', type = str, required = True, location = 'json', help = 'username cannot be blank')
-user_parser.add_argument('password', type = str, required = True, location = 'json', help = 'password cannot be blank')
-user_parser.add_argument('name', type = str, required = True, location = 'json', help = 'name cannot be blank')
-user_parser.add_argument('email', type = str, required = True, location = 'json', help = 'email cannot be blank')
-user_parser.add_argument('labels', type = type_label, required = False, location = 'json', help = 'labels must be integer and greater than -1')
-user_parser.add_argument('roles', type = type_roles, required = False, location = 'json', help = 'roles must be a list of valid roles')
+add_role_parser = reqparse.RequestParser()
+add_role_parser.add_argument('role', type = str, required = True, location = 'json', help = 'role cannot be blank')
+add_role_parser.add_argument('can_write', type = bool, required = False, location = 'json', help = 'can_write must be boolean')
+add_role_parser.add_argument('access_to', type = str, required = False, location = 'json')
+
+add_user_parser = reqparse.RequestParser()
+add_user_parser.add_argument('username', type = str, required = True, location = 'json', help = 'username cannot be blank')
+add_user_parser.add_argument('password', type = str, required = True, location = 'json', help = 'password cannot be blank')
+add_user_parser.add_argument('name', type = str, required = True, location = 'json', help = 'name cannot be blank')
+add_user_parser.add_argument('email', type = str, required = True, location = 'json', help = 'email cannot be blank')
+add_user_parser.add_argument('labels', type = type_label, required = False, location = 'json', help = 'labels must be integer and greater than -1')
+add_user_parser.add_argument('roles', type = type_roles, required = False, location = 'json', help = 'roles must be a list of valid roles')
+

@@ -12,8 +12,19 @@ from controller.catalog.models import *
 from controller.catalog.parsers import *
 
 class Role(Resource):
-
-    #def delete(self, role = None):
+    def delete(self, role = None):
+        checkAuthz(request, 'admin')
+        if not role:
+            # No role has been selected
+            abort(400)
+        else:
+            # Delete a role if exists, else 404
+            role = RoleTable.query.get_or_404(role)
+        db.session.delete(role)
+        db.session.commit()
+        return {
+            'status': 'success',
+        }
 
     def get(self, role = None, page = 1):
         checkAuthz(request, 'admin')
@@ -28,7 +39,7 @@ class Role(Resource):
             # Print each role
             data[role.role] = {
                 'role': role.role,
-                'access_to': role.acces_to,
+                'access_to': role.access_to,
                 'can_write': role.can_write
             }
         return {
@@ -36,28 +47,27 @@ class Role(Resource):
             'data': data
         }
 
+    def path(self):
+        args = patch_role_parser.parse_args()
+        return {
+            'status': 'success',
+        }
+
     def post(self):
-        args = role_parser.parse_args()
+        args = add_role_parser.parse_args()
         if RoleTable.query.get(args['role']):
             # Role eady exists
             abort(409)
-        user = RoleTable(
-            username = args['username'],
-            password = args['password'],
-            name = args['name'],
-            email = args['email'],
-            labels = args['labels']
+        role = RoleTable(
+            role = args['role'],
+            can_write = args['can_write'],
+            access_to = args['access_to']
         )
-        for role in args['roles']:
-            # Adding all roles
-            user.roles.append = RoleTable.query.get(role)
-        db.session.add(user)
+        db.session.add(role)
         db.session.commit()
         return {
             'status': 'success',
         }
-    #def patch???
-    #def put
 
 class User(Resource):
 
@@ -87,7 +97,7 @@ class User(Resource):
         }
 
     def post(self):
-        args = user_parser.parse_args()
+        args = add_user_parser.parse_args()
         if UserTable.query.get(args['username']):
             # Username already exists
             abort(409)
@@ -106,3 +116,4 @@ class User(Resource):
         return {
             'status': 'success',
         }
+
