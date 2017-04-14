@@ -93,5 +93,6 @@ if not user:
     db.session.commit()
 
 # Routing
+api.add_resource(Auth, '/api/v1/auth')
 api.add_resource(Role, '/api/v1/roles', '/api/v1/roles/<string:role>')
 api.add_resource(User, '/api/v1/users', '/api/v1/users/<string:username>')

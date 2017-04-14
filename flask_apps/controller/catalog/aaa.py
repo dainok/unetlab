@@ -13,8 +13,15 @@ from controller.catalog.models import UserTable
 def checkAuth(request):
     if request.args.get('api_key') and request.args.get('api_key') == api_key:
         # Correct API KEY: authenticated and authorized as admin user
-        username = 'admin'
-        password = UserTable.query.get('admin').password
+        return {
+            'username': 'admin',
+            'roles': {
+                'admin': {
+                    'access_to': '*',
+                    'can_write': True
+                }
+            }
+        }
     elif request.args.get('api_key'):
         # Wrong API KEY: not authenticated
         abort(401)
@@ -24,33 +31,46 @@ def checkAuth(request):
             username = request.authorization.username
             password = hashlib.sha256(request.authorization.password.encode('utf-8')).hexdigest()
         except:
-            # Invalid authentication
             abort(401)
 
-
-    # Caching user
-    if not cache.get(username):
+    cached_user = cache.get(username)
+    if cached_user:
+        # User found in cache
+        if cached_user['password'] == password:
+            return cached_user
+        abort(401)
+    else:
         # User not found in cache
-        user = UserTable.query.get(username)
-        if not user:
-            # User does not exist
-            abort(404)
-        cache.set(username, {
-            'password': user.password,
-            'roles': user.roles
-        })
+        user = UserTable.query.get_or_404(username)
+        if user.password == password:
+            # User authenticated, caching the user
+            roles = {}
+            for role in user.roles:
+                roles[role.role] = {
+                    'access_to': role.access_to,
+                    'can_write': role.can_write
+                }
+            user = {
+                'username': username,
+                'password': user.password,
+                'roles': roles
+            }
+            cache.set(username, user)
+            return user
+        else:
+            # Wrong password
+            abort(401)
 
-    # Checking user authentication
-    user = cache.get(username)
-    if user['password'] == password:
-        return user
-    abort(401)
-
-def checkAuthz(request, roles):
+def checkAuthz(request, roles = []):
     # User Authentication
     user = checkAuth(request)
-    for role in user['roles']:
-        if role.role in roles:
+    if len(roles) == 0:
+        # No role required
+        return user['username']
+    for role in roles:
+        if role in user['roles']:
             # A user role match the required one
-            return True
+            return user['username']
+    # User does not have any required role
     abort(403)
+

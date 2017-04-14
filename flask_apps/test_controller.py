@@ -11,100 +11,290 @@ import base64, json, os, random, tempfile, unittest
 admin_username = 'admin'
 admin_password = 'admin'
 
-headers = {
-    'Authorization': 'Basic ' + base64.b64encode(str.encode(admin_username) + b':' + str.encode(admin_password)).decode('utf-8'),
-}
-
-role_1 = ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(8))
-role_2 = ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(8))
-username_1 = ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(10))
+role_1 = 'z' + ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(7))
+username_1 = 'z' + ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(9))
 password_1 = ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(20))
-username_2 = ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(10))
 password_2 = ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(20))
 
 class FlaskTestCase(unittest.TestCase):
     def setUp(self):
         self.app = app.test_client()
 
-    def test_001_get_roles_via_api(self):
-        # curl -s -D- -X GET http://127.0.0.1:5000/api/v1/roles?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6
+    def test_00_00_auth_via_api(self):
+        # curl -s -D- -X GET 'http://127.0.0.1:5000/api/v1/auth?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
+        url = '/api/v1/auth?api_key={}'.format(api_key)
+        response = self.app.get(url)
+        response_data = json.loads(response.get_data(as_text = True))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_data['status'], 'success')
+        self.assertEqual(response_data['data']['email'], 'admin@example.com')
+        self.assertEqual(response_data['data']['labels'], -1)
+        self.assertEqual(response_data['data']['name'], 'Default Administrator')
+        self.assertEqual(response_data['data']['roles'], ['admin'])
+        self.assertEqual(response_data['data']['username'], 'admin')
+
+    def test_00_01_auth_via_auth(self):
+        # curl -s -D- -u admin:admin -X GET 'http://127.0.0.1:5000/api/v1/auth'
+        headers = {
+            'Authorization': 'Basic ' + base64.b64encode(str.encode(admin_username) + b':' + str.encode(admin_password)).decode('utf-8'),
+        }
+        url = '/api/v1/auth?api_key={}'.format(api_key)
+        response = self.app.get(url)
+        response_data = json.loads(response.get_data(as_text = True))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_data['status'], 'success')
+        self.assertEqual(response_data['data']['email'], 'admin@example.com')
+        self.assertEqual(response_data['data']['labels'], -1)
+        self.assertEqual(response_data['data']['name'], 'Default Administrator')
+        self.assertEqual(response_data['data']['roles'], ['admin'])
+        self.assertEqual(response_data['data']['username'], 'admin')
+
+    """
+    Tests about roles
+    """
+
+    def test_01_00_get_roles_via_api(self):
+        # curl -s -D- -X GET 'http://127.0.0.1:5000/api/v1/roles?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
         url = '/api/v1/roles?api_key={}'.format(api_key)
         response = self.app.get(url)
+        response_data = json.loads(response.get_data(as_text = True))
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_data['status'], 'success')
+        self.assertEqual(response_data['data']['admin']['can_write'], True)
+        self.assertEqual(response_data['data']['admin']['access_to'], '*')
 
-    def test_002_get_roles_via_auth(self):
-        # curl -s -D- -u admin:admin -X GET http://127.0.0.1:5000/api/v1/roles
-        url = '/api/v1/roles'
-        response = self.app.get(url, headers = headers)
-        self.assertEqual(response.status_code, 200)
-
-    def test_003_post_role_via_api(self):
-        # curl -s -D- -X POST -d '{"role":"test1","can_write":true,"access_to":"*"}' -H 'Content-type: application/json' http://127.0.0.1:5000/api/v1/roles?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6
+    def test_01_01_post_role_via_api(self):
+        # curl -s -D- -X POST -d '{"role":"test1","can_write":true,"access_to":"*"}' -H 'Content-type: application/json' 'http://127.0.0.1:5000/api/v1/roles?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
         url = '/api/v1/roles?api_key={}'.format(api_key)
         data = {
             'role': role_1,
-            'can_write': True,
+            'can_write': False,
             'access_to': '*'
         }
         response = self.app.post(url, data = json.dumps(data), content_type = 'application/json')
+        response_data = json.loads(response.get_data(as_text = True))
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_data['status'], 'success')
+        self.assertEqual(response_data['data'][role_1]['can_write'], False)
+        self.assertEqual(response_data['data'][role_1]['access_to'], '*')
 
-    def test_004_post_role_via_auth(self):
-        # curl -s -D- -u admin:admin -X POST -d '{"role":"test2","can_write":true,"access_to":"*"}' -H 'Content-type: application/json' http://127.0.0.1:5000/api/v1/roles
-        url = '/api/v1/roles'
-        data = {
-            'role': role_2,
-            'can_write': True,
-            'access_to': '*'
-        }
-        response = self.app.post(url, data = json.dumps(data), content_type = 'application/json')
-        self.assertEqual(response.status_code, 200)
-
-    def test_005_get_role_via_api(self):
-        # curl -s -D- -X GET http://127.0.0.1:5000/api/v1/roles/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6
+    def test_01_02_get_role_via_api(self):
+        # curl -s -D- -X GET 'http://127.0.0.1:5000/api/v1/roles/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
         url = '/api/v1/roles/{}?api_key={}'.format(role_1, api_key)
         response = self.app.get(url)
+        response_data = json.loads(response.get_data(as_text = True))
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_data['status'], 'success')
+        self.assertEqual(response_data['data'][role_1]['can_write'], False)
+        self.assertEqual(response_data['data'][role_1]['access_to'], '*')
 
-    def test_006_get_role_via_auth(self):
-        # curl -s -D- -u admin:admin -X GET http://127.0.0.1:5000/api/v1/roles/test2
-        url = '/api/v1/roles/{}'.format(role_2)
+    def test_01_03_patch_role_via_api(self):
+        # curl -s -D- -X PATCH -d '{"can_write":false,"access_to":"something*"}' -H 'Content-type: application/json' 'http://127.0.0.1:5000/api/v1/roles/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
+        url = '/api/v1/roles/{}?api_key={}'.format(role_1, api_key)
+        data = {
+            'can_write': True,
+            'access_to': 'something*'
+        }
+        response = self.app.patch(url, data = json.dumps(data), content_type = 'application/json')
+        response_data = json.loads(response.get_data(as_text = True))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_data['status'], 'success')
+        self.assertEqual(response_data['data'][role_1]['can_write'], True)
+        self.assertEqual(response_data['data'][role_1]['access_to'], 'something*')
+
+    def test_01_04_get_role_via_api(self):
+        # curl -s -D- -X GET 'http://127.0.0.1:5000/api/v1/roles/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
+        url = '/api/v1/roles/{}?api_key={}'.format(role_1, api_key)
+        response = self.app.get(url)
+        response_data = json.loads(response.get_data(as_text = True))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_data['status'], 'success')
+        self.assertEqual(response_data['data'][role_1]['can_write'], True)
+        self.assertEqual(response_data['data'][role_1]['access_to'], 'something*')
+
+    def test_01_05_patch_role_via_api(self):
+        # curl -s -D- -X PATCH -d '{"can_write":false}' -H 'Content-type: application/json' 'http://127.0.0.1:5000/api/v1/roles/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
+        url = '/api/v1/roles/{}?api_key={}'.format(role_1, api_key)
+        data = {
+            'can_write': True
+        }
+        response = self.app.patch(url, data = json.dumps(data), content_type = 'application/json')
+        response_data = json.loads(response.get_data(as_text = True))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_data['status'], 'success')
+        self.assertEqual(response_data['data'][role_1]['can_write'], True)
+        self.assertEqual(response_data['data'][role_1]['access_to'], 'something*')
+
+    def test_01_06_get_role_via_api(self):
+        # curl -s -D- -X GET 'http://127.0.0.1:5000/api/v1/roles/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
+        url = '/api/v1/roles/{}?api_key={}'.format(role_1, api_key)
+        response = self.app.get(url)
+        response_data = json.loads(response.get_data(as_text = True))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_data['status'], 'success')
+        self.assertEqual(response_data['data'][role_1]['can_write'], True)
+        self.assertEqual(response_data['data'][role_1]['access_to'], 'something*')
+
+    """
+    Tests about users
+    """
+
+    def test_02_00_get_users_via_api(self):
+        # curl -s -D- -X GET 'http://127.0.0.1:5000/api/v1/users?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
+        url = '/api/v1/users?api_key={}'.format(api_key)
+        response = self.app.get(url)
+        response_data = json.loads(response.get_data(as_text = True))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_data['status'], 'success')
+        self.assertEqual(response_data['data']['admin']['email'], 'admin@example.com')
+        self.assertEqual(response_data['data']['admin']['labels'], -1)
+        self.assertEqual(response_data['data']['admin']['name'], 'Default Administrator')
+        self.assertEqual(response_data['data']['admin']['roles'], ['admin'])
+        self.assertEqual(response_data['data']['admin']['username'], 'admin')
+
+    def test_02_01_post_user_via_api(self):
+        # curl -s -D- -X POST -d '{"username":"test1","password":"test1","labels":100,"email":"user1@example.com","name":"User 1","roles":["admin"]}' -H 'Content-type: application/json' 'http://127.0.0.1:5000/api/v1/users?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
+        url = '/api/v1/users?api_key={}'.format(api_key)
+        data = {
+            'email': '{}@example.com'.format(username_1),
+            'labels': 100,
+            'name': 'User 1',
+            'password': password_1,
+            'roles': [role_1],
+            'username': username_1
+        }
+        response = self.app.post(url, data = json.dumps(data), content_type = 'application/json')
+        response_data = json.loads(response.get_data(as_text = True))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_data['status'], 'success')
+        self.assertEqual(response_data['data'][username_1]['email'], '{}@example.com'.format(username_1))
+        self.assertEqual(response_data['data'][username_1]['labels'], 100)
+        self.assertEqual(response_data['data'][username_1]['name'], 'User 1')
+        self.assertEqual(response_data['data'][username_1]['roles'], [role_1])
+        self.assertEqual(response_data['data'][username_1]['username'], username_1)
+
+    def test_02_02_get_user_via_api(self):
+        # curl -s -D- -X GET 'http://127.0.0.1:5000/api/v1/users/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
+        url = '/api/v1/users/{}?api_key={}'.format(username_1, api_key)
+        response = self.app.get(url)
+        response_data = json.loads(response.get_data(as_text = True))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_data['status'], 'success')
+        self.assertEqual(response_data['data'][username_1]['email'], '{}@example.com'.format(username_1))
+        self.assertEqual(response_data['data'][username_1]['labels'], 100)
+        self.assertEqual(response_data['data'][username_1]['name'], 'User 1')
+        self.assertEqual(response_data['data'][username_1]['roles'], [role_1])
+        self.assertEqual(response_data['data'][username_1]['username'], username_1)
+
+    def test_02_03_auth_via_auth(self):
+        # curl -s -D- -u test1:test1 -X GET 'http://127.0.0.1:5000/api/v1/auth'
+        headers = {
+            'Authorization': 'Basic ' + base64.b64encode(str.encode(username_1) + b':' + str.encode(password_1)).decode('utf-8'),
+        }
+        url = '/api/v1/auth'
         response = self.app.get(url, headers = headers)
+        response_data = json.loads(response.get_data(as_text = True))
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_data['status'], 'success')
+        self.assertEqual(response_data['data']['email'], '{}@example.com'.format(username_1))
+        self.assertEqual(response_data['data']['labels'], 100)
+        self.assertEqual(response_data['data']['name'], 'User 1')
+        self.assertEqual(response_data['data']['roles'], [role_1])
+        self.assertEqual(response_data['data']['username'], username_1)
+
+    def test_02_04_patch_user_via_api(self):
+        # curl -s -D- -X PATCH -d '{"email":"user1@example.org","labels":200,"name":"User A","password":"test2","roles":["admin","test1"]}' -H 'Content-type: application/json' 'http://127.0.0.1:5000/api/v1/users/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
+        url = '/api/v1/users/{}?api_key={}'.format(username_1, api_key)
+        data = {
+            'email': '{}@example.org'.format(username_1),
+            'labels': 200,
+            'name': 'User A',
+            'password': password_2,
+            'roles': ['admin', role_1],
+        }
+        response = self.app.patch(url, data = json.dumps(data), content_type = 'application/json')
+        response_data = json.loads(response.get_data(as_text = True))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_data['status'], 'success')
+        self.assertEqual(response_data['data'][username_1]['email'], '{}@example.org'.format(username_1))
+        self.assertEqual(response_data['data'][username_1]['labels'], 200)
+        self.assertEqual(response_data['data'][username_1]['name'], 'User A')
+        self.assertEqual(response_data['data'][username_1]['roles'], ['admin', role_1])
+        self.assertEqual(response_data['data'][username_1]['username'], username_1)
+
+    def test_02_05_auth_via_auth(self):
+        # curl -s -D- -u test1:test2 -X GET 'http://127.0.0.1:5000/api/v1/auth'
+        headers = {
+            'Authorization': 'Basic ' + base64.b64encode(str.encode(username_1) + b':' + str.encode(password_2)).decode('utf-8'),
+        }
+        url = '/api/v1/auth'
+        response = self.app.get(url, headers = headers)
+        response_data = json.loads(response.get_data(as_text = True))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_data['status'], 'success')
+        self.assertEqual(response_data['data']['email'], '{}@example.org'.format(username_1))
+        self.assertEqual(response_data['data']['labels'], 200)
+        self.assertEqual(response_data['data']['name'], 'User A')
+        self.assertEqual(response_data['data']['roles'], ['admin', role_1])
+        self.assertEqual(response_data['data']['username'], username_1)
+
+    def test_02_06_patch_user_via_api(self):
+        # curl -s -D- -X PATCH -d '{"email":"user1@example.net"}' -H 'Content-type: application/json' 'http://127.0.0.1:5000/api/v1/users/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
+        url = '/api/v1/users/{}?api_key={}'.format(username_1, api_key)
+        data = {
+            'email': '{}@example.net'.format(username_1),
+        }
+        response = self.app.patch(url, data = json.dumps(data), content_type = 'application/json')
+        response_data = json.loads(response.get_data(as_text = True))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_data['status'], 'success')
+        self.assertEqual(response_data['data'][username_1]['email'], '{}@example.net'.format(username_1))
+        self.assertEqual(response_data['data'][username_1]['labels'], 200)
+        self.assertEqual(response_data['data'][username_1]['name'], 'User A')
+        self.assertEqual(response_data['data'][username_1]['roles'], ['admin', role_1])
+        self.assertEqual(response_data['data'][username_1]['username'], username_1)
+
+    def test_02_07_get_user_via_api(self):
+        # curl -s -D- -X GET 'http://127.0.0.1:5000/api/v1/users/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
+        url = '/api/v1/users/{}?api_key={}'.format(username_1, api_key)
+        response = self.app.get(url)
+        response_data = json.loads(response.get_data(as_text = True))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_data['status'], 'success')
+        self.assertEqual(response_data['data'][username_1]['email'], '{}@example.net'.format(username_1))
+        self.assertEqual(response_data['data'][username_1]['labels'], 200)
+        self.assertEqual(response_data['data'][username_1]['name'], 'User A')
+        self.assertEqual(response_data['data'][username_1]['roles'], ['admin', role_1])
+        self.assertEqual(response_data['data'][username_1]['username'], username_1)
 
 
 
 
-    def test_009_delete_role_via_api(self):
-        # curl -s -D- -X DELETE http://127.0.0.1:5000/api/v1/roles/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6
+
+
+
+
+
+
+    """
+    Final tests and cleaning
+    """
+
+    def test_ff_00_delete_role_via_api(self):
+        # curl -s -D- -X DELETE 'http://127.0.0.1:5000/api/v1/roles/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
         url = '/api/v1/roles/{}?api_key={}'.format(role_1, api_key)
         response = self.app.delete(url)
+        response_data = json.loads(response.get_data(as_text = True))
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_data['status'], 'success')
 
-    def test_00a_delete_role_via_auth(self):
-        # curl -s -D- -u admin:admin -X DELETE http://127.0.0.1:5000/api/v1/roles/test2
-        url = '/api/v1/roles/{}'.format(role_2)
-        response = self.app.delete(url, headers = headers)
+    def test_ff_00_delete_user_via_api(self):
+        # curl -s -D- -X DELETE 'http://127.0.0.1:5000/api/v1/users/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
+        url = '/api/v1/users/{}?api_key={}'.format(username_1, api_key)
+        response = self.app.delete(url)
+        response_data = json.loads(response.get_data(as_text = True))
         self.assertEqual(response.status_code, 200)
-
-
-
-
-
-    def atest_1_api_get_users(self):
-        method = 'GET'
-        url = '/api/v1/users?api_key={}'.format(api_key)
-        print('curl -s -D- -X {} http://127.0.0.1:5000{}'.format(method, url))
-        response = self.app.get(url)
-        self.assertEqual(response.status_code, 200)
-
-    def atest_2_api_get_user(self):
-        method = 'POST'
-        url = '/api/v1/users/{}?api_key={}'.format(self.username, api_key)
-        print('curl -s -D- -X {} -d \'{"name":"andrea","email":"andrea.dainese@example.com","username":"andrea","password":"andrea"}\' -H \'Content-type: application/json\' http://127.0.0.1:5000{}'.format(method, url))
-        #curl -s -D- -X POST -d '{"name":"andrea","email":"andrea.dainese@example.com","username":"andrea","password":"andrea","roles":[ "admin" ]}' -H 'Content-type: application/json' http://127.0.0.1:5000/api/v1/users?api_key=emml5esk8it58pbq2u8qqskz7jhhjiw6smr0v4vw
-        response = self.app.get(url)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_data['status'], 'success')
 
 if __name__ == '__main__':
     unittest.main()

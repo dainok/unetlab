@@ -23,14 +23,19 @@ def type_roles(arg):
     # A role must be defined in RoleTable
     if type(arg) is list:
         for role in arg:
-            if RoleTable.query.get(role):
-                return arg
+            if not RoleTable.query.get(role):
+                raise ValueError
+        return arg
     raise ValueError
 
 add_role_parser = reqparse.RequestParser()
 add_role_parser.add_argument('role', type = str, required = True, location = 'json', help = 'role cannot be blank')
 add_role_parser.add_argument('can_write', type = bool, required = False, location = 'json', help = 'can_write must be boolean')
-add_role_parser.add_argument('access_to', type = str, required = False, location = 'json')
+add_role_parser.add_argument('access_to', type = str, required = False, location = 'json', help = 'access_to must be a regex')
+
+patch_role_parser = reqparse.RequestParser()
+patch_role_parser.add_argument('can_write', type = bool, required = False, store_missing = False, location = 'json', help = 'can_write must be boolean')
+patch_role_parser.add_argument('access_to', type = str, required = False, store_missing = False, location = 'json', help = 'access_to must be a regex')
 
 add_user_parser = reqparse.RequestParser()
 add_user_parser.add_argument('username', type = str, required = True, location = 'json', help = 'username cannot be blank')
@@ -39,4 +44,11 @@ add_user_parser.add_argument('name', type = str, required = True, location = 'js
 add_user_parser.add_argument('email', type = str, required = True, location = 'json', help = 'email cannot be blank')
 add_user_parser.add_argument('labels', type = type_label, required = False, location = 'json', help = 'labels must be integer and greater than -1')
 add_user_parser.add_argument('roles', type = type_roles, required = False, location = 'json', help = 'roles must be a list of valid roles')
+
+patch_user_parser = reqparse.RequestParser()
+patch_user_parser.add_argument('password', type = str, required = False, store_missing = False, location = 'json', help = 'password cannot be blank')
+patch_user_parser.add_argument('name', type = str, required = False, store_missing = False, location = 'json', help = 'name cannot be blank')
+patch_user_parser.add_argument('email', type = str, required = False, store_missing = False, location = 'json', help = 'email cannot be blank')
+patch_user_parser.add_argument('labels', type = type_label, required = False, store_missing = False, location = 'json', help = 'labels must be integer and greater than -1')
+patch_user_parser.add_argument('roles', type = type_roles, required = False, store_missing = False, location = 'json', help = 'roles must be a list of valid roles')
 
