@@ -7,10 +7,11 @@ __revision__ = '20170403'
 
 from flask import abort, request
 from flask_restful import Resource
-from controller import cache
+from controller import cache, git
 from controller.catalog.aaa import checkAuth, checkAuthz
 from controller.catalog.models import *
 from controller.catalog.parsers import *
+from controller.catalog.tasks import *
 
 def printRole(role):
     return {
@@ -39,6 +40,25 @@ class Auth(Resource):
             'message': 'User authenticated',
             'data': printUser(user)
         }
+
+class Repository(Resource):
+    # create
+    # delete
+    # edit remote
+    # push
+    # commit -> solo se un lab viene salvato (i lab vengono caricati e messi su in db. editati da db. solo save li porta sul repo con commit)
+    # pull
+    # allo startup scan dei repo con aggiunta al db dei lab
+    def post(self):
+        checkAuthz(request, ['admin'])
+        args = add_repository_parser.parse_args()
+        if args['repository'] == 'local':
+            # local is a reserved repository
+            abort(400)
+
+        # diverso da local, aggiunge un repository remoto
+        # potrebbe essere lungo e fallire, meglio usare MQ
+        return "ciao"
 
 class Role(Resource):
     def delete(self, role = None):
@@ -220,4 +240,3 @@ class User(Resource):
                 user.username: printUser(user)
             }
         }
-

@@ -29,6 +29,12 @@ def type_roles(arg):
     raise ValueError
 
 add_role_parser = reqparse.RequestParser()
+add_role_parser.add_argument('repository', type = str, required = True, location = 'json', help = 'repository cannot be bank')
+add_role_parser.add_argument('url', type = str, required = True, location = 'json', help = 'url cannot be bank')
+add_role_parser.add_argument('username', type = str, required = False, location = 'json', help = 'username must be a string')
+add_role_parser.add_argument('password', type = str, required = False, location = 'json', help = 'password must be a string')
+
+add_role_parser = reqparse.RequestParser()
 add_role_parser.add_argument('role', type = str, required = True, location = 'json', help = 'role cannot be blank')
 add_role_parser.add_argument('can_write', type = bool, required = False, location = 'json', help = 'can_write must be boolean')
 add_role_parser.add_argument('access_to', type = str, required = False, location = 'json', help = 'access_to must be a regex')
@@ -51,4 +57,3 @@ patch_user_parser.add_argument('name', type = str, required = False, store_missi
 patch_user_parser.add_argument('email', type = str, required = False, store_missing = False, location = 'json', help = 'email cannot be blank')
 patch_user_parser.add_argument('labels', type = type_label, required = False, store_missing = False, location = 'json', help = 'labels must be integer and greater than -1')
 patch_user_parser.add_argument('roles', type = type_roles, required = False, store_missing = False, location = 'json', help = 'roles must be a list of valid roles')
-

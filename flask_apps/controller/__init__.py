@@ -26,13 +26,26 @@ __revision__ = '20170403'
     - 500 error - Server error, maybe a bug/exception or a backend/database error
 """
 
-import hashlib, memcache, sys
+import hashlib, memcache, os,  sh, shutil, sys
 from flask import Flask
 from flask_migrate import Migrate, MigrateCommand
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from flask_script import Manager
+from celery import Celery
 from controller.config import *
+
+def make_celery(app):
+    celery = Celery(app.import_name, backend = app.config['CELERY_RESULT_BACKEND'], broker = app.config['CELERY_BROKER_URL'])
+    celery.conf.update(app.config)
+    TaskBase = celery.Task
+    class ContextTask(TaskBase):
+        abstract = True
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return TaskBase.__call__(self, *args, **kwargs)
+    celery.Task = ContextTask
+    return celery
 
 # Loading configuration from file
 config_file = '/data/etc/controller.ini'
@@ -45,14 +58,19 @@ app.config.update(
     BUNDLE_ERRORS = True,
     DEBUG = config['app']['debug'],
     TESTING = config['app']['testing'],
+    CELERY_BROKER_URL='redis://localhost:6379',
+    CELERY_RESULT_BACKEND='redis://localhost:6379',
     SQLALCHEMY_DATABASE_URI = config['app']['database_uri'],
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 )
 api = Api(app)
 db = SQLAlchemy(app)
+git = sh.git.bake(_cwd='/data/labs')
 cache = memcache.Client([config['app']['memcache_server']], debug = 0)
+celery = make_celery(app)
 api_key = config['app']['api_key']
 manager = Manager(app)
+#TODO manager.add_command('celery', run_celery)
 #TODO manager.add_command('db', MigrateCommand)
 
 # Postpone to avoid circular import
@@ -92,7 +110,19 @@ if not user:
     db.session.add(user)
     db.session.commit()
 
+# Adding local repository if not present
+if not os.path.isdir('{}/local'.format(config['app']['lab_repository'])):
+    try:
+        os.makedirs('{}/local'.format(config['app']['lab_repository']))
+        git.init('-q', '{}/local'.format(config['app']['lab_repository']))
+    except:
+        # Cannot create local reporitory
+        shutil.rmtree('{}/local'.format(config['app']['lab_repository']), ignore_errors = True)
+        sys.stderr.write('Cannot create local repository\n')
+        sys.exit(1)
+
 # Routing
 api.add_resource(Auth, '/api/v1/auth')
+api.add_resource(Repository, '/api/v1/repositories', '/api/v1/reporitories/<string:repository>')
 api.add_resource(Role, '/api/v1/roles', '/api/v1/roles/<string:role>')
 api.add_resource(User, '/api/v1/users', '/api/v1/users/<string:username>')
