@@ -26,7 +26,7 @@ __revision__ = '20170403'
     - 500 error - Server error, maybe a bug/exception or a backend/database error
 """
 
-import hashlib, memcache, os,  sh, shutil, sys
+import hashlib, memcache, os, sh, shutil, sys
 from flask import Flask
 from flask_migrate import Migrate, MigrateCommand
 from flask_restful import Api
@@ -114,7 +114,12 @@ if not user:
 if not os.path.isdir('{}/local'.format(config['app']['lab_repository'])):
     try:
         os.makedirs('{}/local'.format(config['app']['lab_repository']))
-        git.init('-q', '{}/local'.format(config['app']['lab_repository']))
+        git.init('-q', '{}/local'.format(config['app']['lab_repository']), _bg = False)
+        repository = RepositoryTable(
+            repository = 'local'
+        )
+        db.session.add(repository)
+        db.session.commit()
     except:
         # Cannot create local reporitory
         shutil.rmtree('{}/local'.format(config['app']['lab_repository']), ignore_errors = True)
@@ -123,6 +128,6 @@ if not os.path.isdir('{}/local'.format(config['app']['lab_repository'])):
 
 # Routing
 api.add_resource(Auth, '/api/v1/auth')
-api.add_resource(Repository, '/api/v1/repositories', '/api/v1/reporitories/<string:repository>')
+api.add_resource(Repository, '/api/v1/repositories', '/api/v1/repositories/<string:repository>')
 api.add_resource(Role, '/api/v1/roles', '/api/v1/roles/<string:role>')
 api.add_resource(User, '/api/v1/users', '/api/v1/users/<string:username>')

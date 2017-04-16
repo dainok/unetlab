@@ -5,9 +5,10 @@ __copyright__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
 __license__ = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
 __revision__ = '20170403'
 
+import os
 from flask import abort, request
 from flask_restful import Resource
-from controller import cache, git
+from controller import cache, config, git
 from controller.catalog.aaa import checkAuth, checkAuthz
 from controller.catalog.models import *
 from controller.catalog.parsers import *
@@ -41,24 +42,46 @@ class Auth(Resource):
             'data': printUser(user)
         }
 
+class Lab(Resource):
+    # TODO
+    def post(self):
+        return "ciao"
+
+
 class Repository(Resource):
-    # create
-    # delete
-    # edit remote
-    # push
-    # commit -> solo se un lab viene salvato (i lab vengono caricati e messi su in db. editati da db. solo save li porta sul repo con commit)
-    # pull
-    # allo startup scan dei repo con aggiunta al db dei lab
+    # TODO: only admin edit remote
+    # TODO: all users with write permission push
+    # TODO: all users with write permission commit -> solo se un lab viene salvato (i lab vengono caricati e messi su in db. editati da db. solo save li porta sul repo con commit)
+    # TODO: all users with write permission pull
+    # TODO: allo startup pull + scan dei repo con aggiunta al db dei lab
+    def delete(self, repository = None):
+        checkAuthz(request, ['admin'])
+        if not repository:
+            # No repository has been selected
+            abort(400)
+        elif repository == 'local':
+            # Repository 'local' cannot be deleted
+            abort(403)
+        elif not os.path.isdir('{}/{}'.format(config['app']['lab_repository'], repository)):
+            # Repository does not exist
+            abort(404)
+        t = deleteGit.apply_async((repository,))
+        return {
+            'status': 'enqueued',
+            'message': 'Task "{}" enqueued to the batch manager'.format(t)
+        }
+
     def post(self):
         checkAuthz(request, ['admin'])
         args = add_repository_parser.parse_args()
         if args['repository'] == 'local':
             # local is a reserved repository
             abort(400)
-
-        # diverso da local, aggiunge un repository remoto
-        # potrebbe essere lungo e fallire, meglio usare MQ
-        return "ciao"
+        t = addGit.apply_async((args['repository'], args['url'], args['username'], args['password']))
+        return {
+            'status': 'enqueued',
+            'message': 'Task "{}" enqueued to the batch manager'.format(t)
+        }
 
 class Role(Resource):
     def delete(self, role = None):

@@ -28,11 +28,11 @@ def type_roles(arg):
         return arg
     raise ValueError
 
-add_role_parser = reqparse.RequestParser()
-add_role_parser.add_argument('repository', type = str, required = True, location = 'json', help = 'repository cannot be bank')
-add_role_parser.add_argument('url', type = str, required = True, location = 'json', help = 'url cannot be bank')
-add_role_parser.add_argument('username', type = str, required = False, location = 'json', help = 'username must be a string')
-add_role_parser.add_argument('password', type = str, required = False, location = 'json', help = 'password must be a string')
+add_repository_parser = reqparse.RequestParser()
+add_repository_parser.add_argument('repository', type = str, required = True, location = 'json', help = 'repository cannot be bank')
+add_repository_parser.add_argument('url', type = str, required = True, location = 'json', help = 'url cannot be bank')
+add_repository_parser.add_argument('username', type = str, required = False, location = 'json', help = 'username must be a string')
+add_repository_parser.add_argument('password', type = str, required = False, location = 'json', help = 'password must be a string')
 
 add_role_parser = reqparse.RequestParser()
 add_role_parser.add_argument('role', type = str, required = True, location = 'json', help = 'role cannot be blank')

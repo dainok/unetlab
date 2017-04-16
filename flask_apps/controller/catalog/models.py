@@ -39,7 +39,7 @@ class ActiveTopologyTable(db.Model):
 
 class ControllerTable(db.Model):
     __tablename__ = 'controllers'
-    id = db.Column(db.String(128), primary_key = True)
+    id = db.Column(db.Integer, primary_key = True)
     inside_ip = db.Column(db.String(128))
     outside_ip = db.Column(db.String(128))
     master = db.Column(db.Boolean)
@@ -53,9 +53,20 @@ class LabTable(db.Model):
     name = db.Column(db.String(128))
     filename = db.Column(db.String(128))
     path = db.Column(db.String(128))
+    repository = db.Column(db.String(128), db.ForeignKey('repositories.repository'))
 
     def __repr__(self):
         return '<Lab(id={})>'.format(self.id)
+
+class RepositoryTable(db.Model):
+    __tablename__ = 'repositories'
+    repository = db.Column(db.String(128), primary_key = True)
+    url = db.Column(db.String(128))
+    username = db.Column(db.String(128))
+    password = db.Column(db.String(128))
+
+    def __repr__(self):
+        return '<Repository(repository={})>'.format(self.repository)
 
 class RoleTable(db.Model):
     __tablename__ = 'roles'
@@ -65,7 +76,7 @@ class RoleTable(db.Model):
     users = db.relationship('UserTable', secondary = roles_to_users, back_populates = 'roles')
 
     def __repr__(self):
-        return '<Role({})>'.format(self.role)
+        return '<Role(role={})>'.format(self.role)
 
 class UserTable(db.Model):
     __tablename__ = 'users'
@@ -77,4 +88,4 @@ class UserTable(db.Model):
     roles = db.relationship('RoleTable', secondary = roles_to_users, back_populates = 'users')
 
     def __repr__(self):
-        return '<User({})>'.format(self.username)
+        return '<User(username={})>'.format(self.username)
