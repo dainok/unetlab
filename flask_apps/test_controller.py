@@ -271,7 +271,7 @@ class FlaskTestCase(unittest.TestCase):
     Tests about repositories
     """
 
-    def test_03_00_post_repository_via_api(self):
+    def dis_test_03_00_post_repository_via_api(self):
         # curl -s -D- -X POST -d '{"repository":"test","url":"https://github.com/dainok/rrlabs"}' -H 'Content-type: application/json' http://127.0.0.1:5000/api/v1/repositories?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6
         url = '/api/v1/repositories?api_key={}'.format(api_key)
         data = {
@@ -283,10 +283,127 @@ class FlaskTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response_data['status'], 'enqueued')
 
-    def test_03_ff_delete_repository_via_api(self):
+    def dis_test_03_ff_delete_repository_via_api(self):
         # curl -s -D- -X DELETE http://127.0.0.1:5000/api/v1/repositories/test?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6
-        url = 'api/v1/repositories/test{}?api_key={}'.format(api_key)
+        url = 'api/v1/repositories/test?api_key={}'.format(api_key)
         response = self.app.delete(url)
+        response_data = json.loads(response.get_data(as_text = True))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_data['status'], 'enqueued')
+
+    """
+    Tests about labs
+    """
+
+    def test_04_00_post_lab_via_api(self):
+        # curl -s -D- -X POST -d '{"name":"Test","repository":"local","version":1,"author":"Tester"}' -H 'Content-type: application/json' http://127.0.0.1:5000/api/v1/labs?api_key=emml5esk8it58pbq2u8qqskz7jhhjiw6smr0v4vw
+        url = '/api/v1/labs?commit=true&api_key={}'.format(api_key)
+        data = {
+            'name': 'Test',
+            'repository': 'local',
+            'version': 1,
+            'author': 'Tester',
+            'topology': {
+                'nodes': {
+                    0: {
+                        'name': 'NodeA',
+                        'type': 'iol',
+                        'image': 'aaa',
+                        'ethernet': 3,
+                        'serial': 1,
+                        'ram': 1024,
+                        'icon': 'router.png',
+                        'left': 100,
+                        'top': 100,
+                        'interfaces': {
+                            0: {
+                                'name': 'e0/0',
+                                'connection': 0,
+                                'delay': 100,
+                                'drop': 50,
+                                'jitter': 3
+                            },
+                            1: {
+                                'name': 's0/0',
+                                'connection': 2,
+                                'delay': 100,
+                                'drop': 50,
+                                'jitter': 3
+                            }
+                        }
+                    },
+                    1: {
+                        'name': 'NodeB',
+                        'type': 'iol',
+                        'image': 'aaa',
+                        'ethernet': 3,
+                        'serial': 1,
+                        'ram': 1024,
+                        'icon': 'router.png',
+                        'left': 100,
+                        'top': 100,
+                        'interfaces': {
+                            0: {
+                                'name': 'e0/0',
+                                'connection': 0,
+                                'delay': 100,
+                                'drop': 50,
+                                'jitter': 3
+                            },
+                            1: {
+                                'name': 'e0/0',
+                                'connection': 1,
+                                'delay': 100,
+                                'drop': 50,
+                                'jitter': 3
+                            }
+                        }
+                    },
+                    2: {
+                        'name': 'NodeC',
+                        'type': 'iol',
+                        'image': 'aaa',
+                        'ethernet': 3,
+                        'serial': 1,
+                        'ram': 1024,
+                        'icon': 'router.png',
+                        'left': 100,
+                        'top': 100,
+                        'interfaces': {
+                            0: {
+                                'name': 'e0/0',
+                                'connection': 1,
+                                'delay': 100,
+                                'drop': 50,
+                                'jitter': 3
+                            },
+                            1: {
+                                'name': 's0/0',
+                                'connection': 2,
+                                'delay': 100,
+                                'drop': 50,
+                                'jitter': 3
+                            }
+                        }
+                    },
+                },
+                'connections': {
+                    0: {
+                        'type': 'ethernet',
+                        'shutdown': False
+                    },
+                    1: {
+                        'type': 'ethernet',
+                        'shutdown': False
+                    },
+                    2: {
+                        'type': 'serial',
+                        'shutdown': False
+                    }
+                }
+            }
+        }
+        response = self.app.post(url, data = json.dumps(data), content_type = 'application/json')
         response_data = json.loads(response.get_data(as_text = True))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response_data['status'], 'enqueued')

@@ -50,9 +50,10 @@ class ControllerTable(db.Model):
 class LabTable(db.Model):
     __tablename__ = 'labs'
     id = db.Column(db.String(128), primary_key = True)
+    author = db.Column(db.String(128))
     name = db.Column(db.String(128))
-    filename = db.Column(db.String(128))
-    path = db.Column(db.String(128))
+    version = db.Column(db.Integer)
+    json = db.Column(db.Text)
     repository = db.Column(db.String(128), db.ForeignKey('repositories.repository'))
 
     def __repr__(self):

@@ -17,7 +17,7 @@ def checkAuth(request):
             'username': 'admin',
             'roles': {
                 'admin': {
-                    'access_to': '*',
+                    'access_to': '.*',
                     'can_write': True
                 }
             }
@@ -55,6 +55,7 @@ def checkAuth(request):
                 'password': user.password,
                 'roles': roles
             }
+            print('HERREE')
             cache.set(username, user)
             return user
         else:
@@ -74,21 +75,22 @@ def checkAuthz(request, roles = []):
     # User does not have any required role
     abort(403)
 
-def checkAuthzPath(request, path, would_write = False):
+def checkAuthzPath(request, paths, would_write = False):
     import re
     # User Authentication
     user = checkAuth(request)
-
-    user = User.query.get(username)
-    if not user:
-        return False
-    for role in user.roles:
-        try:
-            pattern = re.compile(role.access_to)
-            if pattern.match(path) != None:
-                if would_write and not role.can_write:
-                    return False
-                return True
-        except Exception as err:
-            return False
-    return False
+    for key, role in user['roles'].items():
+        for path in paths:
+            # At least one user role must match one path
+            try:
+                pattern = re.compile(role['access_to'])
+                if pattern.match(path) != None:
+                    # Regex matches
+                    if would_write and not role['can_write']:
+                        # User would write but cannot with this role
+                        continue
+                    return True
+            except:
+                # Invalid regex
+                pass
+    abort(403)

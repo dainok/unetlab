@@ -5,14 +5,17 @@ __copyright__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
 __license__ = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
 __revision__ = '20170403'
 
-import os
+import json, os, uuid
 from flask import abort, request
 from flask_restful import Resource
 from controller import cache, config, git
-from controller.catalog.aaa import checkAuth, checkAuthz
+from controller.catalog.aaa import checkAuth, checkAuthz, checkAuthzPath
 from controller.catalog.models import *
 from controller.catalog.parsers import *
 from controller.catalog.tasks import *
+
+def printLab(lab):
+    return {}
 
 def printRole(role):
     return {
@@ -43,20 +46,34 @@ class Auth(Resource):
         }
 
 class Lab(Resource):
-    # TODO
+    # TODO: post
+    # creo nuovo lab: creo il file nel repository, se non esiste
+    # lo modifico, e' in db fino al save
+    # save, scrivo in git e commit + push?
+    # TODO: patch
+    # modifico in DB
+    # TODO: delete
+    # cancello da DB e da repo
     def post(self):
-        checkAuthz(request, ['admin'])
-        args = add_repository_parser.parse_args()
-        if args['repository'] == 'local':
-            # local is a reserved repository
-            abort(400)
-        t = addGit.apply_async((args['repository'], args['url'], args['username'], args['password']))
+        args = add_lab_parser.parse_args()
+        checkAuthzPath(request, [args['repository']], True)
+        lab = LabTable(
+            id = str(uuid.uuid4()),
+            name = args['name'],
+            repository = args['repository'],
+            author = args['author'],
+            version = args['version'],
+            json = json.dumps({}, separators=(',', ':'), sort_keys=True)
+        )
+        db.session.add(lab)
+        db.session.commit()
         return {
-            'status': 'enqueued',
-            'message': 'Task "{}" enqueued to the batch manager'.format(t),
-            'task': str(t)
+            'status': 'success',
+            'message': 'Lab "{}" added'.format(lab.id),
+            'data': {
+                lab.id: printLab(lab)
+            }
         }
-
 
 class Repository(Resource):
     # TODO: only admin edit remote
@@ -83,8 +100,8 @@ class Repository(Resource):
         }
 
     def post(self):
-        checkAuthz(request, ['admin'])
         args = add_repository_parser.parse_args()
+        checkAuthz(request, ['admin'])
         if args['repository'] == 'local':
             # local is a reserved repository
             abort(400)
@@ -136,6 +153,7 @@ class Role(Resource):
         }
 
     def patch(self, role = None):
+        args = patch_role_parser.parse_args()
         checkAuthz(request, ['admin'])
         if not role:
             # No role has been selected
@@ -143,7 +161,6 @@ class Role(Resource):
         else:
             # Get the role if exists, else 404
             role = RoleTable.query.get_or_404(role)
-        args = patch_role_parser.parse_args()
         for key, value in args.items():
             if key in ['access_to', 'can_write']:
                 setattr(role, key, value)
@@ -160,8 +177,8 @@ class Role(Resource):
         }
 
     def post(self):
-        checkAuthz(request, ['admin'])
         args = add_role_parser.parse_args()
+        checkAuthz(request, ['admin'])
         if RoleTable.query.get(args['role']):
             # Role eady exists
             abort(409)
@@ -220,6 +237,7 @@ class User(Resource):
         }
 
     def patch(self, username = None):
+        args = patch_user_parser.parse_args()
         checkAuthz(request, ['admin'])
         if not username:
             # No user has been selected
@@ -227,7 +245,6 @@ class User(Resource):
         else:
             # Get the user if exists, else 404
             user = UserTable.query.get_or_404(username)
-        args = patch_user_parser.parse_args()
         for key, value in args.items():
             if key in ['email', 'labels', 'name']:
                 setattr(user, key, value)
@@ -250,8 +267,8 @@ class User(Resource):
         }
 
     def post(self):
-        checkAuthz(request, ['admin'])
         args = add_user_parser.parse_args()
+        checkAuthz(request, ['admin'])
         if UserTable.query.get(args['username']):
             # User already exists
             abort(409)

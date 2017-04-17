@@ -90,7 +90,7 @@ role = RoleTable.query.get('admin')
 if not role:
     role = RoleTable(
         role = 'admin',
-        access_to = '*',
+        access_to = '.*',
         can_write = True
     )
     db.session.add(role)
@@ -128,6 +128,7 @@ if not os.path.isdir('{}/local'.format(config['app']['lab_repository'])):
 
 # Routing
 api.add_resource(Auth, '/api/v1/auth')
+api.add_resource(Lab, '/api/v1/labs')
 api.add_resource(Repository, '/api/v1/repositories', '/api/v1/repositories/<string:repository>')
 api.add_resource(Role, '/api/v1/roles', '/api/v1/roles/<string:role>')
 api.add_resource(User, '/api/v1/users', '/api/v1/users/<string:username>')
