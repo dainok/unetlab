@@ -12,15 +12,18 @@ from controller.catalog.models import *
 @celery.task()
 def addGit(repository, url, username, password):
     # Add a git repository for labs
+    task = addGit.request.id
     if os.path.isdir('{}/{}'.format(config['app']['lab_repository'], repository)):
         # Repository already exists
         print('Repository already "{}" exists'.format(repository))
+        print('Task {} failed'.format(task))
         return False
     try:
         print('Starting to clone repository "{}" to "{}"'.format(url, repository))
         git.clone('-q', url, '{}/{}'.format(config['app']['lab_repository'], repository), _bg = False)
     except:
         print('Failed to clone repository "{}"'.format(url))
+        print('Task {} failed'.format(task))
         return False
     repository = RepositoryTable(
         repository = repository,
@@ -31,16 +34,22 @@ def addGit(repository, url, username, password):
     db.session.add(repository)
     db.session.commit()
     print('Repository "{}" successfully cloned'.format(url))
+    print('Task {} completed'.format(task))
     return True
 
 @celery.task()
 def deleteGit(repository):
     # Delete repository
+    task = deleteGit.request.id
     print('Starting to delete repository "{}"'.format(repository))
     try:
         shutil.rmtree('{}/{}'.format(config['app']['lab_repository'], repository), ignore_errors = False)
     except:
         print('Failed to delete repository "{}"'.format(repository))
+        print('Task {} failed'.format(task))
         return False
+    db.session.delete(RepositoryTable.query.get(repository))
+    db.session.commit()
     print('Repository "{}" successfully deleted'.format(repository))
+    print('Task {} completed'.format(task))
     return True

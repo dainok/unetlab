@@ -45,7 +45,17 @@ class Auth(Resource):
 class Lab(Resource):
     # TODO
     def post(self):
-        return "ciao"
+        checkAuthz(request, ['admin'])
+        args = add_repository_parser.parse_args()
+        if args['repository'] == 'local':
+            # local is a reserved repository
+            abort(400)
+        t = addGit.apply_async((args['repository'], args['url'], args['username'], args['password']))
+        return {
+            'status': 'enqueued',
+            'message': 'Task "{}" enqueued to the batch manager'.format(t),
+            'task': str(t)
+        }
 
 
 class Repository(Resource):
@@ -68,7 +78,8 @@ class Repository(Resource):
         t = deleteGit.apply_async((repository,))
         return {
             'status': 'enqueued',
-            'message': 'Task "{}" enqueued to the batch manager'.format(t)
+            'message': 'Task "{}" enqueued to the batch manager'.format(t),
+            'task': str(t)
         }
 
     def post(self):
@@ -80,7 +91,8 @@ class Repository(Resource):
         t = addGit.apply_async((args['repository'], args['url'], args['username'], args['password']))
         return {
             'status': 'enqueued',
-            'message': 'Task "{}" enqueued to the batch manager'.format(t)
+            'message': 'Task "{}" enqueued to the batch manager'.format(t),
+            'task': str(t)
         }
 
 class Role(Resource):

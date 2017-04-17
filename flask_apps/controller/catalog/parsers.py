@@ -5,7 +5,9 @@ __copyright__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
 __license__ = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
 __revision__ = '20170403'
 
+import os
 from flask_restful import reqparse
+from controller import config
 from controller.catalog.models import RoleTable
 
 def type_label(arg):
@@ -19,6 +21,12 @@ def type_label(arg):
         return label
     raise ValueError
 
+def type_repository(arg):
+    # A repository must exist under lab_repository
+    if os.path.isdir('{}/{}'.format(config['app']['lab_repository'], arg)):
+        return arg
+    raise ValueError
+
 def type_roles(arg):
     # A role must be defined in RoleTable
     if type(arg) is list:
@@ -28,9 +36,15 @@ def type_roles(arg):
         return arg
     raise ValueError
 
+add_lab_parser = reqparse.RequestParser()
+add_lab_parser.add_argument('name', type = str, required = True, location = 'json', help = 'name cannot be blank')
+add_lab_parser.add_argument('repository', type = type_repository, required = True, location = 'json', help = 'repository must be present')
+add_lab_parser.add_argument('author', type = str, required = False, location = 'json', help = 'author must be a string')
+add_lab_parser.add_argument('version', type = str, required = False, location = 'json', help = 'version must be a string')
+
 add_repository_parser = reqparse.RequestParser()
-add_repository_parser.add_argument('repository', type = str, required = True, location = 'json', help = 'repository cannot be bank')
-add_repository_parser.add_argument('url', type = str, required = True, location = 'json', help = 'url cannot be bank')
+add_repository_parser.add_argument('repository', type = str, required = True, location = 'json', help = 'repository cannot be blank')
+add_repository_parser.add_argument('url', type = str, required = True, location = 'json', help = 'url cannot be blank')
 add_repository_parser.add_argument('username', type = str, required = False, location = 'json', help = 'username must be a string')
 add_repository_parser.add_argument('password', type = str, required = False, location = 'json', help = 'password must be a string')
 
