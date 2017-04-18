@@ -55,7 +55,6 @@ def checkAuth(request):
                 'password': user.password,
                 'roles': roles
             }
-            print('HERREE')
             cache.set(username, user)
             return user
         else:

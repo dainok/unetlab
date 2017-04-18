@@ -5,17 +5,18 @@ __copyright__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
 __license__ = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
 __revision__ = '20170403'
 
-import json, os, uuid
+import json, os, shutil, uuid
 from flask import abort, request
 from flask_restful import Resource
-from controller import cache, config, git
+from controller import cache, config
 from controller.catalog.aaa import checkAuth, checkAuthz, checkAuthzPath
 from controller.catalog.models import *
 from controller.catalog.parsers import *
 from controller.catalog.tasks import *
 
 def printLab(lab):
-    return {}
+    data = json.loads(lab.json)
+    return data
 
 def printRole(role):
     return {
@@ -57,16 +58,31 @@ class Lab(Resource):
     def post(self):
         args = add_lab_parser.parse_args()
         checkAuthzPath(request, [args['repository']], True)
+        jlab = {
+            'id': str(uuid.uuid4()),
+            'name': args['name'],
+            'repository': args['repository'],
+            'author': args['author'],
+            'version': args['version']
+        }
         lab = LabTable(
-            id = str(uuid.uuid4()),
-            name = args['name'],
-            repository = args['repository'],
-            author = args['author'],
-            version = args['version'],
-            json = json.dumps({}, separators=(',', ':'), sort_keys=True)
+            id = jlab['id'],
+            name = jlab['name'],
+            repository = jlab['repository'],
+            author = jlab['author'],
+            version = jlab['version'],
+            json = json.dumps(jlab, separators=(',', ':'), sort_keys = True)
         )
         db.session.add(lab)
         db.session.commit()
+        if args['commit']:
+            # TODO: manage exception: delete lab, remove from db only if commit = true
+            # Write to file, add to git and commit
+            lab_file = '{}/{}/{}.{}'.format(config['app']['lab_repository'], lab.repository, lab.id, config['app']['lab_extension'])
+            with open(lab_file, 'w') as lab_fd:
+                json.dump(printLab(lab), lab_fd, sort_keys = True, indent = 4)
+            sh.git('-C', '{}/{}'.format(config['app']['lab_repository'], lab.repository), 'add', lab_file, _bg = False)
+            sh.git('-C', '{}/{}'.format(config['app']['lab_repository'], lab.repository), 'commit', '-m', 'Added lab {} ("{}")'.format(lab.id, lab.name))
         return {
             'status': 'success',
             'message': 'Lab "{}" added'.format(lab.id),

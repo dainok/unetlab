@@ -65,7 +65,6 @@ app.config.update(
 )
 api = Api(app)
 db = SQLAlchemy(app)
-git = sh.git.bake(_cwd='/data/labs')
 cache = memcache.Client([config['app']['memcache_server']], debug = 0)
 celery = make_celery(app)
 api_key = config['app']['api_key']
@@ -114,16 +113,19 @@ if not user:
 if not os.path.isdir('{}/local'.format(config['app']['lab_repository'])):
     try:
         os.makedirs('{}/local'.format(config['app']['lab_repository']))
-        git.init('-q', '{}/local'.format(config['app']['lab_repository']), _bg = False)
+        sh.git('-C', '{}/local'.format(config['app']['lab_repository']), 'init', '-q', _bg = False)
         repository = RepositoryTable(
             repository = 'local'
         )
         db.session.add(repository)
         db.session.commit()
-    except:
+    except Exception as err:
         # Cannot create local reporitory
-        shutil.rmtree('{}/local'.format(config['app']['lab_repository']), ignore_errors = True)
-        sys.stderr.write('Cannot create local repository\n')
+        shutil.rmtree('{}'.format(config['app']['lab_repository']), ignore_errors = True)
+        repository = RepositoryTable.query.get('local')
+        if repository:
+            db.session.delete(repository)
+        sys.stderr.write('Cannot create local repository ({})\n'.format(err))
         sys.exit(1)
 
 # Routing

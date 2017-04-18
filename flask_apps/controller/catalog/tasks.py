@@ -6,7 +6,7 @@ __license__ = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
 __revision__ = '20170403'
 
 import os, sh, shutil
-from controller import celery, config, git
+from controller import celery, config
 from controller.catalog.models import *
 
 @celery.task()
@@ -20,10 +20,11 @@ def addGit(repository, url, username, password):
         return False
     try:
         print('Starting to clone repository "{}" to "{}"'.format(url, repository))
-        git.clone('-q', url, '{}/{}'.format(config['app']['lab_repository'], repository), _bg = False)
-    except:
+        sh.git('-C', '{}'.format(config['app']['lab_repository']), 'clone', '-q', url, repository, _bg = False)
+    except Exception as err:
         print('Failed to clone repository "{}"'.format(url))
         print('Task {} failed'.format(task))
+        print(err)
         return False
     repository = RepositoryTable(
         repository = repository,
@@ -44,9 +45,10 @@ def deleteGit(repository):
     print('Starting to delete repository "{}"'.format(repository))
     try:
         shutil.rmtree('{}/{}'.format(config['app']['lab_repository'], repository), ignore_errors = False)
-    except:
+    except Exception as err:
         print('Failed to delete repository "{}"'.format(repository))
         print('Task {} failed'.format(task))
+        print(err)
         return False
     db.session.delete(RepositoryTable.query.get(repository))
     db.session.commit()

@@ -57,10 +57,10 @@ def loadConfig(config_file):
         config['app']['testing'] = 'False'
         need_to_save = True
     if not config.has_option('app', 'lab_extension'):
-        config['app']['lab_extension'] = 'unl'
+        config['app']['lab_extension'] = 'junl'
         need_to_save = True
     if not config.has_option('app', 'lab_repository'):
-        config['app']['lab_repository'] = '/data/labs'
+        config['app']['lab_repository'] = '/data/repositories'
         need_to_save = True
     if not config.has_option('controller', 'id'):
         config['controller']['id'] = '0'

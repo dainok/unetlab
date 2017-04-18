@@ -61,22 +61,22 @@ class FlaskTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response_data['status'], 'success')
         self.assertEqual(response_data['data']['admin']['can_write'], True)
-        self.assertEqual(response_data['data']['admin']['access_to'], '*')
+        self.assertEqual(response_data['data']['admin']['access_to'], '.*')
 
     def test_01_01_post_role_via_api(self):
-        # curl -s -D- -X POST -d '{"role":"test1","can_write":true,"access_to":"*"}' -H 'Content-type: application/json' 'http://127.0.0.1:5000/api/v1/roles?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
+        # curl -s -D- -X POST -d '{"role":"test1","can_write":true,"access_to":".*"}' -H 'Content-type: application/json' 'http://127.0.0.1:5000/api/v1/roles?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
         url = '/api/v1/roles?api_key={}'.format(api_key)
         data = {
             'role': role_1,
             'can_write': False,
-            'access_to': '*'
+            'access_to': '.*'
         }
         response = self.app.post(url, data = json.dumps(data), content_type = 'application/json')
         response_data = json.loads(response.get_data(as_text = True))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response_data['status'], 'success')
         self.assertEqual(response_data['data'][role_1]['can_write'], False)
-        self.assertEqual(response_data['data'][role_1]['access_to'], '*')
+        self.assertEqual(response_data['data'][role_1]['access_to'], '.*')
 
     def test_01_02_get_role_via_api(self):
         # curl -s -D- -X GET 'http://127.0.0.1:5000/api/v1/roles/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
@@ -86,21 +86,21 @@ class FlaskTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response_data['status'], 'success')
         self.assertEqual(response_data['data'][role_1]['can_write'], False)
-        self.assertEqual(response_data['data'][role_1]['access_to'], '*')
+        self.assertEqual(response_data['data'][role_1]['access_to'], '.*')
 
     def test_01_03_patch_role_via_api(self):
-        # curl -s -D- -X PATCH -d '{"can_write":false,"access_to":"something*"}' -H 'Content-type: application/json' 'http://127.0.0.1:5000/api/v1/roles/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
+        # curl -s -D- -X PATCH -d '{"can_write":false,"access_to":"something.*"}' -H 'Content-type: application/json' 'http://127.0.0.1:5000/api/v1/roles/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
         url = '/api/v1/roles/{}?api_key={}'.format(role_1, api_key)
         data = {
             'can_write': True,
-            'access_to': 'something*'
+            'access_to': 'something.*'
         }
         response = self.app.patch(url, data = json.dumps(data), content_type = 'application/json')
         response_data = json.loads(response.get_data(as_text = True))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response_data['status'], 'success')
         self.assertEqual(response_data['data'][role_1]['can_write'], True)
-        self.assertEqual(response_data['data'][role_1]['access_to'], 'something*')
+        self.assertEqual(response_data['data'][role_1]['access_to'], 'something.*')
 
     def test_01_04_get_role_via_api(self):
         # curl -s -D- -X GET 'http://127.0.0.1:5000/api/v1/roles/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
@@ -110,7 +110,7 @@ class FlaskTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response_data['status'], 'success')
         self.assertEqual(response_data['data'][role_1]['can_write'], True)
-        self.assertEqual(response_data['data'][role_1]['access_to'], 'something*')
+        self.assertEqual(response_data['data'][role_1]['access_to'], 'something.*')
 
     def test_01_05_patch_role_via_api(self):
         # curl -s -D- -X PATCH -d '{"can_write":false}' -H 'Content-type: application/json' 'http://127.0.0.1:5000/api/v1/roles/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
@@ -123,7 +123,7 @@ class FlaskTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response_data['status'], 'success')
         self.assertEqual(response_data['data'][role_1]['can_write'], True)
-        self.assertEqual(response_data['data'][role_1]['access_to'], 'something*')
+        self.assertEqual(response_data['data'][role_1]['access_to'], 'something.*')
 
     def test_01_06_get_role_via_api(self):
         # curl -s -D- -X GET 'http://127.0.0.1:5000/api/v1/roles/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
@@ -133,7 +133,7 @@ class FlaskTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response_data['status'], 'success')
         self.assertEqual(response_data['data'][role_1]['can_write'], True)
-        self.assertEqual(response_data['data'][role_1]['access_to'], 'something*')
+        self.assertEqual(response_data['data'][role_1]['access_to'], 'something.*')
 
     """
     Tests about users
@@ -271,7 +271,7 @@ class FlaskTestCase(unittest.TestCase):
     Tests about repositories
     """
 
-    def dis_test_03_00_post_repository_via_api(self):
+    def disabled_test_03_00_post_repository_via_api(self):
         # curl -s -D- -X POST -d '{"repository":"test","url":"https://github.com/dainok/rrlabs"}' -H 'Content-type: application/json' http://127.0.0.1:5000/api/v1/repositories?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6
         url = '/api/v1/repositories?api_key={}'.format(api_key)
         data = {
@@ -283,7 +283,7 @@ class FlaskTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response_data['status'], 'enqueued')
 
-    def dis_test_03_ff_delete_repository_via_api(self):
+    def disabled_test_03_ff_delete_repository_via_api(self):
         # curl -s -D- -X DELETE http://127.0.0.1:5000/api/v1/repositories/test?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6
         url = 'api/v1/repositories/test?api_key={}'.format(api_key)
         response = self.app.delete(url)
@@ -406,7 +406,7 @@ class FlaskTestCase(unittest.TestCase):
         response = self.app.post(url, data = json.dumps(data), content_type = 'application/json')
         response_data = json.loads(response.get_data(as_text = True))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response_data['status'], 'enqueued')
+        self.assertEqual(response_data['status'], 'success')
 
     """
     Final tests and cleaning
