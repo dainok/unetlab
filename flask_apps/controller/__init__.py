@@ -114,23 +114,22 @@ if not os.path.isdir('{}/local'.format(config['app']['lab_repository'])):
     try:
         os.makedirs('{}/local'.format(config['app']['lab_repository']))
         sh.git('-C', '{}/local'.format(config['app']['lab_repository']), 'init', '-q', _bg = False)
-        repository = RepositoryTable(
-            repository = 'local'
-        )
-        db.session.add(repository)
-        db.session.commit()
     except Exception as err:
         # Cannot create local reporitory
         shutil.rmtree('{}'.format(config['app']['lab_repository']), ignore_errors = True)
-        repository = RepositoryTable.query.get('local')
-        if repository:
-            db.session.delete(repository)
         sys.stderr.write('Cannot create local repository ({})\n'.format(err))
         sys.exit(1)
+repository = RepositoryTable.query.get('local')
+if not repository:
+    repository = RepositoryTable(
+        repository = 'local'
+    )
+    db.session.add(repository)
+    db.session.commit()
 
 # Routing
 api.add_resource(Auth, '/api/v1/auth')
-api.add_resource(Lab, '/api/v1/labs')
+api.add_resource(Lab, '/api/v1/labs', '/api/v1/labs/<path:lab_id>')
 api.add_resource(Repository, '/api/v1/repositories', '/api/v1/repositories/<string:repository>')
 api.add_resource(Role, '/api/v1/roles', '/api/v1/roles/<string:role>')
 api.add_resource(User, '/api/v1/users', '/api/v1/users/<string:username>')

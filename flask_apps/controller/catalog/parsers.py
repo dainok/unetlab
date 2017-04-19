@@ -43,6 +43,9 @@ add_lab_parser.add_argument('repository', type = type_repository, required = Tru
 add_lab_parser.add_argument('author', type = str, required = False, location = 'json', help = 'author must be a string')
 add_lab_parser.add_argument('version', type = int, required = False, location = 'json', help = 'version must be a string')
 
+delete_lab_parser = reqparse.RequestParser()
+delete_lab_parser.add_argument('commit', type = bool, required = False, help = 'commit must be boolean')
+
 add_repository_parser = reqparse.RequestParser()
 add_repository_parser.add_argument('repository', type = str, required = True, location = 'json', help = 'repository cannot be blank')
 add_repository_parser.add_argument('url', type = str, required = True, location = 'json', help = 'url cannot be blank')

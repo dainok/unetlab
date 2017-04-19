@@ -88,7 +88,7 @@ def checkAuthzPath(request, paths, would_write = False):
                     if would_write and not role['can_write']:
                         # User would write but cannot with this role
                         continue
-                    return True
+                    return user['username']
             except:
                 # Invalid regex
                 pass

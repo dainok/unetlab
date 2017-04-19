@@ -14,8 +14,17 @@ from controller.catalog.models import *
 from controller.catalog.parsers import *
 from controller.catalog.tasks import *
 
-def printLab(lab):
-    data = json.loads(lab.json)
+def printLab(lab, summary = False):
+    if summary:
+        data =  {
+            'id': lab.id,
+            'name': lab.name,
+            'repository': lab.repository,
+            'author': lab.author,
+            'version': lab.version
+        }
+    else:
+        data = json.loads(lab.json)
     return data
 
 def printRole(role):
@@ -40,13 +49,65 @@ def printUser(user):
 class Auth(Resource):
     def get(self):
         user = UserTable.query.get_or_404(checkAuthz(request))
-        return {
+        data = {
             'status': 'success',
             'message': 'User authenticated',
             'data': printUser(user)
         }
+        data['data']['active_labs'] = {}
+        for active_lab in user.active_labs:
+            data['data']['active_labs'][active_lab.id] = {
+                'id': active_lab.id,
+                'name': active_lab.name,
+                'repository': active_lab.repository,
+                'author': active_lab.author,
+                'version': active_lab.version
+            }
+        return data
 
 class Lab(Resource):
+    def delete(self, lab_id = None):
+        username = checkAuthz(request)
+        args = delete_lab_parser.parse_args()
+        if not lab_id:
+            # No lab has been selected
+            abort(400)
+        else:
+            active_lab = ActiveLabTable.query.get((lab_id, username))
+            lab = LabTable.query.get(lab_id)
+        if not active_lab and not lab:
+            abort(404)
+        if active_lab:
+            # If an active lab exists for the user, it can be deleted by the user himself
+            db.session.delete(active_lab)
+        if lab and args['commit'] == True:
+            # If a lab exists, it can be deleted by an authorized user only
+            checkAuthzPath(request, [lab.repository, lab.name], True)
+            db.session.delete(lab)
+        db.session.commit()
+        return {
+            'status': 'success',
+            'message': 'Lab "{}" deleted'.format(lab_id)
+        }
+
+    def get(self, lab_id = None, page = 1):
+        checkAuthz(request)
+        if not lab_id:
+            # List all labs
+            labs = LabTable.query.paginate(page, 10).items
+        else:
+            # List a single lab if exists, else 404
+            labs = [LabTable.query.get_or_404(lab_id)]
+        data = {}
+        for lab in labs:
+            # Print each lab
+            data[lab.id] = printLab(lab, summary = True)
+        return {
+            'status': 'success',
+            'message': 'Role(s) found',
+            'data': data
+        }
+
     # TODO: post
     # creo nuovo lab: creo il file nel repository, se non esiste
     # lo modifico, e' in db fino al save
@@ -57,7 +118,7 @@ class Lab(Resource):
     # cancello da DB e da repo
     def post(self):
         args = add_lab_parser.parse_args()
-        checkAuthzPath(request, [args['repository']], True)
+        username = checkAuthzPath(request, [args['repository']], True)
         jlab = {
             'id': str(uuid.uuid4()),
             'name': args['name'],
@@ -65,30 +126,39 @@ class Lab(Resource):
             'author': args['author'],
             'version': args['version']
         }
-        lab = LabTable(
+        active_lab = ActiveLabTable(
             id = jlab['id'],
             name = jlab['name'],
             repository = jlab['repository'],
             author = jlab['author'],
             version = jlab['version'],
-            json = json.dumps(jlab, separators=(',', ':'), sort_keys = True)
+            json = json.dumps(jlab, separators=(',', ':'), sort_keys = True),
+            username = username
         )
-        db.session.add(lab)
-        db.session.commit()
+        db.session.add(active_lab)
         if args['commit']:
             # TODO: manage exception: delete lab, remove from db only if commit = true
             # Write to file, add to git and commit
-            lab_file = '{}/{}/{}.{}'.format(config['app']['lab_repository'], lab.repository, lab.id, config['app']['lab_extension'])
+            lab_file = '{}/{}/{}.{}'.format(config['app']['lab_repository'], jlab['repository'], jlab['id'], config['app']['lab_extension'])
+            lab = LabTable(
+                id = jlab['id'],
+                name = jlab['name'],
+                repository = jlab['repository'],
+                author = jlab['author'],
+                version = jlab['version'],
+                json = json.dumps(jlab, separators=(',', ':'), sort_keys = True),
+            )
             with open(lab_file, 'w') as lab_fd:
                 json.dump(printLab(lab), lab_fd, sort_keys = True, indent = 4)
             sh.git('-C', '{}/{}'.format(config['app']['lab_repository'], lab.repository), 'add', lab_file, _bg = False)
             sh.git('-C', '{}/{}'.format(config['app']['lab_repository'], lab.repository), 'commit', '-m', 'Added lab {} ("{}")'.format(lab.id, lab.name))
+
+            db.session.add(lab)
+        db.session.commit()
         return {
             'status': 'success',
-            'message': 'Lab "{}" added'.format(lab.id),
-            'data': {
-                lab.id: printLab(lab)
-            }
+            'message': 'Lab "{}" added'.format(active_lab.id),
+            'data': printLab(active_lab)
         }
 
 class Repository(Resource):
@@ -187,9 +257,7 @@ class Role(Resource):
         return {
             'status': 'success',
             'message': 'Role "{}" saved'.format(role.role),
-            'data': {
-                role.role: printRole(role)
-            }
+            'data': printRole(role)
         }
 
     def post(self):
@@ -208,9 +276,7 @@ class Role(Resource):
         return {
             'status': 'success',
             'message': 'Role "{}" added'.format(role.role),
-            'data': {
-                role.role: printRole(role)
-            }
+            'data': printRole(role)
         }
 
 class User(Resource):
@@ -277,9 +343,7 @@ class User(Resource):
         return {
             'status': 'success',
             'message': 'User "{}" saved'.format(user.username),
-            'data': {
-                user.username: printUser(user)
-            }
+            'data': printUser(user)
         }
 
     def post(self):
@@ -304,7 +368,5 @@ class User(Resource):
         return {
             'status': 'success',
             'message': 'User "{}" added'.format(user.username),
-            'data': {
-                user.username: printUser(user)
-            }
+            'data': printUser(user)
         }

@@ -14,6 +14,17 @@ roles_to_users = db.Table(
     db.Column('username', db.String(128), db.ForeignKey('users.username')),
 )
 
+class ActiveLabTable(db.Model):
+    __tablename__ = 'active_labs'
+    id = db.Column(db.String(128), primary_key = True)
+    username = db.Column(db.String(128), db.ForeignKey('users.username'), primary_key = True)
+    author = db.Column(db.String(128))
+    name = db.Column(db.String(128))
+    version = db.Column(db.Integer)
+    json = db.Column(db.Text)
+    repository = db.Column(db.String(128), db.ForeignKey('repositories.repository'))
+    # array of avtive nodes
+
 class ActiveNodeTable(db.Model):
     __tablename__ = 'active_nodes'
     username = db.Column(db.String(128), db.ForeignKey('users.username'), primary_key = True)
@@ -87,6 +98,7 @@ class UserTable(db.Model):
     email = db.Column(db.String(128), unique = True)
     labels = db.Column(db.Integer)
     roles = db.relationship('RoleTable', secondary = roles_to_users, back_populates = 'users')
+    active_labs = db.relationship('ActiveLabTable')
 
     def __repr__(self):
         return '<User(username={})>'.format(self.username)
