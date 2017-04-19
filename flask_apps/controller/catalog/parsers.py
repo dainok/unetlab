@@ -36,12 +36,54 @@ def type_roles(arg):
         return arg
     raise ValueError
 
+def type_topology(arg):
+    # Topology is a dict
+    if not isinstance(arg, dict):
+        raise ValueError
+    # Topology can have nodes and connections
+    if 'nodes' in arg:
+        # nodes is a dict
+        if not isinstance(arg['nodes'], dict):
+            raise ValueError
+        for node_id, node in arg['nodes'].items():
+            # node_id is numeric
+            if not node_id.isdigit():
+                raise ValueError
+            # node is a dict
+            if not isinstance(node, dict):
+                raise ValueError
+            # node can have interfaces
+            if 'interfaces' in node:
+                # interfaces is a dict
+                if not isinstance(node['interfaces'], dict):
+                    raise ValueError
+                for interface_id, interface in node['interfaces'].items():
+                    # interface_id is numeric
+                    if not interface_id.isdigit():
+                        raise ValueError
+                    # interface is a dict
+                    if not instance(interface, dict):
+                        raise ValueError
+    if 'connections' in arg:
+        # connections is a dict
+        if not isinstance(arg['connections'], dict):
+            raise ValueError
+        for connection_id, connection in arg['connections'].items():
+            # connection_id is numeric
+            if not connection_id.isdigit():
+                raise ValueError
+            # connection is a dict
+            if not isinstance(connection, dict):
+                raise ValueError
+    return arg
+
 add_lab_parser = reqparse.RequestParser()
 add_lab_parser.add_argument('commit', type = bool, required = False, help = 'commit must be boolean')
 add_lab_parser.add_argument('name', type = str, required = True, location = 'json', help = 'name cannot be blank')
 add_lab_parser.add_argument('repository', type = type_repository, required = True, location = 'json', help = 'repository must be present')
 add_lab_parser.add_argument('author', type = str, required = False, location = 'json', help = 'author must be a string')
 add_lab_parser.add_argument('version', type = int, required = False, location = 'json', help = 'version must be a string')
+add_lab_parser.add_argument('topology', type = type_topology, required = False, location = 'json', help = 'topology must be valid')
 
 delete_lab_parser = reqparse.RequestParser()
 delete_lab_parser.add_argument('commit', type = bool, required = False, help = 'commit must be boolean')

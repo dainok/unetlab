@@ -124,7 +124,8 @@ class Lab(Resource):
             'name': args['name'],
             'repository': args['repository'],
             'author': args['author'],
-            'version': args['version']
+            'version': args['version'],
+            'topology': args['topology']
         }
         active_lab = ActiveLabTable(
             id = jlab['id'],
@@ -132,12 +133,11 @@ class Lab(Resource):
             repository = jlab['repository'],
             author = jlab['author'],
             version = jlab['version'],
-            json = json.dumps(jlab, separators=(',', ':'), sort_keys = True),
+            json = json.dumps(jlab, separators = (',', ':'), sort_keys = True),
             username = username
         )
         db.session.add(active_lab)
         if args['commit']:
-            # TODO: manage exception: delete lab, remove from db only if commit = true
             # Write to file, add to git and commit
             lab_file = '{}/{}/{}.{}'.format(config['app']['lab_repository'], jlab['repository'], jlab['id'], config['app']['lab_extension'])
             lab = LabTable(
@@ -146,13 +146,12 @@ class Lab(Resource):
                 repository = jlab['repository'],
                 author = jlab['author'],
                 version = jlab['version'],
-                json = json.dumps(jlab, separators=(',', ':'), sort_keys = True),
+                json = json.dumps(jlab, separators = (',', ':'), sort_keys = True),
             )
             with open(lab_file, 'w') as lab_fd:
                 json.dump(printLab(lab), lab_fd, sort_keys = True, indent = 4)
             sh.git('-C', '{}/{}'.format(config['app']['lab_repository'], lab.repository), 'add', lab_file, _bg = False)
             sh.git('-C', '{}/{}'.format(config['app']['lab_repository'], lab.repository), 'commit', '-m', 'Added lab {} ("{}")'.format(lab.id, lab.name))
-
             db.session.add(lab)
         db.session.commit()
         return {

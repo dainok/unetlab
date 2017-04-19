@@ -314,7 +314,7 @@ class FlaskTestCase(unittest.TestCase):
             'author': 'Tester',
             'topology': {
                 'nodes': {
-                    0: {
+                    '0': {
                         'name': 'NodeA',
                         'type': 'iol',
                         'image': 'aaa',
@@ -325,14 +325,14 @@ class FlaskTestCase(unittest.TestCase):
                         'left': 100,
                         'top': 100,
                         'interfaces': {
-                            0: {
+                            '0': {
                                 'name': 'e0/0',
                                 'connection': 0,
                                 'delay': 100,
                                 'drop': 50,
                                 'jitter': 3
                             },
-                            1: {
+                            '1': {
                                 'name': 's0/0',
                                 'connection': 2,
                                 'delay': 100,
@@ -341,7 +341,7 @@ class FlaskTestCase(unittest.TestCase):
                             }
                         }
                     },
-                    1: {
+                    '1': {
                         'name': 'NodeB',
                         'type': 'iol',
                         'image': 'aaa',
@@ -352,14 +352,14 @@ class FlaskTestCase(unittest.TestCase):
                         'left': 100,
                         'top': 100,
                         'interfaces': {
-                            0: {
+                            '0': {
                                 'name': 'e0/0',
                                 'connection': 0,
                                 'delay': 100,
                                 'drop': 50,
                                 'jitter': 3
                             },
-                            1: {
+                            '1': {
                                 'name': 'e0/0',
                                 'connection': 1,
                                 'delay': 100,
@@ -368,7 +368,7 @@ class FlaskTestCase(unittest.TestCase):
                             }
                         }
                     },
-                    2: {
+                    '2': {
                         'name': 'NodeC',
                         'type': 'iol',
                         'image': 'aaa',
@@ -379,14 +379,14 @@ class FlaskTestCase(unittest.TestCase):
                         'left': 100,
                         'top': 100,
                         'interfaces': {
-                            0: {
+                            '0': {
                                 'name': 'e0/0',
                                 'connection': 1,
                                 'delay': 100,
                                 'drop': 50,
                                 'jitter': 3
                             },
-                            1: {
+                            '1': {
                                 'name': 's0/0',
                                 'connection': 2,
                                 'delay': 100,
@@ -397,15 +397,15 @@ class FlaskTestCase(unittest.TestCase):
                     },
                 },
                 'connections': {
-                    0: {
+                    '0': {
                         'type': 'ethernet',
                         'shutdown': False
                     },
-                    1: {
+                    '1': {
                         'type': 'ethernet',
                         'shutdown': False
                     },
-                    2: {
+                    '2': {
                         'type': 'serial',
                         'shutdown': False
                     }
