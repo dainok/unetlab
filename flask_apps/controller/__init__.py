@@ -48,6 +48,13 @@ def make_celery(app):
     return celery
 
 # Loading configuration from file
+if not os.path.isdir('/data/etc'):
+    try:
+        os.makedirs('/data/etc')
+    except Exception as err:
+        # Cannot create etc directory
+        sys.stderr.write('Cannot create "/data/etc" directory ({})\n'.format(err))
+        sys.exit(1)
 config_file = '/data/etc/controller.ini'
 config = loadConfig(config_file)
 config_files = [ config_file ]

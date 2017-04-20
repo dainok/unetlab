@@ -53,7 +53,7 @@ def type_topology(arg):
             if not isinstance(node, dict):
                 raise ValueError
             # node can have interfaces
-            if 'interfaces' in node:
+            if 'interfaces' in node.items():
                 # interfaces is a dict
                 if not isinstance(node['interfaces'], dict):
                     raise ValueError
