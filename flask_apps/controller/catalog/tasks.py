@@ -9,23 +9,33 @@ import os, sh, shutil
 from controller import celery, config
 from controller.catalog.models import *
 
-@celery.task()
+@celery.task(bind = True)
 def addGit(repository, url, username, password):
     # Add a git repository for labs
     task = addGit.request.id
+    self.update_state(state='STARTED', meta={
+        'status': 'started',
+        'message': 'Starting to clone repository "{}"'.format(repository),
+        'task': task,
+        'progress': -1
+    })
     if os.path.isdir('{}/{}'.format(config['app']['lab_repository'], repository)):
         # Repository already exists
-        print('Repository already "{}" exists'.format(repository))
-        print('Task {} failed'.format(task))
-        return False
+        return {
+            'status': 'failed',
+            'message': 'Repository already "{}" exists'.format(repository),
+            'task': task,
+            'progress': -1
+        }
     try:
-        print('Starting to clone repository "{}" to "{}"'.format(url, repository))
         sh.git('-C', '{}'.format(config['app']['lab_repository']), 'clone', '-q', url, repository, _bg = False)
     except Exception as err:
-        print('Failed to clone repository "{}"'.format(url))
-        print('Task {} failed'.format(task))
-        print(err)
-        return False
+        return {
+            'status': 'failed',
+            'message': 'Failed to clone repository "{}" ({})'.format(url, err),
+            'task': task,
+            'progress': -1
+        }
     repository = RepositoryTable(
         repository = repository,
         url = url,
@@ -34,24 +44,38 @@ def addGit(repository, url, username, password):
     )
     db.session.add(repository)
     db.session.commit()
-    print('Repository "{}" successfully cloned'.format(url))
-    print('Task {} completed'.format(task))
-    return True
+    return {
+        'status': 'completed',
+        'message': 'Repository "{}" successfully cloned'.format(url),
+        'task': task,
+        'progress': -1
+    }
 
-@celery.task()
+@celery.task(bind = True)
 def deleteGit(repository):
     # Delete repository
     task = deleteGit.request.id
-    print('Starting to delete repository "{}"'.format(repository))
+    self.update_state(state='STARTED', meta={
+        'status': 'started',
+        'message': 'Starting to delete repository "{}"'.format(repository),
+        'task': task,
+        'progress': -1
+    })
     try:
         shutil.rmtree('{}/{}'.format(config['app']['lab_repository'], repository), ignore_errors = False)
     except Exception as err:
-        print('Failed to delete repository "{}"'.format(repository))
-        print('Task {} failed'.format(task))
-        print(err)
-        return False
+        return {
+            'status': 'failed',
+            'message': 'Failed to delete repository "{}" ({})'.format(url, err),
+            'task': task,
+            'progress': -1
+        }
     db.session.delete(RepositoryTable.query.get(repository))
     db.session.commit()
-    print('Repository "{}" successfully deleted'.format(repository))
-    print('Task {} completed'.format(task))
-    return True
+    return {
+        'status': 'completed',
+        'message': 'Repository "{}" successfully deleted'.format(repository),
+        'task': task,
+        'progress': -1
+    }
+
