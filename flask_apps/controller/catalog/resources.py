@@ -46,6 +46,15 @@ def printUser(user):
         data['roles'].append(role.role)
     return data
 
+def printTask(task):
+    return {
+        'id': task.id,
+        'status': task.status,
+        'message': task.message,
+        'progress': task.progress,
+        'username': task.username
+    }
+
 class Auth(Resource):
     def get(self):
         user = UserTable.query.get_or_404(checkAuthz(request))
@@ -167,7 +176,7 @@ class Repository(Resource):
     # TODO: all users with write permission pull
     # TODO: allo startup pull + scan dei repo con aggiunta al db dei lab
     def delete(self, repository = None):
-        checkAuthz(request, ['admin'])
+        username = checkAuthz(request, ['admin'])
         if not repository:
             # No repository has been selected
             abort(400)
@@ -177,7 +186,7 @@ class Repository(Resource):
         elif not os.path.isdir('{}/{}'.format(config['app']['lab_repository'], repository)):
             # Repository does not exist
             abort(404)
-        t = deleteGit.apply_async((repository,))
+        t = deleteGit.apply_async((username, repository,))
         return {
             'status': 'enqueued',
             'message': 'Task "{}" enqueued to the batch manager'.format(t),
@@ -186,11 +195,11 @@ class Repository(Resource):
 
     def post(self):
         args = add_repository_parser.parse_args()
-        checkAuthz(request, ['admin'])
+        username = checkAuthz(request, ['admin'])
         if args['repository'] == 'local':
             # local is a reserved repository
             abort(400)
-        t = addGit.apply_async((args['repository'], args['url'], args['username'], args['password']))
+        t = addGit.apply_async((username, args['repository'], args['url'], args['username'], args['password']))
         return {
             'status': 'enqueued',
             'message': 'Task "{}" enqueued to the batch manager'.format(t),
@@ -276,6 +285,27 @@ class Role(Resource):
             'status': 'success',
             'message': 'Role "{}" added'.format(role.role),
             'data': printRole(role)
+        }
+
+class Task(Resource):
+    def get(self, task_id = None, page = 1):
+        username = checkAuthz(request)
+        if not task_id:
+            # List all tasks
+            # TODO from this user only, or all for admins
+            tasks = TaskTable.query.paginate(page, 10).items
+        else:
+            # List a single task if exists, else 404
+            # TODO task can be pending: see https://blog.miguelgrinberg.com/post/using-celery-with-flask (task = long_task.AsyncResult(task_id))
+            tasks = [TaskTable.query.get_or_404(task_id)]
+        data = {}
+        for task in tasks:
+            # Print each task
+            data[task.id] = printTask(task)
+        return {
+            'status': 'success',
+            'message': 'Task(s) found',
+            'data': data
         }
 
 class User(Resource):

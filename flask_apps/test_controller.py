@@ -280,7 +280,7 @@ class FlaskTestCase(unittest.TestCase):
     Tests about repositories
     """
 
-    def disabled_test_03_00_post_repository_via_api(self):
+    def test_03_00_post_repository_via_api(self):
         # curl -s -D- -X POST -d '{"repository":"test","url":"https://github.com/dainok/rrlabs"}' -H 'Content-type: application/json' http://127.0.0.1:5000/api/v1/repositories?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6
         url = '/api/v1/repositories?api_key={}'.format(api_key)
         data = {
@@ -292,7 +292,7 @@ class FlaskTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response_data['status'], 'enqueued')
 
-    def disabled_test_03_ff_delete_repository_via_api(self):
+    def test_03_ff_delete_repository_via_api(self):
         # curl -s -D- -X DELETE http://127.0.0.1:5000/api/v1/repositories/test?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6
         url = 'api/v1/repositories/test?api_key={}'.format(api_key)
         response = self.app.delete(url)
@@ -305,7 +305,7 @@ class FlaskTestCase(unittest.TestCase):
     """
 
     def test_04_00_post_lab_via_api(self):
-        # curl -s -D- -X POST -d '{"name":"Test","repository":"local","version":1,"author":"Tester"}' -H 'Content-type: application/json' http://127.0.0.1:5000/api/v1/labs?api_key=emml5esk8it58pbq2u8qqskz7jhhjiw6smr0v4vw
+        # curl -s -D- -X POST -d '{"name":"Test","repository":"local","version":1,"author":"Tester"}' -H 'Content-type: application/json' http://127.0.0.1:5000/api/v1/labs?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6
         url = '/api/v1/labs?commit=true&api_key={}'.format(api_key)
         data = {
             'name': 'Test',

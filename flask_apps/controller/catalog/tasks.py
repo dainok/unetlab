@@ -9,33 +9,61 @@ import os, sh, shutil
 from controller import celery, config
 from controller.catalog.models import *
 
+def updateTask(task_id, username, status, message, progress):
+    task = TaskTable.query.get(task_id)
+    if task:
+        # Update the existing task
+        task.status = status
+        task.message = message
+        task.progress = progress
+    else:
+        # Add a new task
+        task = TaskTable(
+            id = task_id,
+            status = status,
+            message = message,
+            progress = progress,
+            username = username
+        )
+        db.session.add(task)
+    db.session.commit()
+    return {
+        'status': status,
+        'message': message,
+        'task': task_id,
+        'progress': 100,
+        'username': username
+    }
+
 @celery.task(bind = True)
-def addGit(repository, url, username, password):
+def addGit(self, started_by, repository, url, username, password):
     # Add a git repository for labs
-    task = addGit.request.id
-    self.update_state(state='STARTED', meta={
+    task_id = addGit.request.id
+    self.update_state(state='STARTED', meta = {
         'status': 'started',
-        'message': 'Starting to clone repository "{}"'.format(repository),
-        'task': task,
+        'message': 'Starting to clone repository "{}" from "{}"'.format(repository, url),
+        'task': task_id,
         'progress': -1
     })
     if os.path.isdir('{}/{}'.format(config['app']['lab_repository'], repository)):
         # Repository already exists
-        return {
-            'status': 'failed',
-            'message': 'Repository already "{}" exists'.format(repository),
-            'task': task,
-            'progress': -1
-        }
+        return updateTask(
+            task_id = task_id,
+            username = started_by,
+            status = 'failed',
+            message = 'Repository already "{}" exists'.format(repository),
+            progress = 100
+        )
     try:
         sh.git('-C', '{}'.format(config['app']['lab_repository']), 'clone', '-q', url, repository, _bg = False)
     except Exception as err:
-        return {
-            'status': 'failed',
-            'message': 'Failed to clone repository "{}" ({})'.format(url, err),
-            'task': task,
-            'progress': -1
-        }
+        return updateTask(
+            task_id = task_id,
+            username = started_by,
+            status = 'failed',
+            message = 'Failed to clone repository "{}" from "{}" ({})'.format(repository, url, err),
+            progress = 100
+        )
     repository = RepositoryTable(
         repository = repository,
         url = url,
@@ -44,38 +72,39 @@ def addGit(repository, url, username, password):
     )
     db.session.add(repository)
     db.session.commit()
-    return {
-        'status': 'completed',
-        'message': 'Repository "{}" successfully cloned'.format(url),
-        'task': task,
-        'progress': -1
-    }
+    return updateTask(
+        task_id = task_id,
+        username = started_by,        status = 'completed',
+        message = 'Repository "{}" successfully cloned from "{}"'.format(repository, url),
+        progress = 100
+    )
 
 @celery.task(bind = True)
-def deleteGit(repository):
+def deleteGit(self, started_by, repository):
     # Delete repository
-    task = deleteGit.request.id
-    self.update_state(state='STARTED', meta={
+    task_id = deleteGit.request.id
+    self.update_state(state='STARTED', meta = {
         'status': 'started',
         'message': 'Starting to delete repository "{}"'.format(repository),
-        'task': task,
+        'task': task_id,
         'progress': -1
     })
     try:
         shutil.rmtree('{}/{}'.format(config['app']['lab_repository'], repository), ignore_errors = False)
     except Exception as err:
-        return {
-            'status': 'failed',
-            'message': 'Failed to delete repository "{}" ({})'.format(url, err),
-            'task': task,
-            'progress': -1
-        }
+        return updateTask(
+            task_id = task_id,
+            username = started_by,
+            status = 'failed',
+            message = 'Failed to delete repository "{}" ({})'.format(repository, err),
+            progress = 100
+        )
     db.session.delete(RepositoryTable.query.get(repository))
     db.session.commit()
-    return {
-        'status': 'completed',
-        'message': 'Repository "{}" successfully deleted'.format(repository),
-        'task': task,
-        'progress': -1
-    }
-
+    return updateTask(
+        task_id = task_id,
+        username = started_by,
+        status = 'completed',
+        message = 'Repository "{}" successfully deleted'.format(repository),
+        progress = 100
+    )

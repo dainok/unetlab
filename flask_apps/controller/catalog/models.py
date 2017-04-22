@@ -90,6 +90,17 @@ class RoleTable(db.Model):
     def __repr__(self):
         return '<Role(role={})>'.format(self.role)
 
+class TaskTable(db.Model):
+    __tablename__ = 'tasks'
+    id = db.Column(db.String(128), primary_key = True)
+    status = db.Column(db.String(128))
+    message = db.Column(db.Text)
+    progress = db.Column(db.Integer)
+    username = db.Column(db.String(128), db.ForeignKey('users.username'), db.ForeignKey('users.username'))
+
+    def __repr__(self):
+        return '<Task(id={})>'.format(self.id)
+
 class UserTable(db.Model):
     __tablename__ = 'users'
     username = db.Column(db.String(128), primary_key = True)
