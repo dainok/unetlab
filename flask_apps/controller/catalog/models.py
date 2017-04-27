@@ -75,6 +75,8 @@ class RepositoryTable(db.Model):
     url = db.Column(db.String(128))
     username = db.Column(db.String(128))
     password = db.Column(db.String(128))
+    labs = db.relationship('LabTable', cascade = 'save-update, merge, delete')
+    active_labs = db.relationship('ActiveLabTable', cascade = 'save-update, merge, delete')
 
     def __repr__(self):
         return '<Repository(repository={})>'.format(self.repository)
@@ -108,7 +110,8 @@ class UserTable(db.Model):
     email = db.Column(db.String(128), unique = True)
     labels = db.Column(db.Integer)
     roles = db.relationship('RoleTable', secondary = roles_to_users, back_populates = 'users')
-    active_labs = db.relationship('ActiveLabTable')
+    tasks = db.relationship('TaskTable', cascade = 'save-update, merge, delete')
+    active_labs = db.relationship('ActiveLabTable', cascade = 'save-update, merge, delete')
 
     def __repr__(self):
         return '<User(username={})>'.format(self.username)
