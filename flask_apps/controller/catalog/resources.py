@@ -14,7 +14,63 @@ from controller.catalog.models import *
 from controller.catalog.parsers import *
 from controller.catalog.tasks import *
 
+def activateLab(username, jlab):
+    # Checking for available labels
+    available_labels = getAvailableLabels(username)
+    if available_labels != -1 and available_labels < len(jlab['topology']['nodes']):
+        abort(403)
+    # Make the lab active
+    active_lab = ActiveLabTable(
+        id = jlab['id'],
+        name = jlab['name'],
+        repository = jlab['repository'],
+        author = jlab['author'],
+        version = jlab['version'],
+        json = json.dumps(jlab, separators = (',', ':'), sort_keys = True),
+        username = username
+    )
+    db.session.add(active_lab)
+    db.session.commit()
+    # Setting labels
+    label = 0
+    connections = {}
+    for node_id, node in jlab['topology']['nodes'].items():
+        while ActiveNodeTable.query.get(label) != None:
+            label = label + 1
+        active_lab.nodes.append(ActiveNodeTable(
+            node_id = node_id,
+            state = 'off',
+            label = label
+        ))
+        for interface_id, interface in node['interfaces'].items():
+            if not interface['connection'] in connections:
+                connections[interface['connection']] = []
+            connections[interface['connection']].append({
+                'node_id': node_id,
+                'label': label,
+                'interface_id': interface_id
+            })
+    db.session.commit()
+    # Setting connections
+    for connection_id, connection in connections.items():
+        if len(connection) == 2:
+            # Evaluating only valid P2P connections
+            db.session.add(ActiveInterfaceTable(
+                id = connection[0]['interface_id'],
+                label = connection[0]['label'],
+                dst_label = connection[1]['label'],
+                dst_if = connection[1]['interface_id']
+            ))
+            db.session.add(ActiveInterfaceTable(
+                id = connection[1]['interface_id'],
+                label = connection[1]['label'],
+                dst_label = connection[0]['label'],
+                dst_if = connection[0]['interface_id']
+            ))
+            db.session.commit()
+
 def getAvailableLabels(username):
+    # Return available labels for a specific user
     max_labels = UserTable.query.get_or_404(username).labels
     used_labels = ActiveNodeTable.query.filter(ActiveNodeTable.username == username).count()
     if max_labels == -1:
@@ -124,59 +180,8 @@ class Lab(Resource):
                 # Found a lab
                 labs = [lab]
                 jlab = json.loads(lab.json)
-                # Checking for available labels
-                available_labels = getAvailableLabels(username)
-                if available_labels != -1 and available_labels < len(jlab['topology']['nodes']):
-                    abort(403)
                 # Make the lab active
-                active_lab = ActiveLabTable(
-                    id = lab.id,
-                    name = lab.name,
-                    repository = lab.repository,
-                    author = lab.author,
-                    version = lab.version,
-                    json = lab.json,
-                    username = username
-                )
-                db.session.add(active_lab)
-                db.session.commit()
-                # Setting labels
-                label = 0
-                connections = {}
-                for node_id, node in jlab['topology']['nodes'].items():
-                    while ActiveNodeTable.query.get(label) != None:
-                        label = label + 1
-                    active_lab.nodes.append(ActiveNodeTable(
-                        node_id = node_id,
-                        state = 'off',
-                        label = label
-                    ))
-                    for interface_id, interface in node['interfaces'].items():
-                        if not interface['connection'] in connections:
-                            connections[interface['connection']] = []
-                        connections[interface['connection']].append({
-                            'node_id': node_id,
-                            'label': label,
-                            'interface_id': interface_id
-                        })
-                db.session.commit()
-                # Setting connections
-                for connection_id, connection in connections.items():
-                    if len(connection) == 2:
-                        # Evaluating only valid P2P connections
-                        db.session.add(ActiveInterfaceTable(
-                            id = connection[0]['interface_id'],
-                            label = connection[0]['label'],
-                            dst_label = connection[1]['label'],
-                            dst_if = connection[1]['interface_id']
-                        ))
-                        db.session.add(ActiveInterfaceTable(
-                            id = connection[1]['interface_id'],
-                            label = connection[1]['label'],
-                            dst_label = connection[0]['label'],
-                            dst_if = connection[0]['interface_id']
-                        ))
-                        db.session.commit()
+                activateLab(username, jlab)
             else:
                 abort(404)
         data = {}
@@ -189,14 +194,6 @@ class Lab(Resource):
             'data': data
         }
 
-    # TODO: post
-    # creo nuovo lab: creo il file nel repository, se non esiste
-    # lo modifico, e' in db fino al save
-    # save, scrivo in git e commit + push?
-    # TODO: patch
-    # modifico in DB
-    # TODO: delete
-    # cancello da DB e da repo
     def post(self):
         args = add_lab_parser.parse_args()
         username = checkAuthzPath(request, [args['repository']], True)
@@ -208,16 +205,8 @@ class Lab(Resource):
             'version': args['version'],
             'topology': args['topology']
         }
-        active_lab = ActiveLabTable(
-            id = jlab['id'],
-            name = jlab['name'],
-            repository = jlab['repository'],
-            author = jlab['author'],
-            version = jlab['version'],
-            json = json.dumps(jlab, separators = (',', ':'), sort_keys = True),
-            username = username
-        )
-        db.session.add(active_lab)
+        # Make the lab active
+        activateLab(username, jlab)
         if args['commit']:
             # Write to file, add to git and commit
             lab_file = '{}/{}/{}.{}'.format(config['app']['lab_repository'], jlab['repository'], jlab['id'], config['app']['lab_extension'])
@@ -237,8 +226,8 @@ class Lab(Resource):
         db.session.commit()
         return {
             'status': 'success',
-            'message': 'Lab "{}" added'.format(active_lab.id),
-            'data': printLab(active_lab)
+            'message': 'Lab "{}" added'.format(lab.id),
+            'data': printLab(lab)
         }
 
 class Repository(Resource):
