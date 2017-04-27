@@ -23,30 +23,29 @@ class ActiveLabTable(db.Model):
     version = db.Column(db.Integer)
     json = db.Column(db.Text)
     repository = db.Column(db.String(128), db.ForeignKey('repositories.repository'))
-    # array of avtive nodes
+    nodes = db.relationship('ActiveNodeTable', primaryjoin = 'and_(ActiveLabTable.id == ActiveNodeTable.lab_id, ActiveLabTable.username == ActiveNodeTable.username)', cascade = 'save-update, merge, delete')
 
 class ActiveNodeTable(db.Model):
     __tablename__ = 'active_nodes'
-    username = db.Column(db.String(128), db.ForeignKey('users.username'), primary_key = True)
-    lab_id = db.Column(db.String(128), db.ForeignKey('labs.id'), primary_key = True)
-    node_id = db.Column(db.Integer, primary_key = True, autoincrement = False)
+    username = db.Column(db.String(128), db.ForeignKey('active_labs.username'))
+    lab_id = db.Column(db.String(128), db.ForeignKey('active_labs.id'))
+    node_id = db.Column(db.Integer)
     state = db.Column(db.String(128))
-    label = db.Column(db.Integer, unique = True)
+    label = db.Column(db.Integer, primary_key = True, autoincrement = False)
+    interfaces = db.relationship('ActiveInterfaceTable', primaryjoin = 'ActiveNodeTable.label == ActiveInterfaceTable.label', cascade = 'save-update, merge, delete')
 
     def __repr__(self):
         return '<ActiveNode(lab_id={},node_id={})>'.format(self.lab_id, self.node_id)
 
-class ActiveTopologyTable(db.Model):
-    __tablename__ = 'active_topologies'
-    username = db.Column(db.String(128), db.ForeignKey('users.username'), db.ForeignKey('users.username'))
-    lab_id = db.Column(db.String(128), db.ForeignKey('users.username'), db.ForeignKey('labs.id'))
-    src_id = db.Column(db.Integer, db.ForeignKey('active_nodes.label'), primary_key = True)
-    src_if = db.Column(db.Integer)
-    dst_id = db.Column(db.Integer, db.ForeignKey('active_nodes.label'), primary_key = True)
+class ActiveInterfaceTable(db.Model):
+    __tablename__ = 'active_interfaces'
+    id = db.Column(db.Integer, primary_key = True, autoincrement = False)
+    label = db.Column(db.Integer, db.ForeignKey('active_nodes.label'), primary_key = True, autoincrement = False)
+    dst_label = db.Column(db.Integer)
     dst_if = db.Column(db.Integer)
 
     def __repr__(self):
-        return '<Topology(src_id={}:{},dst_id={}:{}>'.format(self.src_id, self_src_if, self.dst_id, self.dst_if)
+        return '<ActiveInterfaceTable(id={})>'.format(self.id)
 
 class ControllerTable(db.Model):
     __tablename__ = 'controllers'

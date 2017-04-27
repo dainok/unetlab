@@ -14,6 +14,13 @@ from controller.catalog.models import *
 from controller.catalog.parsers import *
 from controller.catalog.tasks import *
 
+def getAvailableLabels(username):
+    max_labels = UserTable.query.get_or_404(username).labels
+    used_labels = ActiveNodeTable.query.filter(ActiveNodeTable.username == username).count()
+    if max_labels == -1:
+        return max_labels
+    return max_labels - used_labels
+
 def printLab(lab, summary = False):
     if summary:
         data =  {
@@ -100,20 +107,85 @@ class Lab(Resource):
         }
 
     def get(self, lab_id = None, page = 1):
-        checkAuthz(request)
+        username = checkAuthz(request)
         if not lab_id:
             # List all labs
+            summary = True
             labs = LabTable.query.paginate(page, 10).items
         else:
             # List a single lab if exists, else 404
-            labs = [LabTable.query.get_or_404(lab_id)]
+            summary = False
+            active_lab = ActiveLabTable.query.get((lab_id, username))
+            lab = LabTable.query.get(lab_id)
+            if active_lab:
+                # Found an active lab
+                labs = [active_lab]
+            elif lab:
+                # Found a lab
+                labs = [lab]
+                jlab = json.loads(lab.json)
+                # Checking for available labels
+                available_labels = getAvailableLabels(username)
+                if available_labels != -1 and available_labels < len(jlab['topology']['nodes']):
+                    abort(403)
+                # Make the lab active
+                active_lab = ActiveLabTable(
+                    id = lab.id,
+                    name = lab.name,
+                    repository = lab.repository,
+                    author = lab.author,
+                    version = lab.version,
+                    json = lab.json,
+                    username = username
+                )
+                db.session.add(active_lab)
+                db.session.commit()
+                # Setting labels
+                label = 0
+                connections = {}
+                for node_id, node in jlab['topology']['nodes'].items():
+                    while ActiveNodeTable.query.get(label) != None:
+                        label = label + 1
+                    active_lab.nodes.append(ActiveNodeTable(
+                        node_id = node_id,
+                        state = 'off',
+                        label = label
+                    ))
+                    for interface_id, interface in node['interfaces'].items():
+                        if not interface['connection'] in connections:
+                            connections[interface['connection']] = []
+                        connections[interface['connection']].append({
+                            'node_id': node_id,
+                            'label': label,
+                            'interface_id': interface_id
+                        })
+                db.session.commit()
+                # Setting connections
+                for connection_id, connection in connections.items():
+                    if len(connection) == 2:
+                        # Evaluating only valid P2P connections
+                        db.session.add(ActiveInterfaceTable(
+                            id = connection[0]['interface_id'],
+                            label = connection[0]['label'],
+                            dst_label = connection[1]['label'],
+                            dst_if = connection[1]['interface_id']
+                        ))
+                        db.session.add(ActiveInterfaceTable(
+                            id = connection[1]['interface_id'],
+                            label = connection[1]['label'],
+                            dst_label = connection[0]['label'],
+                            dst_if = connection[0]['interface_id']
+                        ))
+                        db.session.commit()
+            else:
+                abort(404)
         data = {}
         for lab in labs:
             # Print each lab
-            data[lab.id] = printLab(lab, summary = True)
+            data[lab.id] = printLab(lab, summary = summary)
         return {
             'status': 'success',
-            'message': 'Role(s) found',
+            'message': 'Lab(s) found',
             'data': data
         }
 

@@ -305,7 +305,7 @@ class FlaskTestCase(unittest.TestCase):
     """
 
     def test_04_00_post_lab_via_api(self):
-        # curl -s -D- -X POST -d '{"name":"Test","repository":"local","version":1,"author":"Tester"}' -H 'Content-type: application/json' http://127.0.0.1:5000/api/v1/labs?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6
+        # curl -s -D- -X POST -d '{"name":"Test","repository":"local","version":1,"author":"Tester","topology":{"nodes":{"0":{"name":"NodeA","type":"iol","image":"aaa","ethernet":3,"serial":1,"ram":1024,"icon":"router.png","left":100,"top":100,"interfaces":{"0":{"name":"e0/0","connection":0,"delay":100,"drop":50,"jitter":3},"1":{"name":"s0/0","connection":2,"delay":100,"drop":50,"jitter":3}}},"1":{"name":"NodeB","type":"iol","image":"aaa","ethernet":3,"serial":1,"ram":1024,"icon":"router.png","left":100,"top":100,"interfaces":{"0":{"name":"e0/0","connection":0,"delay":100,"drop":50,"jitter":3},"1":{"name":"e0/0","connection":1,"delay":100,"drop":50,"jitter":3}}},"2":{"name":"NodeC","type":"iol","image":"aaa","ethernet":3,"serial":1,"ram":1024,"icon":"router.png","left":100,"top":100,"interfaces":{"0":{"name":"e0/0","connection":1,"delay":100,"drop":50,"jitter":3},"1":{"name":"s0/0","connection":2,"delay":100,"drop":50,"jitter":3}}}},"connections":{"0":{"type":"ethernet","shutdown":"FALSE"},"1":{"type":"ethernet","shutdown":"FALSE"},"2":{"type":"serial","shutdown":"FALSE"}}}}' -H 'Content-type: application/json' 'http://127.0.0.1:5000/api/v1/labs?commit=true&api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
         url = '/api/v1/labs?commit=true&api_key={}'.format(api_key)
         data = {
             'name': 'Test',
@@ -394,7 +394,7 @@ class FlaskTestCase(unittest.TestCase):
                                 'jitter': 3
                             }
                         }
-                    },
+                    }
                 },
                 'connections': {
                     '0': {
