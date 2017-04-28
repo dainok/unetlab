@@ -65,7 +65,7 @@ def addGit(self, started_by, repository, url, username, password):
             progress = 100
         )
     repository = RepositoryTable(
-        repository = repository,
+        id = repository,
         url = url,
         username = username,
         password = password
@@ -108,3 +108,4 @@ def deleteGit(self, started_by, repository):
         message = 'Repository "{}" successfully deleted'.format(repository),
         progress = 100
     )
+

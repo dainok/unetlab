@@ -5,7 +5,7 @@ __copyright__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
 __license__ = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
 __revision__ = '20170403'
 
-import json, os, shutil, uuid
+import hashlib, json, os, shutil, uuid
 from flask import abort, request
 from flask_restful import Resource
 from controller import cache, config
@@ -23,11 +23,12 @@ def activateLab(username, jlab):
     active_lab = ActiveLabTable(
         id = jlab['id'],
         name = jlab['name'],
-        repository = jlab['repository'],
+        repository_id = jlab['repository'],
         author = jlab['author'],
         version = jlab['version'],
         json = json.dumps(jlab, separators = (',', ':'), sort_keys = True),
-        username = username
+        username = username,
+        instance = str(uuid.uuid4())
     )
     db.session.add(active_lab)
     db.session.commit()
@@ -37,7 +38,7 @@ def activateLab(username, jlab):
     for node_id, node in jlab['topology']['nodes'].items():
         while ActiveNodeTable.query.get(label) != None:
             label = label + 1
-        active_lab.nodes.append(ActiveNodeTable(
+        active_lab.active_nodes.append(ActiveNodeTable(
             node_id = node_id,
             state = 'off',
             label = label
@@ -72,7 +73,9 @@ def activateLab(username, jlab):
 def getAvailableLabels(username):
     # Return available labels for a specific user
     max_labels = UserTable.query.get_or_404(username).labels
-    used_labels = ActiveNodeTable.query.filter(ActiveNodeTable.username == username).count()
+    used_labels = 0
+    for active_lab in UserTable.query.get_or_404(username).active_labs:
+        used_labels = used_labels + len(active_lab.active_nodes)
     if max_labels == -1:
         return max_labels
     return max_labels - used_labels
@@ -82,7 +85,7 @@ def printLab(lab, summary = False):
         data =  {
             'id': lab.id,
             'name': lab.name,
-            'repository': lab.repository,
+            'repository': lab.repository_id,
             'author': lab.author,
             'version': lab.version
         }
@@ -131,7 +134,7 @@ class Auth(Resource):
             data['data']['active_labs'][active_lab.id] = {
                 'id': active_lab.id,
                 'name': active_lab.name,
-                'repository': active_lab.repository,
+                'repository': active_lab.repository_id,
                 'author': active_lab.author,
                 'version': active_lab.version
             }
@@ -154,7 +157,7 @@ class Lab(Resource):
             db.session.delete(active_lab)
         if lab and args['commit'] == True:
             # If a lab exists, it can be deleted by an authorized user only
-            checkAuthzPath(request, [lab.repository, lab.name], True)
+            checkAuthzPath(request, [lab.repository_id, lab.name], True)
             db.session.delete(lab)
         db.session.commit()
         return {
@@ -213,15 +216,15 @@ class Lab(Resource):
             lab = LabTable(
                 id = jlab['id'],
                 name = jlab['name'],
-                repository = jlab['repository'],
+                repository_id = jlab['repository'],
                 author = jlab['author'],
                 version = jlab['version'],
                 json = json.dumps(jlab, separators = (',', ':'), sort_keys = True),
             )
             with open(lab_file, 'w') as lab_fd:
                 json.dump(printLab(lab), lab_fd, sort_keys = True, indent = 4)
-            sh.git('-C', '{}/{}'.format(config['app']['lab_repository'], lab.repository), 'add', lab_file, _bg = False)
-            sh.git('-C', '{}/{}'.format(config['app']['lab_repository'], lab.repository), 'commit', '-m', 'Added lab {} ("{}")'.format(lab.id, lab.name))
+            sh.git('-C', '{}/{}'.format(config['app']['lab_repository'], lab.repository_id), 'add', lab_file, _bg = False)
+            sh.git('-C', '{}/{}'.format(config['app']['lab_repository'], lab.repository_id), 'commit', '-m', 'Added lab {} ("{}")'.format(lab.id, lab.name))
             db.session.add(lab)
         db.session.commit()
         return {

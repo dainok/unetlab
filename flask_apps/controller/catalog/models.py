@@ -6,7 +6,6 @@ __license__ = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
 __revision__ = '20170403'
 
 from controller import db
-import hashlib
 
 roles_to_users = db.Table(
     'roles_to_users',
@@ -16,29 +15,35 @@ roles_to_users = db.Table(
 
 class ActiveLabTable(db.Model):
     __tablename__ = 'active_labs'
+    __mapper_args__ = {'confirm_deleted_rows': False}
+    instance = db.Column(db.String(128), unique = True, nullable = False)
     id = db.Column(db.String(128), primary_key = True)
     username = db.Column(db.String(128), db.ForeignKey('users.username'), primary_key = True)
     author = db.Column(db.String(128))
     name = db.Column(db.String(128))
     version = db.Column(db.Integer)
     json = db.Column(db.Text)
-    repository = db.Column(db.String(128), db.ForeignKey('repositories.repository'))
-    nodes = db.relationship('ActiveNodeTable', primaryjoin = 'and_(ActiveLabTable.id == ActiveNodeTable.lab_id, ActiveLabTable.username == ActiveNodeTable.username)', cascade = 'save-update, merge, delete')
+    repository_id = db.Column(db.String(128), db.ForeignKey('repositories.id'))
+    active_nodes = db.relationship('ActiveNodeTable', cascade = 'save-update, merge, delete')
+
+    def __repr__(self):
+        return '<ActiveLab(id={},username={})>'.format(self.id, self.username)
 
 class ActiveNodeTable(db.Model):
     __tablename__ = 'active_nodes'
-    username = db.Column(db.String(128), db.ForeignKey('active_labs.username'))
-    lab_id = db.Column(db.String(128), db.ForeignKey('active_labs.id'))
+    __mapper_args__ = {'confirm_deleted_rows': False}
+    instance = db.Column(db.String(128), db.ForeignKey('active_labs.instance'))
     node_id = db.Column(db.Integer)
     state = db.Column(db.String(128))
     label = db.Column(db.Integer, primary_key = True, autoincrement = False)
-    interfaces = db.relationship('ActiveInterfaceTable', primaryjoin = 'ActiveNodeTable.label == ActiveInterfaceTable.label', cascade = 'save-update, merge, delete')
+    interfaces = db.relationship('ActiveInterfaceTable', cascade = 'save-update, merge, delete')
 
     def __repr__(self):
         return '<ActiveNode(lab_id={},node_id={})>'.format(self.lab_id, self.node_id)
 
 class ActiveInterfaceTable(db.Model):
     __tablename__ = 'active_interfaces'
+    __mapper_args__ = {'confirm_deleted_rows': False}
     id = db.Column(db.Integer, primary_key = True, autoincrement = False)
     label = db.Column(db.Integer, db.ForeignKey('active_nodes.label'), primary_key = True, autoincrement = False)
     dst_label = db.Column(db.Integer)
@@ -49,6 +54,7 @@ class ActiveInterfaceTable(db.Model):
 
 class ControllerTable(db.Model):
     __tablename__ = 'controllers'
+    __mapper_args__ = {'confirm_deleted_rows': False}
     id = db.Column(db.Integer, primary_key = True)
     inside_ip = db.Column(db.String(128))
     outside_ip = db.Column(db.String(128))
@@ -59,19 +65,21 @@ class ControllerTable(db.Model):
 
 class LabTable(db.Model):
     __tablename__ = 'labs'
+    __mapper_args__ = {'confirm_deleted_rows': False}
     id = db.Column(db.String(128), primary_key = True)
     author = db.Column(db.String(128))
     name = db.Column(db.String(128))
     version = db.Column(db.Integer)
     json = db.Column(db.Text)
-    repository = db.Column(db.String(128), db.ForeignKey('repositories.repository'))
+    repository_id = db.Column(db.String(128), db.ForeignKey('repositories.id'))
 
     def __repr__(self):
         return '<Lab(id={})>'.format(self.id)
 
 class RepositoryTable(db.Model):
     __tablename__ = 'repositories'
-    repository = db.Column(db.String(128), primary_key = True)
+    __mapper_args__ = {'confirm_deleted_rows': False}
+    id = db.Column(db.String(128), primary_key = True)
     url = db.Column(db.String(128))
     username = db.Column(db.String(128))
     password = db.Column(db.String(128))
@@ -83,6 +91,7 @@ class RepositoryTable(db.Model):
 
 class RoleTable(db.Model):
     __tablename__ = 'roles'
+    __mapper_args__ = {'confirm_deleted_rows': False}
     role = db.Column(db.String(128), primary_key = True)
     access_to = db.Column(db.String(128))
     can_write = db.Column(db.Boolean())
@@ -93,6 +102,7 @@ class RoleTable(db.Model):
 
 class TaskTable(db.Model):
     __tablename__ = 'tasks'
+    __mapper_args__ = {'confirm_deleted_rows': False}
     id = db.Column(db.String(128), primary_key = True)
     status = db.Column(db.String(128))
     message = db.Column(db.Text)
@@ -104,6 +114,7 @@ class TaskTable(db.Model):
 
 class UserTable(db.Model):
     __tablename__ = 'users'
+    __mapper_args__ = {'confirm_deleted_rows': False}
     username = db.Column(db.String(128), primary_key = True)
     password = db.Column(db.String(128))
     name = db.Column(db.String(128))
@@ -115,3 +126,4 @@ class UserTable(db.Model):
 
     def __repr__(self):
         return '<User(username={})>'.format(self.username)
+
