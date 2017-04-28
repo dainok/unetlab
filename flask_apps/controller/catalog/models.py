@@ -24,7 +24,7 @@ class ActiveLabTable(db.Model):
     version = db.Column(db.Integer)
     json = db.Column(db.Text)
     repository_id = db.Column(db.String(128), db.ForeignKey('repositories.id'))
-    active_nodes = db.relationship('ActiveNodeTable', cascade = 'save-update, merge, delete')
+    nodes = db.relationship('ActiveNodeTable', cascade = 'save-update, merge, delete')
 
     def __repr__(self):
         return '<ActiveLab(id={},username={})>'.format(self.id, self.username)
@@ -34,12 +34,13 @@ class ActiveNodeTable(db.Model):
     __mapper_args__ = {'confirm_deleted_rows': False}
     instance = db.Column(db.String(128), db.ForeignKey('active_labs.instance'))
     node_id = db.Column(db.Integer)
+    controller_id = db.Column(db.Integer)
     state = db.Column(db.String(128))
     label = db.Column(db.Integer, primary_key = True, autoincrement = False)
     interfaces = db.relationship('ActiveInterfaceTable', cascade = 'save-update, merge, delete')
 
     def __repr__(self):
-        return '<ActiveNode(lab_id={},node_id={})>'.format(self.lab_id, self.node_id)
+        return '<ActiveNode(instance={},node_id={})>'.format(self.instance, self.node_id)
 
 class ActiveInterfaceTable(db.Model):
     __tablename__ = 'active_interfaces'
@@ -55,7 +56,7 @@ class ActiveInterfaceTable(db.Model):
 class ControllerTable(db.Model):
     __tablename__ = 'controllers'
     __mapper_args__ = {'confirm_deleted_rows': False}
-    id = db.Column(db.Integer, primary_key = True)
+    id = db.Column(db.Integer, primary_key = True, autoincrement = False)
     inside_ip = db.Column(db.String(128))
     outside_ip = db.Column(db.String(128))
     master = db.Column(db.Boolean)

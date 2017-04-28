@@ -38,7 +38,7 @@ def activateLab(username, jlab):
     for node_id, node in jlab['topology']['nodes'].items():
         while ActiveNodeTable.query.get(label) != None:
             label = label + 1
-        active_lab.active_nodes.append(ActiveNodeTable(
+        active_lab.nodes.append(ActiveNodeTable(
             node_id = node_id,
             state = 'off',
             label = label
@@ -75,7 +75,7 @@ def getAvailableLabels(username):
     max_labels = UserTable.query.get_or_404(username).labels
     used_labels = 0
     for active_lab in UserTable.query.get_or_404(username).active_labs:
-        used_labels = used_labels + len(active_lab.active_nodes)
+        used_labels = used_labels + len(active_lab.nodes)
     if max_labels == -1:
         return max_labels
     return max_labels - used_labels
@@ -268,6 +268,36 @@ class Repository(Resource):
             'status': 'enqueued',
             'message': 'Task "{}" enqueued to the batch manager'.format(t),
             'task': str(t)
+        }
+
+class Routing(Resource):
+    def get(self, role = None, page = 1):
+        checkAuthz(request, ['admin'])
+        nodes = ActiveNodeTable.query
+        controllers = []
+        for controller in ControllerTable.query:
+            controllers.append(controller.id)
+        node_controllers = {}
+        for node in nodes:
+            node_controller = 0 if node.controller_id not in controllers else node.controller_id
+            node_controllers[node.label] = node_controller
+
+        data = []
+        for node in nodes:
+            src_label = node.label
+            for interface in node.interfaces:
+                route = {
+                    'src_label': node.label,
+                    'src_if': interface.id,
+                    'dst_controller': node_controllers[interface.dst_label],
+                    'dst_label': interface.dst_label,
+                    'dst_if' : interface.dst_if
+                }
+            data.append(route)
+        return {
+            'status': 'success',
+            'message': 'Routing table found',
+            'data': data
         }
 
 class Role(Resource):
