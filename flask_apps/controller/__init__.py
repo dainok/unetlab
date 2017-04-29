@@ -3,7 +3,7 @@
 __author__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
 __copyright__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
 __license__ = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
-__revision__ = '20170403'
+__revision__ = '20170429'
 
 """ API
     Methods:
@@ -38,6 +38,10 @@ from controller.config import *
 class runCelery(Command):
     def run(self):
         celery.worker_main(['controller.worker', '--loglevel=INFO'])
+
+class runRouter(Command):
+    def run(self):
+        print("ROUTER")
 
 def make_celery(app):
     celery = Celery(app.import_name, backend = app.config['CELERY_RESULT_BACKEND'], broker = app.config['CELERY_BROKER_URL'])
@@ -80,7 +84,8 @@ cache = memcache.Client([config['app']['memcache_server']], debug = 0)
 celery = make_celery(app)
 api_key = config['app']['api_key']
 manager = Manager(app)
-manager.add_command('celery', runCelery())
+manager.add_command('runcelery', runCelery())
+manager.add_command('runrouter', runRouter())
 #TODO manager.add_command('db', MigrateCommand)
 
 # Postpone to avoid circular import
