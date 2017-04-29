@@ -10,3 +10,14 @@ for FILE in ${FILES}; do
     echo "Missing __revision__ on ${FILE}"
   fi
 done
+
+FILES=$(find . -name "*.dockerfile")
+for FILE in ${FILES}; do
+  fgrep "LABEL version" ${FILE} &> /dev/null
+  if [ $? -eq 0 ]; then
+    TIMESTAMP=$(date -d @$(stat --printf '%Y' ${FILE}) +%Y%m%d)
+    sed -i "s/LABEL version.*$/LABEL version = '${TIMESTAMP}'/g" ${FILE}
+  else
+    echo "Missing __revision__ on ${FILE}"
+  fi
+done
