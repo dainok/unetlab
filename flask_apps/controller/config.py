@@ -65,6 +65,9 @@ def loadConfig(config_file):
     if not config.has_option('controller', 'id'):
         config['controller']['id'] = '0'
         need_to_save = True
+    if not config.has_option('controller', 'master_url'):
+        config['controller']['master_url'] = 'https://127.0.0.1'
+        need_to_save = True
     if not config.has_option('advanced', 'label_length'):
         config['advanced']['label_length'] = '2'
         need_to_save = True

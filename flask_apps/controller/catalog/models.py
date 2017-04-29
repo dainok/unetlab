@@ -60,6 +60,7 @@ class ControllerTable(db.Model):
     inside_ip = db.Column(db.String(128))
     outside_ip = db.Column(db.String(128))
     master = db.Column(db.Boolean)
+    docker_ip = db.Column(db.String(128))
 
     def __repr__(self):
         return '<Controller(id={})>'.format(self.id)
@@ -127,4 +128,3 @@ class UserTable(db.Model):
 
     def __repr__(self):
         return '<User(username={})>'.format(self.username)
-

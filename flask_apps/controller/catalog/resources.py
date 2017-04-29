@@ -80,6 +80,15 @@ def getAvailableLabels(username):
         return max_labels
     return max_labels - used_labels
 
+def printController(controller):
+    return {
+        'id': controller.id,
+        'inside_ip': controller.inside_ip,
+        'outside_ip': controller.outside_ip,
+        'master': controller.master,
+        'docker_ip': controller.docker_ip
+    }
+
 def printLab(lab, summary = False):
     if summary:
         data =  {
@@ -139,6 +148,25 @@ class Auth(Resource):
                 'version': active_lab.version
             }
         return data
+
+class Controller(Resource):
+    def get(self, controller_id = None, page = 1):
+        checkAuthz(request, ['admin'])
+        if not controller_id:
+            # List all controllers
+            controllers = ControllerTable.query.paginate(page, 10).items
+        else:
+            # List a single controller if exists, else 404
+            controllers = ControllerTable.query.get_or_404(controller_id)
+        data = {}
+        for controller in controllers:
+            # Print each controller
+            data[controller.id] = printController(controller)
+        return {
+            'status': 'success',
+            'message': 'Controller(s) found',
+            'data': data
+        }
 
 class Lab(Resource):
     def delete(self, lab_id = None):
@@ -259,7 +287,7 @@ class Repository(Resource):
 
     def post(self):
         args = add_repository_parser.parse_args()
-        username = checkAuthz(request, ['admin'])
+        checkAuthz(request, ['admin'])
         if args['repository'] == 'local':
             # local is a reserved repository
             abort(400)

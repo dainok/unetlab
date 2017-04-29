@@ -34,6 +34,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_script import Command, Manager
 from celery import Celery
 from controller.config import *
+from controller.catalog.router import *
 
 class runCelery(Command):
     def run(self):
@@ -41,7 +42,7 @@ class runCelery(Command):
 
 class runRouter(Command):
     def run(self):
-        print("ROUTER")
+        router_main(id = config['controller']['id'], master_url = config['controller']['master_url'], api_key = config['app']['api_key'])
 
 def make_celery(app):
     celery = Celery(app.import_name, backend = app.config['CELERY_RESULT_BACKEND'], broker = app.config['CELERY_BROKER_URL'])
@@ -156,6 +157,7 @@ if not controller:
 
 # Routing
 api.add_resource(Auth, '/api/v1/auth')
+api.add_resource(Controller, '/api/v1/controllers', '/api/v1/controllers/<string:controller_id>')
 api.add_resource(Lab, '/api/v1/labs', '/api/v1/labs/<string:lab_id>')
 api.add_resource(Repository, '/api/v1/repositories', '/api/v1/repositories/<string:repository>')
 api.add_resource(Role, '/api/v1/roles', '/api/v1/roles/<string:role>')
