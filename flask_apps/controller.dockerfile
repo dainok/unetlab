@@ -4,7 +4,7 @@ LABEL author = "Andrea Dainese <andrea.dainese@gmail.com>"
 LABEL copyright = "Andrea Dainese <andrea.dainese@gmail.com>"
 LABEL description = "The API and controller module"
 LABEL license = "https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode"
-LABEL version = '20170429'
+LABEL version = '20170430'
 
 LABEL build = "docker build -t dainok/controller:latest -f controller.dockerfile ."
 LABEL usage.0 = "docker volume create --name controller_data"
