@@ -79,7 +79,7 @@ case "${IMAGE}" in
 		;;
 esac
 
-echo -ne "Building Docker image ${REPOSITORY}/${NAME} "
+echo -ne "Building Docker image ${REPOSITORY}/${NAME}... "
 ${DOCKER} build -t ${REPOSITORY}/${NAME} -f ${SUBTYPE}/node-${TYPE}-${SUBTYPE}.dockerfile . &>> ${LOG}
 if [ $? -ne 0 ]; then
 	echo -e "${R}failed${U}"
