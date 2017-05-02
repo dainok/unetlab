@@ -11,7 +11,7 @@ LABEL build = "docker build -t dainok/nodetemplate-qemu:latest -f nodetemplate-q
 # Installing dependencies
 RUN apk update || exit 1
 RUN apk upgrade || exit 1
-RUN apk add bash iptables qemu-img qemu-system-x86_64 || exit 1
+RUN apk add bash curl iptables qemu-img qemu-system-x86_64 || exit 1
 
 # Configuring
 COPY bootstrap_node.sh /sbin/bootstrap.sh

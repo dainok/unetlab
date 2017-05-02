@@ -1,5 +1,5 @@
 #!/bin/bash
-URL=http://${CONTROLLER}/api/autoconf/${LABEL}
+URL=http://${CONTROLLER}:5000/api/v1/bootstrap/${LABEL}
 PID=0
 
 function nodeStop {

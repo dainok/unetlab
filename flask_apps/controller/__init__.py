@@ -70,6 +70,7 @@ config_files = [ config_file ]
 
 # Creating the Flask app
 app = Flask(__name__)
+app_root = os.path.dirname(os.path.abspath(__file__))
 app.config.update(
     BUNDLE_ERRORS = True,
     DEBUG = config['app']['debug'],
@@ -157,6 +158,7 @@ if not controller:
 
 # Routing
 api.add_resource(Auth, '/api/v1/auth')
+api.add_resource(Bootstrap, '/api/v1/bootstrap/<string:label>')
 api.add_resource(Controller, '/api/v1/controllers', '/api/v1/controllers/<string:controller_id>')
 api.add_resource(Lab, '/api/v1/labs', '/api/v1/labs/<string:lab_id>')
 api.add_resource(Repository, '/api/v1/repositories', '/api/v1/repositories/<string:repository>')
@@ -164,3 +166,4 @@ api.add_resource(Role, '/api/v1/roles', '/api/v1/roles/<string:role>')
 api.add_resource(Routing, '/api/v1/routing')
 api.add_resource(Task, '/api/v1/tasks', '/api/v1/tasks/<string:task_id>')
 api.add_resource(User, '/api/v1/users', '/api/v1/users/<string:username>')
+

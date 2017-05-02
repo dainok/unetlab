@@ -5,10 +5,10 @@ __copyright__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
 __license__ = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
 __revision__ = '20170430'
 
-import hashlib, json, os, shutil, uuid
-from flask import abort, request
+import hashlib, io, json, os, shutil, uuid
+from flask import abort, request, send_file
 from flask_restful import Resource
-from controller import cache, config
+from controller import app_root, cache, config
 from controller.catalog.aaa import checkAuth, checkAuthz, checkAuthzPath
 from controller.catalog.models import *
 from controller.catalog.parsers import *
@@ -148,6 +148,16 @@ class Auth(Resource):
                 'version': active_lab.version
             }
         return data
+
+class Bootstrap(Resource):
+    def get(self, label = None):
+        # TODO Should filter for incoming IP addresses
+        with open('{}/templates/bootstrap_qemu_header.sh'.format(app_root), 'r') as fd_init_header:
+            init_header = fd_init_header.read()
+        init_body = "sleep 10\n"
+        init_script = init_header + init_body
+        return send_file(io.BytesIO(init_script.encode()), attachment_filename = 'init', mimetype = 'text/x-shellscript')
+
 
 class Controller(Resource):
     def get(self, controller_id = None, page = 1):
