@@ -44,13 +44,14 @@ def activateLab(username, jlab):
             label = label
         ))
         for interface_id, interface in node['interfaces'].items():
-            if not interface['connection'] in connections:
-                connections[interface['connection']] = []
-            connections[interface['connection']].append({
-                'node_id': node_id,
-                'label': label,
-                'interface_id': interface_id
-            })
+            if 'connection' in interface:
+                if not interface['connection'] in connections:
+                    connections[interface['connection']] = []
+                connections[interface['connection']].append({
+                    'node_id': node_id,
+                    'label': label,
+                    'interface_id': interface_id
+                })
     db.session.commit()
     # Setting connections
     for connection_id, connection in connections.items():
@@ -152,6 +153,11 @@ class Auth(Resource):
 class Bootstrap(Resource):
     def get(self, label = None):
         # TODO Should filter for incoming IP addresses
+        active_node = ActiveNodeTable.query.get(label)
+        node_id = active_node.node_id
+        node_json = json.loads(active_node.active_lab.json)['topology']['nodes'][str(node_id)]
+        print(node_json)
+
         with open('{}/templates/bootstrap_qemu_header.sh'.format(app_root), 'r') as fd_init_header:
             init_header = fd_init_header.read()
         init_body = "sleep 10\n"
@@ -320,18 +326,17 @@ class Routing(Resource):
             node_controller = 0 if node.controller_id not in controllers else node.controller_id
             node_controllers[node.label] = node_controller
 
-        data = []
+        data = {}
         for node in nodes:
             src_label = node.label
             for interface in node.interfaces:
-                route = {
-                    'src_label': node.label,
-                    'src_if': interface.id,
+                if not node.label in data:
+                    data[node.label] = {}
+                data[node.label][interface.id] = {
                     'dst_controller': node_controllers[interface.dst_label],
                     'dst_label': interface.dst_label,
                     'dst_if' : interface.dst_if
                 }
-            data.append(route)
         return {
             'status': 'success',
             'message': 'Routing table found',

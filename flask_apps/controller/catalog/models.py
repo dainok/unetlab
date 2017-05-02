@@ -38,6 +38,7 @@ class ActiveNodeTable(db.Model):
     state = db.Column(db.String(128))
     label = db.Column(db.Integer, primary_key = True, autoincrement = False)
     interfaces = db.relationship('ActiveInterfaceTable', cascade = 'save-update, merge, delete')
+    active_lab = db.relationship('ActiveLabTable')
 
     def __repr__(self):
         return '<ActiveNode(instance={},node_id={})>'.format(self.instance, self.node_id)
