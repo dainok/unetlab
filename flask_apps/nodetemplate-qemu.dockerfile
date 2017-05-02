@@ -14,7 +14,8 @@ RUN apk upgrade || exit 1
 RUN apk add bash iptables qemu-img qemu-system-x86_64 || exit 1
 
 # Configuring
-#COPY bootstrap.sh /sbin/bootstrap.sh
+COPY bootstrap_node.sh /sbin/bootstrap.sh
 
 # Cleaning
 RUN find /var/cache/apk/ -type f -delete || exit 1
+

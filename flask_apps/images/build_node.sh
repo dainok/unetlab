@@ -11,15 +11,16 @@ REPOSITORY="dainok"
 DOCKER="docker -H=tcp://127.0.0.1:4243"
 
 function clean {
-	rm -rf ${TMP} node
+	rm -rf ${TMP} node bootstrap.sh &> /dev/null
+	pkill qemu &> /dev/null
 }
 
 function infoImage {
-  echo -e "Found supported image:"
-  echo -e " - type: ${TYPE}"
-  echo -e " - subtype: ${SUBTYPE}"
-  echo -e " - file: ${SOURCE}/${IMAGE}"
-  echo -e " - image name: ${NAME}"
+	echo -e "Found supported image:"
+	echo -e " - type: ${TYPE}"
+	echo -e " - subtype: ${SUBTYPE}"
+	echo -e " - file: ${SOURCE}/${IMAGE}"
+	echo -e " - image name: ${NAME}"
 	echo -e "Check ${LOG} for progress and errors"
 }
 
@@ -52,27 +53,37 @@ IMAGE=$(basename $1)
 SOURCE=$(dirname $1)
 
 if [ ! -f "${SOURCE}/${IMAGE}" ]; then
-	echo -e "${R}Input file (${SOURCE}/${IMAGE}) does not exist.${U}"
+	echo -e "${R}Input file (${SOURCE}/${IMAGE}) does not exist${U}"
 	exit 1
 fi
 
 rm -rf node &>> ${LOG} && mkdir -p node/image &>> ${LOG}
 if [ $? -ne 0 ]; then
-	echo -e "${R}Cannot create directory (node).${U}"
+	echo -e "${R}Cannot create directory (node)${U}"
+	exit 1
+fi
+
+cp -a ../bootstrap_node.sh bootstrap.sh &>> ${LOG}
+if [ $? -ne 0 ]; then
+	echo -e "${R}Cannot find bootstrap file (../bootstrap_node.sh)${U}"
 	exit 1
 fi
 
 case "${IMAGE}" in
-  vyos-*-amd64.iso)
-    TYPE="qemu"
-    SUBTYPE="vyos"
-    DISKS="${TMP}/hda.qcow2"
-    NAME="node-${SUBTYPE}:$(echo ${IMAGE} | sed 's/vyos-\([0-9.]*\)-amd64.iso/\1/')"
-    infoImage
-    qemu-img create -f qcow2 node/image/hda.qcow2 1G &>> ${LOG}
-    qemu-system-x86_64 -boot d -cdrom ${SOURCE}/${IMAGE} -hda node/image/hda.qcow2 -enable-kvm -m 1G -serial telnet:0.0.0.0:5023,server,nowait -monitor telnet:0.0.0.0:5024,server,nowait -nographic & &>> ${LOG}
+	vyos-*-amd64.iso)
+		TYPE="qemu"
+		SUBTYPE="vyos"
+		DISKS="${TMP}/hda.qcow2"
+		NAME="node-${SUBTYPE}:$(echo ${IMAGE} | sed 's/vyos-\([0-9.]*\)-amd64.iso/\1/')"
+		infoImage
+		qemu-img create -f qcow2 node/image/hda.qcow2 1G &>> ${LOG}
+		qemu-system-x86_64 -boot order=c,once=d -cdrom ${SOURCE}/${IMAGE} -hda node/image/hda.qcow2 -enable-kvm -m 1G -serial telnet:0.0.0.0:5023,server,nowait -monitor telnet:0.0.0.0:5024,server,nowait -nographic &>> ${LOG} &
 		vyos/preconfigure_${SUBTYPE}.py &>> ${LOG}
-    ;;
+		if [ $? -ne 0 ]; then
+			echo -e "${R}Preconfiguration failed${U}"
+			exit 1
+		fi
+		;;
 	*)
 		echo -e "${R}Input file (${SOURCE}/${IMAGE}) is not supported${U}"
 		exit 1
