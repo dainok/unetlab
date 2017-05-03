@@ -5,7 +5,7 @@ __copyright__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
 __license__ = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
 __revision__ = '20170430'
 
-import hashlib, io, json, os, shutil, uuid
+import hashlib, io, json, os, random, shutil, uuid
 from flask import abort, request, send_file
 from flask_restful import Resource
 from controller import app_root, cache, config
@@ -70,6 +70,43 @@ def activateLab(username, jlab):
                 dst_if = connection[0]['interface_id']
             ))
             db.session.commit()
+
+def fixjLab(jlab):
+    # Check lab integrity
+    if not 'topology' in jlab:
+        jlab['topology'] = {
+            'nodes': {},
+            'connections': {}
+        }
+    if not 'nodes' in jlab['topology']:
+        jlab['topology']['nodes'] = {}
+    if not 'connections' in jlab['topology']:
+        jlab['topology']['connections'] = {}
+    for node_id, node in  jlab['topology']['nodes'].items():
+        if not 'ram' in node:
+            jlab['topology']['nodes'][node_id]['ram'] = 1024
+        if 'interfaces' in node:
+            for interface_id, interface in node['interfaces'].items():
+                # Adding default MAC address
+                if node['type'] == 'qemu' and 'mac' not in node['interfaces'][interface_id]:
+                    # All QEMU interfaces are ethernet
+                    jlab['topology']['nodes'][node_id]['interfaces'][interface_id]['mac'] = genMac()
+    return jlab
+
+def genMac():
+    # Valid MAC addressed can be:
+    # x2:xx:xx:xx:xx:xx
+    # x6:xx:xx:xx:xx:xx
+    # xa:xx:xx:xx:xx:xx
+    # xe:xx:xx:xx:xx:xx
+    return '52:54:00:{:01x}{:01x}:{:01x}{:01x}:{:01x}{:01x}'.format(
+        random.randint(0, 15),
+        random.randint(0, 15),
+        random.randint(0, 15),
+        random.randint(0, 15),
+        random.randint(0, 15),
+        random.randint(0, 15)
+    )
 
 def getAvailableLabels(username):
     # Return available labels for a specific user
@@ -156,12 +193,34 @@ class Bootstrap(Resource):
         active_node = ActiveNodeTable.query.get(label)
         node_id = active_node.node_id
         node_json = json.loads(active_node.active_lab.json)['topology']['nodes'][str(node_id)]
-        print(node_json)
+        init_body = ''
+        bin_cmd = ''
 
-        with open('{}/templates/bootstrap_qemu_header.sh'.format(app_root), 'r') as fd_init_header:
+        # Load header and footer
+        with open('{}/templates/bootstrap_{}_header.sh'.format(app_root, node_json['type']), 'r') as fd_init_header:
             init_header = fd_init_header.read()
-        init_body = "sleep 10\n"
-        init_script = init_header + init_body
+        with open('{}/templates/bootstrap_{}_footer.sh'.format(app_root, node_json['type']), 'r') as fd_init_footer:
+            init_footer = fd_init_footer.read()
+
+        if node_json['type'] == 'qemu':
+            for i in range(node_json['ethernet']):
+                # Configure TAP interfaces
+                init_body = init_body + 'ip tuntap add dev veth{} mode tap || exit 1\n'.format(i)
+                init_body = init_body + 'ip link set dev veth{} up || exit 1\n'.format(i)
+            for interface_id, interface in sorted(node_json['interfaces'].items()):
+                # Configure management interface
+                if 'management' in interface and bool(interface['management']):
+                    init_body = init_body + 'brctl addif mgmt veth{} || exit 1\n'.format(interface_id)
+            if node_json['subtype'] == 'vyos':
+                bin_cmd = 'qemu-system-x86_64 -boot order=c -drive file=/data/node/hda.qcow2,if=virtio,format=qcow2 -enable-kvm -m {}M -serial telnet:0.0.0.0:5023,server,nowait -monitor telnet:0.0.0.0:5024,server,nowait -nographic'.format(node_json['ram'])
+                for interface_id, interface in sorted(node_json['interfaces'].items()):
+                    bin_cmd = bin_cmd + ' -netdev tap,id=eth{},ifname=veth{},script=no,downscript=no -device virtio-net,netdev=eth{},mac={}'.format(interface_id, interface_id, interface_id, interface['mac'])
+                bin_cmd = bin_cmd + ' &\n'
+            init_body = init_body + bin_cmd
+            init_body = init_body + 'QEMU_PID=$!\n'
+            init_body = init_body + 'wait ${QEMU_PID}\n'
+        
+        init_script = init_header + init_body + init_footer
         return send_file(io.BytesIO(init_script.encode()), attachment_filename = 'init', mimetype = 'text/x-shellscript')
 
 
@@ -252,6 +311,7 @@ class Lab(Resource):
             'version': args['version'],
             'topology': args['topology']
         }
+        jlab = fixjLab(jlab)
         # Make the lab active
         activateLab(username, jlab)
         if args['commit']:

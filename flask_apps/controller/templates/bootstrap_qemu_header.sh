@@ -10,7 +10,3 @@ echo -n "Starting node_${LABEL}..."
 
 trap nodeStop SIGINT SIGTERM &> /dev/null
 
-echo "Starting wrapper/router"
-echo "Starting API"
-echo "Starting QEMU"
-sleep 300
