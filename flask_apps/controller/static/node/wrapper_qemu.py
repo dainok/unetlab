@@ -10,6 +10,7 @@ IFF_NO_PI = 0x1000
 IFF_TAP = 0x0002
 INTERFACE_LENGTH = 1
 LABEL_LENGTH = 2
+MIN_TIME = 5
 TAP_BUFFER = 10000
 TUNSETNOCSUM = 0x400454c8
 TUNSETDEBUG = 0x400454c9
@@ -77,6 +78,7 @@ def usage():
     sys.exit(255)
 
 def main():
+    console_history = bytearray()
     controller = None
     label = None
     inputs = []
@@ -156,32 +158,30 @@ def main():
         atexit.register(from_tun.close)
         inputs.append(from_tun)
 
-
-
     # Starting QEMU
     try:
         qemu_cmd = sys.argv[sys.argv.index('--') + 1:]
     except:
         logging.error('no QEMU command to start')
         sys.exit(1)
-    logging.info('starting: {}'.format(qemu_cmd))
-    sys.exit(0)
+    logging.info('starting: {}'.format(' '.join(qemu_cmd)))
     try:
-        iol = subprocess.Popen([ iol_bin ] + iol_args, env = iol_env, cwd = os.path.dirname(iol_bin), stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE, bufsize = 0)
+        p = subprocess.Popen(qemu_cmd, stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE, bufsize = 0)
+        time.sleep(0.5)
     except Exception as err:
-        logging.error('cannot start IOL process')
+        logging.error('cannot start QEMU process')
         sys.exit(1)
-    atexit.register(subprocessTerminate, iol)
+    atexit.register(subprocessTerminate, p)
 
     # Executing
     while inputs:
         logging.debug('waiting for data')
 
-        if iol.poll() != None:
-            logging.error('IOL process died')
+        if p.poll() != None:
+            logging.error('QEMU process died')
             # Grab all output before exiting
-            console_history += iol.stderr.read()
-            console_history += iol.stdout.read()
+            console_history += p.stderr.read()
+            console_history += p.stdout.read()
             break
 
         readable, writable, exceptional = select.select(inputs, outputs, inputs)
@@ -286,11 +286,10 @@ def main():
                 logging.error('unknown source from select')
 
     # Terminating
-    inputs, clients = terminalServerClose(inputs, clients)
     if time.time() - alive < MIN_TIME:
         # IOL died prematurely
-        logging.error('IOL process died prematurely\n')
-        print(console_history.decode("utf-8") )
+        logging.error('QEMU process died prematurely\n')
+        print(console_history.decode('utf-8') )
         sys.exit(1)
     else:
         # IOL died after a reasonable time
