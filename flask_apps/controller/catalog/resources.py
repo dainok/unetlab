@@ -193,8 +193,15 @@ class Bootstrap(Resource):
         active_node = ActiveNodeTable.query.get(label)
         node_id = active_node.node_id
         node_json = json.loads(active_node.active_lab.json)['topology']['nodes'][str(node_id)]
+        if active_node.controller_id == None:
+            # Controller ID not set, using local
+            active_node.controller_id = config['controller']['id']
+            db.session.commit()
+        master = ControllerTable.query.filter(ControllerTable.master == True).one()
+        controller = ControllerTable.query.get(config['controller']['id'])
         init_body = ''
-        bin_cmd = ''
+        bin_cmd = '/usr/bin/qemu-system-x86_64'
+        wrapper_cmd = '/tmp/wrapper_qemu.py -c {}:{} -l {}'.format(controller.inside_ip, config['advanced']['controller_port'], label)
 
         # Load header and footer
         with open('{}/templates/bootstrap_{}_header.sh'.format(app_root, node_json['type']), 'r') as fd_init_header:
@@ -205,18 +212,45 @@ class Bootstrap(Resource):
         if node_json['type'] == 'qemu':
             for i in range(node_json['ethernet']):
                 # Configure TAP interfaces
-                init_body = init_body + 'ip tuntap add dev veth{} mode tap || exit 1\n'.format(i)
-                init_body = init_body + 'ip link set dev veth{} up || exit 1\n'.format(i)
-            for interface_id, interface in sorted(node_json['interfaces'].items()):
-                # Configure management interface
-                if 'management' in interface and bool(interface['management']):
-                    init_body = init_body + 'brctl addif mgmt veth{} || exit 1\n'.format(interface_id)
+                init_body = init_body + 'brctl addbr mgmt || exit 1\n'
+                init_body = init_body + 'brctl setageing mgmt 0 || exit 1\n'
+                init_body = init_body + 'brctl stp mgmt off || exit 1\n'
+                init_body = init_body + 'ip addr add 192.0.2.1/24 dev mgmt || exit 1\n'
+                init_body = init_body + 'iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE\n'
+                init_body = init_body + 'iptables -t nat -A POSTROUTING -o mgmt -j MASQUERADE\n'
+                init_body = init_body + 'iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 22 -j DNAT --to 192.0.2.254:22\n'
+                init_body = init_body + 'iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 23 -j DNAT --to 192.0.2.254:23\n'
+                init_body = init_body + 'iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j DNAT --to 192.0.2.254:80\n'
+                init_body = init_body + 'iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 443 -j DNAT --to 192.0.2.254:443\n'
+                init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p udp --dport 69 -j DNAT --to {}:69\n'.format(master.inside_ip)
+                init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 20 -j DNAT --to {}:20\n'.format(master.inside_ip)
+                init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 21 -j DNAT --to {}:21\n'.format(master.inside_ip)
+                init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 22 -j DNAT --to {}:22\n'.format(master.inside_ip)
+                init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 80 -j DNAT --to {}:80\n'.format(master.inside_ip)
+                init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 443 -j DNAT --to {}:443\n'.format(master.inside_ip)
             if node_json['subtype'] == 'vyos':
-                bin_cmd = 'qemu-system-x86_64 -boot order=c -drive file=/data/node/hda.qcow2,if=virtio,format=qcow2 -enable-kvm -m {}M -serial telnet:0.0.0.0:5023,server,nowait -monitor telnet:0.0.0.0:5024,server,nowait -nographic'.format(node_json['ram'])
+                bin_cmd = bin_cmd + ' -boot order=c -drive file=/data/node/hda.qcow2,if=virtio,format=qcow2 -enable-kvm -m {}M -serial telnet:0.0.0.0:5023,server,nowait -monitor telnet:0.0.0.0:5024,server,nowait -nographic'.format(node_json['ram'])
                 for interface_id, interface in sorted(node_json['interfaces'].items()):
-                    bin_cmd = bin_cmd + ' -netdev tap,id=eth{},ifname=veth{},script=no,downscript=no -device virtio-net,netdev=eth{},mac={}'.format(interface_id, interface_id, interface_id, interface['mac'])
-                bin_cmd = bin_cmd + ' &\n'
-            init_body = init_body + bin_cmd
+                    interface_id = int(interface_id)
+                    if 'management' in interface and bool(interface['management']):
+                        # Configure management bridge
+                        init_body = init_body + 'ip tuntap add dev veth{} mode tap || exit 1\n'.format(interface_id)
+                        init_body = init_body + 'ip link set dev veth{} up || exit 1\n'.format(interface_id)
+                        init_body = init_body + 'brctl addif mgmt veth{} || exit 1\n'.format(interface_id)
+                        wrapper_cmd = wrapper_cmd + ' -m veth{}'.format(interface_id)
+                    else:
+                        init_body = init_body + 'ip tuntap add dev veth{} mode tap || exit 1\n'.format(interface_id)
+                        init_body = init_body + 'ip link set dev veth{} up || exit 1\n'.format(interface_id)
+                        init_body = init_body + 'ip tuntap add dev qeth{} mode tap || exit 1\n'.format(interface_id)
+                        init_body = init_body + 'ip link set dev qeth{} up || exit 1\n'.format(interface_id)
+                        init_body = init_body + 'brctl addbr br{} || exit 1\n'.format(interface_id)
+                        init_body = init_body + 'ip link set dev br{} up || exit 1\n'.format(interface_id)
+                        init_body = init_body + 'brctl setageing br{} 0 || exit 1\n'.format(interface_id)
+                        init_body = init_body + 'brctl stp br{} off || exit 1\n'.format(interface_id)
+                        init_body = init_body + 'brctl addif br{} veth{} || exit 1\n'.format(interface_id, interface_id)
+                        init_body = init_body + 'brctl addif br{} qeth{} || exit 1\n'.format(interface_id, interface_id)
+                    bin_cmd = bin_cmd + ' -netdev tap,id=eth{},ifname=qeth{},script=no,downscript=no -device virtio-net,netdev=eth{},mac={}'.format(interface_id, interface_id, interface_id, interface['mac'])
+            init_body = init_body + wrapper_cmd + ' -- ' + bin_cmd + ' & \n'
             init_body = init_body + 'QEMU_PID=$!\n'
             init_body = init_body + 'wait ${QEMU_PID}\n'
         

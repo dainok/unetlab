@@ -5,33 +5,21 @@ __copyright__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
 __license__ = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
 __revision__ = '20170430'
 
-CONSOLE_PORT = 5005
+BUFFER = 10000
 IFF_NO_PI = 0x1000
 IFF_TAP = 0x0002
 INTERFACE_LENGTH = 1
 LABEL_LENGTH = 2
 MIN_TIME = 5
-TAP_BUFFER = 10000
 TUNSETNOCSUM = 0x400454c8
 TUNSETDEBUG = 0x400454c9
 TUNSETIFF = 0x400454ca
 TUNSETPERSIST = 0x400454cb
 TUNSETOWNER = 0x400454cc
 TUNSETLINK = 0x400454cd
-UDP_BUFFER = 10000
-UDP_PORT = 5005
 
-import array, atexit, fcntl, getopt, logging, os, select, signal, socket, struct, subprocess, sys, time
+import array, atexit, fcntl, getopt, logging, os, select, signal, struct, subprocess, sys, time
 
-def decodeTAPFrame(frame):
-    """ Decode a TAP frame to components
-    Return:
-    - INTEGER: src label
-    - INTEGER: src interface ID
-    - BYTES: payload
-    """
-    return
-    
 def decodeUDPPacket(datagram):
     """ Decode an UDP datagram to components
     Return:
@@ -40,16 +28,17 @@ def decodeUDPPacket(datagram):
     - BYTES: payload
     """
     dst_label = int.from_bytes(datagram[0:LABEL_LENGTH - 1], byteorder = 'little')
-    dst_if = int.from_bytes(udp_datagram[LABEL_LENGTH:LABEL_LENGTH + INTERFACE_LENGTH - 1], byteorder='little')
+    dst_if = int.from_bytes(datagram[LABEL_LENGTH:LABEL_LENGTH + INTERFACE_LENGTH - 1], byteorder='little')
+    payload = datagram[LABEL_LENGTH + INTERFACE_LENGTH:]
     logging.debug('UDP packet for label={} iface={} payload={}'.format(dst_label, dst_if, sys.getsizeof(payload)))
+    return dst_label, dst_if, payload
 
-def encodeTAPFrame(datagram):
-    """ Encode data to be sent via TAP """
-    return
-
-def encodeUDPPacket(datagram):
-    """ Encode data to be sent via UDP to the router """
-    return
+def encodeUDPPacket(node_id, iface_id, payload):
+    """ Encode components to an UDP datagram
+    Return:
+    - BYTES: UDP datagram
+    """
+    return node_id.to_bytes(3, byteorder='little') + iface_id.to_bytes(1, byteorder='little') + payload
 
 def exitGracefully(signum, frame):
     """ Trap CTRL+C and TERM signal
@@ -74,24 +63,26 @@ def usage():
     print('    -d             enable debug')
     print('    -c controller  the IP or domain name of the controller host')
     print('    -l label       an integer starting from 0')
-    print('    -x veths       list of comma-separated management veths')
+    print('    -m veths       management interfaces')
     sys.exit(255)
 
 def main():
+    import socket
     console_history = bytearray()
     controller = None
+    udp_port = None
     label = None
     inputs = []
     outputs = []
-    taps = []
     mgmt_veths = []
+    veths = {}
 
     if len(sys.argv) < 2:
         usage()
 
     # Reading options
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'dc:l:x:')
+        opts, args = getopt.getopt(sys.argv[1:], 'dc:l:m:')
     except getopt.GetoptError as err:
         sys.stderr.write('ERROR: {}\n'.format(err))
         usage()
@@ -100,19 +91,17 @@ def main():
         if opt == '-d':
             logging.basicConfig(level = logging.DEBUG)
         elif opt == '-c':
-            controller = arg
+            controller, udp_port = arg.split(':', 2)
+            udp_port = int(udp_port)
         elif opt == '-l':
             try:
                 label = int(arg)
             except Exception as err:
                 logging.error('label not recognized')
+                logging.error(err)
                 sys.exit(255)
-        elif opt == '-x':
-            try:
-                mgmt_veths = arg.split(',')
-            except Exception as err:
-                logging.error('management veths not recognized')
-                sys.exit(255)
+        elif opt == '-m':
+            mgmt_veths.append(arg)
         else:
             assert False, 'unhandled option'
 
@@ -125,38 +114,42 @@ def main():
         sys.exit(255)
 
     # Preparing socket (controller -> wrapper)
+    from_controller = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    from_controller.bind(('', udp_port))
     try:
         from_controller = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        from_controller.bind(('', UDP_PORT))
+        from_controller.bind(('', udp_port))
     except Exception as err:
-        logging.error('cannot open UDP socket on port {}'.format(UDP_PORT))
+        logging.error('cannot open UDP socket on port {}'.format(udp_port))
+        logging.error(err)
         sys.exit(1)
     inputs.append(from_controller)
     atexit.register(from_controller.close)
 
-    # Preparing socket (wrapper -> controller)
+   # Preparing socket (wrapper -> controller)
     try:
         to_controller = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     except Exception as err:
         logging.error('cannot prepare socket for controller')
+        logging.error(err)
         sys.exit(1)
     atexit.register(to_controller.close)
 
-    # Preparing tap
+    # Preparing tap (wrapper <-> node)
     for tap in os.listdir('/sys/class/net'):
         if tap.startswith('veth') and tap not in mgmt_veths:
-            taps.append(tap)
-    for tap in taps:
-        try:
-            from_tun = open('/dev/net/tun', 'r+b', buffering = 0)
-            ifr = struct.pack('16sH', tap.encode(), IFF_TAP | IFF_NO_PI)
-            fcntl.ioctl(from_tun, TUNSETIFF, ifr)
-            fcntl.ioctl(from_tun, TUNSETNOCSUM, 1)
-        except Exception as err:
-            logging.error('cannot open TUN/TAP descriptor ({})'.format(tap))
-            sys.exit(1)
-        atexit.register(from_tun.close)
-        inputs.append(from_tun)
+            try:
+                from_tun = open('/dev/net/tun', 'r+b', buffering = 0)
+                ifr = struct.pack('16sH', tap.encode(), IFF_TAP | IFF_NO_PI)
+                fcntl.ioctl(from_tun, TUNSETIFF, ifr)
+                fcntl.ioctl(from_tun, TUNSETNOCSUM, 1)
+            except Exception as err:
+                logging.error('cannot open TUN/TAP descriptor ({})'.format(tap))
+                logging.error(err)
+                sys.exit(1)
+            atexit.register(from_tun.close)
+            inputs.append(from_tun)
+            veths[int(tap[4:])] = from_tun
 
     # Starting QEMU
     try:
@@ -170,6 +163,7 @@ def main():
         time.sleep(0.5)
     except Exception as err:
         logging.error('cannot start QEMU process')
+        logging.error(err)
         sys.exit(1)
     atexit.register(subprocessTerminate, p)
 
@@ -186,113 +180,51 @@ def main():
 
         readable, writable, exceptional = select.select(inputs, outputs, inputs)
 
-        if to_iol == None:
-            try:
-                to_iol = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
-                to_iol.connect(write_fsocket)
-                atexit.register(to_iol.close)
-            except Exception as err:
-                logging.error('cannot connect to IOL socket')
-                to_iol = None
-                pass
-
         for s in readable:
-            if s is from_iol:
-                logging.debug('data from IOL (TAP)')
-                iol_datagram = from_iol.recv(IOL_BUFFER)
-                if not iol_datagram:
-                    logging.error('cannot receive data from IOL node')
-                    break
-                else:
-                    src_id, src_if, dst_id, dst_if, padding, payload = decodeIOLPacket(iol_datagram)
-                    if src_if == MGMT_ID:
-                        logging.debug('sending data to MGMT')
-                        try:
-                            os.write(from_tun.fileno(), payload)
-                        except Exception as err:
-                            logging.error('cannot send data to MGMT')
-                            break
-                    else:
-                        logging.debug('sending data to controller')
-                        try:
-                            to_controller.sendto(encodeUDPPacket(label, src_if, payload), (controller, UDP_PORT))
-                        except Exception as err:
-                            loggin.error('cannot send data to controller')
-                            break
-            elif s is from_controller:
+            if s is from_controller:
                 logging.debug('data from controller')
-                udp_datagram, src_addr = from_controller.recvfrom(UDP_BUFFER)
+                udp_datagram, src_addr = from_controller.recvfrom(BUFFER)
                 if not udp_datagram:
                     logging.error('cannot receive data from controller')
                     sys.exit(1)
                 else:
                     label, iface, payload = decodeUDPPacket(udp_datagram)
-                    if 'to_iol' != None:
-                        try:
-                            to_iol.send(encodeIOLPacket(wrapper_id, iol_id, iface, payload))
-                        except Exception as err:
-                            logging.error('cannot send data to IOL node')
-                            break
-                    else:
-                        logging.error('cannot connect to IOL socket, packet dropped')
-            elif s is from_tun:
-                logging.debug('data from MGMT')
-                try:
-                    tap_datagram = array.array('B', os.read(from_tun.fileno(), TAP_BUFFER))
-                except Exception as err:
-                    logging.error('cannot read data from MGMT')
-                    break
-                if to_iol != None:
                     try:
-                        to_iol.send(encodeIOLPacket(wrapper_id, iol_id, MGMT_ID, tap_datagram))
+                        logging.debug('sending data to QEMU port qeth{}'.format(iface))
+                        os.write(veths[iface].fileno(), payload)
                     except Exception as err:
-                        logging.error('cannot send data to IOL MGMT')
-                        break
-                else:
-                    logging.error('cannot connect to IOL socket, packet dropped')
-            elif s is iol.stdout.fileno():
-                logging.debug('data from IOL console (stdout)')
-                try:
-                    data = iol.stdout.read(1)
-                except Exception as err:
-                    logging.error('cannot read data from IOL console (stdout)')
-                if time.time() - alive < MIN_TIME:
-                    # Saving console if IOL crashes too soon
-                    console_history += data
-                inputs, clients = terminalServerSend(inputs, clients, data)
-            elif s is iol.stderr.fileno():
-                logging.debug('data from IOL console (stderr)')
-                try:
-                    data = iol.stderr.read(1)
-                except Exception as err:
-                    logging.error('cannot read data from IOL console (stderr)')
-                if time.time() - alive < MIN_TIME:
-                    # Saving console if IOL crashes too soon
-                    console_history += data
-                inputs, clients = terminalServerSend(inputs, clients, data)
-            elif s is ts:
-                # New client
-                inputs, clients = terminalServerAccept(s, inputs, clients, title)
-            elif s in clients:
-                logging.debug('data from terminal server client')
-                data, inputs, clients = terminalServerReceive(s, inputs, clients)
-                if data != None:
-                    try:
-                        iol.stdin.write(data)
-                    except Exception as err:
-                        logging.error('cannot send data to IOL console')
+                        logging.error('cannot send data to QEMU port qeth{}'.format(iface))
+                        logging.error(err)
                         break
             else:
+                veth_found = False
+                for interface_id in veths:
+                    if s is veths[interface_id]:
+                        logging.debug('data from QEMU port {}'.format(interface_id))
+                        veth_found = True
+                        datagram = os.read(s.fileno(), BUFFER)
+                        if not datagram:
+                            logging.error('cannot receive data from controller')
+                            sys.exit(1)
+                        else:
+                            try:
+                                logging.debug('sending data to controller')
+                                to_controller.sendto(encodeUDPPacket(label, interface_id, datagram), (controller, udp_port))
+                            except Exception as err:
+                                logging.error('cannot send data to controller')
+                                logging.error(err)
+                                sys.exit(1)
+                        break
                 logging.error('unknown source from select')
 
     # Terminating
     if time.time() - alive < MIN_TIME:
-        # IOL died prematurely
+        # QEMU died prematurely
         logging.error('QEMU process died prematurely\n')
-        print(console_history.decode('utf-8') )
+        logging.error(console_history.decode('utf-8'))
         sys.exit(1)
     else:
-        # IOL died after a reasonable time
+        # QEMU died after a reasonable time
         sys.exit(0)
 
 if __name__ == '__main__':

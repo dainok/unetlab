@@ -77,6 +77,9 @@ def loadConfig(config_file):
     if not config.has_option('advanced', 'controller_length'):
         config['advanced']['controller_length'] = '1'
         need_to_save = True
+    if not config.has_option('advanced', 'controller_port'):
+        config['advanced']['controller_port'] = '5005'
+        need_to_save = True
 
     if need_to_save:
         # Need to update configuration file
@@ -95,6 +98,7 @@ def loadConfig(config_file):
     result['app']['port'] = config.getint('app', 'port')
     result['app']['testing'] = config.getboolean('app', 'testing')
     result['controller']['id'] = config.getint('controller', 'id')
+    result['advanced']['controller_port'] = config.getint('advanced', 'controller_port')
     result['advanced']['label_length'] = config.getint('advanced', 'label_length')
     result['advanced']['interface_length'] = config.getint('advanced', 'interface_length')
     result['advanced']['controller_length'] = config.getint('advanced', 'controller_length')
