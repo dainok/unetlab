@@ -209,39 +209,39 @@ class Bootstrap(Resource):
         with open('{}/templates/bootstrap_{}_footer.sh'.format(app_root, node_json['type']), 'r') as fd_init_footer:
             init_footer = fd_init_footer.read()
 
+        # Configure mgm
+        init_body = init_body + 'brctl addbr mgmt || exit 1\n'
+        init_body = init_body + 'brctl setageing mgmt 0 || exit 1\n'
+        init_body = init_body + 'brctl stp mgmt off || exit 1\n'
+        init_body = init_body + 'ip addr add 192.0.2.1/24 dev mgmt || exit 1\n'
+        init_body = init_body + 'iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE\n'
+        init_body = init_body + 'iptables -t nat -A POSTROUTING -o mgmt -j MASQUERADE\n'
+        init_body = init_body + 'iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 22 -j DNAT --to 192.0.2.254:22\n'
+        init_body = init_body + 'iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 23 -j DNAT --to 192.0.2.254:23\n'
+        init_body = init_body + 'iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j DNAT --to 192.0.2.254:80\n'
+        init_body = init_body + 'iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 443 -j DNAT --to 192.0.2.254:443\n'
+        init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p udp --dport 69 -j DNAT --to {}:69\n'.format(master.inside_ip)
+        init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 20 -j DNAT --to {}:20\n'.format(master.inside_ip)
+        init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 21 -j DNAT --to {}:21\n'.format(master.inside_ip)
+        init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 22 -j DNAT --to {}:22\n'.format(master.inside_ip)
+        init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 80 -j DNAT --to {}:80\n'.format(master.inside_ip)
+        init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 443 -j DNAT --to {}:443\n'.format(master.inside_ip)
+
         if node_json['type'] == 'qemu':
-            for i in range(node_json['ethernet']):
-                # Configure TAP interfaces
-                init_body = init_body + 'brctl addbr mgmt || exit 1\n'
-                init_body = init_body + 'brctl setageing mgmt 0 || exit 1\n'
-                init_body = init_body + 'brctl stp mgmt off || exit 1\n'
-                init_body = init_body + 'ip addr add 192.0.2.1/24 dev mgmt || exit 1\n'
-                init_body = init_body + 'iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE\n'
-                init_body = init_body + 'iptables -t nat -A POSTROUTING -o mgmt -j MASQUERADE\n'
-                init_body = init_body + 'iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 22 -j DNAT --to 192.0.2.254:22\n'
-                init_body = init_body + 'iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 23 -j DNAT --to 192.0.2.254:23\n'
-                init_body = init_body + 'iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j DNAT --to 192.0.2.254:80\n'
-                init_body = init_body + 'iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 443 -j DNAT --to 192.0.2.254:443\n'
-                init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p udp --dport 69 -j DNAT --to {}:69\n'.format(master.inside_ip)
-                init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 20 -j DNAT --to {}:20\n'.format(master.inside_ip)
-                init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 21 -j DNAT --to {}:21\n'.format(master.inside_ip)
-                init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 22 -j DNAT --to {}:22\n'.format(master.inside_ip)
-                init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 80 -j DNAT --to {}:80\n'.format(master.inside_ip)
-                init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 443 -j DNAT --to {}:443\n'.format(master.inside_ip)
             if node_json['subtype'] == 'vyos':
                 bin_cmd = bin_cmd + ' -boot order=c -drive file=/data/node/hda.qcow2,if=virtio,format=qcow2 -enable-kvm -m {}M -serial telnet:0.0.0.0:5023,server,nowait -monitor telnet:0.0.0.0:5024,server,nowait -nographic'.format(node_json['ram'])
                 for interface_id, interface in sorted(node_json['interfaces'].items()):
                     interface_id = int(interface_id)
                     if 'management' in interface and bool(interface['management']):
                         # Configure management bridge
-                        init_body = init_body + 'ip tuntap add dev veth{} mode tap || exit 1\n'.format(interface_id)
+                        init_body = init_body + 'tunctl -t veth{} || exit 1\n'.format(interface_id)
                         init_body = init_body + 'ip link set dev veth{} up || exit 1\n'.format(interface_id)
                         init_body = init_body + 'brctl addif mgmt veth{} || exit 1\n'.format(interface_id)
                         wrapper_cmd = wrapper_cmd + ' -m veth{}'.format(interface_id)
                     else:
-                        init_body = init_body + 'ip tuntap add dev veth{} mode tap || exit 1\n'.format(interface_id)
+                        init_body = init_body + 'tunctl -t veth{} || exit 1\n'.format(interface_id)
                         init_body = init_body + 'ip link set dev veth{} up || exit 1\n'.format(interface_id)
-                        init_body = init_body + 'ip tuntap add dev qeth{} mode tap || exit 1\n'.format(interface_id)
+                        init_body = init_body + 'tunctl -t qeth{} || exit 1\n'.format(interface_id)
                         init_body = init_body + 'ip link set dev qeth{} up || exit 1\n'.format(interface_id)
                         init_body = init_body + 'brctl addbr br{} || exit 1\n'.format(interface_id)
                         init_body = init_body + 'ip link set dev br{} up || exit 1\n'.format(interface_id)
@@ -253,7 +253,7 @@ class Bootstrap(Resource):
             init_body = init_body + wrapper_cmd + ' -- ' + bin_cmd + ' & \n'
             init_body = init_body + 'QEMU_PID=$!\n'
             init_body = init_body + 'wait ${QEMU_PID}\n'
-        
+
         init_script = init_header + init_body + init_footer
         return send_file(io.BytesIO(init_script.encode()), attachment_filename = 'init', mimetype = 'text/x-shellscript')
 
