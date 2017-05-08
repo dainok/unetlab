@@ -187,9 +187,9 @@ class Auth(Resource):
             }
         return data
 
-class Bootstrap(Resource):
+class BootstrapNode(Resource):
     def get(self, label = None):
-        # TODO Should filter for incoming IP addresses
+        checkAuthz(request, ['admin'])
         active_node = ActiveNodeTable.query.get(label)
         node_id = active_node.node_id
         node_json = json.loads(active_node.active_lab.json)['topology']['nodes'][str(node_id)]
@@ -201,7 +201,7 @@ class Bootstrap(Resource):
         controller = ControllerTable.query.get(config['controller']['id'])
         init_body = ''
         bin_cmd = '/usr/bin/qemu-system-x86_64'
-        wrapper_cmd = '/tmp/wrapper_qemu.py -c {}:{} -l {}'.format(controller.inside_ip, config['advanced']['controller_port'], label)
+        wrapper_cmd = '/tmp/wrapper_qemu.py -d -c {}:{} -l {}'.format(controller.inside_ip, config['advanced']['controller_port'], label)
 
         # Load header and footer
         with open('{}/templates/bootstrap_{}_header.sh'.format(app_root, node_json['type']), 'r') as fd_init_header:
@@ -212,7 +212,7 @@ class Bootstrap(Resource):
         # Configure mgm
         init_body = init_body + 'brctl addbr mgmt || exit 1\n'
         init_body = init_body + 'brctl setageing mgmt 0 || exit 1\n'
-        init_body = init_body + 'brctl stp mgmt off || exit 1\n'
+        init_body = init_body + 'ip link set dev mgmt up || exit 1\n'
         init_body = init_body + 'ip addr add 192.0.2.1/24 dev mgmt || exit 1\n'
         init_body = init_body + 'iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE\n'
         init_body = init_body + 'iptables -t nat -A POSTROUTING -o mgmt -j MASQUERADE\n'
@@ -234,22 +234,22 @@ class Bootstrap(Resource):
                     interface_id = int(interface_id)
                     if 'management' in interface and bool(interface['management']):
                         # Configure management bridge
-                        init_body = init_body + 'tunctl -t veth{} || exit 1\n'.format(interface_id)
-                        init_body = init_body + 'ip link set dev veth{} up || exit 1\n'.format(interface_id)
-                        init_body = init_body + 'brctl addif mgmt veth{} || exit 1\n'.format(interface_id)
-                        wrapper_cmd = wrapper_cmd + ' -m veth{}'.format(interface_id)
+                        init_body = init_body + 'tunctl -t qeth{} || exit 1\n'.format(interface_id)
+                        init_body = init_body + 'ip link set dev qeth{} up || exit 1\n'.format(interface_id)
+                        init_body = init_body + 'brctl addif mgmt qeth{} || exit 1\n'.format(interface_id)
+                        wrapper_cmd = wrapper_cmd + ' -m qeth{}'.format(interface_id)
+                        bin_cmd = bin_cmd + ' -netdev tap,id=eth{},ifname=qeth{},script=no,downscript=no -device virtio-net,netdev=eth{},mac=52:54:00:00:00:00'.format(interface_id, interface_id, interface_id)
                     else:
                         init_body = init_body + 'tunctl -t veth{} || exit 1\n'.format(interface_id)
                         init_body = init_body + 'ip link set dev veth{} up || exit 1\n'.format(interface_id)
                         init_body = init_body + 'tunctl -t qeth{} || exit 1\n'.format(interface_id)
                         init_body = init_body + 'ip link set dev qeth{} up || exit 1\n'.format(interface_id)
                         init_body = init_body + 'brctl addbr br{} || exit 1\n'.format(interface_id)
-                        init_body = init_body + 'ip link set dev br{} up || exit 1\n'.format(interface_id)
                         init_body = init_body + 'brctl setageing br{} 0 || exit 1\n'.format(interface_id)
-                        init_body = init_body + 'brctl stp br{} off || exit 1\n'.format(interface_id)
+                        init_body = init_body + 'ip link set dev br{} up || exit 1\n'.format(interface_id)
                         init_body = init_body + 'brctl addif br{} veth{} || exit 1\n'.format(interface_id, interface_id)
                         init_body = init_body + 'brctl addif br{} qeth{} || exit 1\n'.format(interface_id, interface_id)
-                    bin_cmd = bin_cmd + ' -netdev tap,id=eth{},ifname=qeth{},script=no,downscript=no -device virtio-net,netdev=eth{},mac={}'.format(interface_id, interface_id, interface_id, interface['mac'])
+                        bin_cmd = bin_cmd + ' -netdev tap,id=eth{},ifname=qeth{},script=no,downscript=no -device virtio-net,netdev=eth{},mac={}'.format(interface_id, interface_id, interface_id, interface['mac'])
             init_body = init_body + wrapper_cmd + ' -- ' + bin_cmd + ' & \n'
             init_body = init_body + 'QEMU_PID=$!\n'
             init_body = init_body + 'wait ${QEMU_PID}\n'

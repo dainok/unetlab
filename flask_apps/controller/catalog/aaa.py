@@ -5,14 +5,16 @@ __copyright__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
 __license__ = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
 __revision__ = '20170430'
 
-import hashlib
+import hashlib, ipaddress
 from flask import abort
-from controller import api_key, cache
+from controller import api_key, cache, config
 from controller.catalog.models import UserTable
 
 def checkAuth(request):
-    if request.args.get('api_key') and request.args.get('api_key') == api_key:
-        # Correct API KEY: authenticated and authorized as admin user
+    client_ip = ipaddress.ip_address(request.remote_addr)
+    authorized_network = ipaddress.ip_network(config['controller']['client_network'])
+    if (request.args.get('api_key') and request.args.get('api_key') == api_key) or (client_ip in authorized_network):
+        # Correct API KEY or trusted IP address: authenticated and authorized as admin user
         return {
             'username': 'admin',
             'roles': {

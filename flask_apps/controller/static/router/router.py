@@ -1,24 +1,17 @@
 #!/usr/bin/env python3
-""" Wrapper for QEMU """
+""" Router """
 __author__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
 __copyright__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
 __license__ = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
 __revision__ = '20170430'
 
 BUFFER = 10000
-IFF_NO_PI = 0x1000
-IFF_TAP = 0x0002
 INTERFACE_LENGTH = 1
 LABEL_LENGTH = 2
-MIN_TIME = 5
-TUNSETNOCSUM = 0x400454c8
-TUNSETDEBUG = 0x400454c9
-TUNSETIFF = 0x400454ca
-TUNSETPERSIST = 0x400454cb
-TUNSETOWNER = 0x400454cc
-TUNSETLINK = 0x400454cd
+PORT = 5005
 
-import array, atexit, fcntl, getopt, logging, os, select, signal, struct, subprocess, sys, time
+import array, atexit, configparser, fcntl, getopt, logging, os, select, signal, struct, subprocess, sys, time
+from router_modules import *
 
 def decodeUDPPacket(datagram):
     """ Decode an UDP datagram to components
@@ -62,27 +55,25 @@ def usage():
     print('Options:')
     print('    -d             enable debug')
     print('    -c controller  the IP or domain name of the controller host')
-    print('    -l label       an integer starting from 0')
-    print('    -m veths       management interfaces')
+    print('    -i id          an integer starting from 0')
     sys.exit(255)
 
 def main():
+    print(routerGetConfig(0, 'http://127.0.0.1:5000', '172.17.0.1'))
+    return
+
     import socket
-    console_history = bytearray()
     controller = None
-    udp_port = None
-    label = None
+    router_id = None
     inputs = []
     outputs = []
-    mgmt_veths = []
-    veths = {}
 
     if len(sys.argv) < 2:
         usage()
 
     # Reading options
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'dc:l:m:')
+        opts, args = getopt.getopt(sys.argv[1:], 'dc:i:')
     except getopt.GetoptError as err:
         sys.stderr.write('ERROR: {}\n'.format(err))
         usage()
@@ -93,15 +84,13 @@ def main():
         elif opt == '-c':
             controller, udp_port = arg.split(':', 2)
             udp_port = int(udp_port)
-        elif opt == '-l':
+        elif opt == '-i':
             try:
-                label = int(arg)
+                router_id = int(arg)
             except Exception as err:
-                logging.error('label not recognized')
+                logging.error('ID not recognized')
                 logging.error(err)
                 sys.exit(255)
-        elif opt == '-m':
-            mgmt_veths.append(arg)
         else:
             assert False, 'unhandled option'
 
@@ -109,9 +98,11 @@ def main():
     if controller == None:
         logging.error('controller not recognized')
         sys.exit(255)
-    if label == None:
+    if router_id == None:
         logging.error('label not recognized')
         sys.exit(255)
+
+    loadConfig()
 
     # Preparing socket (controller -> wrapper)
     from_controller = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

@@ -57,7 +57,7 @@ if [ ! -f "${SOURCE}/${IMAGE}" ]; then
 	exit 1
 fi
 
-rm -rf node &>> ${LOG} && mkdir -p node/image &>> ${LOG}
+rm -rf node &>> ${LOG} && mkdir -p node/node &>> ${LOG}
 if [ $? -ne 0 ]; then
 	echo -e "${R}Cannot create directory (node)${U}"
 	exit 1
@@ -76,8 +76,8 @@ case "${IMAGE}" in
 		DISKS="${TMP}/hda.qcow2"
 		NAME="node-${SUBTYPE}:$(echo ${IMAGE} | sed 's/vyos-\([0-9.]*\)-amd64.iso/\1/')"
 		infoImage
-		qemu-img create -f qcow2 node/image/hda.qcow2 1G &>> ${LOG}
-		qemu-system-x86_64 -boot order=c,once=d -cdrom ${SOURCE}/${IMAGE} -hda node/image/hda.qcow2 -enable-kvm -m 1G -serial telnet:0.0.0.0:5023,server,nowait -monitor telnet:0.0.0.0:5024,server,nowait -nographic &>> ${LOG} &
+		qemu-img create -f qcow2 node/node/hda.qcow2 1G &>> ${LOG}
+		qemu-system-x86_64 -boot order=c,once=d -cdrom ${SOURCE}/${IMAGE} -hda node/node/hda.qcow2 -enable-kvm -m 1G -serial telnet:0.0.0.0:5023,server,nowait -monitor telnet:0.0.0.0:5024,server,nowait -nographic -netdev user,id=eth0 -device virtio-net,netdev=eth0,mac=52:54:00:00:00:00 &>> ${LOG} &
 		vyos/preconfigure_${SUBTYPE}.py &>> ${LOG}
 		if [ $? -ne 0 ]; then
 			echo -e "${R}Preconfiguration failed${U}"

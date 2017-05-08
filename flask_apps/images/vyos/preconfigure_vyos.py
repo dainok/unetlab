@@ -63,6 +63,8 @@ def main():
     c.expect('#', timeout = None)
     c.sendline('set interfaces ethernet eth0 address "192.0.2.254/24"')
     c.expect('#', timeout = None)
+    c.sendline('set service ssh port "22"')
+    c.expect('#', timeout = None)
     c.sendline('commit')
     c.expect('#', timeout = None)
     c.sendline('save')

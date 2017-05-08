@@ -1,8 +1,8 @@
 #!/bin/bash
-URL=http://${CONTROLLER}:5000/api/v1/bootstrap/nodes/${LABEL}
+URL=http://${CONTROLLER}:5000/api/v1/bootstrap/routers/${ID}
 PID=0
 
-function nodeStop {
+function routerStop {
 	if [ ${PID} -ne 0 ]; then
 		kill -SIGTERM ${PID}
 		wait ${PID}
@@ -15,7 +15,7 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 
-trap nodeStop SIGINT SIGTERM
+trap routerStop SIGINT SIGTERM
 bash /tmp/init &
 PID=$!
 wait $PID
