@@ -7,7 +7,7 @@ LABEL license = "https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode"
 LABEL version = '20170430'
 
 LABEL build = "docker build -t dainok/router:latest -f router.dockerfile ."
-LABEL usage.0 = "docker run --name router_0 --env CONTROLLER=172.17.0.1 --env LABEL=0 dainok/router"
+LABEL usage.0 = "docker run --name router_0 --env CONTROLLER=172.17.0.1 --env ROUTERID=0 dainok/router"
 
 ENTRYPOINT ["/sbin/bootstrap.sh"]
 

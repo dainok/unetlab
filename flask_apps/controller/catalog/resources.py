@@ -118,14 +118,25 @@ def getAvailableLabels(username):
         return max_labels
     return max_labels - used_labels
 
-def printController(controller):
-    return {
-        'id': controller.id,
-        'inside_ip': controller.inside_ip,
-        'outside_ip': controller.outside_ip,
-        'master': controller.master,
-        'docker_ip': controller.docker_ip
-    }
+def printController(controller, summary = False):
+    if summary:
+        data =  {
+            'id': controller.id,
+            'inside_ip': controller.inside_ip,
+            'outside_ip': controller.outside_ip,
+            'master': controller.master,
+            'docker_ip': controller.docker_ip
+        }
+    else:
+        data = printController(controller, summary = True)
+        data['labels'] = {}
+        # Loading nodes running in this controller
+        nodes = ActiveNodeTable.query.filter(ActiveNodeTable.controller_id == controller.id)
+        for node in nodes:
+            data['labels'][node.label] = {
+                'ip': node.ip
+            }
+    return data
 
 def printLab(lab, summary = False):
     if summary:
@@ -201,7 +212,7 @@ class BootstrapNode(Resource):
         controller = ControllerTable.query.get(config['controller']['id'])
         init_body = ''
         bin_cmd = '/usr/bin/qemu-system-x86_64'
-        wrapper_cmd = '/tmp/wrapper_qemu.py -d -c {}:{} -l {}'.format(controller.inside_ip, config['advanced']['controller_port'], label)
+        wrapper_cmd = '/tmp/wrapper_qemu.py -d -c {} -l {}'.format(controller.inside_ip, label)
 
         # Load header and footer
         with open('{}/templates/bootstrap_{}_header.sh'.format(app_root, node_json['type']), 'r') as fd_init_header:
@@ -263,14 +274,16 @@ class Controller(Resource):
         checkAuthz(request, ['admin'])
         if not controller_id:
             # List all controllers
+            summary = True
             controllers = ControllerTable.query.paginate(page, 10).items
         else:
             # List a single controller if exists, else 404
-            controllers = ControllerTable.query.get_or_404(controller_id)
+            summary = False
+            controllers = [ControllerTable.query.get_or_404(controller_id)]
         data = {}
         for controller in controllers:
             # Print each controller
-            data[controller.id] = printController(controller)
+            data[controller.id] = printController(controller, summary = summary)
         return {
             'status': 'success',
             'message': 'Controller(s) found',

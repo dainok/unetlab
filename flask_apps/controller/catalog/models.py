@@ -35,6 +35,7 @@ class ActiveNodeTable(db.Model):
     instance = db.Column(db.String(128), db.ForeignKey('active_labs.instance'))
     node_id = db.Column(db.Integer)
     controller_id = db.Column(db.Integer)
+    ip = db.Column(db.String(128))
     state = db.Column(db.String(128))
     label = db.Column(db.Integer, primary_key = True, autoincrement = False)
     interfaces = db.relationship('ActiveInterfaceTable', cascade = 'save-update, merge, delete')

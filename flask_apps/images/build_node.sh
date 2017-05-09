@@ -78,7 +78,23 @@ case "${IMAGE}" in
 		infoImage
 		qemu-img create -f qcow2 node/node/hda.qcow2 1G &>> ${LOG}
 		qemu-system-x86_64 -boot order=c,once=d -cdrom ${SOURCE}/${IMAGE} -hda node/node/hda.qcow2 -enable-kvm -m 1G -serial telnet:0.0.0.0:5023,server,nowait -monitor telnet:0.0.0.0:5024,server,nowait -nographic -netdev user,id=eth0 -device virtio-net,netdev=eth0,mac=52:54:00:00:00:00 &>> ${LOG} &
-		vyos/preconfigure_${SUBTYPE}.py &>> ${LOG}
+		${SUBTYPE}/preconfigure_${SUBTYPE}.py &>> ${LOG}
+		if [ $? -ne 0 ]; then
+			echo -e "${R}Preconfiguration failed${U}"
+			exit 1
+		fi
+		;;
+	pfSense-CE-memstick-serial-*-RELEASE-amd64.img.gz)
+		TYPE="qemu"
+		SUBTYPE="pfsense"
+		DISKS="${TMP}/hda.qcow2"
+		NAME="node-${SUBTYPE}:$(echo ${IMAGE} | sed 's/pfSense-CE-memstick-serial-\([0-9.]*\)-.*/\1/')"
+		infoImage
+		gunzip -k ${IMAGE} &>> ${LOG}
+		qemu-img convert -f raw -O qcow2 pfSense-CE-memstick-serial-*.img node/node/hda.qcow2 &>> ${LOG}
+		rm -f pfSense-CE-memstick-serial-*.img
+		qemu-system-x86_64 -boot order=c -hda node/node/hda.qcow2 -enable-kvm -m 1G -serial telnet:0.0.0.0:5023,server,nowait -monitor telnet:0.0.0.0:5024,server,nowait -nographic -netdev user,id=eth0 -device virtio-net,netdev=eth0 &>> ${LOG} &
+		${SUBTYPE}/preconfigure_${SUBTYPE}.py &>> ${LOG}
 		if [ $? -ne 0 ]; then
 			echo -e "${R}Preconfiguration failed${U}"
 			exit 1

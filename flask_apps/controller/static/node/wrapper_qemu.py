@@ -5,12 +5,14 @@ __copyright__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
 __license__ = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
 __revision__ = '20170430'
 
+API_PORT = 5000
 BUFFER = 10000
 IFF_NO_PI = 0x1000
 IFF_TAP = 0x0002
 INTERFACE_LENGTH = 1
 LABEL_LENGTH = 2
 MIN_TIME = 5
+ROUTER_PORT = 5005
 TUNSETNOCSUM = 0x400454c8
 TUNSETDEBUG = 0x400454c9
 TUNSETIFF = 0x400454ca
@@ -27,8 +29,8 @@ def decodeUDPPacket(datagram):
     - INTEGER: dst interface ID
     - BYTES: payload
     """
-    dst_label = int.from_bytes(datagram[0:LABEL_LENGTH - 1], byteorder = 'little')
-    dst_if = int.from_bytes(datagram[LABEL_LENGTH:LABEL_LENGTH + INTERFACE_LENGTH - 1], byteorder='little')
+    dst_label = int.from_bytes(datagram[0:LABEL_LENGTH], byteorder = 'little')
+    dst_if = int.from_bytes(datagram[LABEL_LENGTH:LABEL_LENGTH + INTERFACE_LENGTH], byteorder='little')
     payload = datagram[LABEL_LENGTH + INTERFACE_LENGTH:]
     logging.debug('UDP packet for label={} iface={} payload={}'.format(dst_label, dst_if, sys.getsizeof(payload)))
     return dst_label, dst_if, payload
@@ -38,7 +40,7 @@ def encodeUDPPacket(node_id, iface_id, payload):
     Return:
     - BYTES: UDP datagram
     """
-    return node_id.to_bytes(3, byteorder='little') + iface_id.to_bytes(1, byteorder='little') + payload
+    return node_id.to_bytes(LABEL_LENGTH, byteorder='little') + iface_id.to_bytes(INTERFACE_LENGTH, byteorder='little') + payload
 
 def exitGracefully(signum, frame):
     """ Trap CTRL+C and TERM signal
@@ -70,7 +72,6 @@ def main():
     import socket
     console_history = bytearray()
     controller = None
-    udp_port = None
     label = None
     inputs = []
     outputs = []
@@ -91,8 +92,7 @@ def main():
         if opt == '-d':
             logging.basicConfig(level = logging.DEBUG)
         elif opt == '-c':
-            controller, udp_port = arg.split(':', 2)
-            udp_port = int(udp_port)
+            controller = arg
         elif opt == '-l':
             try:
                 label = int(arg)
@@ -115,12 +115,12 @@ def main():
 
     # Preparing socket (controller -> wrapper)
     from_controller = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    from_controller.bind(('', udp_port))
+    from_controller.bind(('', ROUTER_PORT))
     try:
         from_controller = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        from_controller.bind(('', udp_port))
+        from_controller.bind(('', ROUTER_PORT))
     except Exception as err:
-        logging.error('cannot open UDP socket on port {}'.format(udp_port))
+        logging.error('cannot open UDP socket on port {}'.format(ROUTER_PORT))
         logging.error(err)
         sys.exit(1)
     inputs.append(from_controller)
@@ -137,7 +137,7 @@ def main():
 
     # Preparing tap (wrapper <-> node)
     for tap in os.listdir('/sys/class/net'):
-        if tap.startswith('veth') and tap not in mgmt_veths:
+        if tap.startswith('veth'):
             try:
                 from_tun = open('/dev/net/tun', 'r+b', buffering = 0)
                 ifr = struct.pack('16sH', tap.encode(), IFF_TAP | IFF_NO_PI)
@@ -211,14 +211,13 @@ def main():
                             sys.exit(1)
                         else:
                             try:
-                                logging.debug('sending data to controller')
-                                to_controller.sendto(encodeUDPPacket(label, interface_id, datagram), (controller, udp_port))
-                                continue
+                                logging.debug('sending data to controller {} ({}:{})'.format(controller, label, interface_id))
+                                to_controller.sendto(encodeUDPPacket(label, interface_id, datagram), (controller, ROUTER_PORT))
+                                break
                             except Exception as err:
                                 logging.error('cannot send data to controller')
                                 logging.error(err)
                                 sys.exit(1)
-                        break
                 if veth_found == False:
                     logging.error('unknown source from select')
 
