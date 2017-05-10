@@ -155,7 +155,7 @@ def main():
 
                     if dst_router_id == router_id:
                         # Local destination
-                        egress.sendto(encodeUDPPacket(dst_label, dst_if, udp_datagram), (dst_node_ip, ROUTER_PORT))
+                        egress.sendto(encodeUDPPacket(dst_label, dst_if, payload), (dst_node_ip, ROUTER_PORT))
                         logging.debug('packet sent to local router ({}:{})'.format(dst_label, dst_if))
                     else:
                         # Remote destination
