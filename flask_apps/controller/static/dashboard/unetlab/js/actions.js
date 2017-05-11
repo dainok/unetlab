@@ -4,7 +4,7 @@ $('#form-login').on('submit', function (event) {
 		localStorage.setItem('username', form_data['username']);
 		localStorage.setItem('password', form_data['password']);
 		notifyUser('info', data['message']);
-		$(window.location).attr('href', 'home.html');
+		//$(window.location).attr('href', 'home.html');
 	}).fail(function(data) {
 		$('#form-login, input').val('');
 		notifyUser('error', data['message']);

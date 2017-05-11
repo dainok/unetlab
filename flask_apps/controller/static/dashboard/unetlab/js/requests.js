@@ -1,4 +1,4 @@
-var DEMO = new Boolean(true);
+var DEMO = false;
 var TIMEOUT = 3000
 
 // GET /api/v1/auth
@@ -21,13 +21,13 @@ function getAuth(username, password) {
 			timeout: TIMEOUT,
 			type: 'GET',
 			url: '/api/v1/auth',
-			username: username,
-			password: password
+            headers: {'Authorization': 'Basic ' + btoa(username + ':' + password)}
 		}).done(function(data) {
-			// if data status == success
-			deferred.resolve(data);
-			// else
-			// reject with message
+            if (data['status'] == 'success') {
+                deferred.resolve(data);
+            } else {
+                deferred.reject(data);
+            }
 		}).fail(function(jqXHR, textStatus, errorThrown) {
 			deferred.reject({
 				status: 'fail',

@@ -10,17 +10,28 @@ function formToJSON($form) {
 
 // Check if a user is authenticated
 function isAuthenticated() {
-	username = localStorage.getItem('username');
-	password = localStorage.getItem('password');
-	if (username !== null && password !== null) {
-		$.when(getAuth(username, password)).done(function(data) {
-			return true;
-		}).fail(function(data) {
-			return true;
-		});
-	} else {
-		return false;
-	}
+    var deferred = $.Deferred();
+    var username = localStorage.getItem('username');
+    var password = localStorage.getItem('password');
+    if (username != null && password != null) {
+        $.when(getAuth(username, password)).done(function(data) {
+            if (data['status'] == 'success') {
+                deferred.resolve(true);
+            } else {
+                deferred.reject(false);
+                localStorage.removeItem(username);
+                localStorage.removeItem(password);
+                rc = false;
+            }
+        }).fail(function(data) {
+            deferred.reject(false);
+            localStorage.removeItem(username);
+            localStorage.removeItem(password);
+        });
+    } else {
+        deferred.reject(false);
+    }
+    return deferred.promise();
 }
 
 // Notify a message to a user
