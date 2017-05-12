@@ -77,6 +77,10 @@ def type_topology(arg):
                 raise ValueError
     return arg
 
+patch_auth_parser = reqparse.RequestParser()
+patch_auth_parser.add_argument('name', type = str, location = 'json', help = 'name cannot be blank')
+patch_auth_parser.add_argument('password', type = str, location = 'json', help = 'password cannot be blank')
+
 add_lab_parser = reqparse.RequestParser()
 add_lab_parser.add_argument('commit', type = bool, required = False, help = 'commit must be boolean')
 add_lab_parser.add_argument('name', type = str, required = True, location = 'json', help = 'name cannot be blank')

@@ -1,32 +1,50 @@
+/* UNetLabv2 UI - functions
+ * ================
+ * @author    Andrea Dainese <andrea.dainese@gmail.com>
+ * @copyright Andrea Dainese <andrea.dainese@gmail.com>
+ * @license   https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode
+ * @revision  2.3.8
+ */
+
 // Convert form data into JSON 
-function formToJSON($form) {
-	var unindexed_array = $form.serializeArray();
-	var indexed_array = {};
-	$.map(unindexed_array, function(n, i){
-		indexed_array[n['name']] = n['value'];
-	});
-	return indexed_array;
+function formToJSON(form) {
+    var form_array = {}
+    var key = null;
+    var value = null;
+    $.each(form.serializeArray(), function(object_id, object) {
+        $.each(object, function(field, data) {
+            if (key == null) {
+                key = data;
+            } else {
+                value = data;
+                form_array[key] = value;
+                value = null;
+                key = null;
+            }
+        });
+    });
+    return form_array;
 }
 
 // Check if a user is authenticated
 function isAuthenticated() {
     var deferred = $.Deferred();
     var username = localStorage.getItem('username');
-    var password = localStorage.getItem('password');
+    var password = localStorage.getItem('password')
     if (username != null && password != null) {
         $.when(getAuth(username, password)).done(function(data) {
             if (data['status'] == 'success') {
                 deferred.resolve(true);
             } else {
                 deferred.reject(false);
-                localStorage.removeItem(username);
-                localStorage.removeItem(password);
+                localStorage.removeItem('username');
+                localStorage.removeItem('password');
                 rc = false;
             }
         }).fail(function(data) {
             deferred.reject(false);
-            localStorage.removeItem(username);
-            localStorage.removeItem(password);
+            localStorage.removeItem('username');
+            localStorage.removeItem('password');
         });
     } else {
         deferred.reject(false);
@@ -49,4 +67,21 @@ function notifyUser(priority, message) {
 		var notification = new Notification(priority + ': ' + message);
 		setTimeout(notification.close.bind(notification), timeout); 
 	}
+}
+
+// Set data-user
+function setUserData() {
+    var username = localStorage.getItem('username');
+    var password = localStorage.getItem('password')
+    $.when(getAuth(username, password)).done(function(data) {
+        $.each(data['data'], function(key, value) {
+            $('.data-user-' + key).each(function() {
+                if ($(this).get(0).tagName == 'INPUT') {
+                    $(this).val(value);
+                } else {
+                    $(this).text(value);
+                }
+            });
+        });
+    });
 }

@@ -198,6 +198,28 @@ class Auth(Resource):
             }
         return data
 
+    def patch(self, role = None):
+        args = patch_auth_parser.parse_args()
+        username = checkAuthz(request)
+        user = UserTable.query.get_or_404(username)
+        for key, value in args.items():
+            if key in ['name', 'password']:
+                if key == 'password' and value == '':
+                    # Skip empty password
+                    continue
+                if key == 'password':
+                    setattr(user, key, hashlib.sha256(value.encode('utf-8')).hexdigest())
+                    # Purging the cached user
+                    cache.delete(user.username)
+                else:
+                    setattr(user, key, value)
+        db.session.commit()
+        return {
+            'status': 'success',
+            'message': 'User "{}" saved'.format(user.username),
+            'data': printUser(user)
+        }
+
 class BootstrapNode(Resource):
     def get(self, label = None):
         checkAuthz(request, ['admin'])
@@ -421,35 +443,6 @@ class Repository(Resource):
             'task': str(t)
         }
 
-class Routing(Resource):
-    def get(self, role = None, page = 1):
-        checkAuthz(request, ['admin'])
-        nodes = ActiveNodeTable.query
-        controllers = []
-        for controller in ControllerTable.query:
-            controllers.append(controller.id)
-        node_controllers = {}
-        for node in nodes:
-            node_controller = 0 if node.controller_id not in controllers else node.controller_id
-            node_controllers[node.label] = node_controller
-
-        data = {}
-        for node in nodes:
-            src_label = node.label
-            for interface in node.interfaces:
-                if not node.label in data:
-                    data[node.label] = {}
-                data[node.label][interface.id] = {
-                    'dst_controller': node_controllers[interface.dst_label],
-                    'dst_label': interface.dst_label,
-                    'dst_if' : interface.dst_if
-                }
-        return {
-            'status': 'success',
-            'message': 'Routing table found',
-            'data': data
-        }
-
 class Role(Resource):
     def delete(self, role = None):
         checkAuthz(request, ['admin'])
@@ -529,6 +522,35 @@ class Role(Resource):
             'status': 'success',
             'message': 'Role "{}" added'.format(role.role),
             'data': printRole(role)
+        }
+
+class Routing(Resource):
+    def get(self, role = None, page = 1):
+        checkAuthz(request, ['admin'])
+        nodes = ActiveNodeTable.query
+        controllers = []
+        for controller in ControllerTable.query:
+            controllers.append(controller.id)
+        node_controllers = {}
+        for node in nodes:
+            node_controller = 0 if node.controller_id not in controllers else node.controller_id
+            node_controllers[node.label] = node_controller
+
+        data = {}
+        for node in nodes:
+            src_label = node.label
+            for interface in node.interfaces:
+                if not node.label in data:
+                    data[node.label] = {}
+                data[node.label][interface.id] = {
+                    'dst_controller': node_controllers[interface.dst_label],
+                    'dst_label': interface.dst_label,
+                    'dst_if' : interface.dst_if
+                }
+        return {
+            'status': 'success',
+            'message': 'Routing table found',
+            'data': data
         }
 
 class Task(Resource):
