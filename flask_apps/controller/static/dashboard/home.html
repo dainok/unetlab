@@ -192,10 +192,10 @@
                         <li><a href="#">Link in level 2</a></li>
                     </ul>
                 </li>
-                <li class="header">LABELS</li>
-                <li><a href="#"><i class="fa fa-circle-o text-red"></i> <span>Important</span></a></li>
-                <li><a href="#"><i class="fa fa-circle-o text-yellow"></i> <span>Warning</span></a></li>
-                <li><a href="#"><i class="fa fa-circle-o text-aqua"></i> <span>Information</span></a></li>
+                <li class="header">ADMIN</li>
+                <li><a href="#" class="action-users"><i class="fa fa-user"></i> <span>Users</span></a></li>
+                <li><a href="#" class="action-roles"><i class="fa fa-users"></i> <span>Roles</span></a></li>
+                <li><a href="#" class="action-repositories"><i class="fa fa-folder"></i> <span>Repositories</span></a></li>
             </ul>
             <!-- /.sidebar-menu -->
         </section>
@@ -324,7 +324,7 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title">Profile</h4>
-                </div>
+                </div><!-- /.modal-header -->
                 <div class="modal-body">
                     <div class="box-body">
                         <div class="form-group">
@@ -363,35 +363,75 @@
                                 <input type="text" class="form-control data-user-labels" id="data-user-labels" placeholder="0" name="labels" disabled>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </div><!-- ./box-body -->
+                </div><!-- /.modal-body -->
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary">Save changes</button>
-                </div>
+                </div><!-- /.modal-footer -->
             </form>
-        </div>
-        <!-- /.modal-content -->
-    </div>
-    <!-- /.modal-dialog -->
-</div>
-<!-- /.modal -->
-<!-- /.example-modal -->
-
-
-
-<!-- REQUIRED JS SCRIPTS -->
-<!-- jQuery 2.2.3 -->
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /#modal-users -->
+<div id="modal-users" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form id="form-users" class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Users</h4>
+                </div><!-- /.modal-header -->
+                <div class="modal-body">
+										<div class="box-body">
+												<div class="table-responsive no-padding">
+														<table id="table-users" class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Password</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Labels</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>183</td>
+                                        <td>John Doe</td>
+                                        <td>11-7-2014</td>
+                                        <td><span class="label label-success">Approved</span></td>
+                                        <td>Bacon ipsum dolor sit amet salami venison chicken flank fatback doner.</td>
+                                    </tr>
+                                    <tr>
+                                        <td>219</td>
+                                        <td>Alexander Pierce</td>
+                                        <td>11-7-2014</td>
+                                        <td><span class="label label-warning">Pending</span></td>
+                                        <td>Bacon ipsum dolor sit amet salami venison chicken flank fatback doner.</td>
+                                    </tr>
+                                </tbody>
+														</table>
+												</div><!-- /.table -->
+										</div><!-- /.box-body -->
+                </div><!-- /.modal-body -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div><!-- /.modal-footer -->
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /#modal-users -->
 <script src="plugins/jQuery/jquery-2.2.3.min.js"></script>
-<!-- Bootstrap 3.3.6 -->
 <script src="bootstrap/js/bootstrap.min.js"></script>
-<!-- AdminLTE App -->
 <script src="dist/js/app.min.js"></script>
 <script src="plugins/fastclick/fastclick.min.js"></script>
 <script src="plugins/slimScroll/jquery.slimscroll.min.js"></script>
-<!-- iCheck -->
 <script src="plugins/iCheck/icheck.min.js"></script>
-<!-- UNetLab -->
+<script src="plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="plugins/datatables/dataTables.bootstrap.min.js"></script>
+<script src="plugins/jquery-tabledit/jquery.tabledit.min.js"></script>
 <script src="unetlab/js/actions.js"></script>
 <script src="unetlab/js/functions.js"></script>
 <script src="unetlab/js/requests.js"></script>
@@ -409,6 +449,22 @@
             setUserData();
         }).fail(function(data) {
             $(window.location).attr('href', 'login.html');
+        });
+
+        // Tables
+        // https://editor.datatables.net/examples/inline-editing/submitButton.html
+        // https://editor.datatables.net/examples/inline-editing/submitData.html
+        // https://editor.datatables.net/examples/inline-editing/options.html
+        $("#table-users").DataTable();
+        $('#table-users').Tabledit({
+            url: 'example.php',
+            editButton: false,
+            deleteButton: false,
+            hideIdentifier: false,
+            columns: {
+                identifier: [0, 'username'],
+                editable: [[1, 'password'], [2, 'name'], [3, 'email'], [4, 'labels']]
+            }
         });
     });
 </script>
