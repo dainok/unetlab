@@ -192,10 +192,10 @@
                         <li><a href="#">Link in level 2</a></li>
                     </ul>
                 </li>
-                <li class="header">ADMIN</li>
-                <li><a href="#" class="action-users"><i class="fa fa-user"></i> <span>Users</span></a></li>
-                <li><a href="#" class="action-roles"><i class="fa fa-users"></i> <span>Roles</span></a></li>
-                <li><a href="#" class="action-repositories"><i class="fa fa-folder"></i> <span>Repositories</span></a></li>
+                <li class="header hidden admin-item">ADMIN</li>
+                <li class="hidden admin-item"><a href="#" class="action-users"><i class="fa fa-user"></i> <span>Users</span></a></li>
+                <li class="hidden admin-item"><a href="#" class="action-roles"><i class="fa fa-users"></i> <span>Roles</span></a></li>
+                <li class="hidden admin-item"><a href="#" class="action-repositories"><i class="fa fa-folder"></i> <span>Repositories</span></a></li>
             </ul>
             <!-- /.sidebar-menu -->
         </section>
@@ -431,7 +431,6 @@
 <script src="plugins/iCheck/icheck.min.js"></script>
 <script src="plugins/datatables/jquery.dataTables.min.js"></script>
 <script src="plugins/datatables/dataTables.bootstrap.min.js"></script>
-<script src="plugins/jquery-tabledit/jquery.tabledit.min.js"></script>
 <script src="unetlab/js/actions.js"></script>
 <script src="unetlab/js/functions.js"></script>
 <script src="unetlab/js/requests.js"></script>
@@ -455,8 +454,21 @@
         // https://editor.datatables.net/examples/inline-editing/submitButton.html
         // https://editor.datatables.net/examples/inline-editing/submitData.html
         // https://editor.datatables.net/examples/inline-editing/options.html
-        $("#table-users").DataTable();
-        $('#table-users').Tabledit({
+
+
+
+        /*
+        $('#table-users').on('click', 'tbody td:not(:first-child)', function(event) {
+            editor.inline(this, {
+                onBlur: 'submit'
+            });
+        });
+        */
+
+                
+        //$("#table-users").DataTable();
+        /*
+           $('#table-users').Tabledit({
             url: 'example.php',
             editButton: false,
             deleteButton: false,
@@ -466,6 +478,7 @@
                 editable: [[1, 'password'], [2, 'name'], [3, 'email'], [4, 'labels']]
             }
         });
+        */
     });
 </script>
 </body>
