@@ -376,50 +376,33 @@
 <div id="modal-users" class="modal fade">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form id="form-users" class="form-horizontal">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Users</h4>
-                </div><!-- /.modal-header -->
-                <div class="modal-body">
-										<div class="box-body">
-												<div class="table-responsive no-padding">
-														<table id="table-users" class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Username</th>
-                                        <th>Password</th>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Labels</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>183</td>
-                                        <td>John Doe</td>
-                                        <td>11-7-2014</td>
-                                        <td><span class="label label-success">Approved</span></td>
-                                        <td>Bacon ipsum dolor sit amet salami venison chicken flank fatback doner.</td>
-                                    </tr>
-                                    <tr>
-                                        <td>219</td>
-                                        <td>Alexander Pierce</td>
-                                        <td>11-7-2014</td>
-                                        <td><span class="label label-warning">Pending</span></td>
-                                        <td>Bacon ipsum dolor sit amet salami venison chicken flank fatback doner.</td>
-                                    </tr>
-                                </tbody>
-														</table>
-												</div><!-- /.table -->
-										</div><!-- /.box-body -->
-                </div><!-- /.modal-body -->
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save changes</button>
-                </div><!-- /.modal-footer -->
-            </form>
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Users</h4>
+            </div><!-- /.modal-header -->
+            <div class="modal-body">
+                <div class="box-body">
+                    <div class="table-responsive no-padding">
+                        <table id="table-users" class="table table-hover" data-table="users">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Password</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Labels</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div><!-- /.table -->
+                </div><!-- /.box-body -->
+            </div><!-- /.modal-body -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Save changes</button>
+            </div><!-- /.modal-footer -->
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /#modal-users -->

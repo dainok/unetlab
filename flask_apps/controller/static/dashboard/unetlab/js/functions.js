@@ -32,19 +32,21 @@ function isAuthenticated() {
     var username = localStorage.getItem('username');
     var password = localStorage.getItem('password')
     if (username != null && password != null) {
-        $.when(getAuth(username, password)).done(function(data) {
-            if (data['status'] == 'success') {
+        $.when(getUrl('/api/v1/auth')).done(function(data) {
+            if (data.status == 'success') {
                 deferred.resolve(true);
             } else {
                 deferred.reject(false);
                 localStorage.removeItem('username');
                 localStorage.removeItem('password');
+                localStorage.removeItem('isadmin');
                 rc = false;
             }
         }).fail(function(data) {
             deferred.reject(false);
             localStorage.removeItem('username');
             localStorage.removeItem('password');
+            localStorage.removeItem('isadmin');
         });
     } else {
         deferred.reject(false);
@@ -73,8 +75,9 @@ function notifyUser(priority, message) {
 function setUserData() {
     var username = localStorage.getItem('username');
     var password = localStorage.getItem('password')
-    $.when(getAuth(username, password)).done(function(data) {
-        $.each(data['data'], function(key, value) {
+    // Setting user's profile
+    $.when(getUrl('/api/v1/auth')).done(function(data) {
+        $.each(data.data, function(key, value) {
             $('.data-user-' + key).each(function() {
                 if ($(this).get(0).tagName == 'INPUT') {
                     $(this).val(value);
@@ -84,4 +87,10 @@ function setUserData() {
             });
         });
     });
+    // Setting admin functions
+    if (localStorage.getItem('isadmin') != null) {
+        $('.admin-item').each(function() {
+            $(this).removeClass('hidden');
+        });
+    }
 }
