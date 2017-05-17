@@ -7,41 +7,62 @@
  */
 
 $('body').on('click', '[data-editable]', function() {
+    // Loading data from elements
     var $element = $(this);
-    var table = $element.parents('table').attr('data-table');
-    var id = $element.parents('tr').attr('data-id');
+    var url = $element.parents('tr').attr('data-url');
     var name = $element.attr('data-name');
     var type = $element.attr('data-type');
     if (type == 'password') {
+        // If input type is password, give a blank item
         var value = '';
     } else {
         var value = $element.text();
     }
-    var $input = $('<input/>').val(value);
-    $input.attr('name', name);
-    $input.attr('type', type);
-    $element.empty()
-    $element.append($input);
 
-    var save = function(){
-        data = {};
+    // Create and insert form elements
+    var $input = $('<input name="' + name + '" type="' + type + '" class="form-control"/>').val(value);
+    var $div = $('<div class="input-group input-group-sm"/>');
+    $element.empty()
+    $div.append($input);
+    $element.append($div);
+
+    // What to do when abort
+    var abort = function() {
         if (type == 'password' && $input.val() == '') {
             $element.text('**********');
         } else {
-            data[name] = $input.val();
-            console.log('PATCH');
-            console.log('/api/v1/' + table + '/' + id);
-            console.log(data);
-            $element.text($input.val());
+            $element.text(value);
         }
     };
 
-    $input.one('blur', save).focus();
-    $input.keydown( function(event) {
+    // What to do when save
+    var save = function() {
+        form_data = {};
+        form_data[name] = $input.val();
+        $.when(patchUrl(url, form_data)).done(function(data) {
+            if (type == 'password' && $input.val() == '') {
+                $element.text('**********');
+            } else {
+                $element.text($input.val());
+            }
+        }).fail(function(data) {
+            notifyUser('error', data.message);
+            console.log(data);
+            abort();
+        });
+    };
+
+    // Trigger actions
+    $input.one('blur', abort).focus();
+    $input.keydown(function(event) {
         var key = event.charCode ? event.charCode : event.keyCode ? event.keyCode : 0;
-        if(key == 13) {
-            event.preventDefault();
+        if (key == 13) {
             save();
+            event.preventDefault();
+        } else if (key == 27) {
+            // TODO: trigger modal close
+            abort();
+            event.preventDefault();
         }
     });
 });
@@ -95,23 +116,69 @@ $('.action-logout').on('click', function(event) {
     event.preventDefault()
 });
 
-$('.action-repositories').on('click', function(event) {
-    $('#modal-repositories').modal('toggle');
+/**********************************************************************
+ * Roles
+ *********************************************************************/
+
+$('.action-roles').on('click', function(event) {
+    $('#table-roles tbody').empty();
+	$.when(getUrl('/api/v1/roles')).done(function(data) {
+        $.each(data.data, function(key, value) {
+            $('#table-roles tbody').append('<tr data-url="/api/v1/roles/' + value.role + '"><td>' + value.role + '</td><td data-editable data-name="access_to" data-type="text">' + value.access_to + '</td><td data-editable data-name="can_write" data-type="text">' + value.can_write + '</td></tr>');
+        });
+        $('#table-roles').addClass('nowrap').dataTable();
+        $('#modal-roles').modal('toggle');
+    }).fail(function(data) {
+        notifyUser('error', data.message);
+    });
     event.preventDefault()
 });
 
-$('.action-roles').on('click', function(event) {
-    $('#modal-roles').modal('toggle');
+$('.action-role-add').on('click', function(event) {
+    $('#modal-role-add').modal('toggle');
     event.preventDefault()
 });
+
+$('#form-role').on('submit', function(event) {
+	form_data = formToJSON($(this));
+	$.when(postUrl('/api/v1/roles', form_data)).done(function(data) {
+        $(this).parents('form').find("input,textarea").val('');
+        $('#modal-role-add').modal('toggle');
+        $('#table-roles tbody').prepend('<tr data-url="/api/v1/roles/' + form_data.role + '"><td>' + form_data.role + '</td><td data-editable data-name="access_to" data-type="text">' + form_data.access_to + '</td><td data-editable data-name="can_write" data-type="text">' + form_data.can_write + '</td></tr>');
+    }).fail(function(data) {
+        notifyUser('error', data.message);
+    });
+    event.preventDefault()
+});
+
+/**********************************************************************
+ * Users
+ *********************************************************************/
 
 $('.action-users').on('click', function(event) {
     $('#table-users tbody').empty();
 	$.when(getUrl('/api/v1/users')).done(function(data) {
         $.each(data.data, function(key, value) {
-            $('#table-users tbody').append('<tr data-id=' + value.username + ' data-type="text"><td>' + value.username + '</td><td data-editable data-name="password" data-type="password">**********</td><td data-editable data-name="name" data-type="text">' + value.name + '</td><td data-editable data-name="email" data-type="email">' + value.email + '</td><td data-editable data-name="labels" data-type="text">' + value.labels + '</td></tr>');
+            $('#table-users tbody').append('<tr data-url="/api/v1/users/' + value.username + '"><td>' + value.username + '</td><td data-editable data-name="password" data-type="password">**********</td><td data-editable data-name="name" data-type="text">' + value.name + '</td><td data-editable data-name="email" data-type="email">' + value.email + '</td><td data-editable data-name="labels" data-type="text">' + value.labels + '</td></tr>');
         });
         $('#modal-users').modal('toggle');
+    }).fail(function(data) {
+        notifyUser('error', data.message);
+    });
+    event.preventDefault()
+});
+
+$('.action-user-add').on('click', function(event) {
+    $('#modal-user-add').modal('toggle');
+    event.preventDefault()
+});
+
+$('#form-user').on('submit', function(event) {
+	form_data = formToJSON($(this));
+	$.when(postUrl('/api/v1/users', form_data)).done(function(data) {
+        $(this).parents('form').find("input,textarea").val('');
+        $('#modal-user-add').modal('toggle');
+        $('#table-users tbody').prepend('<tr data-url="/api/v1/users/' + form_data.username + '"><td>' + form_data.username + '</td><td data-editable data-name="password" data-type="password">**********</td><td data-editable data-name="name" data-type="text">' + form_data.name + '</td><td data-editable data-name="email" data-type="email">' + value.email + '</td><td data-editable data-name="labels" data-type="text">' + form_data.labels + '</td></tr>');
     }).fail(function(data) {
         notifyUser('error', data.message);
     });

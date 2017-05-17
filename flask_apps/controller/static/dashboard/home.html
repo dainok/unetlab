@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
     <!-- Ionicons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="plugins/datatables/dataTables.bootstrap.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="dist/css/AdminLTE.min.css">
     <!-- AdminLTE Skins. We have chosen the skin-blue for this starter
@@ -316,6 +318,82 @@
 <!-- ./wrapper -->
 
 <!-- MODALS -->
+<div id="modal-roles" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Roles</h4>
+            </div><!-- /.modal-header -->
+            <div class="modal-body">
+                <div class="box-body">
+                    <div class="table-responsive no-padding">
+                        <table id="table-roles" class="table table-hover table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Role</th>
+                                    <th>Can&nbsp;write?</th>
+                                    <th>Access&nbsp;to</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div><!-- /.table -->
+                </div><!-- /.box-body -->
+            </div><!-- /.modal-body -->
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-default pull-left action-role-add">Add</button>
+                <button type="submit" class="btn btn-danger pull-left action-roles-delete">Delete</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div><!-- /.modal-footer -->
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /#modal-roles -->
+<div id="modal-role-add" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form id="form-role" class="form-horizontal" data-toggle="validator" role="form">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Add role</h4>
+                </div><!-- /.modal-header -->
+                <div class="modal-body">
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label for="form-role-role" class="col-sm-2 control-label">Role</label>
+                            <div class="col-sm-10">
+                                <input type="text" pattern="^[0-9a-zA-Z]{3,}$" id="form-role-role" class="form-control" placeholder="Role" name="role" required>
+                                <div class="help-block">Minimum of 3 characters, use only 0-9a-zA-Z</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-role-access_to" class="col-sm-2 control-label">Access to</label>
+                            <div class="col-sm-10">
+                                <input type="text" id="form-role-access_to" class="form-control" placeholder=".*" name="access_to" value=".*" required>
+                                <div class="help-block">Type a RegEx</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-role-can_write" class="col-sm-2 control-label">Can write?</label>
+                            <div class="col-sm-10">
+                                <select id="form-role-can_write" class="form-control" name="can_write" value="no">
+                                    <option value="true">Yes</option>
+                                    <option value="false" default>No</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div><!-- ./box-body -->
+                </div><!-- /.modal-body -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div><!-- /.modal-footer -->
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /#modal-role-add -->
 <div id="modal-profile" class="modal fade">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -366,13 +444,12 @@
                     </div><!-- ./box-body -->
                 </div><!-- /.modal-body -->
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
                 </div><!-- /.modal-footer -->
             </form>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
-</div><!-- /#modal-users -->
+</div><!-- /#modal-profile -->
 <div id="modal-users" class="modal fade">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -384,7 +461,7 @@
             <div class="modal-body">
                 <div class="box-body">
                     <div class="table-responsive no-padding">
-                        <table id="table-users" class="table table-hover" data-table="users">
+                        <table id="table-users" class="table table-hover">
                             <thead>
                                 <tr>
                                     <th>Username</th>
@@ -400,12 +477,76 @@
                 </div><!-- /.box-body -->
             </div><!-- /.modal-body -->
             <div class="modal-footer">
-                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary">Save changes</button>
+                <button type="submit" class="btn btn-default pull-left action-user-add">Add</button>
+                <button type="submit" class="btn btn-danger pull-left action-users-delete">Delete</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
             </div><!-- /.modal-footer -->
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /#modal-users -->
+<div id="modal-user-add" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form id="form-user" class="form-horizontal" data-toggle="validator" role="form">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Add user</h4>
+                </div><!-- /.modal-header -->
+                <div class="modal-body">
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label for="form-user-username" class="col-sm-2 control-label">Username</label>
+                            <div class="col-sm-10">
+                                <input type="text" pattern="^[0-9a-zA-Z]{5,}$" id="form-user-username" class="form-control" placeholder="Username" name="username" required>
+                                <div class="help-block">Minimum of 5 characters, use only 0-9a-zA-Z</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-user-name" class="col-sm-2 control-label">Name</label>
+                            <div class="col-sm-10">
+                                <input type="text" id="form-user-name" class="form-control" placeholder="Name" name="name" required>
+                                <div class="help-block">Type user's full name</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-user-password" class="col-sm-2 control-label">Password</label>
+                            <div class="col-sm-10">
+                                <input type="password" pattern="^.{10,}$" id="form-user-password" class="form-control" placeholder="Password" name="password" required>
+                                <div class="help-block">Minimum of 10 characters</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-user-repeatpassword" class="col-sm-2 control-label"></label>
+                            <div class="col-sm-10">
+                                <input type="password" data-match="#form-user-password" id="form-user-repeatpassword" class="form-control" placeholder="Repeat password" required>
+                                <div class="help-block">Passwords don't match</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-user-email" class="col-sm-2 control-label">Email</label>
+                            <div class="col-sm-10">
+                                <input type="email" id="form-user-email" class="form-control" placeholder="user@example.com" name="email" required>
+                                <div class="help-block">Email is not valid</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-user-labels" class="col-sm-2 control-label">Max.&nbsp;nodes</label>
+                            <div class="col-sm-10">
+                                <input type="number" id="form-user-labels" class="form-control" placeholder="-1" name="labels" required>
+                                <div class="help-block">Must be a integer starting from -1</div>
+                            </div>
+                        </div>
+                    </div><!-- ./box-body -->
+                </div><!-- /.modal-body -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div><!-- /.modal-footer -->
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /#modal-user-add -->
 <script src="plugins/jQuery/jquery-2.2.3.min.js"></script>
 <script src="bootstrap/js/bootstrap.min.js"></script>
 <script src="dist/js/app.min.js"></script>
@@ -414,11 +555,12 @@
 <script src="plugins/iCheck/icheck.min.js"></script>
 <script src="plugins/datatables/jquery.dataTables.min.js"></script>
 <script src="plugins/datatables/dataTables.bootstrap.min.js"></script>
+<script src="plugins/bootstrap-validator/validator.min.js"></script>
 <script src="unetlab/js/actions.js"></script>
 <script src="unetlab/js/functions.js"></script>
 <script src="unetlab/js/requests.js"></script>
 <script>
-    $(function() {
+    $(document).ready(function() {
         $('input').iCheck({
             checkboxClass: 'icheckbox_square-blue',
             radioClass: 'iradio_square-blue',
@@ -432,36 +574,6 @@
         }).fail(function(data) {
             $(window.location).attr('href', 'login.html');
         });
-
-        // Tables
-        // https://editor.datatables.net/examples/inline-editing/submitButton.html
-        // https://editor.datatables.net/examples/inline-editing/submitData.html
-        // https://editor.datatables.net/examples/inline-editing/options.html
-
-
-
-        /*
-        $('#table-users').on('click', 'tbody td:not(:first-child)', function(event) {
-            editor.inline(this, {
-                onBlur: 'submit'
-            });
-        });
-        */
-
-                
-        //$("#table-users").DataTable();
-        /*
-           $('#table-users').Tabledit({
-            url: 'example.php',
-            editButton: false,
-            deleteButton: false,
-            hideIdentifier: false,
-            columns: {
-                identifier: [0, 'username'],
-                editable: [[1, 'password'], [2, 'name'], [3, 'email'], [4, 'labels']]
-            }
-        });
-        */
     });
 </script>
 </body>

@@ -35,7 +35,7 @@
 <script src="unetlab/js/functions.js"></script>
 <script src="unetlab/js/requests.js"></script>
 <script>
-	$(function() {
+    $(document).ready(function() {
         $.when(isAuthenticated()).done(function(data) {
             $(window.location).attr('href', 'home.html');
         }).fail(function(data) {

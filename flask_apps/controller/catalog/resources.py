@@ -292,12 +292,12 @@ class BootstrapNode(Resource):
 
 
 class Controller(Resource):
-    def get(self, controller_id = None, page = 1):
+    def get(self, controller_id = None):
         checkAuthz(request, ['admin'])
         if not controller_id:
             # List all controllers
             summary = True
-            controllers = ControllerTable.query.paginate(page, 10).items
+            controllers = ControllerTable.query.order_by(ControllerTable.id)
         else:
             # List a single controller if exists, else 404
             summary = False
@@ -337,12 +337,12 @@ class Lab(Resource):
             'message': 'Lab "{}" deleted'.format(lab_id)
         }
 
-    def get(self, lab_id = None, page = 1):
+    def get(self, lab_id = None):
         username = checkAuthz(request)
         if not lab_id:
             # List all labs
             summary = True
-            labs = LabTable.query.paginate(page, 10).items
+            labs = LabTable.query.order_by(LabTable.name)
         else:
             # List a single lab if exists, else 404
             summary = False
@@ -465,11 +465,11 @@ class Role(Resource):
             'message': 'Role "{}" deleted'.format(role.role)
         }
 
-    def get(self, role = None, page = 1):
+    def get(self, role = None):
         checkAuthz(request, ['admin'])
         if not role:
             # List all roles
-            roles = RoleTable.query.paginate(page, 10).items
+            roles = RoleTable.query.order_by(RoleTable.role)
         else:
             # List a single role if exists, else 404
             roles = [RoleTable.query.get_or_404(role)]
@@ -525,9 +525,9 @@ class Role(Resource):
         }
 
 class Routing(Resource):
-    def get(self, role = None, page = 1):
+    def get(self, role = None):
         checkAuthz(request, ['admin'])
-        nodes = ActiveNodeTable.query
+        nodes = ActiveNodeTable.query.order_by(ActiveNodeTable.label)
         controllers = []
         for controller in ControllerTable.query:
             controllers.append(controller.id)
@@ -554,12 +554,12 @@ class Routing(Resource):
         }
 
 class Task(Resource):
-    def get(self, task_id = None, page = 1):
+    def get(self, task_id = None):
         username = checkAuthz(request)
         if not task_id:
             # List all tasks
             # TODO from this user only, or all for admins
-            tasks = TaskTable.query.paginate(page, 10).items
+            tasks = TaskTable.query.order_by(TaskTable.id)
         else:
             # List a single task if exists, else 404
             # TODO task can be pending: see https://blog.miguelgrinberg.com/post/using-celery-with-flask (task = long_task.AsyncResult(task_id))
@@ -595,11 +595,11 @@ class User(Resource):
             'message': 'User "{}" deleted'.format(user.username)
         }
 
-    def get(self, username = None, page = 1):
+    def get(self, username = None):
         checkAuthz(request, ['admin'])
         if not username:
             # List all users
-            users = UserTable.query.paginate(page, 10).items
+            users = UserTable.query.order_by(UserTable.username)
         else:
             # List a single user if exists, else 404
             users = [UserTable.query.get_or_404(username)]
