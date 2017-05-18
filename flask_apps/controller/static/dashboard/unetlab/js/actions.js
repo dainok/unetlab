@@ -6,12 +6,13 @@
  * @revision  2.3.8
  */
 
-$('body').on('click', '[data-editable]', function() {
+$('body').on('click', '[data-editable]', function(event) {
     // Loading data from elements
     var $element = $(this);
     var url = $element.parents('tr').attr('data-url');
     var name = $element.attr('data-name');
     var type = $element.attr('data-type');
+    var selected = '';
     if (type == 'password') {
         // If input type is password, give a blank item
         var value = '';
@@ -20,8 +21,23 @@ $('body').on('click', '[data-editable]', function() {
     }
 
     // Create and insert form elements
-    var $input = $('<input name="' + name + '" type="' + type + '" class="form-control"/>').val(value);
     var $div = $('<div class="input-group input-group-sm"/>');
+    if (type == 'select') {
+        var select = '<select name="' + name + '" class="form-control" value="' + value + '">';
+        var options = jQuery.parseJSON(decodeURIComponent($element.attr('data-options')));
+        $.each(options, function(key, option) {
+            if (key == value) {
+                selected = ' default';
+            } else {
+                selected = ''
+            }
+            select = select + '<option value="' + key + '"' + selected + '>' + option + '</option>'
+        });
+        select = select + '</select>';
+        var $input = $(select);
+    } else {
+        var $input = $('<input name="' + name + '" type="' + type + '" class="form-control"/>').val(value);
+    }
     $element.empty()
     $div.append($input);
     $element.append($div);
@@ -38,7 +54,14 @@ $('body').on('click', '[data-editable]', function() {
     // What to do when save
     var save = function() {
         form_data = {};
-        form_data[name] = $input.val();
+        value = $input.val();
+        if (value == 'true') {
+            form_data[name] = true;
+        } else if (value == 'false') {
+            form_data[name] = false;
+        } else {
+            form_data[name] = $input.val();
+        }
         $.when(patchUrl(url, form_data)).done(function(data) {
             if (type == 'password' && $input.val() == '') {
                 $element.text('**********');
@@ -47,7 +70,6 @@ $('body').on('click', '[data-editable]', function() {
             }
         }).fail(function(data) {
             notifyUser('error', data.message);
-            console.log(data);
             abort();
         });
     };
@@ -121,12 +143,11 @@ $('.action-logout').on('click', function(event) {
  *********************************************************************/
 
 $('.action-roles').on('click', function(event) {
-    $('#table-roles tbody').empty();
+    roleTable.clear().draw();
 	$.when(getUrl('/api/v1/roles')).done(function(data) {
         $.each(data.data, function(key, value) {
-            $('#table-roles tbody').append('<tr data-url="/api/v1/roles/' + value.role + '"><td>' + value.role + '</td><td data-editable data-name="access_to" data-type="text">' + value.access_to + '</td><td data-editable data-name="can_write" data-type="text">' + value.can_write + '</td></tr>');
+            insertRoleTable(value);
         });
-        $('#table-roles').addClass('nowrap').dataTable();
         $('#modal-roles').modal('toggle');
     }).fail(function(data) {
         notifyUser('error', data.message);
@@ -144,7 +165,7 @@ $('#form-role').on('submit', function(event) {
 	$.when(postUrl('/api/v1/roles', form_data)).done(function(data) {
         $(this).parents('form').find("input,textarea").val('');
         $('#modal-role-add').modal('toggle');
-        $('#table-roles tbody').prepend('<tr data-url="/api/v1/roles/' + form_data.role + '"><td>' + form_data.role + '</td><td data-editable data-name="access_to" data-type="text">' + form_data.access_to + '</td><td data-editable data-name="can_write" data-type="text">' + form_data.can_write + '</td></tr>');
+        insertRoleTable(value);
     }).fail(function(data) {
         notifyUser('error', data.message);
     });

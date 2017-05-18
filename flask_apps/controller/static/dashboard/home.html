@@ -333,8 +333,8 @@
                             <thead>
                                 <tr>
                                     <th>Role</th>
-                                    <th>Can&nbsp;write?</th>
                                     <th>Access&nbsp;to</th>
+                                    <th>Can&nbsp;write?</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -553,7 +553,7 @@
 <script src="plugins/fastclick/fastclick.min.js"></script>
 <script src="plugins/slimScroll/jquery.slimscroll.min.js"></script>
 <script src="plugins/iCheck/icheck.min.js"></script>
-<script src="plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="plugins/datatables/jquery.dataTables.min.js"></script> 
 <script src="plugins/datatables/dataTables.bootstrap.min.js"></script>
 <script src="plugins/bootstrap-validator/validator.min.js"></script>
 <script src="unetlab/js/actions.js"></script>
@@ -573,6 +573,10 @@
             setUserData();
         }).fail(function(data) {
             $(window.location).attr('href', 'login.html');
+        });
+        //roleTable = $('#table-roles').addClass('nowrap').dataTable();
+        roleTable = $('#table-roles').DataTable({
+            'order': [[ 0, 'asc' ]]
         });
     });
 </script>

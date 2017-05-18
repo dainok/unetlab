@@ -26,6 +26,11 @@ function formToJSON(form) {
     return form_array;
 }
 
+// Insert role in DataTable
+function insertRoleTable(role) {
+    roleTable.row.add($('<tr data-url="/api/v1/roles/' + role.role + '"><td>' + role.role + '</td><td data-editable data-name="access_to" data-type="text">' + role.access_to + '</td><td data-editable data-name="can_write" data-type="select" data-options="{&quot;true&quot;:true,&quot;false&quot;:false}">' + role.can_write + '</td></tr>')[0]).draw();
+}
+
 // Check if a user is authenticated
 function isAuthenticated() {
     var deferred = $.Deferred();
