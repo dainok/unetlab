@@ -74,10 +74,12 @@ def config_get(handler):
             handler.expect(MTK_PROMPT, timeout = expctimeout)
             break
         except:
+            time.sleep(0.5)
             continue
 
     # Getting the config
     handler.send('/export\r\n')
+    time.sleep(0.5)
     try:
         handler.expect(MTK_PROMPT, timeout = longtimeout)
     except:
@@ -93,7 +95,7 @@ def config_get(handler):
 
     # Manipulating the config
     config = re.sub('\r', '', config, flags=re.DOTALL)                                      # Unix style
-    config = re.sub('/export', '\r', config, flags=re.DOTALL)                                      # Unix style
+    #config = re.sub('/export$', '\r', config, flags=re.DOTALL)                                      # Unix style
     config = re.sub('.*!! IOS XR Configuration', '!! IOS XR Configuration', config, flags=re.DOTALL)   # Header
     config = re.sub('no logging console' , '\n!\n' , config, flags=re.DOTALL) # suppress no login console
     config = re.sub('$.*', '\n!\nend\n', config, flags=re.DOTALL)                # Footer
