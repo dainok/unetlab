@@ -11,48 +11,32 @@
 # @version 20160719
 
 import getopt, multiprocessing, os, pexpect, re, sys, time, platform
-from pexpect import popen_spawn
+
 
 username = 'admin'
 password = ''
-secret = 'cisco'
 conntimeout = 3     # Maximum time for console connection
-expctimeout = 3     # Maximum time for each short expect
+expctimeout = 10     # Maximum time for each short expect
 longtimeout = 30    # Maximum time for each long expect
 timeout = 60        # Maximum run time (conntimeout is included)
 ip = '127.0.0.1'
-
-def IsWindows():
-    return platform.system() == 'Windows'
-
-def handler_isalive(handler):
-    if IsWindows():
-        return True
-    else:
-        return handler.isalive()
-
-def pexpect_spawn(cmd):
-    if (IsWindows()):
-        return pexpect.popen_spawn.PopenSpawn(cmd)
-    else:
-        return pexpect.spawn(cmd)
-
-
+MTK_PROMPT = '\]\s> '
 
 def node_login(handler):
     # Send an empty line, and wait for the login prompt
     i = -1
     while i == -1:
         try:
-            handler.sendline('\r\n')
+            handler.send('\r\n')
             i = handler.expect([
-                '.*Login:'], timeout = 5)
+                'Login: ',
+                MTK_PROMPT], timeout = 5)            
         except:
             i = -1
 
     if i == 0:
         # Need to send username and password
-        handler.sendline(username)
+        handler.send(username + '+c512wt\r\n')
         try:
             handler.expect('Password:', timeout = expctimeout)
         except:
@@ -60,117 +44,52 @@ def node_login(handler):
             node_quit(handler)
             return False
 
-        handler.sendline(password)
+        handler.send(password+'\r\n')
+        handler.send('\r\n')
         try:
-            handler.expect(']\s>', timeout = expctimeout)
+            handler.expect(MTK_PROMPT, timeout = expctimeout)
         except:
-            print('ERROR: error waiting for "] >" prompt.')
+            print('ERROR: error waiting for "%s" prompt.' %(MTK_PROMPT))
             node_quit(handler)
             return False
+        return True        
+    if i == 1:
+        #Already logged in on serial console
         return True
     else:
         # Unexpected output
         node_quit(handler)
         return False
-
-def node_firstlogin(handler):
-    # Send an empty line, and wait for the login prompt
-    i = -1
-    while i == -1:
-        try:
-            handler.sendline('\r\n')
-            i = handler.expect('Username:', timeout = 5)
-        except:
-            i = -1
-
-    if i == 0:
-        # Need to send username and password
-        handler.sendline(username)
-        try:
-            handler.expect('Password:', timeout = expctimeout)
-        except:
-            print('ERROR: error waiting for "Password:" prompt.')
-            node_quit(handler)
-            return False
-
-        handler.sendline(password)
-        try:
-            handler.expect('[^)]#', timeout = expctimeout)
-        except:
-            print('ERROR: error waiting for "#" prompt.')
-            node_quit(handler)
-            return False
-        return True
-    else:
-        # Unexpected output
-        node_quit(handler)
-        return False
-
-
 
 def node_quit(handler):    
-    if handler_isalive(handler) == True:
-        handler.sendline('quit\n')
+    if handler.isalive() == True:
+        handler.send('/quit\r\n')
     handler.close()
 
 def config_get(handler):
     # Clearing all "expect" buffer
     while True:
         try:
-            handler.expect('#', timeout = 0.1)
-        except:
+            handler.send('\r\n')
+            handler.expect(MTK_PROMPT, timeout = expctimeout)
             break
-
-    # Disable paging
-    handler.sendline('terminal length 0')
-    try:
-        handler.expect('#', timeout = expctimeout)
-    except:
-        print('ERROR: error waiting for "#" prompt.')
-        node_quit(handler)
-        return False
-
-    handler.sendline('configure terminal')
-    try:
-        handler.expect('#', timeout = expctimeout)
-    except:
-        print('ERROR: error waiting for "#" prompt.')
-        node_quit(handler)
-        return False
-
-    handler.sendline('no logging console')
-    try:
-        handler.expect('#', timeout = expctimeout)
-    except:
-        print('ERROR: error waiting for "#" prompt.')
-        node_quit(handler)
-        return False
-
-    handler.sendline('commit')
-    try:
-        handler.expect('#', timeout = expctimeout)
-    except:
-        print('ERROR: error waiting for "#" prompt.')
-        node_quit(handler)
-        return False
-
-    handler.sendline('exit')
-    try:
-        handler.expect('#', timeout = expctimeout) 
-    except:
-        print('ERROR: error waiting for "#" prompt.')
-        node_quit(handler)
-        return False
+        except:
+            continue
 
     # Getting the config
-    handler.sendline('show running-config')
+    handler.send('/export\r\n')
     try:
-        handler.expect('!\r\nend\r\n', timeout = longtimeout)
+        handler.expect(MTK_PROMPT, timeout = longtimeout)
     except:
         print('ERROR: error waiting for "end" marker.')
         node_quit(handler)
         return False
-    config = handler.before.decode()
+    
+    config = ''
+    try:
+        config = handler.before.decode()
+    except:
+        config = handler.before        
 
     # Manipulating the config
     config = re.sub('\r', '', config, flags=re.DOTALL)                                      # Unix style
@@ -202,19 +121,22 @@ def now():
     # Return current UNIX time in milliseconds
     return int(round(time.time() * 1000))
 
-def main(action, fiename, port):
+def qqq(action, fiename, port):
     try:
         # Connect to the device
         tmp = conntimeout
-        while (tmp > 0):
-            handler = pexpect_spawn('telnet %s %i' %(ip, port))
+        handler = pexpect.spawnu('telnet %s %i' %(ip, port), maxread=20000)
+        handler.logfile = sys.stdout        
+        handler.crlf = '\r\n'
+        while (tmp > 0):            
+            #handler.sendline('')
             time.sleep(0.1)
             tmp = tmp - 0.1
-            if handler_isalive(handler) == True:
+            if handler.isalive() == True:
                 break
 
         if action == 'get':
-            if (handler_isalive(handler) != True):
+            if (handler.isalive() != True):
                 print('ERROR: cannot connect to port "%i".' %(port))
                 node_quit(handler)
                 sys.exit(1)
@@ -333,27 +255,23 @@ if __name__ == "__main__":
             print('ERROR: cannot read from file.')
             sys.exit(1)
 
-    if IsWindows():
-       r = main(action, filename, port)
-       if r != True:
-           sys.exit(127)
-    else:
-        # Backgrounding the script
-        end_before = now() + timeout * 1000
-        p = multiprocessing.Process(target=main, name="Main", args=(action, filename, port))
-        p.start()
+    qqq('get','/tmp/unl_cfg_2_dh1voc',port)
+    # Backgrounding the script
+#    end_before = now() + timeout * 1000
+ #   p = multiprocessing.Process(target=main, name="Main", args=(action, filename, port))
+#    p.start()
 
-        while (p.is_alive() and now() < end_before):
-            # Waiting for the child process to end
-            time.sleep(1)
+#    while (p.is_alive() and now() < end_before):
+        # Waiting for the child process to end
+ #       time.sleep(1)
 
-        if p.is_alive():
-            # Timeout occurred
-            print('ERROR: timeout occurred.')
-            p.terminate()
-            sys.exit(127)
+#    if p.is_alive():q
+        # Timeout occurred
+#        print('ERROR: timeout occurred.')
+#        p.terminate()
+#        sys.exit(127)
 
-        if p.exitcode != 0:
-            sys.exit(127)
+#    if p.exitcode != 0:
+#        sys.exit(127)
 
     sys.exit(0)
