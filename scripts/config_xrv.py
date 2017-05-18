@@ -320,7 +320,7 @@ if __name__ == "__main__":
                 port = -1
         elif o in ('-t', '--timeout'):
             try:
-                timeout = int(a) * 1000
+                timeout = int(a)
             except:
                 timeout = -1
         else:

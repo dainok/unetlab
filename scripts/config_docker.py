@@ -109,7 +109,7 @@ if __name__ == "__main__":
             docker_id = a
         elif o in ('-t', '--timeout'):
             try:
-                timeout = int(a) * 1000
+                timeout = int(a)
             except:
                 timeout = -1
         else:
@@ -147,7 +147,7 @@ if __name__ == "__main__":
             sys.exit(1)
 
     # Backgrounding the script
-    end_before = now() + timeout
+    end_before = now() + timeout * 1000
     p = multiprocessing.Process(target=main, name="Main", args=(action, filename, docker_id))
     p.start()
 
