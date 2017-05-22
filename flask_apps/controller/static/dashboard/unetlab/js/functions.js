@@ -28,7 +28,14 @@ function formToJSON(form) {
 
 // Insert role in DataTable
 function insertRoleTable(role) {
-    roleTable.row.add($('<tr data-url="/api/v1/roles/' + role.role + '"><td>' + role.role + '</td><td data-editable data-name="access_to" data-type="text">' + role.access_to + '</td><td data-editable data-name="can_write" data-type="select" data-options="{&quot;true&quot;:true,&quot;false&quot;:false}">' + role.can_write + '</td></tr>')[0]).draw();
+    if (role.can_write == true) {
+        selected_true = ' selected';
+        selected_false = '';
+    } else {
+        selected_true = '';
+        selected_false = ' selected';
+    }
+    roleTable.row.add($('<tr data-url="/api/v1/roles/' + role.role + '"><td>' + role.role + '</td><td data-editable data-name="access_to" data-type="text">' + role.access_to + '</td><td data-selectable data-name="can_write" data-type="select"><select><option' + selected_true + '>true</option><option' + selected_false + '>false</option></select></td></tr>')[0]).draw();
 }
 
 // Check if a user is authenticated

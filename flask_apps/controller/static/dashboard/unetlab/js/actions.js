@@ -12,7 +12,7 @@ $('body').on('click', '[data-editable]', function(event) {
     var url = $element.parents('tr').attr('data-url');
     var name = $element.attr('data-name');
     var type = $element.attr('data-type');
-    var selected = '';
+
     if (type == 'password') {
         // If input type is password, give a blank item
         var value = '';
@@ -22,22 +22,7 @@ $('body').on('click', '[data-editable]', function(event) {
 
     // Create and insert form elements
     var $div = $('<div class="input-group input-group-sm"/>');
-    if (type == 'select') {
-        var select = '<select name="' + name + '" class="form-control" value="' + value + '">';
-        var options = jQuery.parseJSON(decodeURIComponent($element.attr('data-options')));
-        $.each(options, function(key, option) {
-            if (key == value) {
-                selected = ' default';
-            } else {
-                selected = ''
-            }
-            select = select + '<option value="' + key + '"' + selected + '>' + option + '</option>'
-        });
-        select = select + '</select>';
-        var $input = $(select);
-    } else {
-        var $input = $('<input name="' + name + '" type="' + type + '" class="form-control"/>').val(value);
-    }
+    var $input = $('<input name="' + name + '" type="' + type + '" class="form-control"/>').val(value);
     $element.empty()
     $div.append($input);
     $element.append($div);
@@ -54,14 +39,7 @@ $('body').on('click', '[data-editable]', function(event) {
     // What to do when save
     var save = function() {
         form_data = {};
-        value = $input.val();
-        if (value == 'true') {
-            form_data[name] = true;
-        } else if (value == 'false') {
-            form_data[name] = false;
-        } else {
-            form_data[name] = $input.val();
-        }
+        form_data[name] = $input.val();
         $.when(patchUrl(url, form_data)).done(function(data) {
             if (type == 'password' && $input.val() == '') {
                 $element.text('**********');
@@ -87,6 +65,44 @@ $('body').on('click', '[data-editable]', function(event) {
             event.preventDefault();
         }
     });
+});
+
+$('body').on('click', '[data-selectable]', function(event) {
+    // Loading data from elements
+    var $element = $(this);
+    var url = $element.parents('tr').attr('data-url');
+    var name = $element.attr('data-name');
+    var $select = $element.find('select');
+    //var value = $element.find('option:selected').text();
+    var value = $select.val();
+
+    // What to do when abort
+    var abort = function() {
+        $element.val(value);
+    };
+
+    // What to do when save
+    var save = function() {
+        form_data = {};
+        new_value = $select.val()
+        if (new_value == 'true') {
+            // Set true as boolean
+            form_data[name] = true;
+        } else if (new_value == 'false') {
+            // Set false as boolean
+            form_data[name] = false;
+        } else {
+            form_data[name] = new_value;
+        }
+        $.when(patchUrl(url, form_data)).fail(function(data) {
+            notifyUser('error', data.message);
+            abort();
+        });
+    };
+
+    // Trigger actions
+    $select.one('blur', abort).focus();
+    $select.one('change', save);
 });
 
 $('#form-login').on('submit', function(event) {
