@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# scripts/config_csr1000v.py
+# scripts/config_xrv.py
 #
 # Import/Export script for vIOS.
 #
@@ -10,34 +10,33 @@
 # @link http://www.unetlab.com/
 # @version 20160719
 
-import getopt, multiprocessing, os, pexpect, re, sys, time
+import getopt, multiprocessing, os, pexpect, re, sys, time, platform
 
-username = 'cisco'
-password = 'cisco'
-secret = 'cisco'
+
+username = 'admin'
+password = ''
 conntimeout = 3     # Maximum time for console connection
-expctimeout = 3     # Maximum time for each short expect
+expctimeout = 10     # Maximum time for each short expect
 longtimeout = 30    # Maximum time for each long expect
 timeout = 60        # Maximum run time (conntimeout is included)
+ip = '127.0.0.1'
+MTK_PROMPT = '\]\s> '
 
 def node_login(handler):
     # Send an empty line, and wait for the login prompt
     i = -1
     while i == -1:
         try:
-            handler.sendline('\r\n')
+            handler.send('\r\n')
             i = handler.expect([
-                'Username:',
-                '\(config',
-                '>',
-                '#',
-                'Would you like to enter the'], timeout = 5)
+                'Login: ',
+                MTK_PROMPT], timeout = 5)            
         except:
             i = -1
 
     if i == 0:
         # Need to send username and password
-        handler.sendline(username)
+        handler.send(username + '+c512wt\r\n')
         try:
             handler.expect('Password:', timeout = expctimeout)
         except:
@@ -45,140 +44,64 @@ def node_login(handler):
             node_quit(handler)
             return False
 
-        handler.sendline(password)
+        handler.send(password+'\r\n')
+        handler.send('\r\n')
         try:
-            j = handler.expect(['>', '#'], timeout = expctimeout)
+            handler.expect(MTK_PROMPT, timeout = expctimeout)
         except:
-            print('ERROR: error waiting for [">", "#"] prompt.')
+            print('ERROR: error waiting for "%s" prompt.' %(MTK_PROMPT))
             node_quit(handler)
             return False
-
-        if j == 0:
-            # Secret password required
-            handler.sendline(secret)
-            try:
-                handler.expect('#', timeout = expctimeout)
-            except:
-                print('ERROR: error waiting for "#" prompt.')
-                node_quit(handler)
-                return False
-            return True
-        elif j == 1:
-            # Nothing to do
-            return True
-        else:
-            # Unexpected output
-            node_quit(handler)
-            return False
-    elif i == 1:
-        # Config mode detected, need to exit
-        handler.sendline('end')
-        try:
-            handler.expect('#', timeout = expctimeout)
-        except:
-            print('ERROR: error waiting for "#" prompt.')
-            node_quit(handler)
-            return False
-        return True
-    elif i == 2:
-        # Need higher privilege
-        handler.sendline('enable')
-        try:
-            j = handler.expect(['Password:', '#'])
-        except:
-            print('ERROR: error waiting for ["Password:", "#"] prompt.')
-            node_quit(handler)
-            return False
-        if j == 0:
-            # Need do provide secret
-            handler.sendline(secret)
-            try:
-                handler.expect('#', timeout = expctimeout)
-            except:
-                print('ERROR: error waiting for "#" prompt.')
-                node_quit(handler)
-                return False
-            return True
-        elif j == 1:
-            # Nothing to do
-            return True
-        else:
-            # Unexpected output
-            node_quit(handler)
-            return False
-    elif i == 3:
-        # Nothing to do
-        return True
-    elif i == 4:
-        # First boot detected
-        handler.sendline('no')
-        try:
-            handler.expect('Press RETURN to get started', timeout = longtimeout)
-        except:
-            print('ERROR: error waiting for "Press RETURN to get started" prompt.')
-            node_quit(handler)
-            return False
-        handler.sendline('\r\n')
-        try:
-            handler.expect('Router>', timeout = expctimeout)
-        except:
-            print('ERROR: error waiting for "Router> prompt.')
-            node_quit(handler)
-            return False
-        handler.sendline('enable')
-        try:
-            handler.expect('Router#', timeout = expctimeout)
-        except:
-            print('ERROR: error waiting for "Router# prompt.')
-            node_quit(handler)
-            return False
+        return True        
+    if i == 1:
+        #Already logged in on serial console
         return True
     else:
         # Unexpected output
         node_quit(handler)
         return False
 
-def node_quit(handler):
+def node_quit(handler):    
     if handler.isalive() == True:
-        handler.sendline('quit\n')
+        handler.send('/quit\r\n')
     handler.close()
 
 def config_get(handler):
     # Clearing all "expect" buffer
     while True:
         try:
-            handler.expect('#', timeout = 0.1)
-        except:
+            handler.send('\r\n')
+            handler.expect(MTK_PROMPT, timeout = expctimeout)
             break
-
-    # Disable paging
-    handler.sendline('terminal length 0')
-    try:
-        handler.expect('#', timeout = expctimeout)
-    except:
-        print('ERROR: error waiting for "#" prompt.')
-        node_quit(handler)
-        return False
+        except:
+            time.sleep(0.5)
+            continue
 
     # Getting the config
-    handler.sendline('more system:running-config')
+    handler.send('/export\r\n')
+    time.sleep(0.5)
     try:
-        handler.expect('#', timeout = longtimeout)
+        handler.expect(MTK_PROMPT, timeout = longtimeout)
     except:
-        print('ERROR: error waiting for "#" prompt.')
+        print('ERROR: error waiting for "end" marker.')
         node_quit(handler)
         return False
-    config = handler.before.decode()
+    
+    config = ''
+    try:
+        config = handler.before.decode()
+    except:
+        config = handler.before        
 
     # Manipulating the config
     config = re.sub('\r', '', config, flags=re.DOTALL)                                      # Unix style
-    config = re.sub('.*Using [0-9]+ out of [0-9]+ bytes\n', '', config, flags=re.DOTALL)    # Header
-    config = re.sub('.*more system:running-config\n', '', config, flags=re.DOTALL)          # Header
-    config = re.sub('!\nend.*', '!\nend\n', config, flags=re.DOTALL)                        # Footer
-
+    #config = re.sub('/export$', '\r', config, flags=re.DOTALL)                                      # Unix style
+    config = re.sub('.*!! IOS XR Configuration', '!! IOS XR Configuration', config, flags=re.DOTALL)   # Header
+    config = re.sub('no logging console' , '\n!\n' , config, flags=re.DOTALL) # suppress no login console
+    config = re.sub('$.*', '\n!\nend\n', config, flags=re.DOTALL)                # Footer
     return config
 
-def config_put(handler):
+def config_put(handler): 
     while True:
         try:
            i = handler.expect('CVAC-4-CONFIG_DONE', timeout)
@@ -201,24 +124,25 @@ def now():
     # Return current UNIX time in milliseconds
     return int(round(time.time() * 1000))
 
-def main(action, fiename, port):
+def qqq(action, fiename, port):
     try:
         # Connect to the device
         tmp = conntimeout
-        while (tmp > 0):
-            handler = pexpect.spawn('telnet 127.0.0.1 %i' %(port))
+        handler = pexpect.spawnu('telnet %s %i' %(ip, port), maxread=20000)
+        handler.logfile = sys.stdout        
+        handler.crlf = '\r\n'
+        while (tmp > 0):            
+            #handler.sendline('')
             time.sleep(0.1)
             tmp = tmp - 0.1
             if handler.isalive() == True:
                 break
 
-        if (handler.isalive() != True):
-            print('ERROR: cannot connect to port "%i".' %(port))
-            node_quit(handler)
-            sys.exit(1)
-
         if action == 'get':
-            # Login to the device and get a privileged prompt
+            if (handler.isalive() != True):
+                print('ERROR: cannot connect to port "%i".' %(port))
+                node_quit(handler)
+                sys.exit(1)
             rc = node_login(handler)
             if rc != True:
                 print('ERROR: failed to login.')
@@ -274,7 +198,7 @@ if __name__ == "__main__":
 
     # Getting parameters from command line
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'a:p:t:f:', ['action=', 'port=', 'timeout=', 'file='])
+        opts, args = getopt.getopt(sys.argv[1:], 'a:p:t:f:i', ['action=', 'port=', 'timeout=', 'file=', 'address='])
     except getopt.GetoptError as e:
         usage()
         sys.exit(3)
@@ -294,6 +218,8 @@ if __name__ == "__main__":
                 timeout = int(a)
             except:
                 timeout = -1
+        elif o in ('-i', '--address'):
+            ip = a
         else:
             print('ERROR: invalid parameter.')
 
@@ -332,22 +258,23 @@ if __name__ == "__main__":
             print('ERROR: cannot read from file.')
             sys.exit(1)
 
+    qqq('get','/tmp/unl_cfg_2_dh1voc',port)
     # Backgrounding the script
-    end_before = now() + timeout * 1000
-    p = multiprocessing.Process(target=main, name="Main", args=(action, filename, port))
-    p.start()
+#    end_before = now() + timeout * 1000
+ #   p = multiprocessing.Process(target=main, name="Main", args=(action, filename, port))
+#    p.start()
 
-    while (p.is_alive() and now() < end_before):
+#    while (p.is_alive() and now() < end_before):
         # Waiting for the child process to end
-        time.sleep(1)
+ #       time.sleep(1)
 
-    if p.is_alive():
+#    if p.is_alive():q
         # Timeout occurred
-        print('ERROR: timeout occurred.')
-        p.terminate()
-        sys.exit(127)
+#        print('ERROR: timeout occurred.')
+#        p.terminate()
+#        sys.exit(127)
 
-    if p.exitcode != 0:
-        sys.exit(127)
+#    if p.exitcode != 0:
+#        sys.exit(127)
 
     sys.exit(0)
