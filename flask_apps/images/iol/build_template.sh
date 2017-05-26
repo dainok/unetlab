@@ -10,7 +10,7 @@ LOG="/tmp/unetlab_build_node.log"
 REPOSITORY="dainok"
 DOCKER="docker -H=tcp://127.0.0.1:4243"
 
-ARCH="amd64"
+ARCH="i386"
 SUITE="jessie"
 MIRROR="http://auto.mirror.devuan.org/merged"
 PACKAGES="bridge-utils curl iproute2 iptables iputils-ping net-tools procps python3 uml-utilities"
@@ -90,6 +90,7 @@ echo -e "${G}done${U}"
 # Customization for Docker
 rm -f ${TMP}/usr/sbin/invoke-rc.d
 ln -s /bin/true ${TMP}/usr/sbin/invoke-rc.d
+cp -a ../../bootstrap_node.sh ${TMP}/sbin/bootstrap.sh
 
 echo -ne "Installing additional packages... "
 chroot ${TMP} apt-get -y install ${PACKAGES} &>> ${LOG}
@@ -101,10 +102,11 @@ echo -e "${G}done${U}"
 
 echo -ne "Cleaning the system... "
 chroot ${TMP} apt-get autoclean &>> ${LOG}
-chroot ${TMP} apt-get clean &>> ${LOG}
 chroot ${TMP} apt-get autoremove &>> ${LOG}
+chroot ${TMP} apt-get clean &>> ${LOG}
 find ${TMP} -name "*-old" -exec rm -f {} \; &>> ${LOG}
 rm -f ${TMP}/etc/*- ${TMP}/etc/.pwd.lock ${TMP}/var/log/*.log ${TMP}/var/lib/apt/lists/* ${TMP}/etc/ssh/ssh_host_* &>> ${LOG}
+rm -rf ${TMP}/boot ${TMP}/home ${TMP}/media ${TMP}/mnt ${TMP}/opt ${TMP}/srv ${TMP}/usr/share/doc ${TMP}/usr/games ${TMP}/usr/local ${TMP}/usr/src &>> ${LOG}
 echo -e "${G}done${U}"
 
 echo -ne "Importing system to Docker... "
@@ -115,5 +117,4 @@ if [ $? -ne 0 ]; then
 fi
 echo -e "${G}done${U}"
 
-rm -rf ${LOG}
 exit 0
