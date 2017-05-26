@@ -408,7 +408,7 @@ class Lab(Resource):
         return {
             'status': 'success',
             'message': 'Lab "{}" added'.format(lab.id),
-            'data': printLab(lab)
+            'data': printLab(lab, username = username)
         }
 
 class Repository(Resource):
