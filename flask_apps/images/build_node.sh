@@ -70,10 +70,26 @@ if [ $? -ne 0 ]; then
 fi
 
 case "${IMAGE}" in
+	*.bin)
+		TYPE="iol"
+		SUBTYPE="iol"
+		NAME="node-${SUBTYPE}:$(echo ${IMAGE} | sed 's/\.bin//')"
+		CWD=${PWD}
+		infoImage
+		cp ${SOURCE}/${IMAGE} node/node/iol.bin &>> ${LOG}
+		cp ${SOURCE}/iourc node/node &>> ${LOG}
+		chmod 755 node/node/iol.bin &>> ${LOG}
+		cd node/node &>> ${LOG}
+		${CWD}/${SUBTYPE}/preconfigure_${SUBTYPE}.py &>> ${LOG}
+		cd ${CWD} &>> ${LOG}
+		if [ $? -ne 0 ]; then
+			echo -e "${R}Preconfiguration failed${U}"
+			exit 1
+		fi
+		;;
 	vyos-*-amd64.iso)
 		TYPE="qemu"
 		SUBTYPE="vyos"
-		DISKS="${TMP}/hda.qcow2"
 		NAME="node-${SUBTYPE}:$(echo ${IMAGE} | sed 's/vyos-\([0-9.]*\)-amd64.iso/\1/')"
 		infoImage
 		qemu-img create -f qcow2 node/node/hda.qcow2 1G &>> ${LOG}
@@ -87,7 +103,6 @@ case "${IMAGE}" in
 	pfSense-CE-memstick-serial-*-RELEASE-amd64.img.gz)
 		TYPE="qemu"
 		SUBTYPE="pfsense"
-		DISKS="${TMP}/hda.qcow2"
 		NAME="node-${SUBTYPE}:$(echo ${IMAGE} | sed 's/pfSense-CE-memstick-serial-\([0-9.]*\)-.*/\1/')"
 		infoImage
 		gunzip -k ${IMAGE} &>> ${LOG}
@@ -116,3 +131,4 @@ echo -e "${G}done${U}"
 
 rm -f ${LOG}
 exit 0
+

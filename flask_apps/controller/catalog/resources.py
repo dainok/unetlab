@@ -8,6 +8,7 @@ __revision__ = '20170430'
 import hashlib, io, json, os, random, shutil, uuid
 from flask import abort, request, send_file
 from flask_restful import Resource
+from sqlalchemy import and_
 from controller import app_root, cache, config
 from controller.catalog.aaa import checkAuth, checkAuthz, checkAuthzPath
 from controller.catalog.models import *
@@ -138,7 +139,7 @@ def printController(controller, summary = False):
             }
     return data
 
-def printLab(lab, summary = False):
+def printLab(lab, summary = False, username = None):
     if summary:
         data =  {
             'id': lab.id,
@@ -149,6 +150,9 @@ def printLab(lab, summary = False):
         }
     else:
         data = json.loads(lab.json)
+        # Adding label to each node
+        for node in ActiveLabTable.query.get_or_404((lab.id, username)).nodes:
+            data['topology']['nodes'][str(node.node_id)]['label'] = node.label
     return data
 
 def printRole(role):
@@ -362,7 +366,7 @@ class Lab(Resource):
         data = {}
         for lab in labs:
             # Print each lab
-            data[lab.id] = printLab(lab, summary = summary)
+            data[lab.id] = printLab(lab, summary = summary, username = username)
         return {
             'status': 'success',
             'message': 'Lab(s) found',

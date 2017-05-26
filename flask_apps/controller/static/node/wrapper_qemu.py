@@ -112,6 +112,11 @@ def main():
     if label == None:
         logging.error('label not recognized')
         sys.exit(255)
+    try:
+        qemu_cmd = sys.argv[sys.argv.index('--') + 1:]
+    except:
+        logging.error('no QEMU command to start')
+        sys.exit(1)
 
     # Preparing socket (controller -> wrapper)
     from_controller = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -152,11 +157,6 @@ def main():
             veths[int(tap[4:])] = from_tun
 
     # Starting QEMU
-    try:
-        qemu_cmd = sys.argv[sys.argv.index('--') + 1:]
-    except:
-        logging.error('no QEMU command to start')
-        sys.exit(1)
     logging.info('starting: {}'.format(' '.join(qemu_cmd)))
     try:
         p = subprocess.Popen(qemu_cmd, stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE, bufsize = 0)

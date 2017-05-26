@@ -332,6 +332,7 @@
                         <table id="table-roles" class="table table-hover table-bordered table-striped">
                             <thead>
                                 <tr>
+                                    <th><a href="#" class="action-select-all">All</a> \ <a href="#" class="action-select-none">None</a></th>
                                     <th>Role</th>
                                     <th>Access&nbsp;to</th>
                                     <th>Can&nbsp;write?</th>
@@ -576,7 +577,11 @@
         });
         //roleTable = $('#table-roles').addClass('nowrap').dataTable();
         roleTable = $('#table-roles').DataTable({
-            'order': [[ 0, 'asc' ]]
+            'columnDefs': [
+                {'targets': 0, 'orderable': false, 'width': '5%'},
+                {'targets': 3, 'orderable': false},
+            ],
+            'order': [[ 1, 'asc' ]]
         });
     });
 </script>
