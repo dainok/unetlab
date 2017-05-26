@@ -150,9 +150,10 @@ def printLab(lab, summary = False, username = None):
         }
     else:
         data = json.loads(lab.json)
-        # Adding label to each node
-        for node in ActiveLabTable.query.get_or_404((lab.id, username)).nodes:
-            data['topology']['nodes'][str(node.node_id)]['label'] = node.label
+        if username != None:
+            # Adding label to each node
+            for node in ActiveLabTable.query.get_or_404((lab.id, username)).nodes:
+                data['topology']['nodes'][str(node.node_id)]['label'] = node.label
     return data
 
 def printRole(role):
