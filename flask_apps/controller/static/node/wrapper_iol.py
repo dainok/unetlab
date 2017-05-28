@@ -215,6 +215,7 @@ def usage():
     print('    -l label       an integer starting from 0')
     print('    -m veths       management interfaces')
     print('    -t             enable terminal server')
+    print('    -w title       window title')
     sys.exit(255)
 
 def main():
@@ -235,7 +236,7 @@ def main():
 
     # Reading options
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'tdc:l:m:')
+        opts, args = getopt.getopt(sys.argv[1:], 'tdc:l:m:w:')
     except getopt.GetoptError as err:
         sys.stderr.write('ERROR: {}\n'.format(err))
         usage()
@@ -256,6 +257,8 @@ def main():
             mgmt_veths.append(arg)
         elif opt == '-t':
             enable_ts = True
+        elif opt == '-w':
+            title = arg
         else:
             assert False, 'unhandled option'
 

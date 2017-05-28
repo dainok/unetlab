@@ -265,10 +265,17 @@ class BootstrapNode(Resource):
 
         if node_json['type'] == 'iol':
             bin_cmd = '/data/nodes/iol.bin'
-            wrapper_cmd = '/tmp/wrapper_iol.py -d -c {} -l {}'.format(controller.inside_ip, label)
+            wrapper_cmd = '/tmp/wrapper_iol.py -c {} -l {} -t -w {}'.format(controller.inside_ip, label, node_json['name'])
+            if 'management' in interface and bool(interface['management']):
+                # Configure management bridge
+                init_body = init_body + 'tunctl -t qeth{} || exit 1\n'.format(interface_id)
+                init_body = init_body + 'ip link set dev qeth{} up || exit 1\n'.format(interface_id)
+                init_body = init_body + 'brctl addif mgmt qeth{} || exit 1\n'.format(interface_id)
+                wrapper_cmd = wrapper_cmd + ' -m qeth{}'.format(interface_id)
+                bin_cmd = bin_cmd + ' -netdev tap,id=eth{},ifname=qeth{},script=no,downscript=no -device virtio-net,netdev=eth{},mac=52:54:00:00:00:00'.format(interface_id, interface_id, interface_id)
         elif node_json['type'] == 'qemu':
             bin_cmd = '/usr/bin/qemu-system-x86_64'
-            wrapper_cmd = '/tmp/wrapper_qemu.py -d -c {} -l {}'.format(controller.inside_ip, label)
+            wrapper_cmd = '/tmp/wrapper_qemu.py -c {} -l {}'.format(controller.inside_ip, label)
             if node_json['subtype'] == 'vyos':
                 bin_cmd = bin_cmd + ' -boot order=c -drive file=/data/node/hda.qcow2,if=virtio,format=qcow2 -enable-kvm -m {}M -serial telnet:0.0.0.0:5023,server,nowait -monitor telnet:0.0.0.0:5024,server,nowait -nographic'.format(node_json['ram'])
                 for interface_id, interface in sorted(node_json['interfaces'].items()):
