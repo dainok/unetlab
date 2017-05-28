@@ -238,8 +238,6 @@ class BootstrapNode(Resource):
         master = ControllerTable.query.filter(ControllerTable.master == True).one()
         controller = ControllerTable.query.get(config['controller']['id'])
         init_body = ''
-        bin_cmd = '/usr/bin/qemu-system-x86_64'
-        wrapper_cmd = '/tmp/wrapper_qemu.py -d -c {} -l {}'.format(controller.inside_ip, label)
 
         # Load header and footer
         with open('{}/templates/bootstrap_{}_header.sh'.format(app_root, node_json['type']), 'r') as fd_init_header:
@@ -265,7 +263,12 @@ class BootstrapNode(Resource):
         init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 80 -j DNAT --to {}:80\n'.format(master.inside_ip)
         init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 443 -j DNAT --to {}:443\n'.format(master.inside_ip)
 
-        if node_json['type'] == 'qemu':
+        if node_json['type'] == 'iol':
+            bin_cmd = '/data/nodes/iol.bin'
+            wrapper_cmd = '/tmp/wrapper_iol.py -d -c {} -l {}'.format(controller.inside_ip, label)
+        elif node_json['type'] == 'qemu':
+            bin_cmd = '/usr/bin/qemu-system-x86_64'
+            wrapper_cmd = '/tmp/wrapper_qemu.py -d -c {} -l {}'.format(controller.inside_ip, label)
             if node_json['subtype'] == 'vyos':
                 bin_cmd = bin_cmd + ' -boot order=c -drive file=/data/node/hda.qcow2,if=virtio,format=qcow2 -enable-kvm -m {}M -serial telnet:0.0.0.0:5023,server,nowait -monitor telnet:0.0.0.0:5024,server,nowait -nographic'.format(node_json['ram'])
                 for interface_id, interface in sorted(node_json['interfaces'].items()):
