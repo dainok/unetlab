@@ -264,15 +264,27 @@ class BootstrapNode(Resource):
         init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 443 -j DNAT --to {}:443\n'.format(master.inside_ip)
 
         if node_json['type'] == 'iol':
-            bin_cmd = '/data/nodes/iol.bin'
             wrapper_cmd = '/tmp/wrapper_iol.py -c {} -l {} -t -w {}'.format(controller.inside_ip, label, node_json['name'])
-            if 'management' in interface and bool(interface['management']):
-                # Configure management bridge
-                init_body = init_body + 'tunctl -t qeth{} || exit 1\n'.format(interface_id)
-                init_body = init_body + 'ip link set dev qeth{} up || exit 1\n'.format(interface_id)
-                init_body = init_body + 'brctl addif mgmt qeth{} || exit 1\n'.format(interface_id)
-                wrapper_cmd = wrapper_cmd + ' -m qeth{}'.format(interface_id)
-                bin_cmd = bin_cmd + ' -netdev tap,id=eth{},ifname=qeth{},script=no,downscript=no -device virtio-net,netdev=eth{},mac=52:54:00:00:00:00'.format(interface_id, interface_id, interface_id)
+            bin_cmd = '/data/node/iol.bin -n 4096 -q'
+            if 'iol_id' in node_json:
+                iol_id = node_json['iol_id']
+            else:
+                iol_id = random.randint(1, 1024)
+            if 'memory' in node_json:
+                bin_cmd * bin_cmd + ' -m {}'.format(node_json['memory'])
+            if 'ethernet' in node_json:
+                bin_cmd = bin_cmd + ' -e {}'.format(-(-node_json['ethernet'] // 4))
+            if 'serial' in node_json:
+                bin_cmd = bin_cmd + ' -s {}'.format(-(-node_json['serial'] // 4))
+            bin_cmd = bin_cmd + ' {}'.format(iol_id)
+            # Configure management bridge
+            init_body = init_body + 'tunctl -t veth0 || exit 1\n'
+            init_body = init_body + 'ip link set dev veth0 up || exit 1\n'
+            init_body = init_body + 'brctl addif mgmt veth0 || exit 1\n'
+            init_body = init_body + 'cd /data/node || exit 1\n'
+            for interface_id, interface in sorted(node_json['interfaces'].items()):
+                if 'management' in interface and bool(interface['management']):
+                    wrapper_cmd = wrapper_cmd + ' -m {}'.format(interface_id)
         elif node_json['type'] == 'qemu':
             bin_cmd = '/usr/bin/qemu-system-x86_64'
             wrapper_cmd = '/tmp/wrapper_qemu.py -c {} -l {}'.format(controller.inside_ip, label)
@@ -298,10 +310,10 @@ class BootstrapNode(Resource):
                         init_body = init_body + 'brctl addif br{} veth{} || exit 1\n'.format(interface_id, interface_id)
                         init_body = init_body + 'brctl addif br{} qeth{} || exit 1\n'.format(interface_id, interface_id)
                         bin_cmd = bin_cmd + ' -netdev tap,id=eth{},ifname=qeth{},script=no,downscript=no -device virtio-net,netdev=eth{},mac={}'.format(interface_id, interface_id, interface_id, interface['mac'])
-            init_body = init_body + wrapper_cmd + ' -- ' + bin_cmd + ' & \n'
-            init_body = init_body + 'QEMU_PID=$!\n'
-            init_body = init_body + 'wait ${QEMU_PID}\n'
 
+        init_body = init_body + wrapper_cmd + ' -- ' + bin_cmd + ' & \n'
+        init_body = init_body + 'BIN_PID=$!\n'
+        init_body = init_body + 'wait ${BIN_PID}\n'
         init_script = init_header + init_body + init_footer
         return send_file(io.BytesIO(init_script.encode()), attachment_filename = 'init', mimetype = 'text/x-shellscript')
 

@@ -229,7 +229,6 @@ def main():
     mgmt_veths = []
     title = None
     to_iol = None
-    veths = {}
 
     if len(sys.argv) < 2:
         usage()
@@ -254,7 +253,7 @@ def main():
                 logging.error(err)
                 sys.exit(255)
         elif opt == '-m':
-            mgmt_veths.append(arg)
+            mgmt_veths.append(int(arg))
         elif opt == '-t':
             enable_ts = True
         elif opt == '-w':
@@ -327,20 +326,17 @@ def main():
     atexit.register(to_controller.close)
 
     # Preparing tap (wrapper <-> node)
-    for tap in os.listdir('/sys/class/net'):
-        if tap.startswith('veth'):
-            try:
-                from_tun = open('/dev/net/tun', 'r+b', buffering = 0)
-                ifr = struct.pack('16sH', tap.encode(), IFF_TAP | IFF_NO_PI)
-                fcntl.ioctl(from_tun, TUNSETIFF, ifr)
-                fcntl.ioctl(from_tun, TUNSETNOCSUM, 1)
-            except Exception as err:
-                logging.error('cannot open TUN/TAP descriptor ({})'.format(tap))
-                logging.error(err)
-                sys.exit(1)
-            atexit.register(from_tun.close)
-            inputs.append(from_tun)
-            veths[int(tap[4:])] = from_tun
+    try:
+        from_tun = open('/dev/net/tun', 'r+b', buffering = 0)
+        ifr = struct.pack('16sH', 'veth0'.encode(), IFF_TAP | IFF_NO_PI)
+        fcntl.ioctl(from_tun, TUNSETIFF, ifr)
+        fcntl.ioctl(from_tun, TUNSETNOCSUM, 1)
+    except Exception as err:
+        logging.error('cannot open TUN/TAP descriptor ({})'.format(tap))
+        logging.error(err)
+        sys.exit(1)
+    atexit.register(from_tun.close)
+    inputs.append(from_tun)
 
     # Preparing socket (IOL -> wrapper)
     try:
@@ -382,7 +378,6 @@ def main():
         atexit.register(ts.close)
         inputs.append(ts)
 
-
     # Executing
     while inputs:
         logging.debug('waiting for data')
@@ -416,19 +411,22 @@ def main():
                     sys.exit(1)
                 else:
                     label, iface, payload = decodeUDPPacket(udp_datagram)
-                    if not iface in veths:
-                        logging.debug('dropping data for management interface (veth{})'.format(iface))
+                    if iface in mgmt_veths:
+                        logging.debug('dropping data for management interface ({})'.format(iface))
                         continue
                     try:
-                        logging.debug('sending data to IOL port veth{}'.format(iface))
-                        os.write(veths[iface].fileno(), payload)
+                        if to_iol != None:
+                            logging.debug('sending data to IOL port {}'.format(iface))
+                            to_iol.send(encodeIOLPacket(wrapper_id, iol_id, iface, payload))
+                        else:
+                            logging.debug('IOL not active, dropping data to IOL port {}'.format(iface))
                     except Exception as err:
-                        logging.error('cannot send data to IOL port veth{}'.format(iface))
+                        logging.error('cannot send data to IOL port {}'.format(iface))
                         logging.error(err)
                         break
 
             elif s is from_iol:
-                logging.debug('data from IOL (TAP)')
+                logging.debug('data from IOL (AF_UNIX)')
                 iol_datagram = from_iol.recv(BUFFER)
                 if not iol_datagram:
                     logging.error('cannot receive data from IOL node')
