@@ -66,19 +66,6 @@ if [ ! -d /data/database/unetlab ]; then
 	fi
 	echo "10000000" > /data/database/version
 fi
-for SCHEMA in $(ls -1 /etc/unetlab/schema-*.sql); do
-	VERSION=$(cat /data/database/version | sed 's/schema-\([0-9]*\)\.sql/\1/g')
-	SCHEMA_VERSION=$(echo ${SCHEMA} | sed 's/.*\/schema-\([0-9]*\)\.sql/\1/g')
-	if [ ${VERSION} -lt ${SCHEMA_VERSION} ]; then
-		mysql -u root unetlab < ${SCHEMA}
-		if [ $? -ne 0 ]; then
-			echo " failed"
-			echo "ERROR: failed to upgrade database to ${SCHEMA_VERSION}"
-			exit 1
-		fi
-		echo ${SCHEMA_VERSION} > /data/database/version
-	fi
-done
 
 # Starting Memcached
 /usr/bin/memcached -m 64 -p 11211 -u memcached -l 127.0.0.1 &> /data/logs/memcached.log &

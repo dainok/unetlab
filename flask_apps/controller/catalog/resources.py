@@ -245,7 +245,7 @@ class BootstrapNode(Resource):
         with open('{}/templates/bootstrap_{}_footer.sh'.format(app_root, node_json['type']), 'r') as fd_init_footer:
             init_footer = fd_init_footer.read()
 
-        # Configure mgm
+        # Configure mgmt
         init_body = init_body + 'brctl addbr mgmt || exit 1\n'
         init_body = init_body + 'brctl setageing mgmt 0 || exit 1\n'
         init_body = init_body + 'ip link set dev mgmt up || exit 1\n'
@@ -277,6 +277,9 @@ class BootstrapNode(Resource):
             if 'serial' in node_json:
                 bin_cmd = bin_cmd + ' -s {}'.format(-(-node_json['serial'] // 4))
             bin_cmd = bin_cmd + ' {}'.format(iol_id)
+            init_body = init_body + 'if [ ! -f /data/node/nvram_{:05} ]; then\n'.format(iol_id)
+            init_body = init_body + '\tfind /data/node -name "nvram_*" -exec mv {{}} /data/node/nvram_{:05} \;\n'.format(iol_id)
+            init_body = init_body + 'fi\n'
             # Configure management bridge
             init_body = init_body + 'tunctl -t veth0 || exit 1\n'
             init_body = init_body + 'ip link set dev veth0 up || exit 1\n'

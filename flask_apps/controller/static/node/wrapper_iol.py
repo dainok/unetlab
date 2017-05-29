@@ -451,13 +451,14 @@ def main():
             elif s is from_tun:
                 logging.debug('data from TAP')
                 try:
-                    tap_datagram = array.array('B', os.read(from_tun.fileno(), TAP_BUFFER))
+                    tap_datagram = array.array('B', os.read(from_tun.fileno(), BUFFER))
                 except Exception as err:
-                    logging.error('cannot read data from MGMT')
+                    logging.error('cannot read data from TAP')
                     break
                 if to_iol != None:
                     try:
-                        to_iol.send(encodeIOLPacket(wrapper_id, iol_id, MGMT_ID, tap_datagram))
+                        for interface_id in mgmt_veths:
+                            to_iol.send(encodeIOLPacket(wrapper_id, iol_id, interface_id, tap_datagram))
                     except Exception as err:
                         logging.error('cannot send data to IOL MGMT')
                         break
