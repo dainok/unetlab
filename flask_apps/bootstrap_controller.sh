@@ -1,6 +1,6 @@
 #!/bin/bash
 
-shutdown() {
+controllerStop() {
 	echo -n "Shutting down..."
 	killall -s SIGTERM mysqld memcached nginx pytyon3 &> /data/logs/shutdown.log
 	# Double check for critical processes
@@ -13,7 +13,7 @@ shutdown() {
 
 echo -n "Starting controller..."
 
-trap shutdown SIGHUP SIGINT SIGTERM &> /dev/null
+trap controllerStop SIGHUP SIGINT SIGTERM
 
 if [ ! -d /data/logs ]; then
 	mkdir /data/logs || exit 1
@@ -87,3 +87,4 @@ echo " done"
 wait ${MARIADB_PID} ${MEMCACHED_PID} ${NGINX_PID} ${API_PID}
 
 echo "Exiting..."
+

@@ -1,23 +1,39 @@
 #!/bin/bash
-URL=http://${CONTROLLER}:5000/api/v1/bootstrap/routers/${ID}
+URL="https://${CONTROLLER}/api/v1/bootstrap/routers/${ID}?api_key=${API}"
 PID=0
 
 function routerStop {
+	echo -n "Shutting down..."
+	killall -s SIGTERM curl sleep &> /dev/null
 	if [ ${PID} -ne 0 ]; then
 		kill -SIGTERM ${PID}
 		wait ${PID}
+	else
+		exit
 	fi
 }
 
-curl -m 3 -s ${URL} &> /tmp/init
-if [ $? -ne 0 ]; then
-	echo "ERROR: cannot download init script from ${URL}"
-	exit 1
-fi
+echo "Starting router..."
 
 trap routerStop SIGINT SIGTERM
+
+while true; do
+	curl -k -m 3 -s "${URL}" &> /tmp/init
+	if [ $? -ne 0 ]; then
+		echo "ERROR: cannot download init script from ${URL}"
+		sleep 5
+	else
+		break
+	fi
+done
+
 bash /tmp/init &
 PID=$!
-wait $PID
-exit $?
+if [ ${PID} -ne 0 ]; then
+	echo waiting
+	wait $PID
+	exit $?
+fi
+
+echo "Exiting..."
 
