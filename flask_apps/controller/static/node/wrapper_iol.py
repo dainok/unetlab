@@ -423,14 +423,14 @@ def main():
                     except Exception as err:
                         logging.error('cannot send data to IOL port {}'.format(iface))
                         logging.error(err)
-                        break
+                        sys.exit(1)
 
             elif s is from_iol:
                 logging.debug('data from IOL (AF_UNIX)')
                 iol_datagram = from_iol.recv(BUFFER)
                 if not iol_datagram:
                     logging.error('cannot receive data from IOL node')
-                    break
+                    sys.exit(1)
                 else:
                     src_id, src_if, dst_id, dst_if, padding, payload = decodeIOLPacket(iol_datagram)
                     if src_if in mgmt_veths:
@@ -439,14 +439,16 @@ def main():
                             os.write(from_tun.fileno(), payload)
                         except Exception as err:
                             logging.error('cannot send data to MGMT')
-                            break
+                            logging.error(err)
+                            sys.exit(1)
                     else:
                         logging.debug('sending data to controller')
                         try:
-                            to_controller.sendto(encodeUDPPacket(label, src_if, payload), (controller, UDP_PORT))
+                            to_controller.sendto(encodeUDPPacket(label, src_if, payload), (controller, ROUTER_PORT))
                         except Exception as err:
                             logging.error('cannot send data to controller')
-                            break
+                            logging.error(err)
+                            sys.exit(1)
 
             elif s is from_tun:
                 logging.debug('data from TAP')
@@ -454,14 +456,16 @@ def main():
                     tap_datagram = array.array('B', os.read(from_tun.fileno(), BUFFER))
                 except Exception as err:
                     logging.error('cannot read data from TAP')
-                    break
+                    logging.error(err)
+                    sys.exit(1)
                 if to_iol != None:
                     try:
                         for interface_id in mgmt_veths:
                             to_iol.send(encodeIOLPacket(wrapper_id, iol_id, interface_id, tap_datagram))
                     except Exception as err:
                         logging.error('cannot send data to IOL MGMT')
-                        break
+                        logging.error(err)
+                        sys.exit(1)
                 else:
                     logging.error('cannot connect to IOL socket, packet dropped')
 
@@ -501,7 +505,7 @@ def main():
                         p.stdin.write(data)
                     except Exception as err:
                         logging.error('cannot send data to IOL console')
-                        break
+                        logging.error(err)
 
             else:
                 veth_found = False
