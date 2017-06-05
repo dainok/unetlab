@@ -139,25 +139,25 @@ if not repository:
     db.session.add(repository)
     db.session.commit()
 
-# Adding local controller if not present
-controller = ControllerTable.query.get(config['controller']['id'])
-if not controller:
-    controller = ControllerTable(
-        id = config['controller']['id'],
-        inside_ip = socket.gethostbyname(socket.gethostname()),
-        master = True
+# Adding first controller if not present
+router = RouterTable.query.get(0)
+if not router:
+    router = RouterTable(
+        id = 0,
+        inside_ip = '127.0.0.1',
+        outside_ip = '127.0.0.1'
     )
-    db.session.add(controller)
+    db.session.add(router)
     db.session.commit()
 
 # Routing
 api.add_resource(Auth, '/api/v1/auth')
 api.add_resource(BootstrapNode, '/api/v1/bootstrap/nodes/<string:label>')
-#api.add_resource(BootstrapRouter, '/api/v1/bootstrap/routers/<string:label>')
-api.add_resource(Controller, '/api/v1/controllers', '/api/v1/controllers/<string:controller_id>')
+api.add_resource(BootstrapRouter, '/api/v1/bootstrap/routers/<string:router_id>')
 api.add_resource(Lab, '/api/v1/labs', '/api/v1/labs/<string:lab_id>')
 api.add_resource(Repository, '/api/v1/repositories', '/api/v1/repositories/<string:repository>')
 api.add_resource(Role, '/api/v1/roles', '/api/v1/roles/<string:role>')
+api.add_resource(Router, '/api/v1/routers', '/api/v1/routers/<string:router_id>')
 api.add_resource(Routing, '/api/v1/routing')
 api.add_resource(Task, '/api/v1/tasks', '/api/v1/tasks/<string:task_id>')
 api.add_resource(User, '/api/v1/users', '/api/v1/users/<string:username>')

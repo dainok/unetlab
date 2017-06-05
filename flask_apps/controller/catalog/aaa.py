@@ -12,8 +12,7 @@ from controller.catalog.models import UserTable
 
 def checkAuth(request):
     client_ip = ipaddress.ip_address(request.remote_addr)
-    authorized_network = ipaddress.ip_network(config['controller']['client_network'])
-    if (client_ip in ipaddress.ip_network('127.0.0.0/16')) or (client_ip in authorized_network) or (request.args.get('api_key') and request.args.get('api_key') == api_key):
+    if request.args.get('api_key') and request.args.get('api_key') == api_key:
         # Correct API KEY or trusted IP address: authenticated and authorized as admin user
         return {
             'username': 'admin',

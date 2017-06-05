@@ -24,7 +24,6 @@ RUN git config --global user.email "root@example.com" || exit 1
 RUN git config --global user.name "Root User"
 COPY nginx.conf /etc/nginx/
 COPY run_controller.py /usr/bin
-COPY controller /usr/lib/python3.6/site-packages/controller
 COPY controller /root
 COPY bootstrap_controller.sh /sbin/bootstrap.sh
 

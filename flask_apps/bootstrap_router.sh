@@ -1,5 +1,5 @@
 #!/bin/bash
-URL="https://${CONTROLLER}/api/v1/bootstrap/routers/${ID}?api_key=${API}"
+URL="https://${CONTROLLER}/api/v1/bootstrap/routers/${ROUTERID}?api_key=${API}"
 PID=0
 
 function routerStop {

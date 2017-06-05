@@ -34,7 +34,7 @@ class ActiveNodeTable(db.Model):
     __mapper_args__ = {'confirm_deleted_rows': False}
     instance = db.Column(db.String(128), db.ForeignKey('active_labs.instance'))
     node_id = db.Column(db.Integer)
-    controller_id = db.Column(db.Integer)
+    router_id = db.Column(db.Integer)
     ip = db.Column(db.String(128))
     state = db.Column(db.String(128))
     label = db.Column(db.Integer, primary_key = True, autoincrement = False)
@@ -55,17 +55,15 @@ class ActiveInterfaceTable(db.Model):
     def __repr__(self):
         return '<ActiveInterfaceTable(id={})>'.format(self.id)
 
-class ControllerTable(db.Model):
-    __tablename__ = 'controllers'
+class RouterTable(db.Model):
+    __tablename__ = 'routers'
     __mapper_args__ = {'confirm_deleted_rows': False}
     id = db.Column(db.Integer, primary_key = True, autoincrement = False)
     inside_ip = db.Column(db.String(128))
     outside_ip = db.Column(db.String(128))
-    master = db.Column(db.Boolean)
-    docker_ip = db.Column(db.String(128))
 
     def __repr__(self):
-        return '<Controller(id={})>'.format(self.id)
+        return '<Router(id={})>'.format(self.id)
 
 class LabTable(db.Model):
     __tablename__ = 'labs'

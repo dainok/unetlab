@@ -32,9 +32,6 @@ def loadConfig(config_file):
     if not config.has_section('app'):
         config.add_section('app')
         need_to_save = True
-    if not config.has_section('controller'):
-        config.add_section('controller')
-        need_to_save = True
     if not config.has_section('advanced'):
         config.add_section('advanced')
         need_to_save = True
@@ -61,15 +58,6 @@ def loadConfig(config_file):
         need_to_save = True
     if not config.has_option('app', 'lab_repository'):
         config['app']['lab_repository'] = '/data/repositories'
-        need_to_save = True
-    if not config.has_option('controller', 'id'):
-        config['controller']['id'] = '0'
-        need_to_save = True
-    if not config.has_option('controller', 'master_url'):
-        config['controller']['master_url'] = 'https://127.0.0.1'
-        need_to_save = True
-    if not config.has_option('controller', 'client_network'):
-        config['controller']['client_network'] = '127.0.0.0/24'
         need_to_save = True
     if not config.has_option('advanced', 'label_length'):
         config['advanced']['label_length'] = '2'
@@ -100,7 +88,6 @@ def loadConfig(config_file):
     result['app']['debug'] = config.getboolean('app', 'debug')
     result['app']['port'] = config.getint('app', 'port')
     result['app']['testing'] = config.getboolean('app', 'testing')
-    result['controller']['id'] = config.getint('controller', 'id')
     result['advanced']['controller_port'] = config.getint('advanced', 'controller_port')
     result['advanced']['label_length'] = config.getint('advanced', 'label_length')
     result['advanced']['interface_length'] = config.getint('advanced', 'interface_length')

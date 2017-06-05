@@ -119,20 +119,18 @@ def getAvailableLabels(username):
         return max_labels
     return max_labels - used_labels
 
-def printController(controller, summary = False):
+def printRouter(router, summary = False):
     if summary:
         data =  {
-            'id': controller.id,
-            'inside_ip': controller.inside_ip,
-            'outside_ip': controller.outside_ip,
-            'master': controller.master,
-            'docker_ip': controller.docker_ip
+            'id': router.id,
+            'inside_ip': router.inside_ip,
+            'outside_ip': router.outside_ip,
         }
     else:
-        data = printController(controller, summary = True)
+        data = printRouter(router, summary = True)
         data['labels'] = {}
         # Loading nodes running in this controller
-        nodes = ActiveNodeTable.query.filter(ActiveNodeTable.controller_id == controller.id)
+        nodes = ActiveNodeTable.query.filter(ActiveNodeTable.router_id == router.id)
         for node in nodes:
             data['labels'][node.label] = {
                 'ip': node.ip
@@ -225,18 +223,32 @@ class Auth(Resource):
             'data': printUser(user)
         }
 
+class BootstrapRouter(Resource):
+    def get(self, router_id = None):
+        checkAuthz(request, ['admin'])
+        router = RouterTable.query.get_or_404(router_id)
+        init_body = ''
+
+        # Load header and footer
+        with open('{}/templates/bootstrap_router_header.sh'.format(app_root), 'r') as fd_init_header:
+            init_header = fd_init_header.read()
+        with open('{}/templates/bootstrap_router_footer.sh'.format(app_root), 'r') as fd_init_footer:
+            init_footer = fd_init_footer.read()
+
+        init_script = init_header + init_body + init_footer
+        return send_file(io.BytesIO(init_script.encode()), attachment_filename = 'init', mimetype = 'text/x-shellscript')
+
 class BootstrapNode(Resource):
     def get(self, label = None):
         checkAuthz(request, ['admin'])
-        active_node = ActiveNodeTable.query.get(label)
+        active_node = ActiveNodeTable.query.get_or_404(label)
         node_id = active_node.node_id
         node_json = json.loads(active_node.active_lab.json)['topology']['nodes'][str(node_id)]
-        if active_node.controller_id == None:
-            # Controller ID not set, using local
-            active_node.controller_id = config['controller']['id']
+        if active_node.router_id == None:
+            # Router ID not set, using local
+            active_node.router_id = 0
             db.session.commit()
-        master = ControllerTable.query.filter(ControllerTable.master == True).one()
-        controller = ControllerTable.query.get(config['controller']['id'])
+        router = RouterTable.query.get_or_404(active_node.router_id)
         init_body = ''
 
         # Load header and footer
@@ -319,28 +331,6 @@ class BootstrapNode(Resource):
         init_body = init_body + 'wait ${BIN_PID}\n'
         init_script = init_header + init_body + init_footer
         return send_file(io.BytesIO(init_script.encode()), attachment_filename = 'init', mimetype = 'text/x-shellscript')
-
-
-class Controller(Resource):
-    def get(self, controller_id = None):
-        checkAuthz(request, ['admin'])
-        if not controller_id:
-            # List all controllers
-            summary = True
-            controllers = ControllerTable.query.order_by(ControllerTable.id)
-        else:
-            # List a single controller if exists, else 404
-            summary = False
-            controllers = [ControllerTable.query.get_or_404(controller_id)]
-        data = {}
-        for controller in controllers:
-            # Print each controller
-            data[controller.id] = printController(controller, summary = summary)
-        return {
-            'status': 'success',
-            'message': 'Controller(s) found',
-            'data': data
-        }
 
 class Lab(Resource):
     def delete(self, lab_id = None):
@@ -552,6 +542,27 @@ class Role(Resource):
             'status': 'success',
             'message': 'Role "{}" added'.format(role.role),
             'data': printRole(role)
+        }
+
+class Router(Resource):
+    def get(self, router_id = None):
+        checkAuthz(request, ['admin'])
+        if not router_id:
+            # List all routers
+            summary = True
+            routers = RouterTable.query.order_by(RouterTable.id)
+        else:
+            # List a single controller if exists, else 404
+            summary = False
+            routers = [RouterTable.query.get_or_404(router_id)]
+        data = {}
+        for router in routers:
+            # Print each router
+            data[router.id] = printRouter(router, summary = summary)
+        return {
+            'status': 'success',
+            'message': 'Router(s) found',
+            'data': data
         }
 
 class Routing(Resource):
