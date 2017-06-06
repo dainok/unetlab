@@ -121,7 +121,7 @@ class UserTable(db.Model):
     password = db.Column(db.String(128))
     name = db.Column(db.String(128))
     email = db.Column(db.String(128), unique = True)
-    labels = db.Column(db.Integer)
+    labels = db.Column(db.Integer, default = 0)
     roles = db.relationship('RoleTable', secondary = roles_to_users, back_populates = 'users')
     tasks = db.relationship('TaskTable', cascade = 'save-update, merge, delete')
     active_labs = db.relationship('ActiveLabTable', cascade = 'save-update, merge, delete')

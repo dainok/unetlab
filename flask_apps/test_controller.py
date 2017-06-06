@@ -1,462 +1,284 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.5
 """ Tests for controller app """
 __author__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
 __copyright__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
 __license__ = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
 __revision__ = '20170430'
 
-from controller import app, api_key
-import base64, json, os, random, tempfile, unittest
-
-admin_username = 'admin'
-admin_password = 'admin'
+import base64, getopt, json, logging, random, requests, sys, urllib3
+urllib3.disable_warnings()
 
 role_1 = 'z' + ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(7))
+role_2 = 'z' + ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(7))
+role_3 = 'z' + ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(7))
 username_1 = 'z' + ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(9))
 password_1 = ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(20))
+username_2 = 'z' + ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(9))
 password_2 = ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(20))
+password_3 = ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(20))
 
-class FlaskTestCase(unittest.TestCase):
-    lab_id = None
+def usage():
+    print('Usage: {} [OPTIONS]'.format(sys.argv[0]))
+    print('')
+    print('Options:')
+    print('    -d             enable debug')
+    print('    -c controller  the IP or domain name of the controller host')
+    print('    -k key         API key')
+    print('    -p password    a privileged password')
+    print('    -u username    a privileged username')
+    sys.exit(255)
 
-    def setUp(self):
-        self.app = app.test_client()
+def make_request(url, method = 'GET', data = None, username = None, password = None, api_key = None, expected_code = 200):
+    basic_auth = None
 
-    def test_00_00_auth_via_api(self):
-        # curl -s -D- -X GET 'http://127.0.0.1:5000/api/v1/auth?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
-        url = '/api/v1/auth?api_key={}'.format(api_key)
-        response = self.app.get(url)
-        response_data = json.loads(response.get_data(as_text = True))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response_data['status'], 'success')
-        self.assertEqual(response_data['data']['email'], 'admin@example.com')
-        self.assertEqual(response_data['data']['labels'], -1)
-        self.assertEqual(response_data['data']['name'], 'Default Administrator')
-        self.assertEqual(response_data['data']['roles'], ['admin'])
-        self.assertEqual(response_data['data']['username'], 'admin')
+    if api_key != None:
+        logging.debug('Using API authentication')
+        url = url + '?api_key={}'.format(api_key)
+    elif username != None and password != None:
+        logging.debug('Using basic authentication')
+        basic_auth = requests.auth.HTTPBasicAuth(username, password)
 
-    def test_00_01_auth_via_auth(self):
-        # curl -s -D- -u admin:admin -X GET 'http://127.0.0.1:5000/api/v1/auth'
-        headers = {
-            'Authorization': 'Basic ' + base64.b64encode(str.encode(admin_username) + b':' + str.encode(admin_password)).decode('utf-8'),
-        }
-        url = '/api/v1/auth?api_key={}'.format(api_key)
-        response = self.app.get(url)
-        response_data = json.loads(response.get_data(as_text = True))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response_data['status'], 'success')
-        self.assertEqual(response_data['data']['email'], 'admin@example.com')
-        self.assertEqual(response_data['data']['labels'], -1)
-        self.assertEqual(response_data['data']['name'], 'Default Administrator')
-        self.assertEqual(response_data['data']['roles'], ['admin'])
-        self.assertEqual(response_data['data']['username'], 'admin')
+    if method == 'GET':
+        r = requests.get(url, verify = False, auth = basic_auth)
+    elif method == 'POST':
+        r = requests.post(url, verify = False, auth = basic_auth, json = data)
+    elif method == 'PATCH':
+        r = requests.patch(url, verify = False, auth = basic_auth, json = data)
+    elif method == 'DELETE':
+        r = requests.delete(url, verify = False, auth = basic_auth)
+    else:
+        logging.error('Method not supported')
+        sys.exit(1)
 
-    """
-    Tests about roles
-    """
+    if r.status_code != expected_code:
+        logging.error('Received {}, expecting {}'.format(r.status_code, expected_code))
+        logging.error('Status is {}'.format(r.status_code))
+        logging.error('Reason is {}'.format(r.reason))
+        logging.error('Received content is {}'.format(r.text))
+        sys.exit(1)
 
-    def test_01_00_get_roles_via_api(self):
-        # curl -s -D- -X GET 'http://127.0.0.1:5000/api/v1/roles?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
-        url = '/api/v1/roles?api_key={}'.format(api_key)
-        response = self.app.get(url)
-        response_data = json.loads(response.get_data(as_text = True))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response_data['status'], 'success')
-        self.assertEqual(response_data['data']['admin']['access_to'], '.*')
-        self.assertEqual(response_data['data']['admin']['can_write'], True)
-        self.assertEqual(response_data['data']['admin']['role'], 'admin')
+    try:
+        returned_data = r.json()
+    except:
+        logging.error('Invalid JSON answer')
+        logging.error('Status is {}'.format(r.status_code))
+        logging.error('Reason is {}'.format(r.reason))
+        logging.error('Content is {}'.format(r.text))
+        sys.exit(1)
 
-    def test_01_01_post_role_via_api(self):
-        # curl -s -D- -X POST -d '{"role":"test1","can_write":true,"access_to":".*"}' -H 'Content-type: application/json' 'http://127.0.0.1:5000/api/v1/roles?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
-        url = '/api/v1/roles?api_key={}'.format(api_key)
-        data = {
-            'role': role_1,
-            'can_write': False,
-            'access_to': '.*'
-        }
-        response = self.app.post(url, data = json.dumps(data), content_type = 'application/json')
-        response_data = json.loads(response.get_data(as_text = True))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response_data['status'], 'success')
-        self.assertEqual(response_data['data']['access_to'], '.*')
-        self.assertEqual(response_data['data']['can_write'], False)
-        self.assertEqual(response_data['data']['role'], role_1)
+    logging.debug('Status is {}'.format(r.status_code))
+    logging.debug('Reason is {}'.format(r.reason))
+    logging.debug('Content is {}'.format(r.text))
+    return returned_data
 
-    def test_01_02_get_role_via_api(self):
-        # curl -s -D- -X GET 'http://127.0.0.1:5000/api/v1/roles/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
-        url = '/api/v1/roles/{}?api_key={}'.format(role_1, api_key)
-        response = self.app.get(url)
-        response_data = json.loads(response.get_data(as_text = True))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response_data['status'], 'success')
-        self.assertEqual(response_data['data'][role_1]['access_to'], '.*')
-        self.assertEqual(response_data['data'][role_1]['can_write'], False)
-        self.assertEqual(response_data['data'][role_1]['role'], role_1)
+def main():
+    level = logging.INFO
+    admin_username = None
+    admin_password = None
+    api_key = None
+    controller = None
 
-    def test_01_03_patch_role_via_api(self):
-        # curl -s -D- -X PATCH -d '{"can_write":false,"access_to":"something.*"}' -H 'Content-type: application/json' 'http://127.0.0.1:5000/api/v1/roles/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
-        url = '/api/v1/roles/{}?api_key={}'.format(role_1, api_key)
-        data = {
-            'can_write': True,
-            'access_to': 'something.*'
-        }
-        response = self.app.patch(url, data = json.dumps(data), content_type = 'application/json')
-        response_data = json.loads(response.get_data(as_text = True))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response_data['status'], 'success')
-        self.assertEqual(response_data['data']['access_to'], 'something.*')
-        self.assertEqual(response_data['data']['can_write'], True)
-        self.assertEqual(response_data['data']['role'], role_1)
+    # Reading options
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], 'dc:u:p:k:')
+    except getopt.GetoptError as err:
+        sys.stderr.write('ERROR: {}\n'.format(err))
+        usage()
+        sys.exit(255)
+    for opt, arg in opts:
+        if opt == '-d':
+            level = logging.DEBUG
+        elif opt == '-c':
+            controller = arg
+        elif opt == '-u':
+            admin_username = arg
+        elif opt == '-p':
+            admin_password = arg
+        elif opt == '-k':
+            api_key = arg
+        else:
+            assert False, 'unhandled option'
 
-    def test_01_04_get_role_via_api(self):
-        # curl -s -D- -X GET 'http://127.0.0.1:5000/api/v1/roles/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
-        url = '/api/v1/roles/{}?api_key={}'.format(role_1, api_key)
-        response = self.app.get(url)
-        response_data = json.loads(response.get_data(as_text = True))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response_data['status'], 'success')
-        self.assertEqual(response_data['data'][role_1]['access_to'], 'something.*')
-        self.assertEqual(response_data['data'][role_1]['can_write'], True)
-        self.assertEqual(response_data['data'][role_1]['role'], role_1)
+    # Checking options
+    logging.basicConfig(level = level)
+    if controller == None:
+        logging.error('controller not set')
+        sys.exit(255)
+    if admin_username == None:
+        logging.error('admin username not set')
+        sys.exit(255)
+    if admin_password == None:
+        logging.error('admin password not set')
+        sys.exit(255)
+    if api_key == None:
+        logging.error('API key not set')
+        sys.exit(255)
 
-    def test_01_05_patch_role_via_api(self):
-        # curl -s -D- -X PATCH -d '{"can_write":false}' -H 'Content-type: application/json' 'http://127.0.0.1:5000/api/v1/roles/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
-        url = '/api/v1/roles/{}?api_key={}'.format(role_1, api_key)
-        data = {
-            'can_write': True
-        }
-        response = self.app.patch(url, data = json.dumps(data), content_type = 'application/json')
-        response_data = json.loads(response.get_data(as_text = True))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response_data['status'], 'success')
-        self.assertEqual(response_data['data']['access_to'], 'something.*')
-        self.assertEqual(response_data['data']['can_write'], True)
-        self.assertEqual(response_data['data']['role'], role_1)
+    # /auth
+    logging.info('Auth: unauthenticated request')
+    returned_data = make_request('https://{}/api/v1/auth'.format(controller), method = 'GET', expected_code = 401)
 
-    def test_01_06_get_role_via_api(self):
-        # curl -s -D- -X GET 'http://127.0.0.1:5000/api/v1/roles/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
-        url = '/api/v1/roles/{}?api_key={}'.format(role_1, api_key)
-        response = self.app.get(url)
-        response_data = json.loads(response.get_data(as_text = True))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response_data['status'], 'success')
-        self.assertEqual(response_data['data'][role_1]['access_to'], 'something.*')
-        self.assertEqual(response_data['data'][role_1]['can_write'], True)
-        self.assertEqual(response_data['data'][role_1]['role'], role_1)
+    logging.info('Auth: authentication via API')
+    returned_data = make_request('https://{}/api/v1/auth'.format(controller), method = 'GET', api_key = api_key, expected_code = 200)
 
-    """
-    Tests about users
-    """
+    logging.info('Auth: basic authentication')
+    returned_data = make_request('https://{}/api/v1/auth'.format(controller), method = 'GET', username = admin_username, password = admin_password, expected_code = 200)
 
-    def test_02_00_get_users_via_api(self):
-        # curl -s -D- -X GET 'http://127.0.0.1:5000/api/v1/users?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
-        url = '/api/v1/users?api_key={}'.format(api_key)
-        response = self.app.get(url)
-        response_data = json.loads(response.get_data(as_text = True))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response_data['status'], 'success')
-        self.assertEqual(response_data['data']['admin']['email'], 'admin@example.com')
-        self.assertEqual(response_data['data']['admin']['labels'], -1)
-        self.assertEqual(response_data['data']['admin']['name'], 'Default Administrator')
-        self.assertEqual(response_data['data']['admin']['roles'], ['admin'])
-        self.assertEqual(response_data['data']['admin']['username'], 'admin')
+    # /roles
+    logging.info('Roles: get all roles')
+    returned_data = make_request('https://{}/api/v1/roles'.format(controller), method = 'GET', api_key = api_key, expected_code = 200)
 
-    def test_02_01_post_user_via_api(self):
-        # curl -s -D- -X POST -d '{"username":"test1","password":"test1","labels":100,"email":"user1@example.com","name":"User 1","roles":["admin"]}' -H 'Content-type: application/json' 'http://127.0.0.1:5000/api/v1/users?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
-        url = '/api/v1/users?api_key={}'.format(api_key)
-        data = {
-            'email': '{}@example.com'.format(username_1),
-            'labels': 100,
-            'name': 'User 1',
-            'password': password_1,
-            'roles': [role_1],
-            'username': username_1
-        }
-        response = self.app.post(url, data = json.dumps(data), content_type = 'application/json')
-        response_data = json.loads(response.get_data(as_text = True))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response_data['status'], 'success')
-        self.assertEqual(response_data['data']['email'], '{}@example.com'.format(username_1))
-        self.assertEqual(response_data['data']['labels'], 100)
-        self.assertEqual(response_data['data']['name'], 'User 1')
-        self.assertEqual(response_data['data']['roles'], [role_1])
-        self.assertEqual(response_data['data']['username'], username_1)
+    logging.info('Roles: get admin role')
+    returned_data = make_request('https://{}/api/v1/roles/admin'.format(controller), method = 'GET', api_key = api_key, expected_code = 200)
 
-    def test_02_02_get_user_via_api(self):
-        # curl -s -D- -X GET 'http://127.0.0.1:5000/api/v1/users/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
-        url = '/api/v1/users/{}?api_key={}'.format(username_1, api_key)
-        response = self.app.get(url)
-        response_data = json.loads(response.get_data(as_text = True))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response_data['status'], 'success')
-        self.assertEqual(response_data['data'][username_1]['email'], '{}@example.com'.format(username_1))
-        self.assertEqual(response_data['data'][username_1]['labels'], 100)
-        self.assertEqual(response_data['data'][username_1]['name'], 'User 1')
-        self.assertEqual(response_data['data'][username_1]['roles'], [role_1])
-        self.assertEqual(response_data['data'][username_1]['username'], username_1)
+    logging.info('Roles: adding role')
+    data = {
+        'role': role_1,
+        'can_write': False,
+        'access_to': '.*'
+    }
+    returned_data = make_request('https://{}/api/v1/roles'.format(controller), method = 'POST', data = data, api_key = api_key, expected_code = 200)
+    if returned_data['data']['role'] != data['role']: sys.exit('role not validated')
+    if returned_data['data']['access_to'] != data['access_to']: sys.exit('access_to not validated')
+    if returned_data['data']['can_write'] != data['can_write']: sys.exit('can_write not validated')
 
-    def test_02_03_auth_via_auth(self):
-        # curl -s -D- -u test1:test1 -X GET 'http://127.0.0.1:5000/api/v1/auth'
-        headers = {
-            'Authorization': 'Basic ' + base64.b64encode(str.encode(username_1) + b':' + str.encode(password_1)).decode('utf-8'),
-        }
-        url = '/api/v1/auth'
-        response = self.app.get(url, headers = headers)
-        response_data = json.loads(response.get_data(as_text = True))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response_data['status'], 'success')
-        self.assertEqual(response_data['data']['email'], '{}@example.com'.format(username_1))
-        self.assertEqual(response_data['data']['labels'], 100)
-        self.assertEqual(response_data['data']['name'], 'User 1')
-        self.assertEqual(response_data['data']['roles'], [role_1])
-        self.assertEqual(response_data['data']['username'], username_1)
+    logging.info('Roles: get created role')
+    returned_data = make_request('https://{}/api/v1/roles/{}'.format(controller, role_1), method = 'GET', api_key = api_key, expected_code = 200)
+    if returned_data['data'][role_1]['role'] != role_1: sys.exit('role not validated')
+    if returned_data['data'][role_1]['access_to'] != data['access_to']: sys.exit('access_to not validated')
+    if returned_data['data'][role_1]['can_write'] != data['can_write']: sys.exit('can_write not validated')
 
-    def test_02_04_patch_user_via_api(self):
-        # curl -s -D- -X PATCH -d '{"email":"user1@example.org","labels":200,"name":"User A","password":"test2","roles":["admin","test1"]}' -H 'Content-type: application/json' 'http://127.0.0.1:5000/api/v1/users/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
-        url = '/api/v1/users/{}?api_key={}'.format(username_1, api_key)
-        data = {
-            'email': '{}@example.org'.format(username_1),
-            'labels': 200,
-            'name': 'User A',
-            'password': password_2,
-            'roles': ['admin', role_1],
-        }
-        response = self.app.patch(url, data = json.dumps(data), content_type = 'application/json')
-        response_data = json.loads(response.get_data(as_text = True))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response_data['status'], 'success')
-        self.assertEqual(response_data['data']['email'], '{}@example.org'.format(username_1))
-        self.assertEqual(response_data['data']['labels'], 200)
-        self.assertEqual(response_data['data']['name'], 'User A')
-        self.assertEqual(response_data['data']['roles'], ['admin', role_1])
-        self.assertEqual(response_data['data']['username'], username_1)
+    logging.info('Roles: try to create a minimal role')
+    data = {
+        'role': role_2
+    }
+    returned_data = make_request('https://{}/api/v1/roles'.format(controller), method = 'POST', data = data, api_key = api_key, expected_code = 200)
+    if returned_data['data']['role'] != data['role']: sys.exit('role not validated')
+    if returned_data['data']['access_to'] != None: sys.exit('access_to not validated')
+    if returned_data['data']['can_write'] != None: sys.exit('can_write not validated')
 
-    def test_02_05_auth_via_auth(self):
-        # curl -s -D- -u test1:test2 -X GET 'http://127.0.0.1:5000/api/v1/auth'
-        headers = {
-            'Authorization': 'Basic ' + base64.b64encode(str.encode(username_1) + b':' + str.encode(password_2)).decode('utf-8'),
-        }
-        url = '/api/v1/auth'
-        response = self.app.get(url, headers = headers)
-        response_data = json.loads(response.get_data(as_text = True))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response_data['status'], 'success')
-        self.assertEqual(response_data['data']['email'], '{}@example.org'.format(username_1))
-        self.assertEqual(response_data['data']['labels'], 200)
-        self.assertEqual(response_data['data']['name'], 'User A')
-        self.assertEqual(response_data['data']['roles'], ['admin', role_1])
-        self.assertEqual(response_data['data']['username'], username_1)
+    logging.info('Roles: edit role')
+    data = {
+        'can_write': True,
+        'access_to': 'something.*'
+    }
+    returned_data = make_request('https://{}/api/v1/roles/{}'.format(controller, role_2), method = 'PATCH', data = data, api_key = api_key, expected_code = 200)
+    if returned_data['data']['role'] != role_2: sys.exit('role not validated')
+    if returned_data['data']['access_to'] != data['access_to']: sys.exit('access_to not validated')
+    if returned_data['data']['can_write'] != data['can_write']: sys.exit('can_write not validated')
 
-    def test_02_06_patch_user_via_api(self):
-        # curl -s -D- -X PATCH -d '{"email":"user1@example.net"}' -H 'Content-type: application/json' 'http://127.0.0.1:5000/api/v1/users/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
-        url = '/api/v1/users/{}?api_key={}'.format(username_1, api_key)
-        data = {
-            'email': '{}@example.net'.format(username_1),
-        }
-        response = self.app.patch(url, data = json.dumps(data), content_type = 'application/json')
-        response_data = json.loads(response.get_data(as_text = True))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response_data['status'], 'success')
-        self.assertEqual(response_data['data']['email'], '{}@example.net'.format(username_1))
-        self.assertEqual(response_data['data']['labels'], 200)
-        self.assertEqual(response_data['data']['name'], 'User A')
-        self.assertEqual(response_data['data']['roles'], ['admin', role_1])
-        self.assertEqual(response_data['data']['username'], username_1)
+    logging.info('Roles: get modified role')
+    returned_data = make_request('https://{}/api/v1/roles/{}'.format(controller, role_2), method = 'GET', api_key = api_key, expected_code = 200)
+    if returned_data['data'][role_2]['role'] != role_2: sys.exit('role not validated')
+    if returned_data['data'][role_2]['access_to'] != data['access_to']: sys.exit('access_to not validated')
+    if returned_data['data'][role_2]['can_write'] != data['can_write']: sys.exit('can_write not validated')
 
-    def test_02_07_get_user_via_api(self):
-        # curl -s -D- -X GET 'http://127.0.0.1:5000/api/v1/users/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
-        url = '/api/v1/users/{}?api_key={}'.format(username_1, api_key)
-        response = self.app.get(url)
-        response_data = json.loads(response.get_data(as_text = True))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response_data['status'], 'success')
-        self.assertEqual(response_data['data'][username_1]['email'], '{}@example.net'.format(username_1))
-        self.assertEqual(response_data['data'][username_1]['labels'], 200)
-        self.assertEqual(response_data['data'][username_1]['name'], 'User A')
-        self.assertEqual(response_data['data'][username_1]['roles'], ['admin', role_1])
-        self.assertEqual(response_data['data'][username_1]['username'], username_1)
+    logging.info('Roles: try to create a fake role')
+    data = {}
+    returned_data = make_request('https://{}/api/v1/roles'.format(controller), method = 'POST', data = data, api_key = api_key, expected_code = 400)
 
-    """
-    Tests about repositories
-    """
+    # /users
+    logging.info('Users: get all users')
+    returned_data = make_request('https://{}/api/v1/users'.format(controller), method = 'GET', api_key = api_key, expected_code = 200)
 
-    def test_03_00_post_repository_via_api(self):
-        # curl -s -D- -X POST -d '{"repository":"test","url":"https://github.com/dainok/rrlabs"}' -H 'Content-type: application/json' http://127.0.0.1:5000/api/v1/repositories?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6
-        url = '/api/v1/repositories?api_key={}'.format(api_key)
-        data = {
-            'repository': 'test',
-            'url': 'https://github.com/dainok/rrlabs'
-        }
-        response = self.app.post(url, data = json.dumps(data), content_type = 'application/json')
-        response_data = json.loads(response.get_data(as_text = True))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response_data['status'], 'enqueued')
+    logging.info('Users: get admin user')
+    returned_data = make_request('https://{}/api/v1/users/admin'.format(controller), method = 'GET', api_key = api_key, expected_code = 200)
 
-    def test_03_ff_delete_repository_via_api(self):
-        # curl -s -D- -X DELETE http://127.0.0.1:5000/api/v1/repositories/test?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6
-        url = 'api/v1/repositories/test?api_key={}'.format(api_key)
-        response = self.app.delete(url)
-        response_data = json.loads(response.get_data(as_text = True))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response_data['status'], 'enqueued')
+    logging.info('Users: adding user')
+    data = {
+        'email': '{}@example.com'.format(username_1),
+        'labels': 100,
+        'name': 'User 1',
+        'password': password_1,
+        'roles': [role_1],
+        'username': username_1
+    }
+    returned_data = make_request('https://{}/api/v1/users'.format(controller), method = 'POST', data = data, api_key = api_key, expected_code = 200)
+    if returned_data['data']['email'] != data['email']: sys.exit('email not validated')
+    if returned_data['data']['labels'] != data['labels']: sys.exit('labels not validated')
+    if returned_data['data']['name'] != data['name']: sys.exit('name not validated')
+    if returned_data['data']['roles'] != data['roles']: sys.exit('roles not validated')
+    if returned_data['data']['username'] != data['username']: sys.exit('username not validated')
 
-    """
-    Tests about labs
-    """
+    logging.info('Users: get created user')
+    returned_data = make_request('https://{}/api/v1/users/{}'.format(controller, username_1), method = 'GET', api_key = api_key, expected_code = 200)
+    if returned_data['data'][username_1]['email'] != data['email']: sys.exit('email not validated')
+    if returned_data['data'][username_1]['labels'] != data['labels']: sys.exit('labels not validated')
+    if returned_data['data'][username_1]['name'] != data['name']: sys.exit('name not validated')
+    if returned_data['data'][username_1]['roles'] != data['roles']: sys.exit('roles not validated')
+    if returned_data['data'][username_1]['username'] != data['username']: sys.exit('username not validated')
 
-    def test_04_00_post_lab_via_api(self):
-        # curl -s -D- -X POST -d '{"name":"Test","repository":"local","version":1,"author":"Tester","topology":{"nodes":{"0":{"name":"NodeA","type":"qemu","subtype":"vyos","image":"dainok/node-vyos:1.1.7","ethernet":3,"ram":1024,"icon":"router.png","left":100,"top":100,"interfaces":{"0":{"name":"eth0","management":"TRUE"},"1":{"name":"eth1","connection":0},"2":{"name":"eth2","connection":2,"delay":100,"drop":50,"jitter":3}}},"1":{"name":"NodeB","type":"qemu","subtype":"vyos","image":"dainok/node-vyos:1.1.7","ethernet":3,"ram":1024,"icon":"router.png","left":100,"top":100,"interfaces":{"0":{"name":"eth0","management":"TRUE"},"1":{"name":"eth1","connection":0},"2":{"name":"eth2","connection":1}}},"2":{"name":"NodeC","type":"qemu","subtype":"vyos","image":"dainok/node-vyos:1.1.7","ethernet":3,"ram":1024,"icon":"router.png","left":100,"top":100,"interfaces":{"0":{"name":"eth0","management":"TRUE"},"1":{"name":"eth1","connection":1},"2":{"name":"eth2","connection":2}}}},"connections":{"0":{"type":"ethernet","shutdown":"FALSE"},"1":{"type":"ethernet","shutdown":"FALSE"},"2":{"type":"serial","shutdown":"FALSE"}}}}' -H 'Content-type: application/json' 'http://127.0.0.1:5000/api/v1/labs?commit=true&api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
-        url = '/api/v1/labs?commit=true&api_key={}'.format(api_key)
-        data = {
-            'name': 'Test',
-            'repository': 'local',
-            'version': 1,
-            'author': 'Tester',
-            'topology': {
-                'nodes': {
-                    '0': {
-                        'name': 'NodeA',
-                        'type': 'iol',
-                        'image': 'aaa',
-                        'ethernet': 3,
-                        'serial': 1,
-                        'ram': 1024,
-                        'icon': 'router.png',
-                        'left': 100,
-                        'top': 100,
-                        'interfaces': {
-                            '0': {
-                                'name': 'e0/0',
-                                'connection': 0,
-                                'delay': 100,
-                                'drop': 50,
-                                'jitter': 3
-                            },
-                            '1': {
-                                'name': 's0/0',
-                                'connection': 2,
-                                'delay': 100,
-                                'drop': 50,
-                                'jitter': 3
-                            }
-                        }
-                    },
-                    '1': {
-                        'name': 'NodeB',
-                        'type': 'iol',
-                        'image': 'aaa',
-                        'ethernet': 3,
-                        'serial': 1,
-                        'ram': 1024,
-                        'icon': 'router.png',
-                        'left': 100,
-                        'top': 100,
-                        'interfaces': {
-                            '0': {
-                                'name': 'e0/0',
-                                'connection': 0,
-                                'delay': 100,
-                                'drop': 50,
-                                'jitter': 3
-                            },
-                            '1': {
-                                'name': 'e0/0',
-                                'connection': 1,
-                                'delay': 100,
-                                'drop': 50,
-                                'jitter': 3
-                            }
-                        }
-                    },
-                    '2': {
-                        'name': 'NodeC',
-                        'type': 'iol',
-                        'image': 'aaa',
-                        'ethernet': 3,
-                        'serial': 1,
-                        'ram': 1024,
-                        'icon': 'router.png',
-                        'left': 100,
-                        'top': 100,
-                        'interfaces': {
-                            '0': {
-                                'name': 'e0/0',
-                                'connection': 1,
-                                'delay': 100,
-                                'drop': 50,
-                                'jitter': 3
-                            },
-                            '1': {
-                                'name': 's0/0',
-                                'connection': 2,
-                                'delay': 100,
-                                'drop': 50,
-                                'jitter': 3
-                            }
-                        }
-                    }
-                },
-                'connections': {
-                    '0': {
-                        'type': 'ethernet',
-                        'shutdown': False
-                    },
-                    '1': {
-                        'type': 'ethernet',
-                        'shutdown': False
-                    },
-                    '2': {
-                        'type': 'serial',
-                        'shutdown': False
-                    }
-                }
-            }
-        }
-        response = self.app.post(url, data = json.dumps(data), content_type = 'application/json')
-        response_data = json.loads(response.get_data(as_text = True))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response_data['status'], 'success')
-        self.assertEqual(response_data['data']['version'], 1)
-        self.assertEqual(response_data['data']['author'], 'Tester')
-        self.assertEqual(response_data['data']['name'], 'Test')
-        self.assertEqual(response_data['data']['repository'], 'local')
-        self.__class__.lab_id = response_data['data']['id']
+    logging.info('Users: basic authentication')
+    returned_data = make_request('https://{}/api/v1/auth'.format(controller), method = 'GET', username = username_1, password = password_1, expected_code = 200)
 
-    def test_04_01_get_labs_via_api(self):
-        # curl -s -D- -X GET http://127.0.0.1:5000/api/v1/labs?api_key=emml5esk8it58pbq2u8qqskz7jhhjiw6smr0v4vw
-        url = '/api/v1/labs?commit=true&api_key={}'.format(api_key)
-        response = self.app.get(url)
-        response_data = json.loads(response.get_data(as_text = True))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response_data['status'], 'success')
+    logging.info('Users: adding a tiny user')
+    data = {
+        'email': '{}@example.com'.format(username_2),
+        'name': 'User 1',
+        'password': password_2,
+        'username': username_2
+    }
+    returned_data = make_request('https://{}/api/v1/users'.format(controller), method = 'POST', data = data, api_key = api_key, expected_code = 200)
+    if returned_data['data']['email'] != data['email']: sys.exit('email not validated')
+    if returned_data['data']['labels'] != 0: sys.exit('labels not validated')
+    if returned_data['data']['name'] != data['name']: sys.exit('name not validated')
+    if returned_data['data']['roles'] != []: sys.exit('roles not validated')
+    if returned_data['data']['username'] != data['username']: sys.exit('username not validated')
 
-    """
-    Final tests and cleaning
-    """
+    logging.info('Users: get created user')
+    returned_data = make_request('https://{}/api/v1/users/{}'.format(controller, username_2), method = 'GET', api_key = api_key, expected_code = 200)
+    if returned_data['data'][username_2]['email'] != data['email']: sys.exit('email not validated')
+    if returned_data['data'][username_2]['labels'] != 0: sys.exit('labels not validated')
+    if returned_data['data'][username_2]['name'] != data['name']: sys.exit('name not validated')
+    if returned_data['data'][username_2]['roles'] != []: sys.exit('roles not validated')
+    if returned_data['data'][username_2]['username'] != data['username']: sys.exit('username not validated')
 
-    def test_ff_00_delete_role_via_api(self):
-        # curl -s -D- -X DELETE 'http://127.0.0.1:5000/api/v1/roles/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
-        url = '/api/v1/roles/{}?api_key={}'.format(role_1, api_key)
-        response = self.app.delete(url)
-        response_data = json.loads(response.get_data(as_text = True))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response_data['status'], 'success')
+    logging.info('Users: edit user')
+    data = {
+        'email': '{}@example.net'.format(username_2),
+        'labels': 111,
+        'name': 'Mr User 1',
+        'password': password_3,
+        'roles': [role_1, role_2, 'admin']
+    }
+    returned_data = make_request('https://{}/api/v1/users/{}'.format(controller, username_2), method = 'PATCH', data = data, api_key = api_key, expected_code = 200)
+    if returned_data['data']['email'] != data['email']: sys.exit('email not validated')
+    if returned_data['data']['labels'] != 111: sys.exit('labels not validated')
+    if returned_data['data']['name'] != data['name']: sys.exit('name not validated')
+    if returned_data['data']['roles'] != [role_1, role_2, 'admin']: sys.exit('roles not validated')
+    if returned_data['data']['username'] != username_2: sys.exit('username not validated')
 
-    def test_ff_01_delete_user_via_api(self):
-        # curl -s -D- -X DELETE 'http://127.0.0.1:5000/api/v1/users/test1?api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
-        url = '/api/v1/users/{}?api_key={}'.format(username_1, api_key)
-        response = self.app.delete(url)
-        response_data = json.loads(response.get_data(as_text = True))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response_data['status'], 'success')
+    logging.info('Users: get modified user')
+    returned_data = make_request('https://{}/api/v1/users/{}'.format(controller, username_2), method = 'GET', api_key = api_key, expected_code = 200)
+    if returned_data['data'][username_2]['email'] != data['email']: sys.exit('email not validated')
+    if returned_data['data'][username_2]['labels'] != data['labels']: sys.exit('labels not validated')
+    if returned_data['data'][username_2]['name'] != data['name']: sys.exit('name not validated')
+    if returned_data['data'][username_2]['roles'] != data['roles']: sys.exit('roles not validated')
+    if returned_data['data'][username_2]['username'] != username_2: sys.exit('username not validated')
 
-    def test_ff_02_delete_lab_via_api(self):
-        # curl -s -D- -X DELETE 'http://127.0.0.1:5000/api/v1/labs/a1796522-2427-4c9d-8f94-5381e7e39274?commit=true&api_key=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6'
-        url = '/api/v1/labs/{}?commit=true&api_key={}'.format(self.__class__.lab_id, api_key)
-        response = self.app.delete(url)
-        response_data = json.loads(response.get_data(as_text = True))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response_data['status'], 'success')
+    logging.info('Users: basic authentication')
+    returned_data = make_request('https://{}/api/v1/auth'.format(controller), method = 'GET', username = username_2, password = password_3, expected_code = 200)
+
+    logging.info('Users: set a wrong user')
+    data = {
+        'email': '{}@example.net'.format(username_2),
+        'roles': [role_1, role_3, 'admin']
+    }
+    returned_data = make_request('https://{}/api/v1/users/{}'.format(controller, username_2), method = 'PATCH', data = data, api_key = api_key, expected_code = 400)
+
+    # Cleaning
+
+    logging.info('Roles: delete role')
+    returned_data = make_request('https://{}/api/v1/roles/{}'.format(controller, role_1), method = 'DELETE', api_key = api_key, expected_code = 200)
+
+    logging.info('Roles: delete role')
+    returned_data = make_request('https://{}/api/v1/roles/{}'.format(controller, role_2), method = 'DELETE', api_key = api_key, expected_code = 200)
+
+    logging.info('Users: delete username')
+    returned_data = make_request('https://{}/api/v1/users/{}'.format(controller, username_1), method = 'DELETE', api_key = api_key, expected_code = 200)
+
+    logging.info('Users: delete username')
+    returned_data = make_request('https://{}/api/v1/users/{}'.format(controller, username_2), method = 'DELETE', api_key = api_key, expected_code = 200)
 
 if __name__ == '__main__':
-    unittest.main()
+    main()
