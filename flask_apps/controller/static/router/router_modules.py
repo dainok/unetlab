@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.5
 """ Modules for router """
 __author__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
 __copyright__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
@@ -9,23 +9,23 @@ BUFFER = 10000
 INTERFACE_LENGTH = 1
 LABEL_LENGTH = 2
 
-import aiohttp, asyncio, json, urllib.request
+import aiohttp, asyncio, json
 
 async def get(url):
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession(connector = aiohttp.TCPConnector(verify_ssl = False)) as session:
         async with session.get(url) as response:
             answer = json.loads(await response.text())
             answer['url'] = url
             return answer
 
-def routerGetConfig(local_id, master_url):
+def routerGetConfig(local_id, controller, api_key):
     routing = None
     controllers = None
     nodes = None
     tasks = [
-        asyncio.ensure_future(get('{}/api/v1/routing'.format(master_url))),
-        asyncio.ensure_future(get('{}/api/v1/controllers'.format(master_url))),
-        asyncio.ensure_future(get('{}/api/v1/controllers/{}'.format(master_url, local_id)))
+            asyncio.ensure_future(get('https://{}/api/v1/routing?api_key={}'.format(controller, api_key))),
+            asyncio.ensure_future(get('https://{}/api/v1/routers?api_key={}'.format(controller, api_key))),
+            asyncio.ensure_future(get('https://{}/api/v1/routers/{}?api_key={}'.format(controller, local_id, api_key)))
     ]
     loop = asyncio.get_event_loop()
     responses, _ = loop.run_until_complete(asyncio.wait(tasks))

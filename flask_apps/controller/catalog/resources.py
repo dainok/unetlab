@@ -569,13 +569,13 @@ class Routing(Resource):
     def get(self, role = None):
         checkAuthz(request, ['admin'])
         nodes = ActiveNodeTable.query.order_by(ActiveNodeTable.label)
-        controllers = []
-        for controller in ControllerTable.query:
-            controllers.append(controller.id)
-        node_controllers = {}
+        routers = []
+        for router in RouterTable.query:
+            router.append(router.id)
+        node_routers = {}
         for node in nodes:
-            node_controller = 0 if node.controller_id not in controllers else node.controller_id
-            node_controllers[node.label] = node_controller
+            node_router = 0 if node.router_id not in routers else node.router_id
+            node_routers[node.label] = node_router
 
         data = {}
         for node in nodes:
@@ -584,7 +584,7 @@ class Routing(Resource):
                 if not node.label in data:
                     data[node.label] = {}
                 data[node.label][interface.id] = {
-                    'dst_controller': node_controllers[interface.dst_label],
+                    'dst_router': node_routers[interface.dst_label],
                     'dst_label': interface.dst_label,
                     'dst_if' : interface.dst_if
                 }
@@ -696,6 +696,8 @@ class User(Resource):
             labels = args['labels']
         )
         user.roles = []
+        if not args['roles']:
+            args['roles'] = []
         for role in args['roles']:
             # Adding all roles
             user.roles.append(RoleTable.query.get_or_404(role))

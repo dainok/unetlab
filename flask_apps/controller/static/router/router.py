@@ -8,7 +8,6 @@ __revision__ = '20170430'
 BUFFER = 10000
 INTERFACE_LENGTH = 1
 LABEL_LENGTH = 2
-API_PORT = 5000
 ROUTER_PORT = 5005
 
 import atexit, getopt, logging, select, signal, sys
@@ -19,6 +18,7 @@ controllers = None
 nodes = None
 router_id = None
 controller = None
+api_key = None
 
 def decodeUDPPacket(datagram):
     """ Decode an UDP datagram to components
@@ -62,11 +62,12 @@ def usage():
     print('    -d             enable debug')
     print('    -c controller  the IP or domain name of the controller host')
     print('    -i id          an integer starting from 0')
+    print('    -k key         API key')
     sys.exit(255)
 
 def main():
     import socket
-    global controller, router_id
+    global api_key, controller, router_id
     inputs = []
     outputs = []
 
@@ -75,7 +76,7 @@ def main():
 
     # Reading options
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'dc:i:')
+        opts, args = getopt.getopt(sys.argv[1:], 'dc:i:k:')
     except getopt.GetoptError as err:
         sys.stderr.write('ERROR: {}\n'.format(err))
         usage()
@@ -92,19 +93,24 @@ def main():
                 logging.error('ID not recognized')
                 logging.error(err)
                 sys.exit(255)
+        elif opt == '-k':
+            api_key = arg
         else:
             assert False, 'unhandled option'
 
     # Checking options
     if controller == None:
-        logging.error('controller not recognized')
+        logging.error('controller not set')
         sys.exit(255)
     if router_id == None:
-        logging.error('label not recognized')
+        logging.error('label not set')
+        sys.exit(255)
+    if api_key == None:
+        logging.error('API key not set')
         sys.exit(255)
 
     # Loading configuration
-    routing, controllers, nodes = router_modules.routerGetConfig(router_id, 'http://{}:{}'.format(controller, API_PORT))
+    routing, controllers, nodes = router_modules.routerGetConfig(router_id, controller, api_key)
 
     # Preparing socket
     ingress = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
