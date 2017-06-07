@@ -106,6 +106,11 @@ add_repository_parser.add_argument('url', type = str, required = True, location 
 add_repository_parser.add_argument('username', type = str, required = False, location = 'json', help = 'username must be a string')
 add_repository_parser.add_argument('password', type = str, required = False, location = 'json', help = 'password must be a string')
 
+patch_repository_parser = reqparse.RequestParser()
+patch_repository_parser.add_argument('url', type = str, required = True, location = 'json', help = 'url cannot be blank')
+patch_repository_parser.add_argument('username', type = str, required = False, location = 'json', help = 'username must be a string')
+patch_repository_parser.add_argument('password', type = str, required = False, location = 'json', help = 'password must be a string')
+
 add_role_parser = reqparse.RequestParser()
 add_role_parser.add_argument('role', type = str, required = True, location = 'json', help = 'role cannot be blank')
 add_role_parser.add_argument('can_write', type = bool, required = False, location = 'json', help = 'can_write must be boolean')

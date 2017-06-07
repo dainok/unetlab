@@ -36,7 +36,7 @@ def updateTask(task_id, username, status, message, progress):
     }
 
 @celery.task(bind = True)
-def addGit(self, started_by, repository, url, username, password):
+def addGit(self, started_by, repository, url, username = None, password = None):
     # Add a git repository for labs
     task_id = addGit.request.id
     self.update_state(state='STARTED', meta = {

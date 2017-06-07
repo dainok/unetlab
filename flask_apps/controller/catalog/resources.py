@@ -136,6 +136,14 @@ def printLab(lab, summary = False, username = None):
                 data['topology']['nodes'][str(node.node_id)]['label'] = node.label
     return data
 
+def printRepository(repository):
+    data =  {
+        'id': repository.id,
+        'url': repository.url,
+        'username': repository.username
+    }
+    return data
+
 def printRole(role):
     return {
         'role': role.role,
@@ -419,6 +427,8 @@ class Lab(Resource):
             sh.git('-C', '{}/{}'.format(config['app']['lab_repository'], lab.repository_id), 'add', lab_file, _bg = False)
             sh.git('-C', '{}/{}'.format(config['app']['lab_repository'], lab.repository_id), 'commit', '-m', 'Added lab {} ("{}")'.format(lab.id, lab.name))
             db.session.add(lab)
+        else:
+            lab = ActiveLabTable.query.get((jlab['id'], username))
         db.session.commit()
         return {
             'status': 'success',
@@ -427,35 +437,71 @@ class Lab(Resource):
         }
 
 class Repository(Resource):
-    # TODO: only admin edit remote
-    # TODO: all users with write permission push
-    # TODO: all users with write permission commit -> solo se un lab viene salvato (i lab vengono caricati e messi su in db. editati da db. solo save li porta sul repo con commit)
-    # TODO: all users with write permission pull
-    # TODO: allo startup pull + scan dei repo con aggiunta al db dei lab
-    def delete(self, repository = None):
+    def delete(self, repository_id = None):
         username = checkAuthz(request, ['admin'])
-        if not repository:
+        if not repository_id:
             # No repository has been selected
             abort(400)
-        elif repository == 'local':
+        elif repository_id == 'local':
             # Repository 'local' cannot be deleted
             abort(403)
-        elif not os.path.isdir('{}/{}'.format(config['app']['lab_repository'], repository)):
+        elif not os.path.isdir('{}/{}'.format(config['app']['lab_repository'], repository_id)):
             # Repository does not exist
             abort(404)
-        t = deleteGit.apply_async((username, repository,))
+        t = deleteGit.apply_async((username, repository_id,))
         return {
             'status': 'enqueued',
             'message': 'Task "{}" enqueued to the batch manager'.format(t),
             'task': str(t)
         }
 
+    def get(self, repository_id = None):
+        username = checkAuthz(request, ['admin'])
+        if not repository_id:
+            # List all repositories
+            repositories = RepositoryTable.query.order_by(RepositoryTable.query.order_by.id)
+        else:
+            # List a single repository if exists, else 404
+            repositories = [RepositoryTable.query.get_or_404(repository_id)]
+        data = {}
+        for repository in repositories:
+            # Print each repository
+            data[repository.id] = printRepository(repository)
+        return {
+            'status': 'success',
+            'message': 'Repository(ies) found',
+            'data': data
+        }
+
+    def patch(self, repository_id = None):
+        args = patch_repository_parser.parse_args()
+        checkAuthz(request, ['admin'])
+        if not repository_id:
+            # No repository has been selected
+            abort(400)
+        else:
+            # Get the repository if exists, else 404
+            repository = RepositoryTable.query.get_or_404(repository_id)
+        for key, value in args.items():
+            if key in ['url', 'username', 'password']:
+                setattr(repository, key, value)
+        db.session.commit()
+        return {
+            'status': 'success',
+            'message': 'Repository "{}" saved'.format(repository.id),
+            'data': printRepository(repository)
+        }
+
     def post(self):
         args = add_repository_parser.parse_args()
-        checkAuthz(request, ['admin'])
+        username = checkAuthz(request, ['admin'])
         if args['repository'] == 'local':
             # local is a reserved repository
             abort(400)
+        if not args['username']:
+            args['username'] = None
+            args['password'] = None
+        print(args)
         t = addGit.apply_async((username, args['repository'], args['url'], args['username'], args['password']))
         return {
             'status': 'enqueued',
