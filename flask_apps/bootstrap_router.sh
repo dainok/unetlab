@@ -13,9 +13,17 @@ function routerStop {
 	fi
 }
 
+function routerReload {
+	if [ ${PID} -ne 0 ]; then
+		kill -SIGHUP ${PID}
+		wait ${PID}
+	fi
+}
+
 echo "Starting router..."
 
 trap routerStop SIGINT SIGTERM
+trap routerReload SIGHUP
 
 while true; do
 	curl -k -m 3 -s "${URL}" &> /tmp/init

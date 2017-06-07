@@ -7,6 +7,16 @@ function routerStop {
 	echo " done"
 }
 
+function routerReload {
+	SERVER_ACTIVE=true
+	kill -s SIGHUP ${ROUTER_PID} &> /dev/null
+}
+
+SERVER_ACTIVE=true
+
+trap routerStop SIGINT SIGTERM &> /dev/null
+trap routerReload SIGHUP &> /dev/null
+
 # Registering router
 echo -n "Registering  router ${ROUTERID}..."
 IP_ADDRESS=$(ifconfig eth0 | grep "inet addr" | sed 's/.*inet addr:\([0-9.]*\) .*Mask:/\1\//g')
@@ -15,7 +25,6 @@ echo "done"
 
 echo -n "Starting router ${ROUTERID}..."
 
-trap routerStop SIGINT SIGTERM &> /dev/null
 
 if [ ! -d /data/logs ]; then
     mkdir -p /data/logs || exit 1
@@ -93,5 +102,10 @@ ROUTER_PID=$!
 
 echo " done"
 
-wait ${ROUTER_PID}
+while ${SERVER_ACTIVE}; do
+	SERVER_ACTIVE=false
+	wait ${ROUTER_PID}
+done
+
+echo ${ROUTER_PID}
 
