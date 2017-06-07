@@ -30,7 +30,7 @@ def usage():
     print('    -u username    a privileged username')
     sys.exit(255)
 
-def make_request(url, method = 'GET', data = None, username = None, password = None, api_key = None, expected_code = 200):
+def make_request(url, method = 'GET', data = None, username = None, password = None, api_key = None, expected_code = 200, is_json = True):
     basic_auth = None
 
     if api_key != None:
@@ -59,14 +59,17 @@ def make_request(url, method = 'GET', data = None, username = None, password = N
         logging.error('Received content is {}'.format(r.text))
         sys.exit(1)
 
-    try:
-        returned_data = r.json()
-    except:
-        logging.error('Invalid JSON answer')
-        logging.error('Status is {}'.format(r.status_code))
-        logging.error('Reason is {}'.format(r.reason))
-        logging.error('Content is {}'.format(r.text))
-        sys.exit(1)
+    if is_json:
+        try:
+            returned_data = r.json()
+        except:
+            logging.error('Invalid JSON answer')
+            logging.error('Status is {}'.format(r.status_code))
+            logging.error('Reason is {}'.format(r.reason))
+            logging.error('Content is {}'.format(r.text))
+            sys.exit(1)
+    else:
+        returned_data = r.text
 
     logging.debug('Status is {}'.format(r.status_code))
     logging.debug('Reason is {}'.format(r.reason))
@@ -333,13 +336,32 @@ def main():
     if returned_data['data'][str(router_1)]['inside_ip'] != data['inside_ip']: sys.exit('inside_ip not validated')
     if returned_data['data'][str(router_1)]['outside_ip'] != data['outside_ip']: sys.exit('outside_ip not validated')
 
+    logging.info('Routers: bootstrap router')
+    returned_data = make_request('https://{}/api/v1/bootstrap/routers/{}'.format(controller, router_1), method = 'GET', api_key = api_key, expected_code = 200, is_json = False)
+
+
     #api.add_resource(BootstrapNode, '/api/v1/bootstrap/nodes/<string:label>')
-    #api.add_resource(BootstrapRouter, '/api/v1/bootstrap/routers/<string:router_id>')
     #api.add_resource(Lab, '/api/v1/labs', '/api/v1/labs/<string:lab_id>')
     #api.add_resource(Repository, '/api/v1/repositories', '/api/v1/repositories/<string:repository>')
-    #api.add_resource(Router, '/api/v1/routers', '/api/v1/routers/<string:router_id>')
     #api.add_resource(Routing, '/api/v1/routing')
     #api.add_resource(Task, '/api/v1/tasks', '/api/v1/tasks/<string:task_id>')
+
+    # /static
+
+    logging.info('Static: get wrapper_dynamips.py')
+    returned_data = make_request('https://{}/static/node/wrapper_dynamips.py'.format(controller), method = 'GET', expected_code = 200, is_json = False)
+
+    logging.info('Static: get wrapper_iol.py')
+    returned_data = make_request('https://{}/static/node/wrapper_iol.py'.format(controller), method = 'GET', expected_code = 200, is_json = False)
+
+    logging.info('Static: get wrapper_qemu.py')
+    returned_data = make_request('https://{}/static/node/wrapper_qemu.py'.format(controller), method = 'GET', expected_code = 200, is_json = False)
+
+    logging.info('Static: get router.py')
+    returned_data = make_request('https://{}/static/router/router.py'.format(controller), method = 'GET', expected_code = 200, is_json = False)
+
+    logging.info('Static: get router_modules.py')
+    returned_data = make_request('https://{}/static/router/router_modules.py'.format(controller), method = 'GET', expected_code = 200, is_json = False)
 
     # Cleaning
 
