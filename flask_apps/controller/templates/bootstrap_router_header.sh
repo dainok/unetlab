@@ -2,20 +2,24 @@
 
 function routerStop {
 	echo -n "Shutting down..."
+	kill -s SIGTERM ${ROUTER_PID} ${NGINX_PID} &> /dev/null
 	killall -s SIGTERM nginx openssl python3 &> /dev/null
 	echo " done"
 }
 
+# Registering router
+echo -n "Registering  router ${ROUTERID}..."
+IP_ADDRESS=$(ifconfig eth0 | grep "inet addr" | sed 's/.*inet addr:\([0-9.]*\) .*Mask:/\1\//g')
+curl -k -s -o /dev/null -X POST -d "{\"id\":${ROUTERID},\"inside_ip\":\"${IP_ADDRESS}\"}" -H 'Content-type: application/json' "https://${CONTROLLER}/api/v1/routers?api_key=${API}" || exit 1
+echo "done"
+
 echo -n "Starting router ${ROUTERID}..."
 
-trap nodeStop SIGINT SIGTERM &> /dev/null
+trap routerStop SIGINT SIGTERM &> /dev/null
 
 if [ ! -d /data/logs ]; then
     mkdir -p /data/logs || exit 1
 fi
-
-curl -k -m 3 -s https://${CONTROLLER}/static/router/router.py &> /tmp/router.py || exit 1
-curl -k -m 3 -s https://${CONTROLLER}/static/router/router_modules &> /tmp/router_modules || exit 1
 
 # Starting NGINX
 echo -n "admin:" > /etc/nginx/.htpasswd
@@ -80,8 +84,14 @@ chown nginx:root /run/nginx &> /dev/null
 NGINX_PID=$!
 
 # Starting router
+curl -k -m 3 -s https://${CONTROLLER}/static/router/router.py &> /tmp/router.py || exit 1
+curl -k -m 3 -s https://${CONTROLLER}/static/router/router_modules.py &> /tmp/router_modules.py || exit 1
+chmod 755 /tmp/router.py || exit 1
+cd /tmp || exit 1
+./router.py -c ${CONTROLLER} -i ${ROUTERID} -k ${API} &> /data/logs/router.log &
+ROUTER_PID=$!
 
 echo " done"
 
-wait ${NGINX_PID}
+wait ${ROUTER_PID}
 

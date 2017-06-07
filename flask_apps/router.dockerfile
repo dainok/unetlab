@@ -16,6 +16,7 @@ RUN apk update || exit 1
 RUN apk upgrade || exit 1
 RUN apk add bash curl nginx openssl openvpn python3 || exit 1
 RUN pip3 install --no-cache-dir --upgrade pip || exit 1
+RUN pip3 install --no-cache-dir requests || exit 1
 
 # Configuring
 COPY bootstrap_router.sh /sbin/bootstrap.sh

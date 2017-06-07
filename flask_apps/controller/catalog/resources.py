@@ -119,24 +119,6 @@ def getAvailableLabels(username):
         return max_labels
     return max_labels - used_labels
 
-def printRouter(router, summary = False):
-    if summary:
-        data =  {
-            'id': router.id,
-            'inside_ip': router.inside_ip,
-            'outside_ip': router.outside_ip,
-        }
-    else:
-        data = printRouter(router, summary = True)
-        data['labels'] = {}
-        # Loading nodes running in this controller
-        nodes = ActiveNodeTable.query.filter(ActiveNodeTable.router_id == router.id)
-        for node in nodes:
-            data['labels'][node.label] = {
-                'ip': node.ip
-            }
-    return data
-
 def printLab(lab, summary = False, username = None):
     if summary:
         data =  {
@@ -160,6 +142,24 @@ def printRole(role):
         'access_to': role.access_to,
         'can_write': role.can_write
     }
+
+def printRouter(router, summary = False):
+    if summary:
+        data =  {
+            'id': router.id,
+            'inside_ip': router.inside_ip,
+            'outside_ip': router.outside_ip,
+        }
+    else:
+        data = printRouter(router, summary = True)
+        data['labels'] = {}
+        # Loading nodes running in this controller
+        nodes = ActiveNodeTable.query.filter(ActiveNodeTable.router_id == router.id)
+        for node in nodes:
+            data['labels'][node.label] = {
+                'ip': node.ip
+            }
+    return data
 
 def printUser(user):
     data = {
@@ -529,7 +529,7 @@ class Role(Resource):
         args = add_role_parser.parse_args()
         checkAuthz(request, ['admin'])
         if RoleTable.query.get(args['role']):
-            # Role eady exists
+            # Role already exists
             abort(409)
         role = RoleTable(
             role = args['role'],
@@ -545,9 +545,24 @@ class Role(Resource):
         }
 
 class Router(Resource):
-    def get(self, router_id = None):
+    def delete(self, router_id = None):
         checkAuthz(request, ['admin'])
         if not router_id:
+            # No router has been selected
+            abort(400)
+        else:
+            # Get the router if exists, else 404
+            router = RouterTable.query.get_or_404(router_id)
+        db.session.delete(router)
+        db.session.commit()
+        return {
+            'status': 'success',
+            'message': 'Router "{}" deleted'.format(router.id)
+        }
+
+    def get(self, router_id = None):
+        checkAuthz(request, ['admin'])
+        if router_id == None:
             # List all routers
             summary = True
             routers = RouterTable.query.order_by(RouterTable.id)
@@ -565,13 +580,56 @@ class Router(Resource):
             'data': data
         }
 
+    def patch(self, router_id = None):
+        args = patch_router_parser.parse_args()
+        checkAuthz(request, ['admin'])
+        if not router_id:
+            # No router has been selected
+            abort(400)
+        else:
+            # Get the router if exists, else 404
+            router = RouterTable.query.get_or_404(router_id)
+        for key, value in args.items():
+            if key in ['inside_ip', 'outside_ip']:
+                setattr(router, key, value)
+        db.session.commit()
+        return {
+            'status': 'success',
+            'message': 'Router "{}" saved'.format(router.id),
+            'data': printRouter(router)
+        }
+
+    def post(self):
+        args = add_router_parser.parse_args()
+        checkAuthz(request, ['admin'])
+        router = RouterTable.query.get(args['id'])
+        if router:
+            # Router already exists (registering)
+            router.inside_ip = args['inside_ip']
+            message = 'Router "{}" registered'.format(router.id)
+        else:
+            # New router
+            router = RouterTable(
+                id = args['id'],
+                inside_ip = args['inside_ip'],
+                outside_ip = args['outside_ip']
+            )
+            message = 'Router "{}" added'.format(router.id)
+            db.session.add(router)
+        db.session.commit()
+        return {
+            'status': 'success',
+            'message': message,
+            'data': printRouter(router)
+        }
+
 class Routing(Resource):
     def get(self, role = None):
         checkAuthz(request, ['admin'])
         nodes = ActiveNodeTable.query.order_by(ActiveNodeTable.label)
         routers = []
         for router in RouterTable.query:
-            router.append(router.id)
+            routers.append(router.id)
         node_routers = {}
         for node in nodes:
             node_router = 0 if node.router_id not in routers else node.router_id

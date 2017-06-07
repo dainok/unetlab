@@ -11,6 +11,8 @@ urllib3.disable_warnings()
 role_1 = 'z' + ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(7))
 role_2 = 'z' + ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(7))
 role_3 = 'z' + ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(7))
+router_1 = random.randint(1000, 10000)
+router_2 = random.randint(1000, 10000)
 username_1 = 'z' + ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(9))
 password_1 = ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(20))
 username_2 = 'z' + ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(9))
@@ -115,6 +117,7 @@ def main():
         sys.exit(255)
 
     # /auth
+
     logging.info('Auth: unauthenticated request')
     returned_data = make_request('https://{}/api/v1/auth'.format(controller), method = 'GET', expected_code = 401)
 
@@ -125,6 +128,7 @@ def main():
     returned_data = make_request('https://{}/api/v1/auth'.format(controller), method = 'GET', username = admin_username, password = admin_password, expected_code = 200)
 
     # /roles
+
     logging.info('Roles: get all roles')
     returned_data = make_request('https://{}/api/v1/roles'.format(controller), method = 'GET', api_key = api_key, expected_code = 200)
 
@@ -178,6 +182,7 @@ def main():
     returned_data = make_request('https://{}/api/v1/roles'.format(controller), method = 'POST', data = data, api_key = api_key, expected_code = 400)
 
     # /users
+
     logging.info('Users: get all users')
     returned_data = make_request('https://{}/api/v1/users'.format(controller), method = 'GET', api_key = api_key, expected_code = 200)
 
@@ -266,6 +271,76 @@ def main():
     }
     returned_data = make_request('https://{}/api/v1/users/{}'.format(controller, username_2), method = 'PATCH', data = data, api_key = api_key, expected_code = 400)
 
+    # /routers
+
+    logging.info('Routers: adding a router')
+    data = {
+        'id': router_1,
+        'inside_ip': '172.31.0.3/16',
+        'outside_ip': '1.1.1.131/24'
+    }
+    returned_data = make_request('https://{}/api/v1/routers'.format(controller), method = 'POST', data = data, api_key = api_key, expected_code = 200)
+    if returned_data['data']['id'] != data['id']: sys.exit('id not validated')
+    if returned_data['data']['inside_ip'] != data['inside_ip']: sys.exit('inside_ip not validated')
+    if returned_data['data']['outside_ip'] != data['outside_ip']: sys.exit('outside_ip not validated')
+
+    logging.info('Routers: get created router')
+    returned_data = make_request('https://{}/api/v1/routers/{}'.format(controller, router_1), method = 'GET', api_key = api_key, expected_code = 200)
+    if returned_data['data'][str(router_1)]['id'] != data['id']: sys.exit('id not validated')
+    if returned_data['data'][str(router_1)]['inside_ip'] != data['inside_ip']: sys.exit('inside_ip not validated')
+    if returned_data['data'][str(router_1)]['outside_ip'] != data['outside_ip']: sys.exit('outside_ip not validated')
+
+    logging.info('Routers: register a new router')
+    data = {
+        'id': router_2,
+        'inside_ip': '172.32.0.3/16'
+    }
+    returned_data = make_request('https://{}/api/v1/routers'.format(controller), method = 'POST', data = data, api_key = api_key, expected_code = 200)
+    if returned_data['data']['id'] != data['id']: sys.exit('id not validated')
+    if returned_data['data']['inside_ip'] != data['inside_ip']: sys.exit('inside_ip not validated')
+
+    logging.info('Routers: get registered router')
+    returned_data = make_request('https://{}/api/v1/routers/{}'.format(controller, router_2), method = 'GET', api_key = api_key, expected_code = 200)
+    if returned_data['data'][str(router_2)]['id'] != data['id']: sys.exit('id not validated')
+    if returned_data['data'][str(router_2)]['inside_ip'] != data['inside_ip']: sys.exit('inside_ip not validated')
+    if returned_data['data'][str(router_2)]['outside_ip'] != None: sys.exit('outside_ip not validated')
+
+    logging.info('Routers: register an existent router')
+    data = {
+        'id': router_1,
+        'inside_ip': '172.31.0.3/16'
+    }
+    returned_data = make_request('https://{}/api/v1/routers'.format(controller), method = 'POST', data = data, api_key = api_key, expected_code = 200)
+    if returned_data['data']['id'] != data['id']: sys.exit('id not validated')
+    if returned_data['data']['inside_ip'] != data['inside_ip']: sys.exit('inside_ip not validated')
+
+    logging.info('Routers: get registered router')
+    returned_data = make_request('https://{}/api/v1/routers/{}'.format(controller, router_1), method = 'GET', api_key = api_key, expected_code = 200)
+    if returned_data['data'][str(router_1)]['id'] != data['id']: sys.exit('id not validated')
+    if returned_data['data'][str(router_1)]['inside_ip'] != data['inside_ip']: sys.exit('inside_ip not validated')
+
+    logging.info('Routers: edit router')
+    data = {
+        'inside_ip': '172.34.0.3/16',
+        'outside_ip': '1.1.1.134/24'
+    }
+    returned_data = make_request('https://{}/api/v1/routers/{}'.format(controller, router_1), method = 'PATCH', data = data, api_key = api_key, expected_code = 200)
+    if returned_data['data']['inside_ip'] != data['inside_ip']: sys.exit('inside_ip not validated')
+    if returned_data['data']['outside_ip'] != data['outside_ip']: sys.exit('outside_ip not validated')
+
+    logging.info('Routers: get modified router')
+    returned_data = make_request('https://{}/api/v1/routers/{}'.format(controller, router_1), method = 'GET', api_key = api_key, expected_code = 200)
+    if returned_data['data'][str(router_1)]['inside_ip'] != data['inside_ip']: sys.exit('inside_ip not validated')
+    if returned_data['data'][str(router_1)]['outside_ip'] != data['outside_ip']: sys.exit('outside_ip not validated')
+
+    #api.add_resource(BootstrapNode, '/api/v1/bootstrap/nodes/<string:label>')
+    #api.add_resource(BootstrapRouter, '/api/v1/bootstrap/routers/<string:router_id>')
+    #api.add_resource(Lab, '/api/v1/labs', '/api/v1/labs/<string:lab_id>')
+    #api.add_resource(Repository, '/api/v1/repositories', '/api/v1/repositories/<string:repository>')
+    #api.add_resource(Router, '/api/v1/routers', '/api/v1/routers/<string:router_id>')
+    #api.add_resource(Routing, '/api/v1/routing')
+    #api.add_resource(Task, '/api/v1/tasks', '/api/v1/tasks/<string:task_id>')
+
     # Cleaning
 
     logging.info('Roles: delete role')
@@ -273,6 +348,12 @@ def main():
 
     logging.info('Roles: delete role')
     returned_data = make_request('https://{}/api/v1/roles/{}'.format(controller, role_2), method = 'DELETE', api_key = api_key, expected_code = 200)
+
+    logging.info('Routers: delete router')
+    returned_data = make_request('https://{}/api/v1/routers/{}'.format(controller, router_1), method = 'DELETE', api_key = api_key, expected_code = 200)
+
+    logging.info('Routers: delete router')
+    returned_data = make_request('https://{}/api/v1/routers/{}'.format(controller, router_2), method = 'DELETE', api_key = api_key, expected_code = 200)
 
     logging.info('Users: delete username')
     returned_data = make_request('https://{}/api/v1/users/{}'.format(controller, username_1), method = 'DELETE', api_key = api_key, expected_code = 200)

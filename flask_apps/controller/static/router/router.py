@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.5
+#!/usr/bin/env python3
 """ Router """
 __author__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
 __copyright__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
@@ -13,9 +13,6 @@ ROUTER_PORT = 5005
 import atexit, getopt, logging, select, signal, sys
 import router_modules
 
-routing = None
-controllers = None
-nodes = None
 router_id = None
 controller = None
 api_key = None
@@ -52,8 +49,7 @@ def exitGracefully(signum, frame):
         sys.exit(0)
     if signum == 1:
         logging.error('reloading')
-        #TODO not working
-        #routing, controllers, nodes = router_modules.routerGetConfig(router_id, 'http://{}:{}'.format(controller, API_PORT))
+        routing, routers, nodes = router_modules.routerGetConfig(router_id, controller, api_key)
 
 def usage():
     print('Usage: {} [OPTIONS] -- [QEMU CMD]'.format(sys.argv[0]))
@@ -110,7 +106,7 @@ def main():
         sys.exit(255)
 
     # Loading configuration
-    routing, controllers, nodes = router_modules.routerGetConfig(router_id, controller, api_key)
+    routing, routers, nodes = router_modules.routerGetConfig(router_id, controller, api_key)
 
     # Preparing socket
     ingress = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

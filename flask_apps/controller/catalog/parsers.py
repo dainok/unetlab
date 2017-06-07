@@ -5,10 +5,18 @@ __copyright__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
 __license__ = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
 __revision__ = '20170430'
 
-import os
+import ipaddress, os
 from flask_restful import reqparse
 from controller import config
 from controller.catalog.models import RoleTable
+
+def type_ipinterface(arg):
+    # An IP address must be in the form of a.b.c.d/x or a.b.c.d/e.f.g.h
+    try:
+        return ipaddress.IPv4Interface(arg)
+    except:
+        raise ValueError
+    raise ValueError
 
 def type_label(arg):
     # A label must be integer greater than -1
@@ -106,6 +114,15 @@ add_role_parser.add_argument('access_to', type = str, required = False, location
 patch_role_parser = reqparse.RequestParser()
 patch_role_parser.add_argument('can_write', type = bool, required = False, store_missing = False, location = 'json', help = 'can_write must be boolean')
 patch_role_parser.add_argument('access_to', type = str, required = False, store_missing = False, location = 'json', help = 'access_to must be a regex')
+
+add_router_parser = reqparse.RequestParser()
+add_router_parser.add_argument('id', type = type_label, required = True, location = 'json', help = 'id must be integer and greater than -1')
+add_router_parser.add_argument('inside_ip', type = type_ipinterface, required = True, location = 'json', help = 'inside_ip must be a valid IP address')
+add_router_parser.add_argument('outside_ip', type = type_ipinterface, required = False, location = 'json', help = 'outside_ip must be a valid IP address')
+
+patch_router_parser = reqparse.RequestParser()
+patch_router_parser.add_argument('inside_ip', type = type_ipinterface, required = True, location = 'json', help = 'inside_ip must be a valid IP address')
+patch_router_parser.add_argument('outside_ip', type = type_ipinterface, required = False, location = 'json', help = 'outside_ip must be a valid IP address')
 
 add_user_parser = reqparse.RequestParser()
 add_user_parser.add_argument('username', type = str, required = True, location = 'json', help = 'username cannot be blank')
