@@ -128,3 +128,4 @@ class UserTable(db.Model):
 
     def __repr__(self):
         return '<User(username={})>'.format(self.username)
+

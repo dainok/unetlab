@@ -150,11 +150,20 @@ if not router:
     db.session.add(router)
     db.session.commit()
 
+@app.errorhandler(404)
+def http_404(err):
+    response = {
+        'message': 'The requested URL was not found on the server.  If you entered the URL manually please check your spelling and try again.'
+    }
+    return json.dumps(response, indent = 4, sort_keys = True) + '\n', 404
+# TODO 400 401 403 405 409 422 500 
+
 # Routing
 api.add_resource(Auth, '/api/v1/auth')
 api.add_resource(BootstrapNode, '/api/v1/bootstrap/nodes/<int:label>')
 api.add_resource(BootstrapRouter, '/api/v1/bootstrap/routers/<int:router_id>')
 api.add_resource(Lab, '/api/v1/labs', '/api/v1/labs/<string:lab_id>')
+api.add_resource(Node, '/api/v1/nodes', '/api/v1/nodes/<int:label>/<string:action>')
 api.add_resource(Repository, '/api/v1/repositories', '/api/v1/repositories/<string:repository_id>')
 api.add_resource(Role, '/api/v1/roles', '/api/v1/roles/<string:role>')
 api.add_resource(Router, '/api/v1/routers', '/api/v1/routers/<int:router_id>')

@@ -254,6 +254,7 @@ class BootstrapNode(Resource):
         node_json = json.loads(active_node.active_lab.json)['topology']['nodes'][str(node_id)]
         if active_node.router_id == None:
             # Router ID not set, using local
+            # TODO: not needed, because start will set it
             active_node.router_id = 0
             db.session.commit()
         router = RouterTable.query.get_or_404(active_node.router_id)
@@ -436,6 +437,32 @@ class Lab(Resource):
             'data': printLab(lab, username = username)
         }
 
+class Node(Resource):
+    def get(self, label = None, action = None):
+        active_node = ActiveNodeTable.query.get_or_404(label)
+        router_id = active_node.router_id
+        ip = active_node.ip
+        username = checkAuthzPath(request, [active_node.active_lab.repository_id, active_node.active_lab.name])
+        jlab = json.loads(active_node.active_lab.json)
+        name = jlab['topology']['nodes'][str(active_node.node_id)]['name']
+        if action == 'start':
+            image = jlab['topology']['nodes'][str(active_node.node_id)]['image']
+            type = jlab['topology']['nodes'][str(active_node.node_id)]['type']
+            t = startNode.apply_async((label, name, active_node.node_id, type, image, router_id, ip))
+        elif action == 'stop':
+            t = stopNode.apply_async((label, name, active_node.node_id, router_id))
+        elif action == 'restart':
+            t = restartNode.apply_async((label, name, active_node.node_id, router_id))
+        elif action == 'delete':
+            t = deleteNode.apply_async((label, name, active_node.node_id, router_id))
+        else:
+            abort(404)
+        return {
+            'status': 'enqueued',
+            'message': 'Task "{}" enqueued to the batch manager'.format(t),
+            'task': str(t)
+        }
+
 class Repository(Resource):
     def delete(self, repository_id = None):
         username = checkAuthz(request, ['admin'])
@@ -501,7 +528,6 @@ class Repository(Resource):
         if not args['username']:
             args['username'] = None
             args['password'] = None
-        print(args)
         t = addGit.apply_async((username, args['repository'], args['url'], args['username'], args['password']))
         return {
             'status': 'enqueued',
@@ -701,6 +727,7 @@ class Routing(Resource):
 class Task(Resource):
     def get(self, task_id = None):
         username = checkAuthz(request)
+        # Todo should list also running tasks from celery
         if not task_id:
             # List all tasks
             # TODO from this user only, or all for admins

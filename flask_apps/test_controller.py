@@ -5,7 +5,7 @@ __copyright__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
 __license__ = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
 __revision__ = '20170430'
 
-import base64, getopt, json, logging, random, requests, sys, urllib3
+import base64, getopt, json, logging, random, requests, sys, time, urllib3
 urllib3.disable_warnings()
 
 role_1 = 'z' + ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(7))
@@ -416,6 +416,20 @@ def main():
     returned_data = make_request('https://{}/api/v1/repositories'.format(controller), method = 'POST', data = data, api_key = api_key, expected_codes = 200)
     if 'task' not in returned_data: sys.exit('task not validated')
     task_repository_1 = returned_data['task']
+
+    while True:
+        returned_data = make_request('https://{}/api/v1/tasks/{}'.format(controller, task_repository_1), method = 'GET', api_key = api_key, expected_codes = [200, 404])
+        try:
+            if returned_data['data'][task_repository_1]['status'] == 'completed':
+                logging.info('Tasks: task completed')
+                break
+            elif returned_data['data'][task_repository_1]['status'] == 'failed':
+                logging.error('Tasks: task failed')
+                sys.exit(1)
+        except:
+            logging.error('Tasks: task does not exist yet')
+            time.sleep(1)
+            pass
 
     logging.info('Repositories: get created repository')
     returned_data = make_request('https://{}/api/v1/repositories/{}'.format(controller, repository_1), method = 'GET', api_key = api_key, expected_codes = [200, 404])
