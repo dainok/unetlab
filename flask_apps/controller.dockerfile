@@ -16,7 +16,7 @@ RUN apk update || exit 1
 RUN apk upgrade || exit 1
 RUN apk add bash gcc git libc-dev mariadb mariadb-client mariadb-dev memcached nginx openssh python3 python3-dev || exit 1
 RUN pip3 install --no-cache-dir --upgrade pip || exit 1
-RUN pip3 install --no-cache-dir celery Flask-MySQLdb Flask-SQLAlchemy flask_migrate flask_restful python3-memcached sh || exit 1
+RUN pip3 install --no-cache-dir celery Flask-MySQLdb Flask-SQLAlchemy flask_migrate flask_restful python3-memcached redis sh || exit 1
 
 # Configuring
 RUN mkdir /usr/lib/python3.6/site-packages/controller || exit 1

@@ -55,16 +55,6 @@ class ActiveInterfaceTable(db.Model):
     def __repr__(self):
         return '<ActiveInterfaceTable(id={})>'.format(self.id)
 
-class RouterTable(db.Model):
-    __tablename__ = 'routers'
-    __mapper_args__ = {'confirm_deleted_rows': False}
-    id = db.Column(db.Integer, primary_key = True, autoincrement = False)
-    inside_ip = db.Column(db.String(128))
-    outside_ip = db.Column(db.String(128))
-
-    def __repr__(self):
-        return '<Router(id={})>'.format(self.id)
-
 class LabTable(db.Model):
     __tablename__ = 'labs'
     __mapper_args__ = {'confirm_deleted_rows': False}
@@ -101,6 +91,16 @@ class RoleTable(db.Model):
 
     def __repr__(self):
         return '<Role(role={})>'.format(self.role)
+
+class RouterTable(db.Model):
+    __tablename__ = 'routers'
+    __mapper_args__ = {'confirm_deleted_rows': False}
+    id = db.Column(db.Integer, primary_key = True, autoincrement = False)
+    inside_ip = db.Column(db.String(128))
+    outside_ip = db.Column(db.String(128))
+
+    def __repr__(self):
+        return '<Router(id={})>'.format(self.id)
 
 class TaskTable(db.Model):
     __tablename__ = 'tasks'

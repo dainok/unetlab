@@ -441,14 +441,17 @@ class Node(Resource):
     def get(self, label = None, action = None):
         active_node = ActiveNodeTable.query.get_or_404(label)
         router_id = active_node.router_id
-        ip = active_node.ip
+        if router_id == None:
+            active_node.router_id = 0
+            db.commit()
+        node_ip = active_node.ip
         username = checkAuthzPath(request, [active_node.active_lab.repository_id, active_node.active_lab.name])
         jlab = json.loads(active_node.active_lab.json)
-        name = jlab['topology']['nodes'][str(active_node.node_id)]['name']
+        node_name = jlab['topology']['nodes'][str(active_node.node_id)]['name']
         if action == 'start':
-            image = jlab['topology']['nodes'][str(active_node.node_id)]['image']
-            type = jlab['topology']['nodes'][str(active_node.node_id)]['type']
-            t = startNode.apply_async((label, name, active_node.node_id, type, image, router_id, ip))
+            node_image = jlab['topology']['nodes'][str(active_node.node_id)]['image']
+            node_type = jlab['topology']['nodes'][str(active_node.node_id)]['type']
+            t = startNode.apply_async((username, label, node_name, active_node.node_id, node_type, node_image, node_ip, router_id))
         elif action == 'stop':
             t = stopNode.apply_async((label, name, active_node.node_id, router_id))
         elif action == 'restart':

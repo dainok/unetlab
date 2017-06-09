@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.5
+#!/usr/bin/env python3
 """ Tests for controller app """
 __author__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
 __copyright__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
@@ -123,6 +123,8 @@ def make_request(url, method = 'GET', data = None, username = None, password = N
         logging.error('Received {}, expecting {}'.format(r.status_code, expected_codes))
         logging.error('Status is {}'.format(r.status_code))
         logging.error('Reason is {}'.format(r.reason))
+        if data:
+            logging.error('Sent content is {}'.format(data))
         logging.error('Received content is {}'.format(r.text))
         sys.exit(1)
 
@@ -191,10 +193,10 @@ def main():
     logging.info('Auth: unauthenticated request')
     returned_data = make_request('https://{}/api/v1/auth'.format(controller), method = 'GET', expected_codes = 401)
 
-    logging.info('Auth: authentication via API')
+    logging.info('Auth: authentication via API ({})'.format(api_key))
     returned_data = make_request('https://{}/api/v1/auth'.format(controller), method = 'GET', api_key = api_key, expected_codes = 200)
 
-    logging.info('Auth: basic authentication')
+    logging.info('Auth: basic authentication ({}:{})'.format(admin_username, admin_password))
     returned_data = make_request('https://{}/api/v1/auth'.format(controller), method = 'GET', username = admin_username, password = admin_password, expected_codes = 200)
 
     # /roles
@@ -202,10 +204,10 @@ def main():
     logging.info('Roles: get all roles')
     returned_data = make_request('https://{}/api/v1/roles'.format(controller), method = 'GET', api_key = api_key, expected_codes = 200)
 
-    logging.info('Roles: get admin role')
+    logging.info('Roles: get role (admin)')
     returned_data = make_request('https://{}/api/v1/roles/admin'.format(controller), method = 'GET', api_key = api_key, expected_codes = 200)
 
-    logging.info('Roles: adding role')
+    logging.info('Roles: adding role ({})'.format(role_1))
     data = {
         'role': role_1,
         'can_write': False,
@@ -216,13 +218,13 @@ def main():
     if returned_data['data']['access_to'] != data['access_to']: sys.exit('access_to not validated')
     if returned_data['data']['can_write'] != data['can_write']: sys.exit('can_write not validated')
 
-    logging.info('Roles: get created role')
+    logging.info('Roles: get created role ({})'.format(role_1))
     returned_data = make_request('https://{}/api/v1/roles/{}'.format(controller, role_1), method = 'GET', api_key = api_key, expected_codes = 200)
     if returned_data['data'][role_1]['role'] != role_1: sys.exit('role not validated')
     if returned_data['data'][role_1]['access_to'] != data['access_to']: sys.exit('access_to not validated')
     if returned_data['data'][role_1]['can_write'] != data['can_write']: sys.exit('can_write not validated')
 
-    logging.info('Roles: try to create a minimal role')
+    logging.info('Roles: try to create a minimal role'.format(role_2))
     data = {
         'role': role_2
     }
@@ -231,7 +233,7 @@ def main():
     if returned_data['data']['access_to'] != None: sys.exit('access_to not validated')
     if returned_data['data']['can_write'] != None: sys.exit('can_write not validated')
 
-    logging.info('Roles: edit role')
+    logging.info('Roles: edit role ({})'.format(role_2))
     data = {
         'can_write': True,
         'access_to': 'something.*'
@@ -241,7 +243,7 @@ def main():
     if returned_data['data']['access_to'] != data['access_to']: sys.exit('access_to not validated')
     if returned_data['data']['can_write'] != data['can_write']: sys.exit('can_write not validated')
 
-    logging.info('Roles: get modified role')
+    logging.info('Roles: get modified role ({})'.format(role_2))
     returned_data = make_request('https://{}/api/v1/roles/{}'.format(controller, role_2), method = 'GET', api_key = api_key, expected_codes = 200)
     if returned_data['data'][role_2]['role'] != role_2: sys.exit('role not validated')
     if returned_data['data'][role_2]['access_to'] != data['access_to']: sys.exit('access_to not validated')
@@ -256,10 +258,10 @@ def main():
     logging.info('Users: get all users')
     returned_data = make_request('https://{}/api/v1/users'.format(controller), method = 'GET', api_key = api_key, expected_codes = 200)
 
-    logging.info('Users: get admin user')
+    logging.info('Users: get user (admin)')
     returned_data = make_request('https://{}/api/v1/users/admin'.format(controller), method = 'GET', api_key = api_key, expected_codes = 200)
 
-    logging.info('Users: adding user')
+    logging.info('Users: adding user ({})'.format(username_1))
     data = {
         'email': '{}@example.com'.format(username_1),
         'labels': 100,
@@ -275,7 +277,7 @@ def main():
     if returned_data['data']['roles'] != data['roles']: sys.exit('roles not validated')
     if returned_data['data']['username'] != data['username']: sys.exit('username not validated')
 
-    logging.info('Users: get created user')
+    logging.info('Users: get created user ({})'.format(username_1))
     returned_data = make_request('https://{}/api/v1/users/{}'.format(controller, username_1), method = 'GET', api_key = api_key, expected_codes = 200)
     if returned_data['data'][username_1]['email'] != data['email']: sys.exit('email not validated')
     if returned_data['data'][username_1]['labels'] != data['labels']: sys.exit('labels not validated')
@@ -283,10 +285,10 @@ def main():
     if returned_data['data'][username_1]['roles'] != data['roles']: sys.exit('roles not validated')
     if returned_data['data'][username_1]['username'] != data['username']: sys.exit('username not validated')
 
-    logging.info('Users: basic authentication')
+    logging.info('Users: basic authentication ({}:{})'.format(username_1, password_1))
     returned_data = make_request('https://{}/api/v1/auth'.format(controller), method = 'GET', username = username_1, password = password_1, expected_codes = 200)
 
-    logging.info('Users: adding a tiny user')
+    logging.info('Users: adding a tiny user ({})'.format(username_2))
     data = {
         'email': '{}@example.com'.format(username_2),
         'name': 'User 1',
@@ -308,7 +310,7 @@ def main():
     if returned_data['data'][username_2]['roles'] != []: sys.exit('roles not validated')
     if returned_data['data'][username_2]['username'] != data['username']: sys.exit('username not validated')
 
-    logging.info('Users: edit user')
+    logging.info('Users: edit user ({})'.format(username_2))
     data = {
         'email': '{}@example.net'.format(username_2),
         'labels': 111,
@@ -323,7 +325,7 @@ def main():
     if returned_data['data']['roles'] != [role_1, role_2, 'admin']: sys.exit('roles not validated')
     if returned_data['data']['username'] != username_2: sys.exit('username not validated')
 
-    logging.info('Users: get modified user')
+    logging.info('Users: get modified user ({})'.format(username_2))
     returned_data = make_request('https://{}/api/v1/users/{}'.format(controller, username_2), method = 'GET', api_key = api_key, expected_codes = 200)
     if returned_data['data'][username_2]['email'] != data['email']: sys.exit('email not validated')
     if returned_data['data'][username_2]['labels'] != data['labels']: sys.exit('labels not validated')
@@ -331,10 +333,10 @@ def main():
     if returned_data['data'][username_2]['roles'] != data['roles']: sys.exit('roles not validated')
     if returned_data['data'][username_2]['username'] != username_2: sys.exit('username not validated')
 
-    logging.info('Users: basic authentication')
+    logging.info('Users: basic authentication ({}:{})'.format(username_2, password_3))
     returned_data = make_request('https://{}/api/v1/auth'.format(controller), method = 'GET', username = username_2, password = password_3, expected_codes = 200)
 
-    logging.info('Users: set a wrong user')
+    logging.info('Users: set a wrong user ({})'.format(username_2))
     data = {
         'email': '{}@example.net'.format(username_2),
         'roles': [role_1, role_3, 'admin']
@@ -343,7 +345,7 @@ def main():
 
     # /routers
 
-    logging.info('Routers: adding a router')
+    logging.info('Routers: adding a router ({})'.format(router_1))
     data = {
         'id': router_1,
         'inside_ip': '172.31.0.3/16',
@@ -354,13 +356,13 @@ def main():
     if returned_data['data']['inside_ip'] != data['inside_ip']: sys.exit('inside_ip not validated')
     if returned_data['data']['outside_ip'] != data['outside_ip']: sys.exit('outside_ip not validated')
 
-    logging.info('Routers: get created router')
+    logging.info('Routers: get created router ({})'.format(router_1))
     returned_data = make_request('https://{}/api/v1/routers/{}'.format(controller, router_1), method = 'GET', api_key = api_key, expected_codes = 200)
     if returned_data['data'][str(router_1)]['id'] != data['id']: sys.exit('id not validated')
     if returned_data['data'][str(router_1)]['inside_ip'] != data['inside_ip']: sys.exit('inside_ip not validated')
     if returned_data['data'][str(router_1)]['outside_ip'] != data['outside_ip']: sys.exit('outside_ip not validated')
 
-    logging.info('Routers: register a new router')
+    logging.info('Routers: register a new router ({})'.format(router_2))
     data = {
         'id': router_2,
         'inside_ip': '172.32.0.3/16'
@@ -369,13 +371,13 @@ def main():
     if returned_data['data']['id'] != data['id']: sys.exit('id not validated')
     if returned_data['data']['inside_ip'] != data['inside_ip']: sys.exit('inside_ip not validated')
 
-    logging.info('Routers: get registered router')
+    logging.info('Routers: get registered router ({})'.format(router_2))
     returned_data = make_request('https://{}/api/v1/routers/{}'.format(controller, router_2), method = 'GET', api_key = api_key, expected_codes = 200)
     if returned_data['data'][str(router_2)]['id'] != data['id']: sys.exit('id not validated')
     if returned_data['data'][str(router_2)]['inside_ip'] != data['inside_ip']: sys.exit('inside_ip not validated')
     if returned_data['data'][str(router_2)]['outside_ip'] != None: sys.exit('outside_ip not validated')
 
-    logging.info('Routers: register an existent router')
+    logging.info('Routers: register an existent router ({})'.format(router_1))
     data = {
         'id': router_1,
         'inside_ip': '172.31.0.3/16'
@@ -384,12 +386,12 @@ def main():
     if returned_data['data']['id'] != data['id']: sys.exit('id not validated')
     if returned_data['data']['inside_ip'] != data['inside_ip']: sys.exit('inside_ip not validated')
 
-    logging.info('Routers: get registered router')
+    logging.info('Routers: get registered router ({})'.format(router_1))
     returned_data = make_request('https://{}/api/v1/routers/{}'.format(controller, router_1), method = 'GET', api_key = api_key, expected_codes = 200)
     if returned_data['data'][str(router_1)]['id'] != data['id']: sys.exit('id not validated')
     if returned_data['data'][str(router_1)]['inside_ip'] != data['inside_ip']: sys.exit('inside_ip not validated')
 
-    logging.info('Routers: edit router')
+    logging.info('Routers: edit router ({})'.format(router_1))
     data = {
         'inside_ip': '172.34.0.3/16',
         'outside_ip': '1.1.1.134/24'
@@ -403,12 +405,12 @@ def main():
     if returned_data['data'][str(router_1)]['inside_ip'] != data['inside_ip']: sys.exit('inside_ip not validated')
     if returned_data['data'][str(router_1)]['outside_ip'] != data['outside_ip']: sys.exit('outside_ip not validated')
 
-    logging.info('Routers: bootstrap router')
+    logging.info('Routers: bootstrap router ({})'.format(router_1))
     returned_data = make_request('https://{}/api/v1/bootstrap/routers/{}'.format(controller, router_1), method = 'GET', api_key = api_key, expected_codes = 200, is_json = False)
 
     # /repositories
 
-    logging.info('Repositories: adding a repository')
+    logging.info('Repositories: adding a repository ({})'.format(repository_1))
     data = {
         'repository': repository_1,
         'url': 'https://github.com/dainok/rrlabs'
@@ -421,20 +423,20 @@ def main():
         returned_data = make_request('https://{}/api/v1/tasks/{}'.format(controller, task_repository_1), method = 'GET', api_key = api_key, expected_codes = [200, 404])
         try:
             if returned_data['data'][task_repository_1]['status'] == 'completed':
-                logging.info('Tasks: task completed')
+                logging.info('Tasks: task completed ({})'.format(task_repository_1))
                 break
             elif returned_data['data'][task_repository_1]['status'] == 'failed':
-                logging.error('Tasks: task failed')
+                logging.error('Tasks: task failed ({})'.format(task_repository_1))
                 sys.exit(1)
         except:
-            logging.error('Tasks: task does not exist yet')
+            logging.error('Tasks: task does not exist yet ({})'.format(task_repository_1))
             time.sleep(1)
             pass
 
-    logging.info('Repositories: get created repository')
+    logging.info('Repositories: get created repository ({})'.format(repository_1))
     returned_data = make_request('https://{}/api/v1/repositories/{}'.format(controller, repository_1), method = 'GET', api_key = api_key, expected_codes = [200, 404])
 
-    logging.info('Repositories: edit repository')
+    logging.info('Repositories: edit repository (local)')
     data = {
         'url': 'https://github.com/dainok/labs',
         'username': repository_username_1,
@@ -445,7 +447,7 @@ def main():
     if returned_data['data']['url'] != data['url']: sys.exit('url not validated')
     if returned_data['data']['username'] != data['username']: sys.exit('username not validated')
 
-    logging.info('Repositories: get modidied repository')
+    logging.info('Repositories: get modified repository (local)')
     returned_data = make_request('https://{}/api/v1/repositories/{}'.format(controller, 'local'), method = 'GET', api_key = api_key, expected_codes = [200])
     if returned_data['data']['local']['id'] != 'local': sys.exit('id not validated')
     if returned_data['data']['local']['url'] != data['url']: sys.exit('url not validated')
@@ -458,15 +460,15 @@ def main():
     returned_data = make_request('https://{}/api/v1/labs'.format(controller), method = 'POST', data = data, api_key = api_key, expected_codes = 200)
     lab_id_1 = returned_data['data']['id']
 
-    logging.info('Labs: get created lab')
+    logging.info('Labs: get created lab ({})'.format(lab_id_1))
     returned_data = make_request('https://{}/api/v1/labs/{}'.format(controller, lab_id_1), method = 'GET', api_key = api_key, expected_codes = [200])
 
-    logging.info('Labs: adding a lab with commit')
+    logging.info('Labs: adding a lab with commit ({})'.format(lab_id_1))
     data = lab_1
     returned_data = make_request('https://{}/api/v1/labs?commit=true'.format(controller), method = 'POST', data = data, api_key = api_key, expected_codes = 200)
     lab_id_2 = returned_data['data']['id']
 
-    logging.info('Labs: get created lab')
+    logging.info('Labs: get created lab ({})'.format(lab_id_1))
     returned_data = make_request('https://{}/api/v1/labs/{}'.format(controller, lab_id_2), method = 'GET', api_key = api_key, expected_codes = [200])
 
 
@@ -501,31 +503,31 @@ def main():
 
     # Cleaning
 
-    logging.info('Roles: delete role')
+    logging.info('Roles: delete role ({})'.format(role_1))
     returned_data = make_request('https://{}/api/v1/roles/{}'.format(controller, role_1), method = 'DELETE', api_key = api_key, expected_codes = 200)
 
-    logging.info('Roles: delete role')
+    logging.info('Roles: delete role ({})'.format(role_2))
     returned_data = make_request('https://{}/api/v1/roles/{}'.format(controller, role_2), method = 'DELETE', api_key = api_key, expected_codes = 200)
 
-    logging.info('Routers: delete router')
+    logging.info('Routers: delete router ({})'.format(router_1))
     returned_data = make_request('https://{}/api/v1/routers/{}'.format(controller, router_1), method = 'DELETE', api_key = api_key, expected_codes = 200)
 
-    logging.info('Routers: delete router')
+    logging.info('Routers: delete router ({})'.format(router_2))
     returned_data = make_request('https://{}/api/v1/routers/{}'.format(controller, router_2), method = 'DELETE', api_key = api_key, expected_codes = 200)
 
-    logging.info('Users: delete username')
+    logging.info('Users: delete username ({})'.format(username_1))
     returned_data = make_request('https://{}/api/v1/users/{}'.format(controller, username_1), method = 'DELETE', api_key = api_key, expected_codes = 200)
 
-    logging.info('Users: delete username')
+    logging.info('Users: delete username ({})'.format(username_2))
     returned_data = make_request('https://{}/api/v1/users/{}'.format(controller, username_2), method = 'DELETE', api_key = api_key, expected_codes = 200)
 
-    logging.info('Repositories: delete repository')
+    logging.info('Repositories: delete repository ({})'.format(repository_1))
     returned_data = make_request('https://{}/api/v1/repositories/{}'.format(controller, repository_1), method = 'DELETE', api_key = api_key, expected_codes = [200, 404])
 
-    logging.info('Labs: delete lab')
+    logging.info('Labs: delete lab ({})'.format(lab_id_1))
     returned_data = make_request('https://{}/api/v1/labs/{}'.format(controller, lab_id_1), method = 'DELETE', api_key = api_key, expected_codes = 200)
 
-    logging.info('Labs: delete lab')
+    logging.info('Labs: delete lab ({})'.format(lab_id_2))
     returned_data = make_request('https://{}/api/v1/labs/{}'.format(controller, lab_id_2), method = 'DELETE', api_key = api_key, expected_codes = 200)
 
 if __name__ == '__main__':

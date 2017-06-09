@@ -11,7 +11,6 @@ from controller import config
 from controller.catalog.models import RoleTable
 
 def type_ipinterface(arg):
-    # An IP address must be in the form of a.b.c.d/x or a.b.c.d/e.f.g.h
     try:
         return ipaddress.IPv4Interface(arg)
     except:
