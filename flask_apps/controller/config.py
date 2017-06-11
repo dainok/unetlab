@@ -36,10 +36,13 @@ def loadConfig(config_file):
         config.add_section('advanced')
         need_to_save = True
     if not config.has_option('app', 'api_key'):
-        config['app']['api_key'] = ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(40))
+        api_key = os.environ.get('API')
+        if not api_key:
+            api_key = ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(40))
+        config['app']['api_key'] = api_key
         need_to_save = True
     if not config.has_option('app', 'database_uri'):
-        config['app']['database_uri'] = 'mysql://root:unetlab@localhost/unetlab'
+        config['app']['database_uri'] = 'mysql://unetlab:UNetLabv2!@localhost/unetlab'
         need_to_save = True
     if not config.has_option('app', 'memcache_server'):
         config['app']['memcache_server'] = '127.0.0.1:11211'
