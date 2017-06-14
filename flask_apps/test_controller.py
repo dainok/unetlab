@@ -323,7 +323,7 @@ def main():
     if returned_data['data']['email'] != data['email']: sys.exit('email not validated')
     if returned_data['data']['labels'] != 111: sys.exit('labels not validated')
     if returned_data['data']['name'] != data['name']: sys.exit('name not validated')
-    if returned_data['data']['roles'] != [role_1, role_2, 'admin']: sys.exit('roles not validated')
+    if sorted(returned_data['data']['roles']) != sorted([role_1, role_2, 'admin']): sys.exit('roles not validated')
     if returned_data['data']['username'] != username_2: sys.exit('username not validated')
 
     logging.info('Users: get modified user ({})'.format(username_2))
@@ -331,7 +331,7 @@ def main():
     if returned_data['data'][username_2]['email'] != data['email']: sys.exit('email not validated')
     if returned_data['data'][username_2]['labels'] != data['labels']: sys.exit('labels not validated')
     if returned_data['data'][username_2]['name'] != data['name']: sys.exit('name not validated')
-    if returned_data['data'][username_2]['roles'] != data['roles']: sys.exit('roles not validated')
+    if sorted(returned_data['data'][username_2]['roles']) != sorted(data['roles']): sys.exit('roles not validated')
     if returned_data['data'][username_2]['username'] != username_2: sys.exit('username not validated')
 
     logging.info('Users: basic authentication ({}:{})'.format(username_2, password_3))
