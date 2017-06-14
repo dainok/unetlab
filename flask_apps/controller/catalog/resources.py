@@ -210,20 +210,11 @@ class Auth(Resource):
         return data
 
     def patch(self, role = None):
-        args = patch_auth_parser.parse_args()
         username = checkAuthz(request)
+        args = auth_parser_patch(username)
         user = UserTable.query.get_or_404(username)
-        for key, value in args.items():
-            if key in ['name', 'password']:
-                if key == 'password' and value == '':
-                    # Skip empty password
-                    continue
-                if key == 'password':
-                    setattr(user, key, hashlib.sha256(value.encode('utf-8')).hexdigest())
-                    # Purging the cached user
-                    cache.delete(user.username)
-                else:
-                    setattr(user, key, value)
+        setattr(user, 'password', hashlib.sha256(args['password'].encode('utf-8')).hexdigest())
+        cache.delete(user.username)
         db.session.commit()
         return {
             'status': 'success',
@@ -541,15 +532,9 @@ class Repository(Resource):
 class Role(Resource):
     def delete(self, role = None):
         checkAuthz(request, ['admin'])
-        if not role:
-            # No role has been selected
-            abort(400)
-        elif role == 'admin':
-            # Role 'admin' cannot be deleted
-            abort(403)
-        else:
-            # Get the role if exists, else 404
-            role = RoleTable.query.get_or_404(role)
+        # Get the role if exists, else 404
+        role_parser_get(role)
+        role = RoleTable.query.get(role)
         db.session.delete(role)
         db.session.commit()
         for user in role.users:
@@ -567,7 +552,8 @@ class Role(Resource):
             roles = RoleTable.query.order_by(RoleTable.role)
         else:
             # List a single role if exists, else 404
-            roles = [RoleTable.query.get_or_404(role)]
+            role_parser_get(role)
+            roles = [RoleTable.query.get(role)]
         data = {}
         for role in roles:
             # Print each role
@@ -579,17 +565,11 @@ class Role(Resource):
         }
 
     def patch(self, role = None):
-        args = patch_role_parser.parse_args()
         checkAuthz(request, ['admin'])
-        if not role:
-            # No role has been selected
-            abort(400)
-        else:
-            # Get the role if exists, else 404
-            role = RoleTable.query.get_or_404(role)
+        args = role_parser_patch(role)
+        role = RoleTable.query.get(role)
         for key, value in args.items():
-            if key in ['access_to', 'can_write']:
-                setattr(role, key, value)
+            setattr(role, key, value)
         db.session.commit()
         for user in role.users:
             # Purging the cached user
@@ -601,11 +581,8 @@ class Role(Resource):
         }
 
     def post(self):
-        args = add_role_parser.parse_args()
         checkAuthz(request, ['admin'])
-        if RoleTable.query.get(args['role']):
-            # Role already exists
-            abort(409)
+        args = role_parser_post()
         role = RoleTable(
             role = args['role'],
             can_write = args['can_write'],
@@ -752,15 +729,9 @@ class Task(Resource):
 class User(Resource):
     def delete(self, username = None):
         checkAuthz(request, ['admin'])
-        if not username:
-            # No user has been selected
-            abort(400)
-        elif username == 'admin':
-            # User 'admin' cannot be deleted
-            abort(403)
-        else:
-            # Get the user if exists, else 404
-            user = UserTable.query.get_or_404(username)
+        # Get the user if exists, else 404
+        user_parser_get(username)
+        user = UserTable.query.get_or_404(username)
         db.session.delete(user)
         db.session.commit()
         # Purging the cached user
@@ -777,7 +748,8 @@ class User(Resource):
             users = UserTable.query.order_by(UserTable.username)
         else:
             # List a single user if exists, else 404
-            users = [UserTable.query.get_or_404(username)]
+            user_parser_get(username)
+            users = [UserTable.query.get(username)]
         data = {}
         for user in users:
             # Print each user
@@ -789,8 +761,8 @@ class User(Resource):
         }
 
     def patch(self, username = None):
-        args = patch_user_parser.parse_args()
         checkAuthz(request, ['admin'])
+        args = user_parser_patch(username)
         if not username:
             # No user has been selected
             abort(400)
@@ -817,11 +789,8 @@ class User(Resource):
         }
 
     def post(self):
-        args = add_user_parser.parse_args()
         checkAuthz(request, ['admin'])
-        if UserTable.query.get(args['username']):
-            # User already exists
-            abort(409)
+        args = user_parser_post()
         user = UserTable(
             username = args['username'],
             password = hashlib.sha256(args['password'].encode('utf-8')).hexdigest(),
@@ -842,3 +811,4 @@ class User(Resource):
             'message': 'User "{}" added'.format(user.username),
             'data': printUser(user)
         }
+

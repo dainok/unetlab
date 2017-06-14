@@ -14,10 +14,11 @@ role_3 = 'z' + ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for
 router_1 = random.randint(1000, 10000)
 router_2 = random.randint(1000, 10000)
 username_1 = 'z' + ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(9))
-password_1 = ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(20))
 username_2 = 'z' + ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(9))
+password_1 = ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(20))
 password_2 = ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(20))
 password_3 = ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(20))
+password_4 = ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(20))
 repository_1 = ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(20))
 repository_username_1 = ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(20))
 repository_password_1 = ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for c in range(20))
@@ -230,8 +231,8 @@ def main():
     }
     returned_data = make_request('https://{}/api/v1/roles'.format(controller), method = 'POST', data = data, api_key = api_key, expected_codes = 200)
     if returned_data['data']['role'] != data['role']: sys.exit('role not validated')
-    if returned_data['data']['access_to'] != None: sys.exit('access_to not validated')
-    if returned_data['data']['can_write'] != None: sys.exit('can_write not validated')
+    if returned_data['data']['access_to'] != '': sys.exit('access_to not validated')
+    if returned_data['data']['can_write'] != False: sys.exit('can_write not validated')
 
     logging.info('Roles: edit role ({})'.format(role_2))
     data = {
@@ -342,6 +343,16 @@ def main():
         'roles': [role_1, role_3, 'admin']
     }
     returned_data = make_request('https://{}/api/v1/users/{}'.format(controller, username_2), method = 'PATCH', data = data, api_key = api_key, expected_codes = 400)
+
+    # /auth
+    logging.info('Auth: change password for user ({})'.format(username_2))
+    data = {
+        'password': password_4,
+    }
+    returned_data = make_request('https://{}/api/v1/auth'.format(controller, username_2), method = 'PATCH', data = data, username = username_2, password = password_3, expected_codes = 200)
+
+    logging.info('Auth: basic authentication ({}:{})'.format(username_2, password_4))
+    returned_data = make_request('https://{}/api/v1/auth'.format(controller), method = 'GET', username = username_2, password = password_4, expected_codes = 200)
 
     # /routers
 
