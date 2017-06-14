@@ -17,12 +17,12 @@ fi
 if [ ! -f /etc/ssh/ssh_host_ed25519_key ]; then
 	ssh-keygen -f /etc/ssh/ssh_host_ed25519_key -N '' -t ed25519 || exit 1
 fi
-/usr/sbin/sshd -D -p 2222 &> /data/logs/sshd.log &
+/usr/sbin/sshd -D -p 2222 &>> /data/logs/sshd.log &
 SSHD_PID=$!
 
 # Starting MariaDB
 if [ ! -d /data/database/mysql ]; then
-	/usr/bin/mysql_install_db --datadir="/data/database" --user="mysql" &> /data/logs/mysql_install_db.log
+	/usr/bin/mysql_install_db --datadir="/data/database" --user="mysql" &>> /data/logs/mysql_install_db.log
 	if [ $? -ne 0 ]; then
 		echo " failed"
 		echo "ERROR: failed to initialize MariaDB"
@@ -32,7 +32,7 @@ if [ ! -d /data/database/mysql ]; then
 fi
 mkdir -m 755 -p /run/mysqld || exit 1
 chown mysql:root /run/mysqld || exit 1
-/usr/bin/mysqld --basedir=/usr --datadir=/data/database --plugin-dir=/usr/lib/mysql/plugin --user=mysql --pid-file=/run/mysqld/mysqld.pid --socket=/run/mysqld/mysqld.sock --port=3306 &> /data/logs/mysqld.log &
+/usr/bin/mysqld --basedir=/usr --datadir=/data/database --plugin-dir=/usr/lib/mysql/plugin --user=mysql --pid-file=/run/mysqld/mysqld.pid --socket=/run/mysqld/mysqld.sock --port=3306 &>> /data/logs/mysqld.log &
 MARIADB_PID=$!
 TIMEOUT=10
 # Waiting for the DB coming up
@@ -51,7 +51,7 @@ fi
 
 # Creating and upgrading database
 if [ -d /data/database/test ]; then
-	echo "DROP DATABASE test;" | /usr/bin/mysql -u root &> /data/logs/mysqld.log
+	echo "DROP DATABASE test;" | /usr/bin/mysql -u root &>> /data/logs/mysqld.log
 	if [ $? -ne 0 ]; then
 		echo " failed"
 		echo "ERROR: failed to delete database \"test\""
@@ -60,25 +60,25 @@ if [ -d /data/database/test ]; then
 	fi
 fi
 if [ ! -d /data/database/unetlab ]; then
-	echo "CREATE DATABASE unetlab;" | /usr/bin/mysql -u root &> /data/logs/mysqld.log
+	echo "CREATE DATABASE unetlab;" | /usr/bin/mysql -u root &>> /data/logs/mysql_install_db.log
 	if [ $? -ne 0 ]; then
 		echo " failed"
 		echo "ERROR: failed to create database \"unetlab\""
 		cat /data/logs/mysqld.log
 		exit 1
 	fi
-	echo "CREATE USER 'unetlab'@'localhost' IDENTIFIED BY 'UNetLabv2!'" | /usr/bin/mysql -u root &> /data/logs/mysqld.log
-	echo "GRANT ALL PRIVILEGES ON unetlab.* TO 'unetlab'@'localhost';" | /usr/bin/mysql -u root &> /data/logs/mysqld.log
-	echo "FLUSH PRIVILEGES;" | /usr/bin/mysql -u root &> /data/logs/mysqld.log
+	echo "CREATE USER 'unetlab'@'localhost' IDENTIFIED BY 'UNetLabv2!'" | /usr/bin/mysql -u root &>> /data/logs/mysql_install_db.log
+	echo "GRANT ALL PRIVILEGES ON unetlab.* TO 'unetlab'@'localhost';" | /usr/bin/mysql -u root &>> /data/logs/mysql_install_db.log
+	echo "FLUSH PRIVILEGES;" | /usr/bin/mysql -u root &>> /data/logs/mysql_install_db.log
 	echo "10000000" > /data/database/version
 fi
 
 # Starting Memcached
-/usr/bin/memcached -m 64 -p 11211 -u memcached -l 127.0.0.1 &> /data/logs/memcached.log &
+/usr/bin/memcached -m 64 -p 11211 -u memcached -l 127.0.0.1 &>> /data/logs/memcached.log &
 MEMCACHED_PID=$!
 
 # Starting Redis
-/usr/bin/redis-server &> /data/logs/redis.log &
+/usr/bin/redis-server &>> /data/logs/redis.log &
 REDIS_PID=$!
 
 # Starting NGINX
@@ -88,15 +88,15 @@ if [ ! -f /etc/ssl/api.key ] || [ ! -f /etc/ssl/api.crt ]; then
 fi
 mkdir -m 755 -p /run/nginx || exit 1
 chown nginx:root /run/nginx || exit 1
-/usr/sbin/nginx &> /data/logs/nginx.log &
+/usr/sbin/nginx &>> /data/logs/nginx.log &
 NGINX_PID=$!
 
 # Starting Celery
-/usr/bin/run_controller.py runcelery &> /data/logs/celery.log &
+/usr/bin/run_controller.py runcelery &>> /data/logs/celery.log &
 CELERY_PID=$!
 
 # Starting API
-/usr/bin/run_controller.py runserver &> /data/logs/api.log &
+/usr/bin/run_controller.py runserver &>> /data/logs/api.log &
 API_PID=$!
 
 echo ${MARIADB_PID} ${MEMCACHED_PID} ${NGINX_PID} ${API_PID} ${CELERY_PID} ${SSHD_PID} ${REDIS_PID}
