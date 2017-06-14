@@ -444,11 +444,11 @@ class Node(Resource):
             node_type = jlab['topology']['nodes'][str(active_node.node_id)]['type']
             t = startNode.apply_async((username, label, node_name, active_node.node_id, node_type, node_image, node_ip, router_id))
         elif action == 'stop':
-            t = stopNode.apply_async((label, name, active_node.node_id, router_id))
+            t = stopNode.apply_async((username, label, node_name, active_node.node_id, router_id))
         elif action == 'restart':
-            t = restartNode.apply_async((label, name, active_node.node_id, router_id))
+            t = restartNode.apply_async((username, label, node_name, active_node.node_id, router_id))
         elif action == 'delete':
-            t = deleteNode.apply_async((label, name, active_node.node_id, router_id))
+            t = deleteNode.apply_async((username, label, node_name, active_node.node_id, router_id))
         else:
             abort(404)
         return {
