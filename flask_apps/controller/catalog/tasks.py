@@ -193,7 +193,8 @@ def startNode(self, started_by, label, node_name, node_id, node_type, node_image
                 "LABEL={}".format(label)
             ],
             'HostConfig': {
-                'Privileged': True
+                'Privileged': True,
+                'NetworkMode': 'workload-net'
             },
             'Image': container_image,
         }
@@ -231,7 +232,7 @@ def startNode(self, started_by, label, node_name, node_id, node_type, node_image
             progress = 100
         )
     node.state = 'on'
-    node.ip = r.json()['NetworkSettings']['IPAddress']
+    node.ip = r.json()['NetworkSettings']['Networks']['workload-net']['IPAddress']
     db.session.commit()
 
     return updateTask(

@@ -134,6 +134,7 @@ def printLab(lab, summary = False, username = None):
             # Adding label to each node
             for node in ActiveLabTable.query.get_or_404((lab.id, username)).nodes:
                 data['topology']['nodes'][str(node.node_id)]['label'] = node.label
+                data['topology']['nodes'][str(node.node_id)]['ip'] = node.ip
     return data
 
 def printRepository(repository):
@@ -239,16 +240,14 @@ class BootstrapRouter(Resource):
 
 class BootstrapNode(Resource):
     def get(self, label = None):
-        checkAuthz(request, ['admin'])
         active_node = ActiveNodeTable.query.get_or_404(label)
         node_id = active_node.node_id
         node_json = json.loads(active_node.active_lab.json)['topology']['nodes'][str(node_id)]
-        if active_node.router_id == None:
-            # Router ID not set, using local
-            # TODO: not needed, because start will set it
-            active_node.router_id = 0
-            db.session.commit()
         router = RouterTable.query.get_or_404(active_node.router_id)
+        if active_node.router_id == 0:
+            controller_ip = config['app']['inside_ip']
+        else:
+            controller_ip = config['app']['outside_ip']
         init_body = ''
 
         # Load header and footer
@@ -268,15 +267,15 @@ class BootstrapNode(Resource):
         init_body = init_body + 'iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 23 -j DNAT --to 192.0.2.254:23\n'
         init_body = init_body + 'iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j DNAT --to 192.0.2.254:80\n'
         init_body = init_body + 'iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 443 -j DNAT --to 192.0.2.254:443\n'
-        init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p udp --dport 69 -j DNAT --to {}:69\n'.format(master.inside_ip)
-        init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 20 -j DNAT --to {}:20\n'.format(master.inside_ip)
-        init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 21 -j DNAT --to {}:21\n'.format(master.inside_ip)
-        init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 22 -j DNAT --to {}:22\n'.format(master.inside_ip)
-        init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 80 -j DNAT --to {}:80\n'.format(master.inside_ip)
-        init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 443 -j DNAT --to {}:443\n'.format(master.inside_ip)
+        init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p udp --dport 69 -j DNAT --to {}:69\n'.format(controller_ip)
+        init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 20 -j DNAT --to {}:20\n'.format(controller_ip)
+        init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 21 -j DNAT --to {}:21\n'.format(controller_ip)
+        init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 22 -j DNAT --to {}:22\n'.format(controller_ip)
+        init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 80 -j DNAT --to {}:80\n'.format(controller_ip)
+        init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 443 -j DNAT --to {}:443\n'.format(controller_ip)
 
         if node_json['type'] == 'iol':
-            wrapper_cmd = '/tmp/wrapper_iol.py -c {} -l {} -t -w {}'.format(controller.inside_ip, label, node_json['name'])
+            wrapper_cmd = '/tmp/wrapper_iol.py -c {} -l {} -t -w {}'.format(router.inside_ip, label, node_json['name'])
             bin_cmd = '/data/node/iol.bin -n 4096 -q'
             if 'iol_id' in node_json:
                 iol_id = node_json['iol_id']
