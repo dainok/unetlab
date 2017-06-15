@@ -8,8 +8,8 @@ LABEL version = '20170430'
 
 LABEL build = "docker build -t dainok/controller:latest -f controller.dockerfile ."
 LABEL usage.0 = "docker volume create --name controller_data"
-LABEL usage.1 = "docker run -d -h controller --ip 172.16.0.2 --name controller --network workload-net -p 80:80 -p 443:443 --restart always -v controller_data:/data --env API=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6 dainok/controller"
-#ENTRYPOINT ["/sbin/bootstrap.sh"]
+LABEL usage.1 = "docker run -d -h controller --ip 172.16.0.2 --name controller --network workload-net -p 80:80 -p 443:443 -p 2222:2222 --restart always -v controller_data:/data --env API=zqg81ge585t0bt3qe0sjj1idvw7hv7vfgc11dsq6 dainok/controller"
+ENTRYPOINT ["/sbin/bootstrap.sh"]
 
 # Installing dependencies
 RUN apk update || exit 1

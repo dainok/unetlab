@@ -11,6 +11,7 @@ function routerStop {
 	else
 		exit
 	fi
+	echo " done"
 }
 
 function routerReload {

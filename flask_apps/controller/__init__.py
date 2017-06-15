@@ -80,9 +80,10 @@ db = SQLAlchemy(app)
 cache = memcache.Client([config['app']['memcache_server']], debug = 0)
 celery = make_celery(app)
 api_key = config['app']['api_key']
+migrate = Migrate(app, db)
 manager = Manager(app)
 manager.add_command('runcelery', runCelery())
-#TODO manager.add_command('db', MigrateCommand)
+manager.add_command('db', MigrateCommand)
 
 # Postpone to avoid circular import
 from controller.catalog.resources import *
