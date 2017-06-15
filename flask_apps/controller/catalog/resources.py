@@ -434,7 +434,8 @@ class Node(Resource):
         router_id = active_node.router_id
         if router_id == None:
             active_node.router_id = 0
-            db.commit()
+            router_id = 0
+            db.session.commit()
         node_ip = active_node.ip
         username = checkAuthzPath(request, [active_node.active_lab.repository_id, active_node.active_lab.name])
         jlab = json.loads(active_node.active_lab.json)
