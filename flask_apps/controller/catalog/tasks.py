@@ -235,6 +235,8 @@ def startNode(self, started_by, label, node_name, node_id, node_type, node_image
     node.ip = r.json()['NetworkSettings']['Networks']['workload-net']['IPAddress']
     db.session.commit()
 
+    # TODO should kill sighup to the router
+
     return updateTask(
         task_id = task_id,
         username = started_by,

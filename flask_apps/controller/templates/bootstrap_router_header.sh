@@ -89,7 +89,7 @@ if [ ! -f /etc/nginx/cert.key ]; then
 fi
 mkdir -m 755 -p /run/nginx &> /dev/null
 chown nginx:root /run/nginx &> /dev/null
-/usr/sbin/nginx &> /data/logs/nginx.log &
+/usr/sbin/nginx &>> /data/logs/nginx.log &
 NGINX_PID=$!
 
 # Starting router
@@ -97,7 +97,7 @@ curl -k -m 3 -s https://${CONTROLLER}/static/router/router.py &> /tmp/router.py 
 curl -k -m 3 -s https://${CONTROLLER}/static/router/router_modules.py &> /tmp/router_modules.py || exit 1
 chmod 755 /tmp/router.py || exit 1
 cd /tmp || exit 1
-./router.py -c ${CONTROLLER} -i ${ROUTERID} -k ${API} &> /data/logs/router.log &
+./router.py -d -c ${CONTROLLER} -i ${ROUTERID} -k ${API} &>> /data/logs/router.log &
 ROUTER_PID=$!
 
 echo " done"

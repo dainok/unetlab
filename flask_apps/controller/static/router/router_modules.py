@@ -11,8 +11,8 @@ urllib3.disable_warnings()
 def routerGetConfig(local_id, controller, api_key):
     while True:
         try:
-            routing = requests.get('https://{}/api/v1/routing?api_key={}'.format(controller, api_key), verify = False).json()
-            routers = requests.get('https://{}/api/v1/routers?api_key={}'.format(controller, api_key), verify = False).json()
+            routing = requests.get('https://{}/api/v1/routing?api_key={}'.format(controller, api_key), verify = False).json()['data']
+            routers = requests.get('https://{}/api/v1/routers?api_key={}'.format(controller, api_key), verify = False).json()['data']
             nodes = requests.get('https://{}/api/v1/routers/{}?api_key={}'.format(controller, local_id, api_key), verify = False).json()['data'][str(local_id)]['labels']
             break
         except:

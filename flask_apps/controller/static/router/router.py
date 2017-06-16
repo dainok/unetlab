@@ -141,12 +141,12 @@ def main():
                 logging.debug('ingress data')
                 udp_datagram, src_addr = ingress.recvfrom(BUFFER)
                 if not udp_datagram:
-                    logging.error('cannot receive data from controller')
+                    logging.error('cannot receive data from remote router/wrapper')
                     sys.exit(1)
                 else:
                     label, iface, payload = decodeUDPPacket(udp_datagram)
                     try:
-                        dst_router_id = routing[str(label)][str(iface)]['dst_controller']
+                        dst_router_id = routing[str(label)][str(iface)]['dst_router']
                         dst_label = routing[str(label)][str(iface)]['dst_label']
                         dst_if = routing[str(label)][str(iface)]['dst_if']
                         dst_node_ip = nodes[str(dst_label)]['ip']

@@ -63,7 +63,7 @@ def usage():
     print('')
     print('Options:')
     print('    -d             enable debug')
-    print('    -c controller  the IP or domain name of the controller host')
+    print('    -r router      the IP or domain name of the router')
     print('    -l label       an integer starting from 0')
     print('    -m veths       management interfaces')
     sys.exit(255)
@@ -71,7 +71,7 @@ def usage():
 def main():
     import socket
     console_history = bytearray()
-    controller = None
+    router = None
     label = None
     inputs = []
     outputs = []
@@ -83,7 +83,7 @@ def main():
 
     # Reading options
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'dc:l:m:')
+        opts, args = getopt.getopt(sys.argv[1:], 'dr:l:m:')
     except getopt.GetoptError as err:
         sys.stderr.write('ERROR: {}\n'.format(err))
         usage()
@@ -91,8 +91,8 @@ def main():
     for opt, arg in opts:
         if opt == '-d':
             logging.basicConfig(level = logging.DEBUG)
-        elif opt == '-c':
-            controller = arg
+        elif opt == '-r':
+            router = arg
         elif opt == '-l':
             try:
                 label = int(arg)
@@ -106,8 +106,8 @@ def main():
             assert False, 'unhandled option'
 
     # Checking options
-    if controller == None:
-        logging.error('controller not recognized')
+    if router == None:
+        logging.error('router not recognized')
         sys.exit(255)
     if label == None:
         logging.error('label not recognized')
@@ -118,27 +118,27 @@ def main():
         logging.error('no QEMU command to start')
         sys.exit(1)
 
-    # Preparing socket (controller -> wrapper)
-    from_controller = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    from_controller.bind(('', ROUTER_PORT))
+    # Preparing socket (router -> wrapper)
+    from_router = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    from_router.bind(('', ROUTER_PORT))
     try:
-        from_controller = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        from_controller.bind(('', ROUTER_PORT))
+        from_router = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        from_router.bind(('', ROUTER_PORT))
     except Exception as err:
         logging.error('cannot open UDP socket on port {}'.format(ROUTER_PORT))
         logging.error(err)
         sys.exit(1)
-    inputs.append(from_controller)
-    atexit.register(from_controller.close)
+    inputs.append(from_router)
+    atexit.register(from_router.close)
 
-   # Preparing socket (wrapper -> controller)
+   # Preparing socket (wrapper -> router)
     try:
-        to_controller = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        to_router = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     except Exception as err:
-        logging.error('cannot prepare socket for controller')
+        logging.error('cannot prepare socket for router')
         logging.error(err)
         sys.exit(1)
-    atexit.register(to_controller.close)
+    atexit.register(to_router.close)
 
     # Preparing tap (wrapper <-> node)
     for tap in os.listdir('/sys/class/net'):
@@ -181,11 +181,11 @@ def main():
         readable, writable, exceptional = select.select(inputs, outputs, inputs)
 
         for s in readable:
-            if s is from_controller:
-                logging.debug('data from controller')
-                udp_datagram, src_addr = from_controller.recvfrom(BUFFER)
+            if s is from_router:
+                logging.debug('data from router')
+                udp_datagram, src_addr = from_router.recvfrom(BUFFER)
                 if not udp_datagram:
-                    logging.error('cannot receive data from controller')
+                    logging.error('cannot receive data from router')
                     sys.exit(1)
                 else:
                     label, iface, payload = decodeUDPPacket(udp_datagram)
@@ -207,15 +207,15 @@ def main():
                         veth_found = True
                         datagram = os.read(s.fileno(), BUFFER)
                         if not datagram:
-                            logging.error('cannot receive data from controller')
+                            logging.error('cannot receive data from router')
                             sys.exit(1)
                         else:
                             try:
-                                logging.debug('sending data to controller {} ({}:{})'.format(controller, label, interface_id))
-                                to_controller.sendto(encodeUDPPacket(label, interface_id, datagram), (controller, ROUTER_PORT))
+                                logging.debug('sending data to router {} ({}:{})'.format(router, label, interface_id))
+                                to_router.sendto(encodeUDPPacket(label, interface_id, datagram), (router, ROUTER_PORT))
                                 break
                             except Exception as err:
-                                logging.error('cannot send data to controller')
+                                logging.error('cannot send data to router')
                                 logging.error(err)
                                 sys.exit(1)
                 if veth_found == False:

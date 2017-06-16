@@ -5,7 +5,7 @@ __copyright__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
 __license__ = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
 __revision__ = '20170430'
 
-import hashlib, io, json, os, random, shutil, uuid
+import hashlib, io, ipaddress, json, os, random, shutil, uuid
 from flask import abort, request, send_file
 from flask_restful import Resource
 from sqlalchemy import and_
@@ -244,6 +244,7 @@ class BootstrapNode(Resource):
         node_id = active_node.node_id
         node_json = json.loads(active_node.active_lab.json)['topology']['nodes'][str(node_id)]
         router = RouterTable.query.get_or_404(active_node.router_id)
+        router_ip = ipaddress.IPv4Interface(router.inside_ip).ip
         if active_node.router_id == 0:
             controller_ip = config['app']['inside_ip']
         else:
@@ -275,7 +276,7 @@ class BootstrapNode(Resource):
         init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 443 -j DNAT --to {}:443\n'.format(controller_ip)
 
         if node_json['type'] == 'iol':
-            wrapper_cmd = '/tmp/wrapper_iol.py -c {} -l {} -t -w {}'.format(router.inside_ip, label, node_json['name'])
+            wrapper_cmd = '/tmp/wrapper_iol.py -d -r {} -l {} -t -w {}'.format(router_ip, label, node_json['name'])
             bin_cmd = '/data/node/iol.bin -n 4096 -q'
             if 'iol_id' in node_json:
                 iol_id = node_json['iol_id']
@@ -301,7 +302,7 @@ class BootstrapNode(Resource):
                     wrapper_cmd = wrapper_cmd + ' -m {}'.format(interface_id)
         elif node_json['type'] == 'qemu':
             bin_cmd = '/usr/bin/qemu-system-x86_64'
-            wrapper_cmd = '/tmp/wrapper_qemu.py -c {} -l {}'.format(controller.inside_ip, label)
+            wrapper_cmd = '/tmp/wrapper_qemu.py -r {} -l {}'.format(router_ip, label)
             if node_json['subtype'] == 'vyos':
                 bin_cmd = bin_cmd + ' -boot order=c -drive file=/data/node/hda.qcow2,if=virtio,format=qcow2 -enable-kvm -m {}M -serial telnet:0.0.0.0:5023,server,nowait -monitor telnet:0.0.0.0:5024,server,nowait -nographic'.format(node_json['ram'])
                 for interface_id, interface in sorted(node_json['interfaces'].items()):
