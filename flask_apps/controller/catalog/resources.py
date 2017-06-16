@@ -276,7 +276,7 @@ class BootstrapNode(Resource):
         init_body = init_body + 'iptables -t nat -A PREROUTING -i mgmt -p tcp --dport 443 -j DNAT --to {}:443\n'.format(controller_ip)
 
         if node_json['type'] == 'iol':
-            wrapper_cmd = '/tmp/wrapper_iol.py -d -r {} -l {} -t -w {}'.format(router_ip, label, node_json['name'])
+            wrapper_cmd = '/tmp/wrapper_iol.py -r {} -l {} -t -w {}'.format(router_ip, label, node_json['name'])
             bin_cmd = '/data/node/iol.bin -n 4096 -q'
             if 'iol_id' in node_json:
                 iol_id = node_json['iol_id']
