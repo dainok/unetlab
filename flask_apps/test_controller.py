@@ -359,8 +359,8 @@ def main():
     logging.info('Routers: adding a router ({})'.format(router_1))
     data = {
         'id': router_1,
-        'inside_ip': '172.31.0.3/16',
-        'outside_ip': '1.1.1.131/24'
+        'inside_ip': '172.31.0.3',
+        'outside_ip': '1.1.1.131'
     }
     returned_data = make_request('https://{}/api/v1/routers'.format(controller), method = 'POST', data = data, api_key = api_key, expected_codes = 200)
     if returned_data['data']['id'] != data['id']: sys.exit('id not validated')
@@ -376,7 +376,7 @@ def main():
     logging.info('Routers: register a new router ({})'.format(router_2))
     data = {
         'id': router_2,
-        'inside_ip': '172.32.0.3/16'
+        'inside_ip': '172.32.0.3'
     }
     returned_data = make_request('https://{}/api/v1/routers'.format(controller), method = 'POST', data = data, api_key = api_key, expected_codes = 200)
     if returned_data['data']['id'] != data['id']: sys.exit('id not validated')
@@ -386,26 +386,25 @@ def main():
     returned_data = make_request('https://{}/api/v1/routers/{}'.format(controller, router_2), method = 'GET', api_key = api_key, expected_codes = 200)
     if returned_data['data'][str(router_2)]['id'] != data['id']: sys.exit('id not validated')
     if returned_data['data'][str(router_2)]['inside_ip'] != data['inside_ip']: sys.exit('inside_ip not validated')
-    if returned_data['data'][str(router_2)]['outside_ip'] != None: sys.exit('outside_ip not validated')
+    if returned_data['data'][str(router_2)]['outside_ip'] != '0.0.0.0': sys.exit('outside_ip not validated')
 
     logging.info('Routers: register an existent router ({})'.format(router_1))
     data = {
-        'id': router_1,
-        'inside_ip': '172.31.0.3/16'
+        'inside_ip': '172.31.0.3'
     }
-    returned_data = make_request('https://{}/api/v1/routers'.format(controller), method = 'POST', data = data, api_key = api_key, expected_codes = 200)
-    if returned_data['data']['id'] != data['id']: sys.exit('id not validated')
+    returned_data = make_request('https://{}/api/v1/routers/{}'.format(controller, router_1), method = 'PATCH', data = data, api_key = api_key, expected_codes = 200)
+    if returned_data['data']['id'] != router_1: sys.exit('id not validated')
     if returned_data['data']['inside_ip'] != data['inside_ip']: sys.exit('inside_ip not validated')
 
     logging.info('Routers: get registered router ({})'.format(router_1))
     returned_data = make_request('https://{}/api/v1/routers/{}'.format(controller, router_1), method = 'GET', api_key = api_key, expected_codes = 200)
-    if returned_data['data'][str(router_1)]['id'] != data['id']: sys.exit('id not validated')
+    if returned_data['data'][str(router_1)]['id'] != router_1: sys.exit('id not validated')
     if returned_data['data'][str(router_1)]['inside_ip'] != data['inside_ip']: sys.exit('inside_ip not validated')
 
     logging.info('Routers: edit router ({})'.format(router_1))
     data = {
-        'inside_ip': '172.34.0.3/16',
-        'outside_ip': '1.1.1.134/24'
+        'inside_ip': '172.34.0.3',
+        'outside_ip': '1.1.1.134'
     }
     returned_data = make_request('https://{}/api/v1/routers/{}'.format(controller, router_1), method = 'PATCH', data = data, api_key = api_key, expected_codes = 200)
     if returned_data['data']['inside_ip'] != data['inside_ip']: sys.exit('inside_ip not validated')

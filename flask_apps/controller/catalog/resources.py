@@ -74,6 +74,7 @@ def activateLab(username, jlab):
 
 def fixjLab(jlab):
     # Check lab integrity
+    # TODO should move into parser
     if not 'topology' in jlab:
         jlab['topology'] = {
             'nodes': {},
@@ -335,15 +336,9 @@ class BootstrapNode(Resource):
 class Lab(Resource):
     def delete(self, lab_id = None):
         username = checkAuthz(request)
-        args = delete_lab_parser.parse_args()
-        if not lab_id:
-            # No lab has been selected
-            abort(400)
-        else:
-            active_lab = ActiveLabTable.query.get((lab_id, username))
-            lab = LabTable.query.get(lab_id)
-        if not active_lab and not lab:
-            abort(404)
+        args = lab_parser_delete(lab_id, username)
+        active_lab = ActiveLabTable.query.get((lab_id, username))
+        lab = LabTable.query.get(lab_id)
         if active_lab:
             # If an active lab exists for the user, it can be deleted by the user himself
             db.session.delete(active_lab)
@@ -390,7 +385,7 @@ class Lab(Resource):
         }
 
     def post(self):
-        args = add_lab_parser.parse_args()
+        args = lab_parser_post()
         username = checkAuthzPath(request, [args['repository']], True)
         jlab = {
             'id': str(uuid.uuid4()),
@@ -458,18 +453,23 @@ class Node(Resource):
             'task': str(t)
         }
 
+    def patch(self, label = None):
+        args = node_parser_patch(label)
+        checkAuthz(request, ['admin'])
+        node = ActiveNodeTable.query.get(label)
+        for key, value in args.items():
+            setattr(node, key, value)
+        db.session.commit()
+        return {
+            'status': 'success',
+            'message': 'Node "{}" registered'.format(label)
+        }
+
 class Repository(Resource):
     def delete(self, repository_id = None):
         username = checkAuthz(request, ['admin'])
-        if not repository_id:
-            # No repository has been selected
-            abort(400)
-        elif repository_id == 'local':
-            # Repository 'local' cannot be deleted
-            abort(403)
-        elif not os.path.isdir('{}/{}'.format(config['app']['lab_repository'], repository_id)):
-            # Repository does not exist
-            abort(404)
+        # Get the repository_id if exists, else 404
+        repository_parser_delete(repository_id)
         t = deleteGit.apply_async((username, repository_id,))
         return {
             'status': 'enqueued',
@@ -484,7 +484,8 @@ class Repository(Resource):
             repositories = RepositoryTable.query.order_by(RepositoryTable.query.order_by.id)
         else:
             # List a single repository if exists, else 404
-            repositories = [RepositoryTable.query.get_or_404(repository_id)]
+            repository_parser_get(repository_id)
+            repositories = [RepositoryTable.query.get(repository_id)]
         data = {}
         for repository in repositories:
             # Print each repository
@@ -496,17 +497,12 @@ class Repository(Resource):
         }
 
     def patch(self, repository_id = None):
-        args = patch_repository_parser.parse_args()
-        checkAuthz(request, ['admin'])
-        if not repository_id:
-            # No repository has been selected
-            abort(400)
-        else:
-            # Get the repository if exists, else 404
-            repository = RepositoryTable.query.get_or_404(repository_id)
+        username = checkAuthz(request, ['admin'])
+        args = repository_parser_patch(repository_id)
+        # Get the repository if exists, else 404
+        repository = RepositoryTable.query.get(repository_id)
         for key, value in args.items():
-            if key in ['url', 'username', 'password']:
-                setattr(repository, key, value)
+            setattr(repository, key, value)
         db.session.commit()
         return {
             'status': 'success',
@@ -515,14 +511,8 @@ class Repository(Resource):
         }
 
     def post(self):
-        args = add_repository_parser.parse_args()
         username = checkAuthz(request, ['admin'])
-        if args['repository'] == 'local':
-            # local is a reserved repository
-            abort(400)
-        if not args['username']:
-            args['username'] = None
-            args['password'] = None
+        args = repository_parser_post()
         t = addGit.apply_async((username, args['repository'], args['url'], args['username'], args['password']))
         return {
             'status': 'enqueued',
@@ -534,7 +524,7 @@ class Role(Resource):
     def delete(self, role = None):
         checkAuthz(request, ['admin'])
         # Get the role if exists, else 404
-        role_parser_get(role)
+        role_parser_delete(role)
         role = RoleTable.query.get(role)
         db.session.delete(role)
         db.session.commit()
@@ -600,12 +590,9 @@ class Role(Resource):
 class Router(Resource):
     def delete(self, router_id = None):
         checkAuthz(request, ['admin'])
-        if not router_id:
-            # No router has been selected
-            abort(400)
-        else:
-            # Get the router if exists, else 404
-            router = RouterTable.query.get_or_404(router_id)
+        # Get the router if exists, else 404
+        router_parser_delete(router_id)
+        router = RouterTable.query.get_or_404(router_id)
         db.session.delete(router)
         db.session.commit()
         return {
@@ -620,9 +607,10 @@ class Router(Resource):
             summary = True
             routers = RouterTable.query.order_by(RouterTable.id)
         else:
-            # List a single controller if exists, else 404
+            # List a single router if exists, else 404
             summary = False
-            routers = [RouterTable.query.get_or_404(router_id)]
+            router_parser_get(router_id)
+            routers = [RouterTable.query.get(router_id)]
         data = {}
         for router in routers:
             # Print each router
@@ -634,17 +622,12 @@ class Router(Resource):
         }
 
     def patch(self, router_id = None):
-        args = patch_router_parser.parse_args()
         checkAuthz(request, ['admin'])
-        if not router_id:
-            # No router has been selected
-            abort(400)
-        else:
-            # Get the router if exists, else 404
-            router = RouterTable.query.get_or_404(router_id)
+        args = router_parser_patch(router_id)
+        # Get the router if exists, else 404
+        router = RouterTable.query.get(router_id)
         for key, value in args.items():
-            if key in ['inside_ip', 'outside_ip']:
-                setattr(router, key, value)
+            setattr(router, key, value)
         db.session.commit()
         return {
             'status': 'success',
@@ -653,26 +636,18 @@ class Router(Resource):
         }
 
     def post(self):
-        args = add_router_parser.parse_args()
         checkAuthz(request, ['admin'])
-        router = RouterTable.query.get(args['id'])
-        if router:
-            # Router already exists (registering)
-            router.inside_ip = args['inside_ip']
-            message = 'Router "{}" registered'.format(router.id)
-        else:
-            # New router
-            router = RouterTable(
-                id = args['id'],
-                inside_ip = args['inside_ip'],
-                outside_ip = args['outside_ip']
-            )
-            message = 'Router "{}" added'.format(router.id)
-            db.session.add(router)
+        args = router_parser_post()
+        router = RouterTable(
+            id = args['id'],
+            inside_ip = args['inside_ip'],
+            outside_ip = args['outside_ip']
+        )
+        db.session.add(router)
         db.session.commit()
         return {
             'status': 'success',
-            'message': message,
+            'message': 'Router "{}" added'.format(router.id),
             'data': printRouter(router)
         }
 

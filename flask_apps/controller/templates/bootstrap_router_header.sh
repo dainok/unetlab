@@ -18,9 +18,10 @@ trap routerStop SIGINT SIGTERM &> /dev/null
 trap routerReload SIGHUP &> /dev/null
 
 # Registering router
-echo -n "Registering  router ${ROUTERID}..."
-IP_ADDRESS=$(ifconfig eth0 | grep "inet addr" | sed 's/.*inet addr:\([0-9.]*\) .*Mask:/\1\//g')
-curl -k -s -o /dev/null -X POST -d "{\"id\":${ROUTERID},\"inside_ip\":\"${IP_ADDRESS}\"}" -H 'Content-type: application/json' "https://${CONTROLLER}/api/v1/routers?api_key=${API}" || exit 1
+echo -n "Registering router ${ROUTERID}..."
+IP_ADDRESS=$(ifconfig eth0 | grep "inet addr" | sed 's/.*inet addr:\([0-9.]*\) .*/\1/g')
+curl -k -s -o /dev/null -X POST -d "{\"id\":${ROUTERID},\"inside_ip\":\"${IP_ADDRESS}\"}" -H 'Content-type: application/json' "https://${CONTROLLER}/api/v1/routers?api_key=${API}"
+curl -k -s -o /dev/null -X PATCH -d "{\"inside_ip\":\"${IP_ADDRESS}\"}" -H 'Content-type: application/json' "https://${CONTROLLER}/api/v1/routers/${ROUTERID}?api_key=${API}" || exit 1
 echo "done"
 
 echo -n "Starting router ${ROUTERID}..."

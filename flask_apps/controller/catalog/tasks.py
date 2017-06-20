@@ -189,6 +189,7 @@ def startNode(self, started_by, label, node_name, node_id, node_type, node_image
         # Create container
         data = {
             'Env': [
+                "API={}".format(config['app']['api_key']),
                 "CONTROLLER={}".format(controller),
                 "LABEL={}".format(label)
             ],
