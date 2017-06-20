@@ -26,9 +26,8 @@ def parse_ip(ip):
     return ip
 
 def parse_json():
-    try:
-        rargs = request.json
-    except:
+    rargs = request.json
+    if not rargs:
         abort(make_response(jsonify(message = 'Input data is not a valid JSON'), 400))
     return rargs
 
@@ -37,7 +36,7 @@ def parse_label(label):
     label = parse_type(label, 'label', int)
     if label < 0:
         abort(make_response(jsonify(message = 'Argument "label" must be equal or greater than 0'), 400))
-    return labels
+    return label
 
 def parse_labels(labels):
     # A label must be integer greater than -1 (-1 is infinite)
@@ -64,7 +63,7 @@ def parse_roles(roles):
             abort(make_response(jsonify(message = 'Role "{}" not found'.format(role)), 400))
     return roles
 
-def parte_state(state):
+def parse_state(state):
     # State can be "on" or "off"
     if state != 'on' and state != 'off':
         abort(make_response(jsonify(message = 'Argument "state" is invalid'), 400))

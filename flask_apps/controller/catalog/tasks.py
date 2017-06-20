@@ -221,23 +221,6 @@ def startNode(self, started_by, label, node_name, node_id, node_type, node_image
             progress = 100
         )
 
-    # Get node IP
-    r = requests.get('https://{}:5443/docker/containers/{}/json'.format(router_ip, container_name), verify = False, auth = basic_auth)
-    if r.status_code != 200:
-        # Failed to query Docker
-        return updateTask(
-            task_id = task_id,
-            username = started_by,
-            status = 'failed',
-            message = 'Failed to start node "{}" (label {}) on router_id "{}" (cannot query Docker for node IP, error {}: {})'.format(node_name, label, router_id, r.status_code, r.reason),
-            progress = 100
-        )
-    node.state = 'on'
-    node.ip = r.json()['NetworkSettings']['Networks']['workload-net']['IPAddress']
-    db.session.commit()
-
-    # TODO should kill sighup to the router
-
     return updateTask(
         task_id = task_id,
         username = started_by,

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function nodeExit {
-	curl -k -s -o /dev/null -X PATCH -d "{\"ip\":null,\"state\":\"off\"}" -H 'Content-type: application/json' "https://${CONTROLLER}/api/v1/nodes/${LABEL}?api_key=${API}" || exit 1
+	curl -k -s -o /dev/null -X PATCH -d "{\"ip\":\"0.0.0.0\",\"state\":\"off\"}" -H 'Content-type: application/json' "https://${CONTROLLER}/api/v1/nodes/${LABEL}?api_key=${API}" || exit 1
 }
 
 function nodeStop {
@@ -15,7 +15,7 @@ trap nodeExit EXIT &> /dev/null
 # Registering router
 echo -n "Registering node_${LABEL}..."
 IP_ADDRESS=$(ifconfig eth0 | grep "inet addr" | sed 's/.*inet addr:\([0-9.]*\) .*/\1/g')
-curl -k -s -o /dev/null -X PATCH -d "{\"ip\":null,\"state\":\"off\"}" -H 'Content-type: application/json' "https://${CONTROLLER}/api/v1/nodes/${LABEL}?api_key=${API}" || exit 1
+curl -k -s -o /dev/null -X PATCH -d "{\"ip\":\"${IP_ADDRESS}\",\"state\":\"on\"}" -H 'Content-type: application/json' "https://${CONTROLLER}/api/v1/nodes/${LABEL}?api_key=${API}" || exit 1
 
 echo "Starting node_${LABEL}..."
 
