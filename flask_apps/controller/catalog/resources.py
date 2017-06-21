@@ -41,6 +41,7 @@ def activateLab(username, jlab):
             label = label + 1
         active_lab.nodes.append(ActiveNodeTable(
             node_id = node_id,
+            router_id = 0,
             state = 'off',
             label = label
         ))
@@ -342,6 +343,10 @@ class Lab(Resource):
         if active_lab:
             # If an active lab exists for the user, it can be deleted by the user himself
             db.session.delete(active_lab)
+            # Delete nodes
+            for active_node in active_lab.nodes:
+                # Delete active nodes
+                t = deleteNode.apply_async((username, active_node.label, 'node_{}'.format(active_node.label), active_node.node_id, active_node.router_id))
         if lab and args['commit'] == True:
             # If a lab exists, it can be deleted by an authorized user only
             checkAuthzPath(request, [lab.repository_id, lab.name], True)
@@ -427,10 +432,6 @@ class Node(Resource):
     def get(self, label = None, action = None):
         active_node = ActiveNodeTable.query.get_or_404(label)
         router_id = active_node.router_id
-        if router_id == None:
-            active_node.router_id = 0
-            router_id = 0
-            db.session.commit()
         node_ip = active_node.ip
         username = checkAuthzPath(request, [active_node.active_lab.repository_id, active_node.active_lab.name])
         jlab = json.loads(active_node.active_lab.json)

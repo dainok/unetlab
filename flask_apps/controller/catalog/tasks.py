@@ -106,6 +106,110 @@ def deleteGit(self, started_by, repository_id):
     )
 
 @celery.task(bind = True)
+def deleteNode(self, started_by, label, node_name, node_id, router_id):
+    # Stop and delete a node
+    basic_auth = requests.auth.HTTPBasicAuth('admin', config['app']['api_key'])
+    container_name = 'node_{}'.format(label)
+    task_id = deleteNode.request.id
+    self.update_state(state = 'STARTED', meta = updateTask(task_id, username = started_by, status = 'started', progress = -1,
+        message = 'Deleting node "{}" (label {})'.format(node_name, label)
+    ))
+    router = RouterTable.query.get(router_id)
+    node = ActiveNodeTable.query.get(label)
+    if not router:
+        # Selected router does not exist
+        return updateTask(
+            task_id = task_id,
+            username = started_by,
+            status = 'failed',
+            message = 'Failed to delete node "{}" (label {}) on router_id "{}" (router does not exist)'.format(node_name, label, router_id),
+            progress = 100
+        )
+    if not node:
+        # Selected node does not exist
+        return updateTask(
+            task_id = task_id,
+            username = started_by,
+            status = 'failed',
+            message = 'Failed to delete node "{}" (label {}) on router_id "{}" (node does not exist)'.format(node_name, label, router_id),
+            progress = 100
+        )
+    if router_id == 0:
+        # Router is in the same network of controller
+        router_ip = ipaddress.IPv4Interface(router.inside_ip).ip
+    else:
+        # Need to use the external IP
+        router_ip = ipaddress.IPv4Interface(router.outside_ip).ip
+
+    # Check node status
+    r = requests.get('https://{}:5443/docker/containers/{}/json'.format(router_ip, container_name), verify = False, auth = basic_auth)
+    if r.status_code == 404:
+        # Selected container does not exist
+        return updateTask(
+            task_id = task_id,
+            username = started_by,
+            status = 'failed',
+            message = 'Failed to delete node "{}" (label {}) on router_id "{}" (node is already deleted)'.format(node_name, label, router_id),
+            progress = 100
+        )
+    elif r.status_code == 200 and not r.json()['State']['Running']:
+        # Selected container is already stopped
+        container_stopped = True
+        node.state = 'off'
+        db.session.commit()
+        return updateTask(
+            task_id = task_id,
+            username = started_by,
+            status = 'failed',
+            message = 'Failed to stop node "{}" (label {}) on router_id "{}" (node is already stopped)'.format(node_name, label, router_id, node_image),
+            progress = 100
+        )
+    elif r.status_code == 200:
+        # Selected container is running
+        container_stopped = False
+    else:
+        # Failed to query Docker
+        return updateTask(
+            task_id = task_id,
+            username = started_by,
+            status = 'failed',
+            message = 'Failed to delete node "{}" (label {}) on router_id "{}" (cannot query Docker for container "{}", error {}: {})'.format(node_name, label, router_id, node_name, r.status_code, r.reason),
+            progress = 100
+        )
+
+    if not container_stopped:
+        # Stop the node
+        r = requests.post('https://{}:5443/docker/containers/{}/stop'.format(router_ip, container_name), verify = False, auth = basic_auth)
+        if r.status_code != 204:
+            return updateTask(
+                task_id = task_id,
+                username = started_by,
+                status = 'failed',
+                message = 'Failed to stop node "{}" (label {}) on router_id "{}" (cannot query Docker for stop, error {}: {})'.format(node_name, label, router_id, r.status_code, r.reason),
+                progress = 100
+            )
+
+    # Delete the node
+    r = requests.delete('https://{}:5443/docker/containers/{}'.format(router_ip, container_name), verify = False, auth = basic_auth)
+    if r.status_code != 204:
+        return updateTask(
+            task_id = task_id,
+            username = started_by,
+            status = 'failed',
+            message = 'Failed to delete node "{}" (label {}) on router_id "{}" (cannot query Docker for delete, error {}: {})'.format(node_name, label, router_id, r.status_code, r.reason),
+            progress = 100
+        )
+
+    return updateTask(
+        task_id = task_id,
+        username = started_by,
+        status = 'completed',
+        message = 'Node "{}" deleted (label {}) on router_id "{}"'.format(node_name, label, router_id),
+        progress = 100
+    )
+
+
+@celery.task(bind = True)
 def startNode(self, started_by, label, node_name, node_id, node_type, node_image, node_ip, router_id):
     # Start a node
     basic_auth = requests.auth.HTTPBasicAuth('admin', config['app']['api_key'])
@@ -225,7 +329,76 @@ def startNode(self, started_by, label, node_name, node_id, node_type, node_image
         task_id = task_id,
         username = started_by,
         status = 'completed',
-        message = 'Node node "{}" started (label {}) on router_id "{}" with image "{}"'.format(node_name, label, router_id, node_image),
+        message = 'Node "{}" started (label {}) on router_id "{}" with image "{}"'.format(node_name, label, router_id, node_image),
+        progress = 100
+    )
+
+@celery.task(bind = True)
+def stopNode(self, started_by, label, node_name, node_id, router_id):
+    # Stop a node
+    basic_auth = requests.auth.HTTPBasicAuth('admin', config['app']['api_key'])
+    container_name = 'node_{}'.format(label)
+    task_id = stopNode.request.id
+    self.update_state(state = 'STARTED', meta = updateTask(task_id, username = started_by, status = 'started', progress = -1,
+        message = 'Stopping node "{}" (label {})'.format(node_name, label)
+    ))
+    router = RouterTable.query.get(router_id)
+    node = ActiveNodeTable.query.get(label)
+    if not router:
+        # Selected router does not exist
+        return updateTask(
+            task_id = task_id,
+            username = started_by,
+            status = 'failed',
+            message = 'Failed to stop node "{}" (label {}) on router_id "{}" (router does not exist)'.format(node_name, label, router_id),
+            progress = 100
+        )
+    if router_id == 0:
+        # Router is in the same network of controller
+        router_ip = ipaddress.IPv4Interface(router.inside_ip).ip
+    else:
+        # Need to use the external IP
+        router_ip = ipaddress.IPv4Interface(router.outside_ip).ip
+
+    # Check node status
+    r = requests.get('https://{}:5443/docker/containers/{}/json'.format(router_ip, container_name), verify = False, auth = basic_auth)
+    if (r.status_code == 404) or (r.status_code == 200 and not r.json()['State']['Running']):
+        # Selected container does not exist or already stopped
+        node.state = 'off'
+        db.session.commit()
+        return updateTask(
+            task_id = task_id,
+            username = started_by,
+            status = 'failed',
+            message = 'Failed to stop node "{}" (label {}) on router_id "{}" (node is already stopped)'.format(node_name, label, router_id, node_image),
+            progress = 100
+        )
+    elif r.status_code != 200:
+        # Failed to query Docker
+        return updateTask(
+            task_id = task_id,
+            username = started_by,
+            status = 'failed',
+            message = 'Failed to stop node "{}" (label {}) on router_id "{}" (cannot query Docker for container "{}", error {}: {})'.format(node_name, label, router_id, node_name, r.status_code, r.reason),
+            progress = 100
+        )
+
+    # Stop the node
+    r = requests.post('https://{}:5443/docker/containers/{}/stop'.format(router_ip, container_name), verify = False, auth = basic_auth)
+    if r.status_code != 204:
+        return updateTask(
+            task_id = task_id,
+            username = started_by,
+            status = 'failed',
+            message = 'Failed to stop node "{}" (label {}) on router_id "{}" (cannot query Docker for stop, error {}: {})'.format(node_name, label, router_id, r.status_code, r.reason),
+            progress = 100
+        )
+
+    return updateTask(
+        task_id = task_id,
+        username = started_by,
+        status = 'completed',
+        message = 'Node "{}" stopped (label {}) on router_id "{}"'.format(node_name, label, router_id),
         progress = 100
     )
 
