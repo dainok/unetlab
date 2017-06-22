@@ -43,6 +43,7 @@ def activateLab(username, jlab):
             node_id = node_id,
             router_id = 0,
             state = 'off',
+            ip = '0.0.0.0',
             label = label
         ))
         for interface_id, interface in node['interfaces'].items():
@@ -137,6 +138,7 @@ def printLab(lab, summary = False, username = None):
             for node in ActiveLabTable.query.get_or_404((lab.id, username)).nodes:
                 data['topology']['nodes'][str(node.node_id)]['label'] = node.label
                 data['topology']['nodes'][str(node.node_id)]['ip'] = node.ip
+                data['topology']['nodes'][str(node.node_id)]['router_id'] = node.router_id
     return data
 
 def printRepository(repository):

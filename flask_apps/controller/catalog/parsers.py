@@ -75,6 +75,12 @@ def parse_topology(topology):
     if 'nodes' in topology:
         nodes = parse_type(topology['nodes'], 'topology[nodes]', dict)
         for node_id, node in nodes.items():
+            if 'ip' in node:
+                # Reserved field
+                abort(make_response(jsonify(message = 'Argument "ip" in "topology[nodes][node_id]" is reserved'), 400))
+            if 'router_id' in node:
+                # Reserved field
+                abort(make_response(jsonify(message = 'Argument "router_id" in "topology[nodes][node_id]" is reserved'), 400))
             if not node_id.isdigit():
                 abort(make_response(jsonify(message = 'Argument node_id in "topology[nodes][node_id]" must be numeric'), 400))
             node = parse_type(node, 'topology[nodes][{}]'.format(node_id), dict)
@@ -216,13 +222,12 @@ def node_parser_patch(label):
 
     if 'ip' in rargs:
         args['ip'] = parse_ip(rargs['ip'])
-    else:
-        abort(make_response(jsonify(message = 'Argument "ip" cannot be blank'), 400))
+
+    if 'router_id' in rargs:
+        args['router_id'] = parse_router(rargs['router_id'])
 
     if 'state' in rargs:
         args['state'] = parse_state(rargs['state'])
-    else:
-        abort(make_response(jsonify(message = 'Argument "state" cannot be blank'), 400))
 
     return args
 
