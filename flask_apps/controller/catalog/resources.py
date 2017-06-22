@@ -228,7 +228,6 @@ class Auth(Resource):
 class BootstrapRouter(Resource):
     def get(self, router_id = None):
         checkAuthz(request, ['admin'])
-        router = RouterTable.query.get_or_404(router_id)
         init_body = ''
 
         # Load header and footer
