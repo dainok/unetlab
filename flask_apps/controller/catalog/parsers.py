@@ -63,6 +63,11 @@ def parse_roles(roles):
             abort(make_response(jsonify(message = 'Role "{}" not found'.format(role)), 400))
     return roles
 
+def parse_router(router_id):
+    if not RouterTable.query.get(router_id):
+        abort(make_response(jsonify(message = 'Argument "router_id" is invalid'), 400))
+    return router_id
+
 def parse_state(state):
     # State can be "on" or "off"
     if state != 'on' and state != 'off':
