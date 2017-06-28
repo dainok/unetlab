@@ -130,6 +130,15 @@ def auth_parser_patch(username):
 
     return args
 
+def controller_parser_patch():
+    args = {}
+    rargs = parse_json()
+
+    if 'outside_ip' in rargs:
+        args['outside_ip'] = parse_ip(rargs['outside_ip'])
+
+    return args
+
 def lab_parser_delete(lab_id, username = None):
     args = {}
 

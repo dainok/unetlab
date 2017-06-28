@@ -14,6 +14,7 @@ from controller.catalog.aaa import checkAuth, checkAuthz, checkAuthzPath
 from controller.catalog.models import *
 from controller.catalog.parsers import *
 from controller.catalog.tasks import *
+from controller.config import *
 
 def activateLab(username, jlab):
     # Checking for available labels
@@ -348,21 +349,23 @@ class Ctrl(Resource):
         return {
             'status': 'success',
             'message': 'Lab(s) found',
-            'data': printController
+            'data': printController()
         }
 
-    def patch(self):
-        checkAuthz(request, ['admin'])
-        args = controller_parser_patch()
-        for key, value in args.items():
-            config['app'][key] = value
-        with open('/data/etc/controller.ini', 'w') as config_fd:
-            config.write(config_fd)
-            config_fd.close()
-        return {
-            'status': 'success',
-            'message': 'Controller saved'
-        }
+    #def patch(self):
+    #    TODO
+    #    checkAuthz(request, ['admin'])
+    #    args = controller_parser_patch()
+    #    #for key, value in args.items():
+    #    #    config['app'][key] = value
+    #    #with open('/data/etc/controller.ini', 'w') as config_fd:
+    #    #    config.write(config_fd)
+    #    #    config_fd.close()
+    #    return { 'a': str(type(config))}
+    #    return {
+    #        'status': 'success',
+    #        'message': 'Controller saved'
+    #    }
 
 class Lab(Resource):
     def delete(self, lab_id = None):
