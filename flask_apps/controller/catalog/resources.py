@@ -141,6 +141,13 @@ def printLab(lab, summary = False, username = None):
                 data['topology']['nodes'][str(node.node_id)]['router_id'] = node.router_id
     return data
 
+def printController():
+    data = {
+        'inside_ip': config['app']['inside_ip'],
+        'outside_ip': config['app']['outside_ip']
+    }
+    return data
+
 def printRepository(repository):
     data =  {
         'id': repository.id,
@@ -334,6 +341,28 @@ class BootstrapNode(Resource):
         init_body = init_body + 'wait ${BIN_PID}\n'
         init_script = init_header + init_body + init_footer
         return send_file(io.BytesIO(init_script.encode()), attachment_filename = 'init', mimetype = 'text/x-shellscript')
+
+class Ctrl(Resource):
+    def get(self):
+        checkAuthz(request, ['admin'])
+        return {
+            'status': 'success',
+            'message': 'Lab(s) found',
+            'data': printController
+        }
+
+    def patch(self):
+        checkAuthz(request, ['admin'])
+        args = controller_parser_patch()
+        for key, value in args.items():
+            config['app'][key] = value
+        with open('/data/etc/controller.ini', 'w') as config_fd:
+            config.write(config_fd)
+            config_fd.close()
+        return {
+            'status': 'success',
+            'message': 'Controller saved'
+        }
 
 class Lab(Resource):
     def delete(self, lab_id = None):

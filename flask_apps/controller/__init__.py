@@ -163,6 +163,7 @@ def http_404(err):
 api.add_resource(Auth, '/api/v1/auth')
 api.add_resource(BootstrapNode, '/api/v1/bootstrap/nodes/<int:label>')
 api.add_resource(BootstrapRouter, '/api/v1/bootstrap/routers/<int:router_id>')
+api.add_resource(Ctrl, '/api/v1/controller')
 api.add_resource(Lab, '/api/v1/labs', '/api/v1/labs/<string:lab_id>')
 api.add_resource(Node, '/api/v1/nodes', '/api/v1/nodes/<int:label>', '/api/v1/nodes/<int:label>/<string:action>')
 api.add_resource(Repository, '/api/v1/repositories', '/api/v1/repositories/<string:repository_id>')

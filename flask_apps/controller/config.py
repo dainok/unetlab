@@ -66,7 +66,7 @@ def loadConfig(config_file):
         config['app']['inside_ip'] = '172.16.0.2'
         need_to_save = True
     if not config.has_option('app', 'outside_ip'):
-        config['app']['outside_ip'] = '127.0.0.1'
+        config['app']['outside_ip'] = '0.0.0.0'
         need_to_save = True
     if not config.has_option('advanced', 'label_length'):
         config['advanced']['label_length'] = '2'
