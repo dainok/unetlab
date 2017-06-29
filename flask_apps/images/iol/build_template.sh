@@ -13,7 +13,7 @@ DOCKER="docker -H=tcp://127.0.0.1:4243"
 ARCH="i386"
 SUITE="jessie"
 MIRROR="http://auto.mirror.devuan.org/merged"
-PACKAGES="bridge-utils curl iproute2 iptables iputils-ping net-tools procps python3 uml-utilities"
+PACKAGES="bridge-utils curl iproute2 iptables iputils-ping libffi6 net-tools procps python3 uml-utilities"
 
 function clean {
     rm -rf ${TMP} &> /dev/null
