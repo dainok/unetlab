@@ -149,8 +149,12 @@ def main():
                         dst_router_id = routing[str(label)][str(iface)]['dst_router']
                         dst_label = routing[str(label)][str(iface)]['dst_label']
                         dst_if = routing[str(label)][str(iface)]['dst_if']
-                        dst_node_ip = nodes[str(dst_label)]['ip']
-                        # dst_router_ip
+                        if router_id == dst_router_id:
+                            dst_node_ip = nodes[str(dst_label)]['ip']
+                            dst_router_ip = None
+                        else:
+                            dst_node_ip = None
+                            dst_router_ip = routers[str(dst_router_id)]['outside_ip']
                     except:
                         logging.debug('cannot lookup routing table ({}:{})'.format(label, iface))
                         continue
@@ -161,8 +165,8 @@ def main():
                         logging.debug('packet sent to local router ({}:{})'.format(dst_label, dst_if))
                     else:
                         # Remote destination
-                        logging.debug('packet for remote router ({})'.format(dst_router_id))
-                        # TODO
+                        egress.sendto(encodeUDPPacket(label, iface, payload), (dst_router_ip, ROUTER_PORT))
+                        logging.debug('packet sent to remote router ({}:{})'.format(dst_router_ip, ROUTER_PORT))
             else:
                 logging.error('unknown source from select')
 
