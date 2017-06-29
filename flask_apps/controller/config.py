@@ -4,9 +4,9 @@ __copyright__ = 'Andrea Dainese <andrea.dainese@gmail.com>'
 __license__ = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
 __revision__ = '20170430'
 
-def loadConfig(config_file):
-    import configparser, os, random, sys
+import configparser, os, random, sys
 
+def loadConfig(config_file):
     if not os.path.isfile(config_file):
         # File is not present
         try:
