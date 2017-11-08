@@ -46,6 +46,8 @@ def main():
     c.expect('#', timeout = None)
     c.sendline('ip scp server enable')
     c.expect('#', timeout = None)
+    c.sendline('alias exec replace configure replace')
+    c.expect('#', timeout = None)
     c.sendline('line vty 0 4')
     c.expect('#', timeout = None)
     c.sendline('login local')
