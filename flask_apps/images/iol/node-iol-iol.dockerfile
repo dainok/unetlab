@@ -2,7 +2,7 @@ FROM dainok/nodetemplate-iol:latest
 MAINTAINER Andrea Dainese <andrea.dainese@gmail.com>
 LABEL author = "Andrea Dainese <andrea.dainese@gmail.com>"
 LABEL copyright = "Andrea Dainese <andrea.dainese@gmail.com>"
-LABEL description = "vyos node"
+LABEL description = "iol node"
 LABEL license = "https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode"
 LABEL version = '20170430'
 

@@ -13,7 +13,10 @@ import multiprocessing, os, pexpect, sys, time
 
 def main():
     open('NETMAP', 'a').close()
-    c = pexpect.spawnu('./iol.bin 1')
+    try:
+        c = pexpect.spawnu('./iol.bin 1')
+    except:
+        sys.stderr.write("ERROR: preconfiguration failed (cannot spawn)\n")
     if DEBUG:
         c.logfile = sys.stdout
     i = -1

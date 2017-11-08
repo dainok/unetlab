@@ -76,16 +76,21 @@ case "${IMAGE}" in
 		NAME="node-${SUBTYPE}:$(echo ${IMAGE} | sed 's/\.bin//')"
 		CWD=${PWD}
 		infoImage
+		if [ ! -f "${SOURCE}/iourc" ]; then
+			echo -e "${R}Cannot find iourc (${SOURCE}/iourc)${U}"
+			exit 1
+		fi
 		cp ${SOURCE}/${IMAGE} node/node/iol.bin &>> ${LOG}
 		cp ${SOURCE}/iourc node/node &>> ${LOG}
 		chmod 755 node/node/iol.bin &>> ${LOG}
 		cd node/node &>> ${LOG}
 		${CWD}/${SUBTYPE}/preconfigure_${SUBTYPE}.py &>> ${LOG}
-		cd ${CWD} &>> ${LOG}
+		echo $?
 		if [ $? -ne 0 ]; then
 			echo -e "${R}Preconfiguration failed${U}"
 			exit 1
 		fi
+		cd ${CWD} &>> ${LOG}
 		;;
 	vyos-*-amd64.iso)
 		TYPE="qemu"
