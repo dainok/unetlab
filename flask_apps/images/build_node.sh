@@ -28,13 +28,13 @@ trap clean EXIT
 rm -f ${LOG}
 
 which qemu-img &> /dev/null
-if [ "$1" == "" ]; then
+if [ "$?" == "" ]; then
 	echo -e "${R}qemu-img not found${U}"
 	exit 1
 fi
 
 which qemu-system-x86_64 &> /dev/null
-if [ "$1" == "" ]; then
+if [ "$?" == "" ]; then
 	echo -e "${R}qemu-system-x86_64${U}"
 	exit 1
 fi
