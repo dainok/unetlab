@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export EASYRSA_SSL_CONF=/usr/share/easy-rsa/openssl-1.0.cnf
+
 function controllerStop() {
     echo -n "Shutting down..."
     killall -s SIGTERM mysqld memcached nginx python3 &> /dev/null
@@ -17,6 +19,16 @@ trap controllerStop SIGHUP SIGINT SIGTERM
 
 if [ ! -d /data/logs ]; then
 	mkdir -p /data/logs || exit 1
+fi
+
+if [ ! -f /data/pki/.build-completed ]; then
+	/usr/share/easy-rsa/easyrsa --pki-dir=/data/pki --batch init-pki || exit 1
+	/usr/share/easy-rsa/easyrsa --pki-dir=/data/pki --batch build-ca nopass || exit 1
+	/usr/share/easy-rsa/easyrsa --pki-dir=/data/pki --batch gen-dh || exit 1
+	cp -a /usr/share/easy-rsa/x509-types/ /data/pki/ || exit 1
+	/usr/share/easy-rsa/easyrsa --pki-dir=/data/pki build-server-full controller nopass || exit 1
+	/usr/share/easy-rsa/easyrsa --pki-dir=/data/pki build-server-full client_admin nopass || exit 1
+	touch /data/pki/.build-completed
 fi
 
 if [ ! -d /data/repositories/local ]; then
