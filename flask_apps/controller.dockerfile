@@ -23,6 +23,7 @@ RUN mkdir /usr/lib/python3.6/site-packages/controller || exit 1
 RUN git config --global user.email "root@example.com" || exit 1
 RUN git config --global user.name "Root User"
 COPY nginx.conf /etc/nginx/
+COPY openvpn.conf /etc/openvpn/
 COPY run_controller.py /usr/bin
 COPY controller /usr/lib/python3.6/site-packages/controller/
 COPY bootstrap_controller.sh /sbin/bootstrap.sh
