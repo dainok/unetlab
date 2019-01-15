@@ -1,2 +1,18 @@
+# Linux
+*.log
+*.swp
+
+# Apple
 .DS_Store
-*.pyc
+
+# Ansible
+*.retry
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Jekyll
+_site
+.sass-cache
+.jekyll-metadata
