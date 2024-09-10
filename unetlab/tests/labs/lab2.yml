@@ -1,0 +1,15 @@
+hll:
+  topologies:
+    - type: defined
+      links:
+        - R1, R2, R3
+        - R1, R4
+        - R3, R4
+  ipv4_addresses:
+    - match: Loopback
+      address: 192.168.0.1/16
+      mask: 32
+    - match: Ethernet
+      address: 10.0.0.0/8
+      mask: auto
+lll:
