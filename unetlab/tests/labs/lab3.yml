@@ -1,4 +1,11 @@
 hll:
+  nodes:
+    - template: vyos-vyos
+      prefix: R
+      count: 4
+      features:
+        - loopback
+        - ospf:area=0
   topologies:
     - type: full-mesh
       match:
