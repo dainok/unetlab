@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+from datetime import datetime
+
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / "subdir".
@@ -20,7 +22,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-is*$9*-@-)qo_%a^xo8i%ppjg2#qx4y)tl+ymhk+w*dfh64%pi"
+SECRET_KEY = (
+    "django-insecure-is*$9*-@-)qo_%a^xo8i%ppjg2#qx4y)tl+ymhk+w*dfh64%pi"  # nosec
+)
 
 # SECURITY WARNING: don"t run with debug turned on in production!
 DEBUG = True
@@ -128,9 +132,22 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Constance backend
 # https://django-constance.readthedocs.io/en/latest/backends.html#backends
-CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
+CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
 CONSTANCE_CONFIG = {
-    # ""
-    # 'THE_ANSWER': (42, 'Answer to the Ultimate Question of Life, '
-    #                    'The Universe, and Everything'),
+    "PROXMOX_CLUSTER_ADDRESS": (
+        "",
+        "The FQDN or IP address of the primary Proxmox host.",
+    ),
+    "PROXMOX_USERNAME": (
+        "",
+        "The username for logging into the Proxmox host.",
+    ),
+    "PROXMOX_PASSWORD": (
+        "",
+        "The password for logging into the Proxmox host.",
+    ),
+    "PROXMOX_UPDATED_AT": (
+        datetime.now(),
+        "The last time the Proxmox hosts were checked.",
+    ),
 }
