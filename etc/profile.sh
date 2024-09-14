@@ -1,1 +1,0 @@
-/opt/ovf/ovfconfig.sh
