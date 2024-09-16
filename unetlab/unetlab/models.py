@@ -2,11 +2,11 @@
 
 Define ORM models for UNetLab objects:
 * A Host represents a Proxmox host.
-* A Template represents a Proxmox template used in UNetLab.
-* A Node represents a Proxmox virtual machine used in UNetLab.
-* A Link represents a Proxmox virtual network used in UNetLab.
 * A Lab represents an instance of a running lab.
+* A Link represents a Proxmox virtual network used in UNetLab.
+* A Node represents a Proxmox virtual machine used in UNetLab.
 * A Repository is a directory or a Git HTTPS URL used to retrieve Labs.
+* A Template represents a Proxmox template used in UNetLab.
 """
 
 __author__ = "Andrea Dainese"
@@ -76,7 +76,7 @@ class Repository(models.Model):
 
         db_table = "repositories"
         db_table_comment = "Lab repositories"
-        ordering = ["url"]
+        ordering = ["name"]
         verbose_name = "Repository"
         verbose_name_plural = "Repositories"
 
