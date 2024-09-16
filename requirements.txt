@@ -1,3 +1,4 @@
 Django==5.1.1
 django-constance==4.1.1
 PyYAML==6.0.2
+shortuuid==1.0.13

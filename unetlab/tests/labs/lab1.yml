@@ -19,100 +19,84 @@ hll:
       mask: auto
 lll:
   groups:
-    - name: Nodes R (vyos-vyos)
+    Group1:
       template: vyos-vyos
       match: R
       features:
         - loopback
         - ospf:area=0
   nodes:
-    - id: 6964F62C-0376-4ECF-8F03-E1FEADB94194
-      name: R1
+    R1:
       interfaces:
         Loopback0:
           ipv4_address: 192.168.0.1/32
         Ethernet1:
           ipv4_address: 10.0.0.0/31
+          link_id: SMycRFqXm8nsr7YNoGv2zB
         Ethernet2:
           ipv4_address: 10.0.0.2/31
+          link_id: k4RFdUKF4PFwiBCKgrtiki
         Ethernet3:
           ipv4_address: 10.0.0.4/31
-    - id: 210827C6-9E59-4CCE-80AC-FD294DDC205E
-      name: R2
+          link_id: kkiR2hsp2yHMzwqyC3K9NE
+    R2:
       interfaces:
         Loopback0:
           ipv4_address: 192.168.0.2/32
         Ethernet1:
           ipv4_address: 10.0.0.1/31
+          link_id: SMycRFqXm8nsr7YNoGv2zB
         Ethernet2:
           ipv4_address: 10.0.0.8/31
+          link_id: ihk4ETzvcTKKm7X7mza7Y9
         Ethernet3:
           ipv4_address: 10.0.0.10/31
-    - id: E27CA70B-C837-42AB-B45A-AAADEE73FFAF
-      name: R3
+          link_id: Yr6djkrksydPCvwvps3A79
+    R3:
       interfaces:
         Loopback0:
           ipv4_address: 192.168.0.3/32
         Ethernet1:
           ipv4_address: 10.0.0.3/31
+          link_id: k4RFdUKF4PFwiBCKgrtiki
         Ethernet2:
           ipv4_address: 10.0.0.9/31
+          link_id: ihk4ETzvcTKKm7X7mza7Y9
         Ethernet3:
           ipv4_address: 10.0.0.16/31
-    - id: 2819092C-DFC6-4B94-9674-A5F0616EA92C
-      name: R4
+          link_id: WAy4NbHvujGvtMCrDdLUTT
+    R4:
       interfaces:
         Loopback0:
           ipv4_address: 192.168.0.4/32
         Ethernet1:
           ipv4_address: 10.0.0.5/31
+          link_id: kkiR2hsp2yHMzwqyC3K9NE
         Ethernet2:
           ipv4_address: 10.0.0.11/31
+          link_id: Yr6djkrksydPCvwvps3A79
         Ethernet3:
           ipv4_address: 10.0.0.17/31
+          link_id: WAy4NbHvujGvtMCrDdLUTT
   links:
-    - id: 9E510FC0-B9D6-459E-9EF0-9113607D2502
+    SMycRFqXm8nsr7YNoGv2zB:
       name: R1:Ethernet1 - R2:Ethernet1
-      interfaces:
-        - node_id: 6964F62C-0376-4ECF-8F03-E1FEADB94194
-          interface: Ethernet1
-        - node_id: 210827C6-9E59-4CCE-80AC-FD294DDC205E
-          interface: Ethernet1
-    - id: E4FA2349-3437-4EB8-B6A9-9E00C240E693
-      name: R1:Ethernet1 - R3:Ethernet1
-      interfaces:
-        - node_id: 6964F62C-0376-4ECF-8F03-E1FEADB94194
-          interface: Ethernet1
-        - node_id: E27CA70B-C837-42AB-B45A-AAADEE73FFAF
-          interface: Ethernet1
-    - id: 76B1E55B-11FC-4F69-98B6-86A9016F1E21
-      name: R1:Ethernet1 - R4:Ethernet1
-      interfaces:
-        - node_id: 6964F62C-0376-4ECF-8F03-E1FEADB94194
-          interface: Ethernet1
-        - node_id: 2819092C-DFC6-4B94-9674-A5F0616EA92C
-          interface: Ethernet1
-    - id: 2E6EA571-1D10-4BCA-9303-95693AF8D6EB
+      type: l1
+    k4RFdUKF4PFwiBCKgrtiki:
+      name: R1:Ethernet2 - R3:Ethernet1
+      type: l1
+    kkiR2hsp2yHMzwqyC3K9NE:
+      name: R1:Ethernet3 - R4:Ethernet1
+      type: l2
+    ihk4ETzvcTKKm7X7mza7Y9:
       name: R2:Ethernet2 - R3:Ethernet2
-      interfaces:
-        - node_id: 210827C6-9E59-4CCE-80AC-FD294DDC205E
-          interface: Ethernet2
-        - node_id: E27CA70B-C837-42AB-B45A-AAADEE73FFAF
-          interface: Ethernet2
-    - id: B513B1C3-7BCC-45E6-8DA2-DCB0AD2D9050
+      type: l2
+    Yr6djkrksydPCvwvps3A79:
       name: R2:Ethernet3 - R4:Ethernet2
-      interfaces:
-        - node_id: 210827C6-9E59-4CCE-80AC-FD294DDC205E
-          interface: Ethernet3
-        - node_id: 2819092C-DFC6-4B94-9674-A5F0616EA92C
-          interface: Ethernet2
-    - id: 27760535-94FA-4EB8-8520-42313E21E0FD
+      type: l2
+    WAy4NbHvujGvtMCrDdLUTT:
       name: R3:Ethernet3 - R4:Ethernet3
-      interfaces:
-        - node_id: E27CA70B-C837-42AB-B45A-AAADEE73FFAF
-          interface: Ethernet3
-        - node_id: 2819092C-DFC6-4B94-9674-A5F0616EA92C
-          interface: Ethernet3
+      type: l2
 metadata:
   author: Andrea Dainese
   name: Test Lab 1
