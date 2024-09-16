@@ -14,6 +14,7 @@ from django.dispatch import receiver
 
 from unetlab import models
 
+
 @receiver(post_save, sender=models.Repository)
 def post_save_repository(sender, instance, **kwargs):
     """Scan labs and update Lab table."""
@@ -31,11 +32,13 @@ def post_save_repository(sender, instance, **kwargs):
                         except yaml.YAMLError as exc:
                             logging.error(f"Invalid lab on file {lab_file}")
                             logging.debug(exc)
-                    
+
                     # Validate lab against schema (TODO)
 
                     # Get or create lab
-                    lab, created = models.Lab.objects.get_or_create(uri=lab_file, repository=instance, parent__isnull=True)
+                    lab, created = models.Lab.objects.get_or_create(
+                        uri=lab_file, repository=instance, parent__isnull=True
+                    )
                     if created:
                         # Update lab
                         lab.author = lab_data["metadata"]["author"]
