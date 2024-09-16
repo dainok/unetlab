@@ -17,10 +17,6 @@ hll:
     - match: Ethernet
       address: 10.0.0.0/8
       mask: auto
-meta:
-  author: Andrea Dainese
-  name: Test Lab 1
-  description: First test lab
 lll:
   groups:
     - name: Nodes R (vyos-vyos)
@@ -117,3 +113,7 @@ lll:
           interface: Ethernet3
         - node_id: 2819092C-DFC6-4B94-9674-A5F0616EA92C
           interface: Ethernet3
+metadata:
+  author: Andrea Dainese
+  name: Test Lab 1
+  description: First test lab

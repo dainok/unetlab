@@ -38,7 +38,6 @@ class Host(models.Model):
         """Database metadata."""
 
         db_table = "hosts"
-        db_table_comment = "Proxmox hosts"
         ordering = ["address"]
         verbose_name = "Host"
         verbose_name_plural = "Hosts"
@@ -50,6 +49,48 @@ class Host(models.Model):
     def get_absolute_url(self):
         """Return the absolute url."""
         return reverse("host-detail-view", args=[str(self.id)])
+
+
+#
+# Lab model
+#
+
+
+class Lab(models.Model):
+    """
+    Model for Lab.
+
+    Cache labs and store user instances.
+    """
+
+    author = models.CharField(max_length=256, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    name = models.CharField(max_length=256, blank=True, null=True)
+    parent = models.ForeignKey(
+        to="self", on_delete=models.SET_NULL, editable=False, blank=True, null=True
+    )
+    repository = models.ForeignKey(
+        to="Repository", on_delete=models.CASCADE, editable=False
+    )
+    uri = models.CharField(max_length=256, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        """Database metadata."""
+
+        db_table = "lab"
+        ordering = ["name"]
+        verbose_name = "Lab"
+        verbose_name_plural = "Labs"
+
+    def __str__(self):
+        """Return a human readable name when the object is printed."""
+        return self.uri
+
+    def get_absolute_url(self):
+        """Return the absolute url."""
+        return reverse("lab-detail-view", args=[str(self.id)])
 
 
 #
@@ -75,7 +116,6 @@ class Repository(models.Model):
         """Database metadata."""
 
         db_table = "repositories"
-        db_table_comment = "Lab repositories"
         ordering = ["name"]
         verbose_name = "Repository"
         verbose_name_plural = "Repositories"

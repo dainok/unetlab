@@ -20,3 +20,7 @@ hll:
       address: 10.0.0.0/8
       mask: auto
 lll:
+metadata:
+  author: Andrea Dainese
+  name: Test Lab 2
+  description: Second test lab

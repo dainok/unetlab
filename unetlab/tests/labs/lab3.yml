@@ -28,3 +28,7 @@ hll:
       address: 10.1.0.0/16
       mask: auto
 lll:
+metadata:
+  author: Andrea Dainese
+  name: Test Lab 3
+  description: Third test lab
