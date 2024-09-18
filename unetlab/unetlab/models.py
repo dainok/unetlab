@@ -133,3 +133,42 @@ class Repository(models.Model):
     def get_absolute_url(self):
         """Return the absolute url."""
         return reverse("repository-detail-view", args=[str(self.id)])
+
+
+#
+# Template model
+#
+
+
+class Template(models.Model):
+    """
+    Model for Template.
+
+    The details of Proxmox templates are retrieved and cached in this table.
+    """
+
+    name = models.CharField(primary_key=True, max_length=256)
+    host = models.ForeignKey(
+        to="Host", on_delete=models.CASCADE, related_name="templates", editable=False
+    )
+    is_orphan = models.BooleanField(
+        default=True
+    )  # True if the template does not exist in the Proxmox cluster.
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        """Database metadata."""
+
+        db_table = "templates"
+        ordering = ["name", "host__name"]
+        verbose_name = "Template"
+        verbose_name_plural = "Templates"
+
+    def __str__(self):
+        """Return a human readable name when the object is printed."""
+        return self.name
+
+    def get_absolute_url(self):
+        """Return the absolute url."""
+        return reverse("template-detail-view", args=[str(self.id)])

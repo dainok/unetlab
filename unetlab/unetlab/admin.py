@@ -43,3 +43,17 @@ class RepositoryAdmin(admin.ModelAdmin):
     list_display = ["name", "uri"]
     readonly_fields = []
     actions = [repository_rescan]
+
+
+#
+# Template
+#
+
+
+@admin.register(models.Template)
+class TemplateAdmin(admin.ModelAdmin):
+    """List Templates."""
+
+    list_display = ["name", "host", "is_orphan"]
+    readonly_fields = []
+    actions = []

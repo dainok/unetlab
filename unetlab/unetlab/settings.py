@@ -124,9 +124,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # https://django-constance.readthedocs.io/en/latest/backends.html#backends
 CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
 CONSTANCE_CONFIG = {
-    "PROXMOX_PRIMARY_URL": (
-        "https://proxmox.example.com:8006",
-        "The URL of the primary Proxmox host, including the TCP port.",
+    "PROXMOX_PRIMARY_ADDRESS": (
+        "",
+        "The address of the primary Proxmox host.",
     ),
     "PROXMOX_USERNAME": (
         "root@pam",
