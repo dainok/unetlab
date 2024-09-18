@@ -1,6 +1,5 @@
 """Django settings for UNetLab project."""
 
-import os
 from datetime import datetime
 
 from pathlib import Path
@@ -125,17 +124,25 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # https://django-constance.readthedocs.io/en/latest/backends.html#backends
 CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
 CONSTANCE_CONFIG = {
-    "PROXMOX_CLUSTER_ADDRESS": (
+    "PROXMOX_PRIMARY_ADDRESS": (
         "",
         "The FQDN or IP address of the primary Proxmox host.",
     ),
     "PROXMOX_USERNAME": (
-        "root",
-        "The username for logging into the Proxmox host.",
+        "root@pam",
+        "The username used for logging into the Proxmox host.",
     ),
-    "PROXMOX_PASSWORD": (
+    "PROXMOX_TOKEN_ID": (
+        "unetlab",
+        "The Token ID associated to the Proxmox username.",
+    ),
+    "PROXMOX_SECRET": (
         "",
-        "The password for logging into the Proxmox host.",
+        "The secret used for logging into the Proxmox host.",
+    ),
+    "PROXMOX_VERIFY_SSL": (
+        True,
+        "The backend must verify the SSL certificates of the Proxmox host.",
     ),
     "PROXMOX_UPDATED_AT": (
         datetime.now(),

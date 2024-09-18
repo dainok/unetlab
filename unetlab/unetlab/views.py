@@ -4,6 +4,7 @@ from django.views.generic.detail import DetailView
 
 from unetlab import models
 
+
 def index(request):
     # a = models.Config.objects.all()
     # print(a)
@@ -16,7 +17,8 @@ def index(request):
 
 
 class LabList(ListView):
-     model = models.Lab
+    model = models.Lab
+
 
 class LabDetail(DetailView):
-     model = models.Lab
+    model = models.Lab

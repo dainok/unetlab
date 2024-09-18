@@ -36,14 +36,14 @@ def post_save_repository(sender, instance, **kwargs):
                     # Validate lab against schema (TODO)
 
                     # Get or create lab
-                    lab, created = models.Lab.objects.get_or_create(
+                    lab_obj, created = models.Lab.objects.get_or_create(
                         uri=lab_file, repository=instance, parent__isnull=True
                     )
                     if created:
                         # Update lab
-                        lab.author = lab_data["metadata"]["author"]
-                        lab.description = lab_data["metadata"]["description"]
-                        lab.name = lab_data["metadata"]["name"]
-                        lab.save()
+                        lab_obj.author = lab_data["metadata"]["author"]
+                        lab_obj.description = lab_data["metadata"]["description"]
+                        lab_obj.name = lab_data["metadata"]["name"]
+                        lab_obj.save()
     else:
         raise ValueError(f"{instance.name} has not a valid URI")

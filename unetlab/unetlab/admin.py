@@ -7,8 +7,28 @@ Enable Django admin features for UNetLab models.
 from django.contrib import admin
 from unetlab import models
 
-admin.site.register(models.Host)
 admin.site.register(models.Lab)
+
+
+#
+# Host
+#
+
+
+@admin.action(description="Rescan selected Hosts")
+def host_rescan(modeladmin, request, queryset):
+    """Rescan Host."""
+    # TODO
+    pass
+
+
+@admin.register(models.Host)
+class HostAdmin(admin.ModelAdmin):
+    """List Hosts."""
+
+    list_display = ["name", "is_online"]
+    readonly_fields = []
+    actions = [host_rescan]
 
 
 #
@@ -19,6 +39,7 @@ admin.site.register(models.Lab)
 @admin.action(description="Rescan selected Repositories")
 def repository_rescan(modeladmin, request, queryset):
     """Rescan Repository."""
+    # TODO
     pass
 
 

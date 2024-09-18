@@ -30,7 +30,8 @@ class Host(models.Model):
     The details of Proxmox hosts are retrieved and cached in this table.
     """
 
-    address = models.CharField(primary_key=True, max_length=256)
+    name = models.CharField(primary_key=True, max_length=256)
+    is_online = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -38,13 +39,13 @@ class Host(models.Model):
         """Database metadata."""
 
         db_table = "hosts"
-        ordering = ["address"]
+        ordering = ["name"]
         verbose_name = "Host"
         verbose_name_plural = "Hosts"
 
     def __str__(self):
         """Return a human readable name when the object is printed."""
-        return self.address
+        return self.name
 
     def get_absolute_url(self):
         """Return the absolute url."""
