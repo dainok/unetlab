@@ -15,20 +15,13 @@ admin.site.register(models.Lab)
 #
 
 
-@admin.action(description="Rescan selected Hosts")
-def host_rescan(modeladmin, request, queryset):
-    """Rescan Host."""
-    # TODO
-    pass
-
-
 @admin.register(models.Host)
 class HostAdmin(admin.ModelAdmin):
     """List Hosts."""
 
-    list_display = ["name", "is_online"]
+    list_display = ["name", "is_online", "is_orphan"]
     readonly_fields = []
-    actions = [host_rescan]
+    actions = []
 
 
 #

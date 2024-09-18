@@ -31,7 +31,12 @@ class Host(models.Model):
     """
 
     name = models.CharField(primary_key=True, max_length=256)
-    is_online = models.BooleanField(default=False)
+    is_online = models.BooleanField(
+        default=False
+    )  # True if the host is reported as online in the Proxmox cluster.
+    is_orphan = models.BooleanField(
+        default=True
+    )  # True if the host does not exist in the Proxmox cluster.
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

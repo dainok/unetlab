@@ -124,9 +124,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # https://django-constance.readthedocs.io/en/latest/backends.html#backends
 CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
 CONSTANCE_CONFIG = {
-    "PROXMOX_PRIMARY_ADDRESS": (
-        "",
-        "The FQDN or IP address of the primary Proxmox host.",
+    "PROXMOX_PRIMARY_URL": (
+        "https://proxmox.example.com:8006",
+        "The URL of the primary Proxmox host, including the TCP port.",
     ),
     "PROXMOX_USERNAME": (
         "root@pam",
@@ -142,7 +142,11 @@ CONSTANCE_CONFIG = {
     ),
     "PROXMOX_VERIFY_SSL": (
         True,
-        "The backend must verify the SSL certificates of the Proxmox host.",
+        "True if the backend is required to verify the SSL certificates of the Proxmox host.",
+    ),
+    "PROXMOX_SHARED_STORAGE": (
+        False,
+        "True if the Proxmox host has shared storage for storing nodes and templates.",
     ),
     "PROXMOX_UPDATED_AT": (
         datetime.now(),
