@@ -30,8 +30,10 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "daphne",
     "django.contrib.staticfiles",
     "constance",
+    "channels",
     "unetlab",
 ]
 
@@ -65,6 +67,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "unetlab.wsgi.application"
 
+ASGI_APPLICATION = "unetlab.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -119,6 +122,18 @@ STATIC_URL = "/static/"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Channel configuration for WebSockets
+# https://channels.readthedocs.io/en/latest/
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
+    },
+}
 
 # Constance backend
 # https://django-constance.readthedocs.io/en/latest/backends.html#backends
