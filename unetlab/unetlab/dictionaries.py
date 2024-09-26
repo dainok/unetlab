@@ -13,7 +13,7 @@ from utilities.choices import ChoiceSet
 class LogSeverityChoices(ChoiceSet):
     """
     Log severity.
-    
+
     https://en.wikipedia.org/wiki/Syslog
     """
 
