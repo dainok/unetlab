@@ -17,6 +17,8 @@ __license__ = "GPLv3"
 from django.db import models
 from django.urls import reverse
 
+from unetlab import dictionaries
+
 
 #
 # Host model
@@ -54,7 +56,7 @@ class Host(models.Model):
 
     def get_absolute_url(self):
         """Return the absolute url."""
-        return reverse("host-detail-view", args=[str(self.id)])
+        return reverse("host-detail-view", args=[str(self.pk)])
 
 
 #
@@ -96,7 +98,42 @@ class Lab(models.Model):
 
     def get_absolute_url(self):
         """Return the absolute url."""
-        return reverse("lab-detail-view", args=[str(self.id)])
+        return reverse("lab-detail-view", args=[str(self.pk)])
+
+
+#
+# Log model
+#
+
+
+class Log(models.Model):
+    """Model for Log."""
+
+    acknowledged = models.BooleanField(
+        default=False
+    )  # True if the log has been acknowledged.
+    name = models.TextField()
+    severity = models.IntegerField(choices=dictionaries.LogSeverityChoices)
+    source = models.CharField(max_length=256)
+    user = models.CharField(max_length=256)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        """Database metadata."""
+
+        db_table = "logs"
+        ordering = ["-created_at"]
+        verbose_name = "Log"
+        verbose_name_plural = "Logs"
+
+    def __str__(self):
+        """Return a human readable name when the object is printed."""
+        return self.pk
+
+    def get_absolute_url(self):
+        """Return the absolute url."""
+        return reverse("log-detail-view", args=[str(self.pk)])
 
 
 #
@@ -132,7 +169,7 @@ class Repository(models.Model):
 
     def get_absolute_url(self):
         """Return the absolute url."""
-        return reverse("repository-detail-view", args=[str(self.id)])
+        return reverse("repository-detail-view", args=[str(self.pk)])
 
 
 #
@@ -171,4 +208,4 @@ class Template(models.Model):
 
     def get_absolute_url(self):
         """Return the absolute url."""
-        return reverse("template-detail-view", args=[str(self.id)])
+        return reverse("template-detail-view", args=[str(self.pk)])
