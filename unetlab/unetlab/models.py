@@ -115,6 +115,7 @@ class Log(models.Model):
     name = models.TextField()
     severity = models.IntegerField(choices=dictionaries.LogSeverityChoices)
     source = models.CharField(max_length=256)
+    type = models.CharField(choices=dictionaries.LogTypeChoices)
     user = models.CharField(max_length=256)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
