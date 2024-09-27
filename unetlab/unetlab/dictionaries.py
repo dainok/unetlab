@@ -12,6 +12,20 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
+class ActionChoices(models.TextChoices):
+    """Action type."""
+
+    CREATE = "CREATE", _("Create")
+    DELETE = "DELETE", _("Delete")
+    REBOOT = "REBOOT", _("Reboot")
+    RESET = "RESET", _("Reset")
+    SHUTDOWN = "SHUTDOWN", _("Shutdown")
+    START = "START", _("Start")
+    STOP = "STOP", _("Stop")
+    SUSPEND = "SUSPEND", _("Suspend")
+    WIPE = "WIPE", _("Wipe")
+
+
 class LogSeverityChoices(models.IntegerChoices):
     """
     Log severity.
@@ -34,4 +48,3 @@ class LogTypeChoices(models.TextChoices):
 
     HOST = "HOST", _("Host")
     NODE = "NODE", _("Node")
-    WEB = "WEB", _("Web")

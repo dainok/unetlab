@@ -1,24 +1,30 @@
-from django.http import HttpResponse
+"""Views, called by URLs."""
+
+__author__ = "Andrea Dainese"
+__contact__ = "andrea@adainese.it"
+__copyright__ = "Copyright 2024, Andrea Dainese"
+__license__ = "GPLv3"
+
+from django.views.generic import TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 
 from unetlab import models
 
 
-def index(request):
-    # a = models.Config.objects.all()
-    # print(a)
-    return HttpResponse("Hello, world. You're at the polls index.")
+class HomeView(TemplateView):
+    """Home page."""
+
+    template_name = "unetlab/home.html"
 
 
-#
-# Lab
-#
+class LabListView(ListView):
+    """Summary view for Labs."""
 
-
-class LabList(ListView):
     model = models.Lab
 
 
-class LabDetail(DetailView):
+class LabDetailView(DetailView):
+    """Detailed view for Lab."""
+
     model = models.Lab

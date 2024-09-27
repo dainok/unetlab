@@ -4,6 +4,11 @@ Admin pages.
 Enable Django admin features for UNetLab models.
 """
 
+__author__ = "Andrea Dainese"
+__contact__ = "andrea@adainese.it"
+__copyright__ = "Copyright 2024, Andrea Dainese"
+__license__ = "GPLv3"
+
 from django.contrib import admin
 from unetlab import models
 

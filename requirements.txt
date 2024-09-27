@@ -5,5 +5,8 @@ PyYAML==6.0.2
 proxmoxer==2.1.0
 requests==2.32.3
 channels==4.1.0
-channels-redis==4.2.0
+# channels-redis==4.2.0
 daphne==4.1.2
+django-rq==2.10.2
+jsonschema==4.23.0
+django-redis==5.4.0

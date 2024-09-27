@@ -1,5 +1,10 @@
 """Django settings for UNetLab project."""
 
+__author__ = "Andrea Dainese"
+__contact__ = "andrea@adainese.it"
+__copyright__ = "Copyright 2024, Andrea Dainese"
+__license__ = "GPLv3"
+
 from datetime import datetime
 
 from pathlib import Path
@@ -32,7 +37,11 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "constance",
     "channels",
+    # "rest_framework",
     "unetlab",
+    "django_rq",  # Must come after uentlab to allow overriding management commands
+    # "drf_spectacular",
+    # "drf_spectacular_sidecar",
 ]
 
 MIDDLEWARE = [
@@ -120,14 +129,29 @@ STATIC_URL = "/static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Channel configuration for WebSockets
-# https://channels.readthedocs.io/en/latest/
+# https://channels.readthedocs.io/en/stable/topics/channel_layers.html
 
 CHANNEL_LAYERS = {
+    "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"},
+}
+
+# Django RQ configuration
+# https://github.com/rq/django-rq
+
+CACHES = {
     "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("localhost", 6379)],
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://localhost:6379",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "MAX_ENTRIES": 5000,
+            # "PASSWORD": "", # TODO
         },
+    },
+}
+RQ_QUEUES = {
+    "default": {
+        "USE_REDIS_CACHE": "default",
     },
 }
 
