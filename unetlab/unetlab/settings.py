@@ -117,7 +117,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
@@ -149,14 +148,19 @@ CACHES = {
         },
     },
 }
+
 RQ_QUEUES = {
-    "default": {
+    "actions": {
+        "USE_REDIS_CACHE": "default",
+    },
+    "logs": {
         "USE_REDIS_CACHE": "default",
     },
 }
 
 # Constance backend
 # https://django-constance.readthedocs.io/en/latest/backends.html#backends
+
 CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
 CONSTANCE_CONFIG = {
     "PROXMOX_PRIMARY_ADDRESS": (

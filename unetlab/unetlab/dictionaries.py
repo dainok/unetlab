@@ -15,7 +15,7 @@ from django.utils.translation import gettext_lazy as _
 class ActionChoices(models.TextChoices):
     """Action type."""
 
-    CREATE = "CREATE", _("Create")
+    CLONE = "CLONE", _("Clone")
     DELETE = "DELETE", _("Delete")
     REBOOT = "REBOOT", _("Reboot")
     RESET = "RESET", _("Reset")
@@ -23,7 +23,6 @@ class ActionChoices(models.TextChoices):
     START = "START", _("Start")
     STOP = "STOP", _("Stop")
     SUSPEND = "SUSPEND", _("Suspend")
-    WIPE = "WIPE", _("Wipe")
 
 
 class LogSeverityChoices(models.IntegerChoices):

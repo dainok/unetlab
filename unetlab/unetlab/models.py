@@ -112,11 +112,15 @@ class Log(models.Model):
     acknowledged = models.BooleanField(
         default=False
     )  # True if the log has been acknowledged.
-    message = models.TextField()
-    severity = models.IntegerField(choices=dictionaries.LogSeverityChoices)
-    source = models.CharField(max_length=256)
-    type = models.CharField(max_length=256, choices=dictionaries.LogTypeChoices)
-    user = models.CharField(max_length=256)
+    message = models.TextField(editable=False)
+    severity = models.IntegerField(
+        choices=dictionaries.LogSeverityChoices, editable=False
+    )
+    source = models.CharField(max_length=256, editable=False)
+    type = models.CharField(
+        max_length=256, choices=dictionaries.LogTypeChoices, editable=False
+    )
+    user = models.CharField(max_length=256, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
