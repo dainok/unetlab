@@ -131,7 +131,17 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # https://channels.readthedocs.io/en/stable/topics/channel_layers.html
 
 CHANNEL_LAYERS = {
-    "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"},
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+            # "hosts":[{
+            #     "address": "rediss://user@host:port",  # "REDIS_TLS_URL"
+            #     "ssl_cert_reqs": None,
+            # }],
+            "prefix": "asgi",
+        },
+    },
 }
 
 # Django RQ configuration
