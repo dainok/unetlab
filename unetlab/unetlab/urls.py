@@ -11,6 +11,8 @@ from django.urls import path, include
 from unetlab import views
 
 admin.site.login_template = "unetlab-admin/login.html"
+admin.site.index_template = "unetlab-admin/index.html"
+admin.autodiscover()
 
 urlpatterns = [
     path("", views.HomeView.as_view(), name="home"),
