@@ -1,0 +1,33 @@
+{% load i18n static %}
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+    <head>
+        <link rel="author" href="https://www.adainese.it"/>
+        <link rel="icon" href="/favicon.ico" type="image/x-icon" sizes="16x16"/>
+        <title>{% block title %}Unified Networking Lab v3{% endblock %}</title>
+        <meta charSet="utf-8"/>
+        <meta name="author" content="Andrea Dainese"/>
+        <meta name="Content-Security-Policy" content="default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self';base-uri 'self';form-action 'self'"/>
+        <meta name="robots" content="noindex, nofollow">
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+        <!-- CSS files -->
+        <link href="{% static "tabler/css/tabler.min.css" %}" rel="stylesheet"/>
+        <link href="{% static "tabler/css/tabler-flags.min.css" %}" rel="stylesheet"/>
+        <link href="{% static "tabler/css/tabler.min.css" %}" rel="stylesheet"/>
+        <link href="{% static "tabler/css/tabler-flags.min.css" %}" rel="stylesheet"/>
+        <link href="{% static "tabler/css/tabler-payments.min.css" %}" rel="stylesheet"/>
+        <link href="{% static "tabler/css/tabler-vendors.min.css" %}" rel="stylesheet"/>
+    </head>
+    <body class="{% block bodyclass %}{% endblock %}">
+        <div class="{% block pageclass %}page{% endblock %}">
+            <!-- Navbar -->
+            {% block navbar %}{% endblock %}
+            <!-- Body -->
+            {% block body %}{% endblock %}
+            <!-- Footer -->
+            {% block footer %}{% endblock %}
+        </div>
+        <!-- Tabler Core -->
+        <script src="{% static "tabler/js/tabler.min.js" %}" defer></script>
+    </body>
+</html>

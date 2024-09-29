@@ -13,7 +13,9 @@ from unetlab import views
 admin.site.login_template = "unetlab-admin/login.html"
 
 urlpatterns = [
-    path("", views.HomeView.as_view()),
+    path("", views.HomeView.as_view(), name="home"),
+    #     path("", TemplateView.as_view(template_name="home.html"), name="home"),
+    path(r"accounts/", include("django.contrib.auth.urls")),
     path(r"admin/rq/", include("django_rq.urls")),
     path("admin/", admin.site.urls),
     path("lab/", views.LabListView.as_view()),

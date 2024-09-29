@@ -24,7 +24,7 @@ require("fslightbox")
 <a data-fslightbox="gallery" href="https://i.imgur.com/fsyrScY.jpg">
 	Open the first slide (an image)
 </a>
-<a 
+<a
 	data-fslightbox="gallery"
 	href="https://www.youtube.com/watch?v=xshEZzpS4CQ"
 >
