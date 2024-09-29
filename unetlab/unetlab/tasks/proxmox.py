@@ -6,21 +6,20 @@ __copyright__ = "Copyright 2024, Andrea Dainese"
 __license__ = "GPLv3"
 
 import socket
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
 
 # from proxmoxer import ProxmoxAPI
 
 import django_rq
 
 from unetlab import dictionaries
+from unetlab import models
 
 
-def send_log(log):
-    """Send a log to the orchestrator."""
-    print("*** SENDING LOG TO CHANNEL")
-    channel_layer = get_channel_layer()
-    async_to_sync(channel_layer.group_send)("broadcast", log)
+def save_log(log):
+    """Save a log."""
+    print("*** SAVE A LOG")
+    # TODO: Validate the log
+    models.Log.objects.create(**log)
 
 
 def delete(host=None, node_id=None):
@@ -42,7 +41,7 @@ def delete(host=None, node_id=None):
     }
 
     queue = django_rq.get_queue("logs")
-    queue.enqueue(send_log, log)
+    queue.enqueue(save_log, log)
 
 
 def provision(
