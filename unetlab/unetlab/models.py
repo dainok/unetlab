@@ -120,7 +120,7 @@ class Log(models.Model):
     type = models.CharField(
         max_length=256, choices=dictionaries.LogTypeChoices, editable=False
     )
-    user = models.CharField(max_length=256, editable=False)
+    user = models.CharField(max_length=256, editable=False, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

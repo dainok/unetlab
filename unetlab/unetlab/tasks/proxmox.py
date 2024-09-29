@@ -6,6 +6,8 @@ __copyright__ = "Copyright 2024, Andrea Dainese"
 __license__ = "GPLv3"
 
 import socket
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 # from proxmoxer import ProxmoxAPI
 
@@ -16,7 +18,9 @@ from unetlab import dictionaries
 
 def send_log(log):
     """Send a log to the orchestrator."""
-    print(log)
+    print("*** SENDING LOG TO CHANNEL")
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)("broadcast", log)
 
 
 def delete(host=None, node_id=None):

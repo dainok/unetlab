@@ -13,11 +13,33 @@ import os
 import logging
 from urllib.parse import urlparse
 import yaml
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from unetlab import models
+
+
+@receiver(post_save, sender=models.Log)
+def post_save_log(sender, instance, created, **kwargs):
+    """Send log to channels."""
+    if created:
+        # Send only new Logs
+        channel_layer = get_channel_layer()
+
+        # TODO: channel depends on the user
+        channel = "broadcast"
+
+        log = {
+            "source": instance.source,
+            "type": instance.type,
+            "user": instance.user,
+            "severity": instance.severity,
+            "message": instance.message,
+        }
+        async_to_sync(channel_layer.group_send)(channel, log)
 
 
 @receiver(post_save, sender=models.Repository)

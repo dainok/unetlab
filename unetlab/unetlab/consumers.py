@@ -66,9 +66,15 @@ class ActionConsumer(AsyncWebsocketConsumer):
         queue = django_rq.get_queue("actions")
         queue.enqueue(proxmox.delete, node_id=32)
 
-    async def HOST(self, event):
-        print("*** HOST MSG -> UPDATE", event)
-        self.channel_layer.group_send("broadcast", event)
+    async def HOST(self, data):
+        """Forward external log to WebSockets."""
+        print("*** HOST MSG -> UPDATE", data)
+        await self.send(text_data=json.dumps(data))
+        self.channel_layer.group_send("broadcast", data)
 
-    async def NODE(self, event):
-        print("*** NODE MSG -> USER", event)
+    async def NODE(self, data):
+        """Forward external log to WebSockets."""
+        print("*** NODE MSG -> USER", data)
+        # TODO: must select the right channel
+        await self.send(text_data=json.dumps(data))
+        self.channel_layer.group_send("broadcast", data)
