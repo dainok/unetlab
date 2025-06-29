@@ -11,5 +11,5 @@ from django.apps import AppConfig
 class UNetLabConfig(AppConfig):
     """Config for logging management app."""
 
-    name = "logging"
+    name = "log"
     verbose_name = "Log management"

@@ -19,8 +19,22 @@ class LogAdmin(admin.ModelAdmin):
         "is_online",
         "is_orphan",
     ]  # Fields display order in view/edit
-    list_display = ["user", "type", "source", "severity", "message", "acknowledged", "created_at"]  # Fields display order in table
-    list_filter = ["acknowledged", "severity", "source", "type", "user"]  # Fields included as filters
+    list_display = [
+        "user",
+        "type",
+        "source",
+        "severity",
+        "message",
+        "acknowledged",
+        "created_at",
+    ]  # Fields display order in table
+    list_filter = [
+        "acknowledged",
+        "severity",
+        "source",
+        "type",
+        "user",
+    ]  # Fields included as filters
     readonly_fields = ["severity", "message", "source", "type", "user"]
     search_fields = [
         "message",

@@ -1,4 +1,4 @@
-"""Define ORM models for Proxmox hosts."""
+"""Define ORM models for logs."""
 
 __author__ = "Andrea Dainese"
 __contact__ = "andrea@adainese.it"
@@ -81,8 +81,6 @@ class Log(models.Model):
         verbose_name="User",
         max_length=256,
         editable=False,
-        null=True,
-        blank=True,
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
