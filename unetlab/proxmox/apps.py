@@ -11,5 +11,5 @@ from django.apps import AppConfig
 class UNetLabConfig(AppConfig):
     """Config for Proxmox hosts management app."""
 
-    name = "proxmox_hosts"
+    name = "proxmox"
     verbose_name = "Proxmox hosts management"

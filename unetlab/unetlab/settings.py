@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     "constance",
     "channels",
     # "rest_framework",
-    "unetlab",
+    "proxmox",  # UNetLab: Proxmox host management
     "django_rq",  # Must come after uentlab to allow overriding management commands
     # "drf_spectacular",
     # "drf_spectacular_sidecar",
@@ -60,7 +60,9 @@ ROOT_URLCONF = "unetlab.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [
+            os.path.join(BASE_DIR, "templates"),
+        ],  # Add custom admin template
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

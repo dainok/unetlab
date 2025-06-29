@@ -13,7 +13,13 @@ from .models import ProxmoxHost
 class ProxmoxHostAdmin(admin.ModelAdmin):
     """List Proxmox hosts."""
 
-    list_display = ["name", "is_online", "is_orphan"]  # Field display order
+    fields = [
+        "name",
+        "ip_address",
+        "is_online",
+        "is_orphan",
+    ]  # Fields display order in view/edit
+    list_display = ["name", "is_online", "is_orphan"]  # Fields display order in table
     list_filter = ["is_online", "is_orphan"]  # Fields included as filters
     readonly_fields = ["name", "is_online", "is_orphan"]
     search_fields = ["name"]  # Fields included in the free search
