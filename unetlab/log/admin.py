@@ -14,10 +14,13 @@ class LogAdmin(admin.ModelAdmin):
     """List logs."""
 
     fields = [
-        "name",
-        "ip_address",
-        "is_online",
-        "is_orphan",
+        "user",
+        "type",
+        "source",
+        "severity",
+        "message",
+        "acknowledged",
+        "created_at",
     ]  # Fields display order in view/edit
     list_display = [
         "user",
@@ -35,11 +38,11 @@ class LogAdmin(admin.ModelAdmin):
         "type",
         "user",
     ]  # Fields included as filters
-    readonly_fields = ["severity", "message", "source", "type", "user"]
+    readonly_fields = ["message", "severity", "source", "type", "user"]
     search_fields = [
         "message",
     ]  # Fields included in the free search
-    actions = ["delete_selected", "acknowledge"]
+    actions = ["acknowledge", "delete_selected"]
 
     def has_add_permission(self, request):
         """Remove add permission."""

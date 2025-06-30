@@ -95,7 +95,7 @@ class Log(models.Model):
 
     def __str__(self):
         """Return a human readable name when the object is printed."""
-        return self.pk
+        return str(self.pk)
 
     def get_absolute_url(self):
         """Return the absolute url."""
