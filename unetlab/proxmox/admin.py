@@ -25,7 +25,13 @@ class ProxmoxHostAdmin(admin.ModelAdmin):
         "is_online",
         "is_orphan",
     ]  # Fields display order in view/edit
-    list_display = ["name", "is_online", "is_orphan"]  # Fields display order in table
+    list_display = [
+        "name",
+        "ip_address",
+        "is_online",
+        "is_orphan",
+        "updated_at",
+    ]  # Fields display order in table
     list_filter = ["is_online", "is_orphan"]  # Fields included as filters
     readonly_fields = ["name", "is_online", "is_orphan"]
     search_fields = ["name"]  # Fields included in the free search
@@ -65,19 +71,20 @@ class ProxmoxHostAdmin(admin.ModelAdmin):
     @admin.action(description="Provision selected Proxmox hosts")
     def provision_selected(self, request, queryset):
         """Provision selected Proxmox hosts."""
-        # TODO: should override PUT method
-        if not queryset.exists():
-            queryset = self.get_queryset(request)
+        pass
+        # # TODO: should override PUT method
+        # if not queryset.exists():
+        #     queryset = self.get_queryset(request)
 
-        count = 0
-        for node in queryset:
-            try:
-                self._provision_node(node)
-                count += 1
-            except Exception as e:
-                messages.error(request, f"Errore nel provisioning di {node}: {e}")
+        # count = 0
+        # for node in queryset:
+        #     try:
+        #         self._provision_node(node)
+        #         count += 1
+        #     except Exception as e:
+        #         messages.error(request, f"Errore nel provisioning di {node}: {e}")
 
-        messages.success(request, f"Provisioning completato su {count} nodi.")
+        # messages.success(request, f"Provisioning completato su {count} nodi.")
 
     def rescan_view(self, request):
         """Start rescan and return to changelist page."""

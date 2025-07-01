@@ -1,3 +1,10 @@
+"""Define Celery configuration."""
+
+__author__ = "Andrea Dainese"
+__contact__ = "andrea@adainese.it"
+__copyright__ = "Copyright 2025, Andrea Dainese"
+__license__ = "GPLv3"
+
 import os
 from celery import Celery
 

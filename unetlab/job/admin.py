@@ -10,7 +10,7 @@ from .models import Job, Log
 
 
 @admin.register(Job)
-class LogAdmin(admin.ModelAdmin):
+class JobAdmin(admin.ModelAdmin):
     """List jobs."""
 
     fields = [

@@ -22,9 +22,7 @@ class JobStatusChoices(models.TextChoices):
 
 
 class LogSeverityChoices(models.IntegerChoices):
-    """
-    Log severity mapped to Django messages.
-    """
+    """Log severity mapped to Django messages."""
 
     ERROR = messages.ERROR
     WARNING = messages.WARNING
@@ -90,7 +88,9 @@ class Log(models.Model):
         help_text="True if log has been acknowledged.",
         verbose_name="Acknowledged",
     )  # True if the log has been acknowledged.
-    job = models.ForeignKey(Job, on_delete=models.CASCADE)  # Associated job
+    job = models.ForeignKey(
+        Job, on_delete=models.CASCADE, related_name="logs"
+    )  # Associated job
     message = models.TextField(
         null=False,
         blank=False,

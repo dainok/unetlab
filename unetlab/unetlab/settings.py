@@ -7,8 +7,6 @@ __license__ = "GPLv3"
 
 import os
 import socket
-from datetime import datetime
-
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / "subdir".
@@ -183,7 +181,7 @@ CONSTANCE_CONFIG = {
         "The username used for logging into the Proxmox host.",
     ),
     "PROXMOX_TOKEN_ID": (
-        "unetlab",
+        "root@pam!unetlab",
         "The Token ID associated to the Proxmox username.",
     ),
     "PROXMOX_SECRET": (
@@ -197,10 +195,6 @@ CONSTANCE_CONFIG = {
     "PROXMOX_SHARED_STORAGE": (
         False,
         "True if the Proxmox host has shared storage for storing nodes and templates.",
-    ),
-    "PROXMOX_UPDATED_AT": (
-        datetime.now(),
-        "The last time the Proxmox hosts were checked.",
     ),
 }
 
