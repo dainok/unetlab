@@ -24,10 +24,10 @@ class JobStatusChoices(models.TextChoices):
 class LogSeverityChoices(models.IntegerChoices):
     """Log severity mapped to Django messages."""
 
-    ERROR = messages.ERROR
-    WARNING = messages.WARNING
-    INFO = messages.INFO
-    DEBUG = messages.DEBUG
+    ERROR = messages.ERROR  # 40
+    WARNING = messages.WARNING  # 30
+    INFO = messages.INFO  # 20
+    DEBUG = messages.DEBUG  # 10
 
 
 class LogTypeChoices(models.TextChoices):
