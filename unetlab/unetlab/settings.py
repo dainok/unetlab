@@ -6,6 +6,7 @@ __copyright__ = "Copyright 2024, Andrea Dainese"
 __license__ = "GPLv3"
 
 import os
+import socket
 from datetime import datetime
 
 from pathlib import Path
@@ -41,7 +42,6 @@ INSTALLED_APPS = [
     # "rest_framework",
     "job",  # UNetLab: job and log management
     "proxmox",  # UNetLab: Proxmox host management
-    "django_rq",  # Must come after uentlab to allow overriding management commands
     # "drf_spectacular",
     # "drf_spectacular_sidecar",
 ]
@@ -156,35 +156,16 @@ CHANNEL_LAYERS = {
     },
 }
 
-# Django RQ configuration
-# https://github.com/rq/django-rq
-
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://localhost:6379",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "MAX_ENTRIES": 5000,
-            # "PASSWORD": "", # TODO
-        },
-    },
-}
-
-RQ_QUEUES = {
-    "APP": {
-        "HOST": "localhost",
-        "PORT": 6379,
-        # "DB": 0,
-        # "USERNAME": "some-user",
-        # "PASSWORD": "some-password",
-    },
-    "HOST": {
-        "HOST": "localhost",
-        "PORT": 6379,
-        # "DB": 0,
-        # "USERNAME": "some-user",
-        # "PASSWORD": "some-password",
+# Celery configuration
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_DEFAULT_QUEUE = "unetlab_default"
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+CELERY_BEAT_SCHEDULE = {
+    "cancel-stale-jobs": {
+        "task": "job.tasks.job_cancel_stale_jobs",
+        "schedule": 300.0,  # every 5 minutes
     },
 }
 
@@ -222,3 +203,5 @@ CONSTANCE_CONFIG = {
         "The last time the Proxmox hosts were checked.",
     ),
 }
+
+SOURCE = socket.gethostname().upper()

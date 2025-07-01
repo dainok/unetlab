@@ -11,7 +11,8 @@ __license__ = "GPLv3"
 
 # import os
 # import logging
-from urllib.parse import urlparse
+# from urllib.parse import urlparse
+
 # import yaml
 # from channels.layers import get_channel_layer
 # from asgiref.sync import async_to_sync
@@ -24,10 +25,9 @@ from .models import Log, LogSeverityChoices
 
 @receiver(pre_save, sender=Log)
 def auto_ack_on_severity(sender, instance, *args, **kwargs):
-    """Auto acknowledge notice logs."""
-    if instance.severity >= LogSeverityChoices.NOTICE.value:
+    """Auto acknowledge info logs."""
+    if instance.severity <= LogSeverityChoices.INFO.value:
         instance.acknowledged = True
-
 
 
 # @receiver(post_save, sender=models.Log)

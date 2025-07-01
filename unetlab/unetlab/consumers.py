@@ -7,7 +7,6 @@ __license__ = "GPLv3"
 
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
-import django_rq
 
 # from unetlab.tasks import proxmox
 
@@ -63,8 +62,8 @@ class ActionConsumer(AsyncWebsocketConsumer):
         print(log)
 
         # Forward action to Hosts via RQ
-        queue = django_rq.get_queue("actions")
-        queue.enqueue(proxmox.delete, node_id=32)
+        # queue = django_rq.get_queue("actions")
+        # queue.enqueue(proxmox.delete, node_id=32)
 
     async def HOST(self, data):
         """Forward external log to WebSockets."""

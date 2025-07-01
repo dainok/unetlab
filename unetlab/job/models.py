@@ -8,6 +8,7 @@ __license__ = "GPLv3"
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from django.contrib import messages
 
 
 class JobStatusChoices(models.TextChoices):
@@ -19,22 +20,16 @@ class JobStatusChoices(models.TextChoices):
     FAILED = "FAILED", _("Failed")
     CANCELED = "CANCELED", _("Canceled")
 
-    
+
 class LogSeverityChoices(models.IntegerChoices):
     """
-    Log severity.
-
-    https://en.wikipedia.org/wiki/Syslog
+    Log severity mapped to Django messages.
     """
 
-    EMERGENCY = 0
-    ALERT = 1
-    CRITICAL = 2
-    ERROR = 3
-    WARNING = 4
-    NOTICE = 5
-    INFORMATIONAL = 6
-    DEBUG = 7
+    ERROR = messages.ERROR
+    WARNING = messages.WARNING
+    INFO = messages.INFO
+    DEBUG = messages.DEBUG
 
 
 class LogTypeChoices(models.TextChoices):
@@ -43,6 +38,7 @@ class LogTypeChoices(models.TextChoices):
     APP = "APP", _("App")
     HOST = "HOST", _("Host")
     NODE = "NODE", _("Node")
+    SCHEDULER = "SCHEDULER", _("Scheduler")
 
 
 class Job(models.Model):
@@ -94,7 +90,7 @@ class Log(models.Model):
         help_text="True if log has been acknowledged.",
         verbose_name="Acknowledged",
     )  # True if the log has been acknowledged.
-    job = models.ForeignKey(Job, on_delete=models.CASCADE) # Associated job
+    job = models.ForeignKey(Job, on_delete=models.CASCADE)  # Associated job
     message = models.TextField(
         null=False,
         blank=False,
