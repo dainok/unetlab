@@ -1,12 +1,14 @@
-Django==5.1.1
-django-constance==4.1.1
-PyYAML==6.0.2
+channels==4.2.2
+channels_redis==4.2.1
+daphne==4.2.0
+Django==5.2.3
+django-constance==4.3.2
+django-redis==6.0.0
+django-rq==3.0.1
+
+#PyYAML==6.0.2
 # shortuuid==1.0.13
-proxmoxer==2.1.0
-requests==2.32.3
-channels==4.1.0
-channels-redis==4.2.0
-daphne==4.1.2
-django-rq==2.10.2
-jsonschema==4.23.0
-django-redis==5.4.0
+#proxmoxer==2.1.0
+#requests==2.32.3
+#jsonschema==4.23.0
+#django-redis==5.4.0

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "constance",
     "channels",
     # "rest_framework",
+    "job",  # UNetLab: job and log management
     "proxmox",  # UNetLab: Proxmox host management
     "django_rq",  # Must come after uentlab to allow overriding management commands
     # "drf_spectacular",
@@ -171,11 +172,19 @@ CACHES = {
 }
 
 RQ_QUEUES = {
-    "actions": {
-        "USE_REDIS_CACHE": "default",
+    "APP": {
+        "HOST": "localhost",
+        "PORT": 6379,
+        # "DB": 0,
+        # "USERNAME": "some-user",
+        # "PASSWORD": "some-password",
     },
-    "logs": {
-        "USE_REDIS_CACHE": "default",
+    "HOST": {
+        "HOST": "localhost",
+        "PORT": 6379,
+        # "DB": 0,
+        # "USERNAME": "some-user",
+        # "PASSWORD": "some-password",
     },
 }
 

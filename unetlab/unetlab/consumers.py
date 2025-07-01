@@ -9,7 +9,7 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 import django_rq
 
-from unetlab.tasks import proxmox
+# from unetlab.tasks import proxmox
 
 
 class ActionConsumer(AsyncWebsocketConsumer):

@@ -7,6 +7,7 @@ __license__ = "GPLv3"
 
 from django.urls import path
 from django.urls import reverse
+from django.http import HttpResponseRedirect
 from django.contrib import admin
 from .models import ProxmoxHost
 from .tasks import do_rescan
@@ -79,11 +80,6 @@ class ProxmoxHostAdmin(admin.ModelAdmin):
         messages.success(request, f"Provisioning completato su {count} nodi.")
 
     def rescan_view(self, request):
-        """Rescan Proxmox infrastructure."""
-        # La tua logica qui
-        # Esempio: richiamare una funzione che fa qualcosa a livello globale
+        """Start rescan and return to changelist page."""
         do_rescan(user=request.user.username)
-
-        # self.message_user(request, "Rescan completato con successo!", messages.SUCCESS)
-        # Redirect alla lista degli oggetti
-        return HttpResponseRedirect("../")
+        return HttpResponseRedirect(reverse("admin:proxmox_proxmoxhost_changelist"))
