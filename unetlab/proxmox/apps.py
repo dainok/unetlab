@@ -12,4 +12,4 @@ class UNetLabConfig(AppConfig):
     """Config for Proxmox hosts management app."""
 
     name = "proxmox"
-    verbose_name = "Proxmox hosts management"
+    verbose_name = "Proxmox hosts"

@@ -12,7 +12,7 @@ class UNetLabConfig(AppConfig):
     """Config for job management app."""
 
     name = "job"
-    verbose_name = "Job management"
+    verbose_name = "Jobs"
 
     def ready(self):
         """Registering signals."""

@@ -54,8 +54,8 @@ class ProxmoxHost(models.Model):
         db_table = "hosts"
         ordering = ["name"]
         unique_together = ["name"]
-        verbose_name = "Proxmox host"
-        verbose_name_plural = "Proxmox hosts"
+        verbose_name = "Host"
+        verbose_name_plural = "Hosts"
 
     def __str__(self):
         """Return a human readable name when the object is printed."""
