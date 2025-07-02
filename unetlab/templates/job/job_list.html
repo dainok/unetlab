@@ -1,38 +1,42 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="it">
-<head>
-  <meta charset="UTF-8" />
-  <title>Lista Job</title>
-  <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css" rel="stylesheet" />
-</head>
-<body>
-  <div class="container my-4">
-    <h1>Lista Job</h1>
-    {% if job_list %}
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nome</th>
-            <th>Stato</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for job in job_list %}
-            <tr>
-              <td>{{ job.id }}</td>
-              <td>{{ job.user }}</td>
-              <td>{{ job.status }}</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    {% else %}
-      <p>Nessun job trovato.</p>
-    {% endif %}
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/js/tabler.min.js"></script>
-</body>
-</html>
+{% extends "unetlab/base.html" %}
+{% block title %}UNetLab | Jobs > List{% endblock %}
+{% block page_title %}Jobs > List{% endblock %}
+{% block page_body %}
+    <div class="row row-cards">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-vcenter card-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>Status</th>
+                                <th>Created at</th>
+                                <th>Updated at</th>
+                                <th class="w-1"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for job in job_list %}
+                                <tr>
+                                    <td>{{ job.id }}</td>
+                                    <td>{{ job.user }}</td>
+                                    <td>{{ job.status }}</td>
+                                    <td>{{ job.created_at }}</td>
+                                    <td>{{ job.updated_at }}</td>
+                                    <td>
+                                        <div class="btn-list flex-nowrap">
+                                            <a href="{% url 'job_detail' job.id %}" class="btn btn-1"> View </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% include "unetlab/partials/pagination.html" %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

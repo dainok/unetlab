@@ -1,0 +1,103 @@
+hll:
+  nodes:
+    - template: vyos-vyos
+      prefix: R
+      count: 4
+      features:
+        - loopback
+        - ospf:area=0
+  topologies:
+    - type: full-mesh
+      match:
+        - R
+  ipv4_addresses:
+    - match: Loopback
+      address: 192.168.0.1/16
+      mask: 32
+    - match: Ethernet
+      address: 10.0.0.0/8
+      mask: auto
+lll:
+  groups:
+    Group1:
+      template: vyos-vyos
+      match: R
+      features:
+        - loopback
+        - ospf:area=0
+  nodes:
+    R1:
+      interfaces:
+        Loopback0:
+          ipv4_address: 192.168.0.1/32
+        Ethernet1:
+          ipv4_address: 10.0.0.0/31
+          link_id: SMycRFqXm8nsr7YNoGv2zB
+        Ethernet2:
+          ipv4_address: 10.0.0.2/31
+          link_id: k4RFdUKF4PFwiBCKgrtiki
+        Ethernet3:
+          ipv4_address: 10.0.0.4/31
+          link_id: kkiR2hsp2yHMzwqyC3K9NE
+    R2:
+      interfaces:
+        Loopback0:
+          ipv4_address: 192.168.0.2/32
+        Ethernet1:
+          ipv4_address: 10.0.0.1/31
+          link_id: SMycRFqXm8nsr7YNoGv2zB
+        Ethernet2:
+          ipv4_address: 10.0.0.8/31
+          link_id: ihk4ETzvcTKKm7X7mza7Y9
+        Ethernet3:
+          ipv4_address: 10.0.0.10/31
+          link_id: Yr6djkrksydPCvwvps3A79
+    R3:
+      interfaces:
+        Loopback0:
+          ipv4_address: 192.168.0.3/32
+        Ethernet1:
+          ipv4_address: 10.0.0.3/31
+          link_id: k4RFdUKF4PFwiBCKgrtiki
+        Ethernet2:
+          ipv4_address: 10.0.0.9/31
+          link_id: ihk4ETzvcTKKm7X7mza7Y9
+        Ethernet3:
+          ipv4_address: 10.0.0.16/31
+          link_id: WAy4NbHvujGvtMCrDdLUTT
+    R4:
+      interfaces:
+        Loopback0:
+          ipv4_address: 192.168.0.4/32
+        Ethernet1:
+          ipv4_address: 10.0.0.5/31
+          link_id: kkiR2hsp2yHMzwqyC3K9NE
+        Ethernet2:
+          ipv4_address: 10.0.0.11/31
+          link_id: Yr6djkrksydPCvwvps3A79
+        Ethernet3:
+          ipv4_address: 10.0.0.17/31
+          link_id: WAy4NbHvujGvtMCrDdLUTT
+  links:
+    SMycRFqXm8nsr7YNoGv2zB:
+      name: R1:Ethernet1 - R2:Ethernet1
+      type: l1
+    k4RFdUKF4PFwiBCKgrtiki:
+      name: R1:Ethernet2 - R3:Ethernet1
+      type: l1
+    kkiR2hsp2yHMzwqyC3K9NE:
+      name: R1:Ethernet3 - R4:Ethernet1
+      type: l2
+    ihk4ETzvcTKKm7X7mza7Y9:
+      name: R2:Ethernet2 - R3:Ethernet2
+      type: l2
+    Yr6djkrksydPCvwvps3A79:
+      name: R2:Ethernet3 - R4:Ethernet2
+      type: l2
+    WAy4NbHvujGvtMCrDdLUTT:
+      name: R3:Ethernet3 - R4:Ethernet3
+      type: l2
+metadata:
+  author: Andrea Dainese
+  name: Test Lab 1
+  description: First test lab

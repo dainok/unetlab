@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "constance",
     "channels",
     "rest_framework",
+    "rest_framework.authtoken",
     "job",  # UNetLab: job and log management
     "proxmox",  # UNetLab: Proxmox host management
     # "drf_spectacular",
@@ -52,6 +53,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "unetlab.middleware.LoginRequiredMiddleware",
 ]
 
 ROOT_URLCONF = "unetlab.urls"
@@ -131,12 +133,6 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Post login and logout redirects
-
-LOGIN_REDIRECT_URL = "home"
-
-LOGOUT_REDIRECT_URL = "home"
-
 # Channel configuration for WebSockets
 # https://channels.readthedocs.io/en/stable/topics/channel_layers.html
 
@@ -158,7 +154,13 @@ CHANNEL_LAYERS = {
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
-    ]
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 10,
 }
 
 # Celery configuration
@@ -173,6 +175,15 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": 300.0,  # every 5 minutes
     },
 }
+
+# Public URLs (UNetLab middleware)
+LOGIN_REDIRECT_URL = "home"
+LOGOUT_REDIRECT_URL = "home"
+PUBLIC_URLS = [
+    "login",
+    "logout",
+    "reset",
+]
 
 # Constance backend
 # https://django-constance.readthedocs.io/en/latest/backends.html#backends

@@ -3,31 +3,58 @@
 <html dir="ltr" lang="en">
     <head>
         <link rel="author" href="https://www.adainese.it"/>
-        <link rel="icon" href="{% static "favicon.ico" %}" type="image/x-icon" sizes="16x16"/>
-        <title>{% block title %}Unified Networking Lab v3{% endblock %}</title>
+        <link rel="icon" href="{% static 'unetlab/favicon.ico' %}" type="image/x-icon" sizes="16x16"/>
+        <title>{% block title %}Unified Networking Lab{% endblock %}</title>
         <meta charSet="utf-8"/>
         <meta name="author" content="Andrea Dainese"/>
         <meta name="Content-Security-Policy" content="default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self';base-uri 'self';form-action 'self'"/>
         <meta name="robots" content="noindex, nofollow">
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
         <!-- CSS files -->
-        <link href="{% static "tabler/css/tabler.min.css" %}" rel="stylesheet"/>
-        <link href="{% static "tabler/css/tabler-flags.min.css" %}" rel="stylesheet"/>
-        <link href="{% static "tabler/css/tabler.min.css" %}" rel="stylesheet"/>
-        <link href="{% static "tabler/css/tabler-flags.min.css" %}" rel="stylesheet"/>
-        <link href="{% static "tabler/css/tabler-payments.min.css" %}" rel="stylesheet"/>
-        <link href="{% static "tabler/css/tabler-vendors.min.css" %}" rel="stylesheet"/>
+        <link href="{% static 'tabler/css/tabler.min.css' %}" rel="stylesheet"/>
+        <link href="{% static 'tabler/css/tabler-flags.min.css' %}" rel="stylesheet"/>
+        <link href="{% static 'tabler/css/tabler-payments.min.css' %}" rel="stylesheet"/>
+        <link href="{% static 'tabler/css/tabler-social.min.css' %}" rel="stylesheet"/>
     </head>
     <body class="{% block bodyclass %}{% endblock %}">
+        <!-- Banner -->
+        {% block banner %}{% endblock %}
         <div class="{% block pageclass %}page{% endblock %}">
             <!-- Navbar -->
-            {% block navbar %}{% endblock %}
-            <!-- Body -->
-            {% block body %}{% endblock %}
-            <!-- Footer -->
-            {% block footer %}{% endblock %}
+            {% block navbar %}
+                {% include "unetlab/partials/navbar.html" %}
+            {% endblock %}
+            <div class="page-wrapper">
+                <!-- Body -->
+                {% block body %}
+                    {% block page_header %}
+                        <div class="page-header d-print-none" aria-label="Page header">
+                            <div class="container-xl">
+                                <div class="row g-2 align-items-center">
+                                    <div class="col">
+                                        <h2 class="page-title">{% block page_title %}{% endblock %}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endblock %}
+                    <div class="page-body">
+                        <div class="container-xl">
+                            {% block page_body %}{% endblock %}
+                        </div>
+                    </div>
+                {% endblock %}
+                <!-- Footer -->
+                {% block footer %}
+                    {% include "unetlab/partials/footer.html" %}
+                {% endblock %}
+            </div>
         </div>
+        <!-- Model -->
+        {% block modal %}
+            {% include "unetlab/partials/modal.html" %}
+        {% endblock %}
         <!-- Tabler Core -->
-        <script src="{% static "tabler/js/tabler.min.js" %}" defer></script>
+        <script src="{% static 'tabler/js/tabler.min.js' %}" defer></script>
     </body>
 </html>
