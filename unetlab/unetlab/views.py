@@ -7,6 +7,7 @@ __license__ = "GPLv3"
 
 from django.views.generic import TemplateView
 
+
 class HomeView(TemplateView):
     """Home page."""
 

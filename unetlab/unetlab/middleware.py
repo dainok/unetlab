@@ -9,6 +9,7 @@ from django.shortcuts import redirect
 from django.conf import settings
 from django.urls import resolve
 
+
 class LoginRequiredMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
@@ -22,4 +23,3 @@ class LoginRequiredMiddleware:
             if resolver_match.view_name not in settings.PUBLIC_URLS:
                 return redirect(settings.LOGIN_REDIRECT_URL)
         return self.get_response(request)
-    

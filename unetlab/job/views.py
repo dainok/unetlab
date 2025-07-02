@@ -30,7 +30,7 @@ class JobQueryMixin:
         if user.is_staff or user.is_superuser or obj.user == user.username:
             return obj
         raise PermissionDenied()
-    
+
     def get_paginate_by(self, queryset):
         per_page = self.request.GET.get("per_page")
         try:
@@ -59,6 +59,7 @@ class JobsListView(JobQueryMixin, ListView):
 
     model = Job
     paginate_by = settings.REST_FRAMEWORK["PAGE_SIZE"]
+
 
 class JobDetailView(JobQueryMixin, DetailView):
     """Implement detail view class."""

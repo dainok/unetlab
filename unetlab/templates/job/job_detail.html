@@ -1,25 +1,38 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="it">
-<head>
-  <meta charset="UTF-8" />
-  <title>Dettaglio Job #{{ object.pk }}</title>
-  <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css" rel="stylesheet" />
-</head>
-<body>
-  <div class="container my-4">
-    <h1>Dettaglio Job #{{ object.pk }}</h1>
-    <div class="card">
-      <div class="card-body">
-        <p><strong>Nome:</strong> {{ object.name }}</p>
-        <p><strong>Stato:</strong> {{ object.status }}</p>
-        <p><strong>Creato il:</strong> {{ object.created_at }}</p>
-        <p><strong>Descrizione:</strong> {{ object.description }}</p>
-      </div>
+{% extends "unetlab/base.html" %}
+{% block title %}UNetLab | Jobs > List{% endblock %}
+{% block page_title %}Jobs > ID:{{ job.id }}{% endblock %}
+{% block page_body %}
+    <div class="container-xl">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Job Details</h3>
+            </div>
+            <div class="card-body">
+                <div class="datagrid">
+                    <div class="datagrid-item">
+                    <div class="datagrid-title">ID</div>
+                    <div class="datagrid-content">{{ job.id }}</div>
+                </div>
+                <div class="datagrid-item">
+                    <div class="datagrid-title">Owner</div>
+                    <div class="datagrid-content">{{ job.user }}</div>
+                </div>
+                <div class="datagrid-item">
+                    <div class="datagrid-title">Status</div>
+                    <div class="datagrid-content">{{ job.status }}</div>
+                </div>
+                <div class="datagrid-item">
+                    <div class="datagrid-title">Created at</div>
+                    <div class="datagrid-content">{{ job.created_at }}</div>
+                </div>
+                <div class="datagrid-item">
+                    <div class="datagrid-title">Updated at</div>
+                    <div class="datagrid-content">{{ job.updated_at }}</div>
+                </div>
+            </div>
+            <div class="text-end">
+                <a href="{% url 'job_list' %}" class="btn btn-primary mt-3">Back to Jobs List</a>
+            </div>
+        </div>
     </div>
-    <a href="{% url 'job_list' %}" class="btn btn-primary mt-3">Torna alla lista</a>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/js/tabler.min.js"></script>
-</body>
-</html>
+{% endblock %}
