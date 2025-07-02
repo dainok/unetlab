@@ -9,8 +9,11 @@ from django.core.exceptions import PermissionDenied
 from django.views.generic import ListView, DetailView
 from django.conf import settings
 from rest_framework import viewsets, mixins
+from django_filters.views import FilterView
+from django_filters.rest_framework import DjangoFilterBackend
 from job.models import Log, Job
 from job.serializers import JobSerializer
+from job.filters import JobFilter
 
 
 class JobQueryMixin:
@@ -52,13 +55,17 @@ class JobViewSet(
     """Implement API class."""
 
     serializer_class = JobSerializer
+    filterset_class = JobFilter
+    filter_backends = [DjangoFilterBackend]
 
 
-class JobsListView(JobQueryMixin, ListView):
+class JobsListView(JobQueryMixin, FilterView, ListView):
     """Implement list view class."""
 
     model = Job
+    filterset_class = JobFilter
     paginate_by = settings.REST_FRAMEWORK["PAGE_SIZE"]
+    template_name = "jobs/job_list.html"
 
 
 class JobDetailView(JobQueryMixin, DetailView):

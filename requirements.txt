@@ -4,6 +4,7 @@ channels_redis==4.2.1
 daphne==4.2.0
 Django==5.2.3
 django-constance==4.3.2
+django-filter==25.1
 django-redis==6.0.0
 djangorestframework==3.16.0
 proxmoxer==2.2.0

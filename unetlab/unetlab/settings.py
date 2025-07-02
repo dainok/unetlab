@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "daphne",
     "django.contrib.staticfiles",
+    "django_filters",
     "constance",
     "channels",
     "rest_framework",
@@ -160,6 +161,9 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend"
+    ],
     "PAGE_SIZE": 10,
 }
 
