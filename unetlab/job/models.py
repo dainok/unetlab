@@ -56,7 +56,7 @@ class Job(models.Model):
         null=False,
         blank=False,
         help_text="User who started the job.",
-        verbose_name="User",
+        verbose_name="Owner",
         max_length=256,
         editable=False,
     )

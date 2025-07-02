@@ -644,7 +644,7 @@
                 <div class="col">
                   <!-- BEGIN NAVBAR MENU -->
                   <ul class="navbar-nav">
-                    <li class="nav-item active">
+                    <li class="nav-item {% if request.resolver_match.view_name == 'home' %} active{% endif %}">
                       <a class="nav-link" href="./">
                         <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler.io/icons/icon/home -->
                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-1">
@@ -654,7 +654,7 @@
                         <span class="nav-link-title"> Home </span>
                       </a>
                     </li>
-                    <li class="nav-item dropdown">
+                    <li class="nav-item dropdown {%if request.resolver_match.view_name == 'job_list'%} active{% endif %}">
                       <a class="nav-link dropdown-toggle" href={% url 'home' %}" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
                         <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler.io/icons/icon/package -->
                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-1">

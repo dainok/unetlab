@@ -8,6 +8,7 @@ __license__ = "GPLv3"
 from django.core.exceptions import PermissionDenied
 from django.views.generic import ListView, DetailView
 from django.conf import settings
+from django.db.models import Count
 from rest_framework import viewsets, mixins
 from django_filters.views import FilterView
 from django_filters.rest_framework import DjangoFilterBackend
@@ -23,8 +24,10 @@ class JobQueryMixin:
         """Implement queryset filters."""
         user = self.request.user
         if user.is_staff or user.is_superuser:
-            return Job.objects.all()
-        return Job.objects.filter(user=user.username)
+            qs = Job.objects.all()
+        else:
+            qs = Job.objects.filter(user=user.username)
+        return qs.annotate(log_count=Count('logs'))
 
     def get_object(self):
         """Implement object filter."""
@@ -66,6 +69,9 @@ class JobsListView(JobQueryMixin, FilterView, ListView):
     filterset_class = JobFilter
     paginate_by = settings.REST_FRAMEWORK["PAGE_SIZE"]
     template_name = "jobs/job_list.html"
+    extra_context = {
+        "job_fields": Job._meta.fields,
+    }
 
 
 class JobDetailView(JobQueryMixin, DetailView):

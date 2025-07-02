@@ -9,11 +9,10 @@
                     <table class="table table-vcenter card-table">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Owner</th>
-                                <th>Status</th>
-                                <th>Created at</th>
-                                <th>Updated at</th>
+                                {% for field in job_fields %}
+                                    <th>{{ field.verbose_name }}</th>
+                                {% endfor %}
+                                <th>Logs</th>
                                 <th class="w-1"></th>
                             </tr>
                         </thead>
@@ -22,9 +21,20 @@
                                 <tr>
                                     <td>{{ job.id }}</td>
                                     <td>{{ job.user }}</td>
-                                    <td>{{ job.status }}</td>
+                                    <td>
+                                        {% if job.status == "FAILED" %}
+                                            <span class="badge bg-red text-red-fg">{{ job.status }}</span>
+                                        {% elif job.status == "CANCELED" %}
+                                            <span class="badge bg-yellow text-yellow-fg">{{ job.status }}</span>
+                                        {% elif job.status == "SUCCEEDED" %}
+                                            <span class="badge bg-green text-green-fg">{{ job.status }}</span>
+                                        {% else %}
+                                            {{ job.status }}
+                                        {% endif %}
+                                    </td>
                                     <td>{{ job.created_at }}</td>
                                     <td>{{ job.updated_at }}</td>
+                                    <td>{{ job.log_count }}</td>
                                     <td>
                                         <div class="btn-list flex-nowrap">
                                             <a href="{% url 'job_detail' job.id %}" class="btn btn-1"> View </a>
@@ -42,10 +52,29 @@
             <div class="card">
                 <form method="get" class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Filters</h4>
+                        <h3 class="card-title">Filters</h3>
                     </div>
                     <div class="card-body">
-                        {{ filter.form.as_p }}
+                        <div class="space-y">
+                            <div>
+                                <label for="{{ filter.form.status.id_for_label }}" class="form-label">
+                                    {{ filter.form.status.label }}
+                                </label>
+                                {{ filter.form.status }}
+                            </div>
+                            <div>
+                                <label for="{{ filter.form.user.id_for_label }}" class="form-label">
+                                    {{ filter.form.user.label }}
+                                </label>
+                                {{ filter.form.user }}
+                            </div>
+                            <div>
+                                <label for="{{ filter.form.created_at.id_for_label }}" class="form-label">
+                                    {{ filter.form.created_at.label }}
+                                </label>
+                                {{ filter.form.created_at }}
+                            </div>
+                        </div>
                     </div>
                     <div class="card-footer text-end">
                         <div class="d-flex">

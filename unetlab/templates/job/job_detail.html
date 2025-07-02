@@ -19,7 +19,17 @@
                 </div>
                 <div class="datagrid-item">
                     <div class="datagrid-title">Status</div>
-                    <div class="datagrid-content">{{ job.status }}</div>
+                    <div class="datagrid-content">
+                        {% if job.status == "FAILED" %}
+                            <span class="badge bg-red text-red-fg">{{ job.status }}</span>
+                        {% elif job.status == "CANCELED" %}
+                            <span class="badge bg-yellow text-yellow-fg">{{ job.status }}</span>
+                        {% elif job.status == "SUCCEEDED" %}
+                            <span class="badge bg-green text-green-fg">{{ job.status }}</span>
+                        {% else %}
+                            {{ job.status }}
+                        {% endif %}
+                    </div>
                 </div>
                 <div class="datagrid-item">
                     <div class="datagrid-title">Created at</div>
