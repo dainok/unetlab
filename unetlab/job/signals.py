@@ -20,7 +20,7 @@ __license__ = "GPLv3"
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
-from .models import Log, LogSeverityChoices
+from job.models import Log, LogSeverityChoices
 
 
 @receiver(pre_save, sender=Log)

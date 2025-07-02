@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "constance",
     "channels",
-    # "rest_framework",
+    "rest_framework",
     "job",  # UNetLab: job and log management
     "proxmox",  # UNetLab: Proxmox host management
     # "drf_spectacular",
@@ -152,6 +152,13 @@ CHANNEL_LAYERS = {
             "prefix": "asgi",
         },
     },
+}
+
+# REST
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ]
 }
 
 # Celery configuration

@@ -9,8 +9,8 @@ from django.urls import path
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.contrib import admin
-from .models import ProxmoxHost
-from .tasks import do_rescan
+from proxmox.models import ProxmoxHost
+from proxmox.tasks import do_rescan
 
 
 @admin.register(ProxmoxHost)

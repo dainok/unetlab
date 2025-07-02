@@ -11,7 +11,7 @@ from proxmoxer.core import ResourceException
 from requests.exceptions import ConnectTimeout, ConnectionError, RequestException
 from constance import config
 from unetlab import messages
-from .models import ProxmoxHost
+from proxmox.models import ProxmoxHost
 from job.models import Job, JobStatusChoices
 from job.utils import log
 

@@ -1,0 +1,25 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dettaglio Job #{{ object.pk }}</title>
+  <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="container my-4">
+    <h1>Dettaglio Job #{{ object.pk }}</h1>
+    <div class="card">
+      <div class="card-body">
+        <p><strong>Nome:</strong> {{ object.name }}</p>
+        <p><strong>Stato:</strong> {{ object.status }}</p>
+        <p><strong>Creato il:</strong> {{ object.created_at }}</p>
+        <p><strong>Descrizione:</strong> {{ object.description }}</p>
+      </div>
+    </div>
+    <a href="{% url 'job_list' %}" class="btn btn-primary mt-3">Torna alla lista</a>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/js/tabler.min.js"></script>
+</body>
+</html>

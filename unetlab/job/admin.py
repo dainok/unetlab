@@ -6,7 +6,7 @@ __copyright__ = "Copyright 2024, Andrea Dainese"
 __license__ = "GPLv3"
 
 from django.contrib import admin
-from .models import Job, Log
+from job.models import Job, Log
 
 
 @admin.register(Job)

@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lista Job</title>
+  <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="container my-4">
+    <h1>Lista Job</h1>
+    {% if job_list %}
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Stato</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for job in job_list %}
+            <tr>
+              <td>{{ job.id }}</td>
+              <td>{{ job.user }}</td>
+              <td>{{ job.status }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>Nessun job trovato.</p>
+    {% endif %}
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/js/tabler.min.js"></script>
+</body>
+</html>

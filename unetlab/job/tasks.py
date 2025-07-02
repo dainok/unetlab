@@ -8,8 +8,8 @@ import redis
 from celery import shared_task
 from django.conf import settings
 from unetlab import messages
-from .models import Job, JobStatusChoices
-from .utils import log
+from job.models import Job, JobStatusChoices
+from job.utils import log
 
 
 @shared_task

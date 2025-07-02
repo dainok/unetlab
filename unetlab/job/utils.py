@@ -5,11 +5,18 @@ __copyright__ = "Copyright 2025, Andrea Dainese"
 __license__ = "GPLv3"
 
 from django.conf import settings
-from .models import Log, LogSeverityChoices, LogTypeChoices
+from job.models import Log, LogSeverityChoices, LogTypeChoices
 
-def log(job_id, message, severity=LogSeverityChoices.INFO.value, log_type=LogTypeChoices.APP.value):
+
+def log(
+    job_id: int,
+    message: str,
+    severity: int = LogSeverityChoices.INFO.value,
+    log_type: str = LogTypeChoices.APP.value,
+) -> None:
+    """Shortcut to add a log."""
     Log.objects.create(
-        job_id = job_id,
+        job_id=job_id,
         message=message,
         severity=severity,
         source=settings.SOURCE,
