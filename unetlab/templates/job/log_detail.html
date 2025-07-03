@@ -1,0 +1,57 @@
+{% extends "unetlab/base.html" %}
+{% block title %}UNetLab | Jobs > List{% endblock %}
+{% block page_title %}Jobs > ID:{{ log.id }}{% endblock %}
+{% block page_body %}
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Log Details</h3>
+            </div>
+            <div class="card-body">
+                <div class="datagrid">
+                    <div class="datagrid-item">
+                        <div class="datagrid-title">{{ log_fields.id }}</div>
+                        <div class="datagrid-content">{{ log.id }}</div>
+                    </div>
+                    <div class="datagrid-item">
+                        <div class="datagrid-title">{{ job_fields.user }}</div>
+                        <div class="datagrid-content">{{ log.job.user }}</div>
+                    </div>
+                    <div class="datagrid-item">
+                        <div class="datagrid-title">{{ log_fields.severity }}</div>
+                        <div class="datagrid-content">
+                            {% if log.get_severity_display == "Error" %}
+                                <span class="badge bg-red text-red-fg">{{ log.get_severity_display }}</span>
+                            {% elif log.get_severity_display == "Warning" %}
+                                <span class="badge bg-yellow text-yellow-fg">{{ log.get_severity_display }}</span>
+                            {% else %}
+                                {{ log.get_severity_display }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="datagrid-item">
+                        <div class="datagrid-title">{{ log_fields.created_at }}</div>
+                        <div class="datagrid-content">{{ log.created_at }}</div>
+                    </div>
+                    <div class="datagrid-item">
+                        <div class="datagrid-title">{{ log_fields.updated_at }}</div>
+                        <div class="datagrid-content">{{ log.updated_at }}</div>
+                    </div>
+                </div>
+                <div class="text-end">
+                    <a href="{% url 'log_list' %}" class="btn btn-primary mt-3">Back to Logs List</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">{{ log_fields.message }}</h3>
+            </div>
+            <div class="card-body">
+                <code>{{ log.message }}</code>
+            </div>
+        </div>
+    </div>
+{% endblock %}

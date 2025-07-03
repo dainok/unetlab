@@ -8,15 +8,24 @@ __license__ = "GPLv3"
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from job.views import JobViewSet, JobsListView, JobDetailView
+from job.views import (
+    JobViewSet,
+    JobListView,
+    JobDetailView,
+    LogViewSet,
+    LogListView,
+    LogDetailView,
+)
 
 router = DefaultRouter()
 router.register(r"job", JobViewSet, basename="job")
 # router.register(r'logs', LogViewSet, basename='log')
 
 urlpatterns = [
-    path("job/", JobsListView.as_view(), name="job_list"),
+    path("job/", JobListView.as_view(), name="job_list"),
     path("job/<int:pk>/", JobDetailView.as_view(), name="job_detail"),
+    path("log/", LogListView.as_view(), name="log_list"),
+    path("log/<int:pk>/", LogDetailView.as_view(), name="log_detail"),
     path("api/", include(router.urls)),
 ]
 
