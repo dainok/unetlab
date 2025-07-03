@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "channels",
     "rest_framework",
     "rest_framework.authtoken",
+    "ui",  # UNetLab: User and Web interface
     "job",  # UNetLab: job and log management
     "proxmox",  # UNetLab: Proxmox host management
     # "drf_spectacular",
