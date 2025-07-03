@@ -336,12 +336,12 @@
                                     <span class="nav-link-title"> System </span>
                                 </a>
                                 <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="./alerts.html"> Hosts </a>
-                                    <a class="dropdown-item" href="{% url 'job_list' %}">Jobs </a>
-                                    <a class="dropdown-item" href="{% url 'log_list' %}"> Logs </a>
-                                    <a class="dropdown-item" href="./alerts.html"> Nodes </a>
-                                    <a class="dropdown-item" href="./alerts.html"> Settings </a>
-                                    <a class="dropdown-item" href="./alerts.html"> Templates </a>
+                                    <a class="dropdown-item{% is_active 'host_list' %}" href="./alerts.html"> Hosts </a>
+                                    <a class="dropdown-item{% is_active 'job_list' %}" href="{% url 'job_list' %}">Jobs </a>
+                                    <a class="dropdown-item{% is_active 'log_list' %}" href="{% url 'log_list' %}"> Logs </a>
+                                    <a class="dropdown-item{% is_active 'node_list' %}" href="./alerts.html"> Nodes </a>
+                                    <a class="dropdown-item{% is_active 'setting_list' %}" href="./alerts.html"> Settings </a>
+                                    <a class="dropdown-item{% is_active 'template_list' %}" href="./alerts.html"> Templates </a>
                                 </div>
                             </li>
                             <li class="nav-item dropdown">

@@ -1,1 +1,2 @@
 pre_commit==4.2.0
+pytest-django==4.11.1
