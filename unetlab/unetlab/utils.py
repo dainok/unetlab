@@ -1,4 +1,3 @@
-
 def db_fields_to_dict(fields):
     output = {}
     for field in fields:
