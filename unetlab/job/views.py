@@ -62,6 +62,7 @@ class JobViewSet(
     serializer_class = JobSerializer
     filterset_class = JobFilter
     filter_backends = [DjangoFilterBackend]
+    queryset = Job.objects.all()
 
 
 class JobListView(JobQueryMixin, FilterView, ListView):
@@ -139,6 +140,7 @@ class LogViewSet(
     serializer_class = LogSerializer
     filterset_class = LogFilter
     filter_backends = [DjangoFilterBackend]
+    queryset = Log.objects.all()
 
 
 class LogListView(LogQueryMixin, FilterView, ListView):

@@ -63,7 +63,7 @@ def test_job_permissions_ui_jobdetail_admin(client, admin_user, jobs):
 @pytest.mark.django_db
 def test_job_permissions_ui_jobdetail_staff(client, staff_user, jobs):
     """Test Job detail access via UI with staff user."""
-    client.login(username="staff", password="admin_pass")
+    client.login(username="staff", password="staff_pass")
     url = reverse("job_detail", args=[jobs["admin"].pk])
     response = client.get(url)
     assert response.status_code == 200
@@ -81,7 +81,7 @@ def test_job_permissions_ui_jobdetail_staff(client, staff_user, jobs):
 @pytest.mark.django_db
 def test_job_permissions_ui_jobdetail_user(client, user, jobs):
     """Test Job detail access via UI with staff user."""
-    client.login(username="user", password="admin_pass")
+    client.login(username="user", password="user_pass")
     url = reverse("job_detail", args=[jobs["admin"].pk])
     response = client.get(url)
     assert response.status_code == 403

@@ -181,7 +181,7 @@ CELERY_BEAT_SCHEDULE = {
 
 # Public URLs (UNetLab middleware)
 LOGIN_REDIRECT_URL = "home"
-LOGOUT_REDIRECT_URL = "home"
+LOGOUT_REDIRECT_URL = "login"
 PUBLIC_URLS = [
     "login",
     "logout",

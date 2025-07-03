@@ -23,10 +23,10 @@ class LoginRequiredMiddleware:
             # API are managed by REST framework
             return self.get_response(request)
         if request.path.startswith("/admin/"):
-            # API are managed by REST framework
+            # Admin is managed by Django
             return self.get_response(request)
         if not request.user.is_authenticated:
             resolver_match = resolve(request.path)
             if resolver_match.view_name not in settings.PUBLIC_URLS:
-                return redirect(settings.LOGIN_REDIRECT_URL)
+                return redirect(settings.LOGOUT_REDIRECT_URL)
         return self.get_response(request)

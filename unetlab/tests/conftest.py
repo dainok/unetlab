@@ -2,20 +2,37 @@ import pytest
 from django.contrib.auth.models import User
 from job.models import Job, Log, LogSeverityChoices, LogTypeChoices
 
+
 @pytest.fixture
 def admin_user(db):
     """Create admin user."""
-    return User.objects.create_superuser(username="admin", email="admin@example.com", password="admin_pass", is_staff=True, is_superuser=True)
+    return User.objects.create_superuser(
+        username="admin",
+        email="admin@example.com",
+        password="admin_pass",
+        is_staff=True,
+        is_superuser=True,
+    )
+
 
 @pytest.fixture
 def staff_user(db):
     """Create staff user."""
-    return User.objects.create_superuser(username="staff", email="staff@example.com", password="staff_pass", is_staff=True)
+    return User.objects.create_superuser(
+        username="staff",
+        email="staff@example.com",
+        password="staff_pass",
+        is_staff=True,
+    )
+
 
 @pytest.fixture
 def user(db):
     """Create unprivileged user."""
-    return User.objects.create_user(username="user", email="user@example.com", password="user_pass")
+    return User.objects.create_user(
+        username="user", email="user@example.com", password="user_pass"
+    )
+
 
 @pytest.fixture
 def jobs(admin_user, staff_user, user):

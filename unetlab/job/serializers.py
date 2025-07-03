@@ -18,7 +18,7 @@ class JobSerializer(serializers.ModelSerializer):
         """Serializer metadata."""
 
         model = Job
-        # fields = ["id", "user", "status", "created_at"]
+        fields = "__all__"
         # fields = ['id', 'user', 'status', 'logs', 'created_at']
 
 
@@ -31,5 +31,6 @@ class LogSerializer(serializers.ModelSerializer):
         """Serializer metadata."""
 
         model = Log
+        fields = "__all__"
         # fields = ["id", "user", "status", "created_at"]
         # fields = ['id', 'user', 'status', 'logs', 'created_at']
