@@ -18,8 +18,8 @@ from job.views import (
 )
 
 router = DefaultRouter()
-router.register(r"job", JobViewSet, basename="job")
 router.register(r"job", LogViewSet, basename="job")
+router.register(r"log", JobViewSet, basename="log")
 
 urlpatterns = [
     path("job/", JobListView.as_view(), name="job_list"),
