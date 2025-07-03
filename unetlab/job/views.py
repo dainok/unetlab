@@ -39,6 +39,7 @@ class JobQueryMixin:
         raise PermissionDenied()
 
     def get_paginate_by(self, queryset):
+        """Implement pagination."""
         per_page = self.request.GET.get("per_page")
         try:
             per_page = int(per_page)
@@ -80,11 +81,13 @@ class JobDetailView(JobQueryMixin, DetailView):
     model = Job
 
     def get_queryset(self):
+        """Implement queryset filters."""
         return Job.objects.prefetch_related(
             Prefetch("logs", queryset=Log.objects.order_by("created_at"))
         )
 
     def get_context_data(self, **kwargs):
+        """Provide additional content to the template."""
         context = super().get_context_data(**kwargs)
         context["job_fields"] = db_fields_to_dict(Job._meta.fields)
         context["log_fields"] = db_fields_to_dict(Log._meta.fields)
@@ -113,6 +116,7 @@ class LogQueryMixin:
         raise PermissionDenied()
 
     def get_paginate_by(self, queryset):
+        """Implement pagination."""
         per_page = self.request.GET.get("per_page")
         try:
             per_page = int(per_page)
@@ -155,6 +159,7 @@ class LogDetailView(LogQueryMixin, DetailView):
     model = Log
 
     def get_context_data(self, **kwargs):
+        """Provide additional content to the template."""
         context = super().get_context_data(**kwargs)
         context["job_fields"] = db_fields_to_dict(Job._meta.fields)
         context["log_fields"] = db_fields_to_dict(Log._meta.fields)

@@ -1,8 +1,10 @@
+"""Testing models in Job app."""
 import pytest
 from job.models import Job, Log, JobStatusChoices, LogSeverityChoices, LogTypeChoices
 
+
 @pytest.mark.django_db
-def test_create_job():
+def test_job_models_job_create():
     """Test Job creation."""
     job = Job.objects.create(
         user="admin",
@@ -13,7 +15,7 @@ def test_create_job():
 
 
 @pytest.mark.django_db
-def test_create_log():
+def test_job_models_log_create():
     """Test Job and Log creation."""
     job = Job.objects.create(
         user="admin",

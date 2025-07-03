@@ -11,6 +11,8 @@ from job.models import Job, JobStatusChoices, Log, LogSeverityChoices
 
 
 class JobFilter(django_filters.FilterSet):
+    """Job filter used by ListView and ViewList."""
+
     user = django_filters.ChoiceFilter(
         choices=[],
         widget=forms.Select(attrs={"class": "form-select"}),
@@ -24,11 +26,14 @@ class JobFilter(django_filters.FilterSet):
     )
 
     def __init__(self, *args, **kwargs):
+        """Override __init__."""
         super().__init__(*args, **kwargs)
         users = Job.objects.order_by("user").values_list("user", flat=True).distinct()
         self.filters["user"].extra["choices"] = [(u, u) for u in users]
 
     class Meta:
+        """Filter metadata."""
+
         model = Job
         fields = {
             "status": ["exact"],
@@ -38,6 +43,8 @@ class JobFilter(django_filters.FilterSet):
 
 
 class LogFilter(django_filters.FilterSet):
+    """Log filter used by ListView and ViewList."""
+
     # user = django_filters.ChoiceFilter(
     #     choices=[],
     #     widget=forms.Select(attrs={"class": "form-select"}),
@@ -68,11 +75,12 @@ class LogFilter(django_filters.FilterSet):
     #     self.filters["user"].extra["choices"] = [(u, u) for u in users]
 
     class Meta:
+        """Filter metadata."""
+
         model = Log
         fields = {
             "severity": ["exact"],
             "acknowledged": ["exact"],
-            # "severity": ["exact"],
-            #     "user": ["exact"],
+            # "user": ["exact"],
             "created_at": ["date__gte", "date__lte"],
         }

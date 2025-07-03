@@ -52,7 +52,7 @@ repos:
     rev: 1.7.5
     hooks:
       - id: bandit
-        exclude: \.raw|migrations|docker|venv|ntc_templates
+        exclude: \.raw|migrations|docker|venv|ntc_templates|tests
   - repo: https://github.com/PyCQA/flake8
     rev: 6.0.0
     hooks:

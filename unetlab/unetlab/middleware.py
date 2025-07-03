@@ -11,11 +11,18 @@ from django.urls import resolve
 
 
 class LoginRequiredMiddleware:
+    """Middleware used to prevent unauthenticated user access UI."""
+
     def __init__(self, get_response):
+        """Override __init__ and save get_response."""
         self.get_response = get_response
 
     def __call__(self, request):
+        """Override __call__ to prevent unauthenticated user access UI."""
         if request.path.startswith("/api/"):
+            # API are managed by REST framework
+            return self.get_response(request)
+        if request.path.startswith("/admin/"):
             # API are managed by REST framework
             return self.get_response(request)
         if not request.user.is_authenticated:
