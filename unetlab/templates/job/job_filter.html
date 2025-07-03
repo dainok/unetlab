@@ -2,88 +2,88 @@
 {% block title %}UNetLab | Jobs > List{% endblock %}
 {% block page_title %}Jobs > List{% endblock %}
 {% block page_body %}
-    <div class="row row-cards">
-        <div class="col-lg-9">
-            <div class="card">
-                <div class="table-responsive">
-                    <table class="table table-vcenter card-table">
-                        <thead>
+    <div class="col-lg-9">
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table table-vcenter card-table">
+                    <thead>
+                        <tr>
+                            <th>{{ job_fields.id }}</th>
+                            <th>{{ job_fields.user }}</th>
+                            <th>{{ job_fields.status }}</th>
+                            <th>{{ job_fields.created_at }}</th>
+                            <th>{{ job_fields.updated_at }}</th>
+                            <th>Logs</th>
+                            <th class="w-1"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for job in job_list %}
                             <tr>
-                                {% for field in job_fields %}
-                                    <th>{{ field.verbose_name }}</th>
-                                {% endfor %}
-                                <th>Logs</th>
-                                <th class="w-1"></th>
+                                <td>{{ job.id }}</td>
+                                <td>{{ job.user }}</td>
+                                <td>
+                                    {% if job.status == "FAILED" %}
+                                        <span class="badge bg-red text-red-fg">{{ job.status }}</span>
+                                    {% elif job.status == "CANCELED" %}
+                                        <span class="badge bg-yellow text-yellow-fg">{{ job.status }}</span>
+                                    {% elif job.status == "SUCCEEDED" %}
+                                        <span class="badge bg-green text-green-fg">{{ job.status }}</span>
+                                    {% else %}
+                                        {{ job.status }}
+                                    {% endif %}
+                                </td>
+                                <td>{{ job.created_at }}</td>
+                                <td>{{ job.updated_at }}</td>
+                                <td>{{ job.log_count }}</td>
+                                <td>
+                                    <div class="btn-list flex-nowrap">
+                                        <a href="{% url 'job_detail' job.id %}" class="btn btn-1"> View </a>
+                                    </div>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            {% for job in job_list %}
-                                <tr>
-                                    <td>{{ job.id }}</td>
-                                    <td>{{ job.user }}</td>
-                                    <td>
-                                        {% if job.status == "FAILED" %}
-                                            <span class="badge bg-red text-red-fg">{{ job.status }}</span>
-                                        {% elif job.status == "CANCELED" %}
-                                            <span class="badge bg-yellow text-yellow-fg">{{ job.status }}</span>
-                                        {% elif job.status == "SUCCEEDED" %}
-                                            <span class="badge bg-green text-green-fg">{{ job.status }}</span>
-                                        {% else %}
-                                            {{ job.status }}
-                                        {% endif %}
-                                    </td>
-                                    <td>{{ job.created_at }}</td>
-                                    <td>{{ job.updated_at }}</td>
-                                    <td>{{ job.log_count }}</td>
-                                    <td>
-                                        <div class="btn-list flex-nowrap">
-                                            <a href="{% url 'job_detail' job.id %}" class="btn btn-1"> View </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% include "unetlab/partials/pagination.html" %}
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
+            {% include "unetlab/partials/pagination.html" %}
         </div>
-        <div class="col-lg-3">
-            <div class="card">
-                <form method="get" class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Filters</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="space-y">
-                            <div>
-                                <label for="{{ filter.form.status.id_for_label }}" class="form-label">
-                                    {{ filter.form.status.label }}
-                                </label>
-                                {{ filter.form.status }}
-                            </div>
-                            <div>
-                                <label for="{{ filter.form.user.id_for_label }}" class="form-label">
-                                    {{ filter.form.user.label }}
-                                </label>
-                                {{ filter.form.user }}
-                            </div>
-                            <div>
-                                <label for="{{ filter.form.created_at.id_for_label }}" class="form-label">
-                                    {{ filter.form.created_at.label }}
-                                </label>
-                                {{ filter.form.created_at }}
-                            </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="card">
+            <form method="get" class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Filters</h3>
+                </div>
+                <div class="card-body">
+                    <div class="space-y">
+                        <div>
+                            <label for="{{ filter.form.status.id_for_label }}" class="form-label">
+                                {{ filter.form.status.label }}
+                            </label>
+                            {{ filter.form.status }}
+                        </div>
+                        <div>
+                            <label for="{{ filter.form.user.id_for_label }}" class="form-label">
+                                {{ filter.form.user.label }}
+                            </label>
+                            {{ filter.form.user }}
+                        </div>
+                        <div>
+                            <label for="{{ filter.form.created_at.id_for_label }}" class="form-label">
+                                {{ filter.form.created_at.label }}
+                            </label>
+                            {{ filter.form.created_at }}
                         </div>
                     </div>
-                    <div class="card-footer text-end">
-                        <div class="d-flex">
-                            <a href="{% url 'job_list' %}" class="btn btn-link">Cancel</a>
-                            <button type="submit" class="btn btn-primary ms-auto">Filter</button>
-                        </div>
+                </div>
+                <div class="card-footer text-end">
+                    <div class="d-flex">
+                        <a href="{% url 'job_list' %}" class="btn btn-link">Cancel</a>
+                        <button type="submit" class="btn btn-primary ms-auto">Filter</button>
                     </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </div>
 {% endblock %}

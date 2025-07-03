@@ -2,7 +2,7 @@
 {% block title %}UNetLab | Jobs > List{% endblock %}
 {% block page_title %}Jobs > ID:{{ job.id }}{% endblock %}
 {% block page_body %}
-    <div class="container-xl">
+    <div class="col-lg-12">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Job Details</h3>
@@ -10,15 +10,15 @@
             <div class="card-body">
                 <div class="datagrid">
                     <div class="datagrid-item">
-                    <div class="datagrid-title">ID</div>
+                    <div class="datagrid-title">{{ job_fields.id }}</div>
                     <div class="datagrid-content">{{ job.id }}</div>
                 </div>
                 <div class="datagrid-item">
-                    <div class="datagrid-title">Owner</div>
+                    <div class="datagrid-title">{{ job_fields.user }}</div>
                     <div class="datagrid-content">{{ job.user }}</div>
                 </div>
                 <div class="datagrid-item">
-                    <div class="datagrid-title">Status</div>
+                    <div class="datagrid-title">{{ job_fields.status }}</div>
                     <div class="datagrid-content">
                         {% if job.status == "FAILED" %}
                             <span class="badge bg-red text-red-fg">{{ job.status }}</span>
@@ -32,16 +32,69 @@
                     </div>
                 </div>
                 <div class="datagrid-item">
-                    <div class="datagrid-title">Created at</div>
+                    <div class="datagrid-title">{{ job_fields.created_at }}</div>
                     <div class="datagrid-content">{{ job.created_at }}</div>
                 </div>
                 <div class="datagrid-item">
-                    <div class="datagrid-title">Updated at</div>
+                    <div class="datagrid-title">{{ job_fields.updated_at }}</div>
                     <div class="datagrid-content">{{ job.updated_at }}</div>
                 </div>
             </div>
             <div class="text-end">
                 <a href="{% url 'job_list' %}" class="btn btn-primary mt-3">Back to Jobs List</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Logs</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-vcenter card-table">
+                        <thead>
+                            <tr>
+                                <th>{{ log_fields.id }}</th>
+                                <th>{{ log_fields.type }}</th>
+                                <th>{{ log_fields.source }}</th>
+                                <th>{{ log_fields.severity }}</th>
+                                <th>{{ log_fields.message }}</th>
+                                <th>{{ log_fields.acknowledged }}</th>
+                                <th>{{ log_fields.created_at }}</th>
+                                <th class="w-1"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in log_list %}
+                                <tr>
+                                    <td>{{ log.id }}</td>
+                                    <td>{{ log.type }}</td>
+                                    <td>{{ log.source }}</td>
+                                    <td>
+                                        {% if log.get_severity_display == "Error" %}
+                                            <span class="badge bg-red text-red-fg">{{ log.get_severity_display }}</span>
+                                        {% elif log.get_severity_display == "Warning" %}
+                                            <span class="badge bg-yellow text-yellow-fg">{{ log.get_severity_display }}</span>
+                                        {% elif log.get_severity_display == "SUCCEEDED" %}
+                                            <span class="badge bg-green text-green-fg">{{ log.get_severity_display }}</span>
+                                        {% else %}
+                                            {{ log.get_severity_display }}
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ log.message }}</td>
+                                    <td>{{ log.acknowledged }}</td>
+                                    <td>{{ log.created_at }}</td>
+                                    <td>
+                                        <div class="btn-list flex-nowrap">
+                                            <a href="% url 'log_detail' log.id %" class="btn btn-1"> View </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
