@@ -1,6 +1,12 @@
 import pytest
+from rest_framework.test import APIClient
 from django.contrib.auth.models import User
 from job.models import Job, Log, LogSeverityChoices, LogTypeChoices
+
+
+@pytest.fixture
+def api_client():
+    return APIClient()
 
 
 @pytest.fixture
