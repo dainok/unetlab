@@ -43,6 +43,15 @@ def test_job_permissions_ui_joblist_user(client, user, jobs):
 
 
 @pytest.mark.django_db
+def test_job_permissions_ui_joblist_guest(client):
+    """Test Job access via UI with non-existent user."""
+    client.login(username="guest", password="guest_pass")
+    url = reverse("job_list")
+    response = client.get(url)
+    assert response.status_code == 302
+
+
+@pytest.mark.django_db
 def test_job_permissions_ui_jobdetail_admin(client, admin_user, jobs):
     """Test Job detail access via UI with admin user."""
     client.login(username="admin", password="admin_pass")
@@ -80,7 +89,7 @@ def test_job_permissions_ui_jobdetail_staff(client, staff_user, jobs):
 
 @pytest.mark.django_db
 def test_job_permissions_ui_jobdetail_user(client, user, jobs):
-    """Test Job detail access via UI with staff user."""
+    """Test Job detail access via UI with unprivileged user."""
     client.login(username="user", password="user_pass")
     url = reverse("job_detail", args=[jobs["admin"].pk])
     response = client.get(url)
@@ -94,3 +103,12 @@ def test_job_permissions_ui_jobdetail_user(client, user, jobs):
     url = reverse("job_detail", args=[jobs["other"].pk])
     response = client.get(url)
     assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_job_permissions_ui_jobdetail_guest(client, jobs):
+    """Test Job detail access via UI with non-existent user."""
+    client.login(username="guest", password="guest_pass")
+    url = reverse("job_detail", args=[jobs["other"].pk])
+    response = client.get(url)
+    assert response.status_code == 302

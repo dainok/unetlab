@@ -1,13 +1,11 @@
 """Test API authentication."""
-from django.contrib.auth.models import User
 from django.urls import reverse
-from rest_framework.test import APITestCase
-from rest_framework import status
+
 
 def test_ui_authentication_api_token_admin(api_client, admin_user):
     """Test API authentication by admin."""
     url = reverse("api_token")
-    data = {"username": "admin", 'password': "admin_pass"}
+    data = {"username": "admin", "password": "admin_pass"}
     response = api_client.post(url, data, format="json")
     assert response.status_code == 200
     assert "token" in response.data
@@ -17,24 +15,26 @@ def test_ui_authentication_api_token_admin(api_client, admin_user):
 def test_ui_authentication_api_token_staff(api_client, staff_user):
     """Test API authentication by staff."""
     url = reverse("api_token")
-    data = {"username": "staff", 'password': "staff_pass"}
+    data = {"username": "staff", "password": "staff_pass"}
     response = api_client.post(url, data, format="json")
     assert response.status_code == 200
     assert "token" in response.data
     assert len(response.data["token"]) > 0
+
 
 def test_ui_authentication_api_token_user(api_client, user):
     """Test API authentication by user."""
     url = reverse("api_token")
-    data = {"username": "user", 'password': "user_pass"}
+    data = {"username": "user", "password": "user_pass"}
     response = api_client.post(url, data, format="json")
     assert response.status_code == 200
     assert "token" in response.data
     assert len(response.data["token"]) > 0
 
+
 def test_ui_authentication_api_token_guest(api_client, db):
     """Test UI authentication by non-existent user."""
     url = reverse("api_token")
-    data = {"username": "guest", 'password': "guest_pass"}
+    data = {"username": "guest", "password": "guest_pass"}
     response = api_client.post(url, data, format="json")
     assert response.status_code == 400
