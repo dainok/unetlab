@@ -1,21 +1,47 @@
-UNetLab is a new generation software for networking lab. It can be considered the next major version of iou-web, but the software has been rewritten from scratch. The major advantage over GNS3 and iou-web itself is about multi-hypervisor support within a single entity. UNetLab allows to design labs using IOU, Dynamips and QEMU nodes without dealing with multi virtual machines: everything run inside a UNetLab host, and a lab is a single file including all information needed.
+# UNetLab
 
-Install Proxmox VE, and create a token without `Privilege Separation` flag.
+UNetLab is a next-generation software platform for networking labs. It is a complete rewrite of iou-web, designed to provide multi-hypervisor support within a single unified environment. Unlike GNS3 and iou-web, UNetLab allows you to design labs using IOU, Dynamips, and QEMU nodes without managing multiple virtual machines — everything runs inside a single UNetLab host. Labs are saved as a single file containing all the necessary information.
 
-Run server:
+## Prerequisites
+
+* Install Proxmox VE.
+* Create a Proxmox API token **without** the `Privilege Separation` flag.
+
+## Running the Server
+
+Install the production dependencies:
 
 ```bash
-./manage.py runserver
+poetry install --without dev
 ```
 
-Run worker:
+Start the Django development server:
 
 ```bash
-celery -A unetlab worker -l info
+poetry run ./manage.py runserver
 ```
 
-Run scheduler:
+## Running Celery Workers and Scheduler
+
+Start the Celery worker:
 
 ```bash
-celery -A unetlab beat -l info
+poetry run celery -A unetlab worker -l info
+```
+
+Start the Celery beat scheduler:
+
+```bash
+poetry run celery -A unetlab beat -l info
+```
+
+## Development
+
+To set up the development environment, including dev dependencies:
+
+```bash
+poetry install --with dev
+poetry lock
+poetry run pre-commit run -a
+poetry run pytest --ds=unetlab.settings --cov=. -v
 ```

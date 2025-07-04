@@ -1,51 +1,62 @@
-"""Django settings for UNetLab project."""
+"""
+Django settings for the UNetLab project.
 
-__author__ = "Andrea Dainese"
-__contact__ = "andrea@adainese.it"
-__copyright__ = "Copyright 2024, Andrea Dainese"
-__license__ = "GPLv3"
+This module contains the Django configuration for UNetLab,
+including settings for Django core, REST framework, Celery, Channels, and Constance.
+"""
 
 import os
 import socket
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / "subdir".
+# Base directory for the project
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
+# ==============================================================================
+# SECURITY SETTINGS
+# ==============================================================================
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = (
-    "django-insecure-is*$9*-@-)qo_%a^xo8i%ppjg2#qx4y)tl+ymhk+w*dfh64%pi"  # nosec
+# ⚠️ WARNING: In production, set the secret key in an environment variable!
+SECRET_KEY = os.environ.get(
+    "DJANGO_SECRET_KEY",
+    "django-insecure-is*$9*-@-)qo_%a^xo8i%ppjg2#qx4y)tl+ymhk+w*dfh64%pi",  # nosec
 )
 
-# SECURITY WARNING: don"t run with debug turned on in production!
-DEBUG = True
+DEBUG = True  # Turn off in production
 
 ALLOWED_HOSTS = []
 
-# Application definition
+# ==============================================================================
+# APPLICATIONS
+# ==============================================================================
 
 INSTALLED_APPS = [
+    # Core Django apps
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "daphne",
+    "daphne",  # Must come before staticfiles for correct ASGI initialization
     "django.contrib.staticfiles",
-    "django_filters",
-    "constance",
-    "channels",
+    # Third-party apps
+    "channels",  # WebSocket support
+    "django_filters",  # Filtering for REST API
     "rest_framework",
     "rest_framework.authtoken",
-    "ui",  # UNetLab: User and Web interface
-    "job",  # UNetLab: job and log management
-    "proxmox",  # UNetLab: Proxmox host management
+    "constance",  # Dynamic settings backend
+    # Local apps
+    "ui",
+    "job",
+    "proxmox",
+    # Optional: OpenAPI docs
     # "drf_spectacular",
     # "drf_spectacular_sidecar",
 ]
+
+# ==============================================================================
+# MIDDLEWARE
+# ==============================================================================
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -55,17 +66,24 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # Custom login-required middleware
     "unetlab.middleware.LoginRequiredMiddleware",
 ]
 
+# ==============================================================================
+# URL ROUTING
+# ==============================================================================
+
 ROOT_URLCONF = "unetlab.urls"
+
+# ==============================================================================
+# TEMPLATES CONFIGURATION
+# ==============================================================================
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [
-            os.path.join(BASE_DIR, "templates"),
-        ],  # Add custom admin template
+        "DIRS": [BASE_DIR / "templates"],  # Custom admin or UI templates
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -78,12 +96,16 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "unetlab.wsgi.application"
+# ==============================================================================
+# ASGI / WSGI APPLICATIONS
+# ==============================================================================
 
+WSGI_APPLICATION = "unetlab.wsgi.application"
 ASGI_APPLICATION = "unetlab.asgi.application"
 
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
+# ==============================================================================
+# DATABASE CONFIGURATION
+# ==============================================================================
 
 DATABASES = {
     "default": {
@@ -92,67 +114,60 @@ DATABASES = {
     }
 }
 
-# Password validation
-# https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
+# ==============================================================================
+# PASSWORD VALIDATORS
+# ==============================================================================
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
     },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-# Internationalization
-# https://docs.djangoproject.com/en/3.2/topics/i18n/
+# ==============================================================================
+# INTERNATIONALIZATION
+# ==============================================================================
 
 LANGUAGE_CODE = "en-us"
-
 TIME_ZONE = "UTC"
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.2/howto/static-files/
+# ==============================================================================
+# STATIC FILES
+# ==============================================================================
 
 STATIC_URL = "/static/"
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
-STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
+# ==============================================================================
+# DEFAULT PRIMARY KEY FIELD TYPE
+# ==============================================================================
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Channel configuration for WebSockets
-# https://channels.readthedocs.io/en/stable/topics/channel_layers.html
+# ==============================================================================
+# CHANNEL LAYERS (WebSocket via Redis)
+# ==============================================================================
 
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
             "hosts": [("localhost", 6379)],
-            # "hosts":[{
-            #     "address": "rediss://user@host:port",  # "REDIS_TLS_URL"
-            #     "ssl_cert_reqs": None,
-            # }],
             "prefix": "asgi",
         },
     },
 }
 
-# REST
+# ==============================================================================
+# DJANGO REST FRAMEWORK (DRF)
+# ==============================================================================
+
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
@@ -166,12 +181,17 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 10,
 }
 
-# Celery configuration
+# ==============================================================================
+# CELERY CONFIGURATION
+# ==============================================================================
+
 CELERY_BROKER_URL = "redis://localhost:6379/0"
 CELERY_ACCEPT_CONTENT = ["json"]
-CELERY_TASK_DEFAULT_QUEUE = "unetlab_default"
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+CELERY_TASK_DEFAULT_QUEUE = "unetlab_default"
+
+# Periodic tasks
 CELERY_BEAT_SCHEDULE = {
     "cancel-stale-jobs": {
         "task": "job.tasks.job_cancel_stale_jobs",
@@ -179,19 +199,26 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
-# Public URLs (UNetLab middleware)
+# ==============================================================================
+# LOGIN / LOGOUT REDIRECTS
+# ==============================================================================
+
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "login"
+
+# Public URLs excluded from login-required middleware
 PUBLIC_URLS = [
     "login",
     "logout",
     "reset",
 ]
 
-# Constance backend
-# https://django-constance.readthedocs.io/en/latest/backends.html#backends
+# ==============================================================================
+# DJANGO-CONSTANCE (Dynamic settings)
+# ==============================================================================
 
 CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
+
 CONSTANCE_CONFIG = {
     "PROXMOX_PRIMARY_ADDRESS": (
         "",
@@ -199,24 +226,28 @@ CONSTANCE_CONFIG = {
     ),
     "PROXMOX_USERNAME": (
         "root@pam",
-        "The username used for logging into the Proxmox host.",
+        "The username used to log in to the Proxmox host.",
     ),
     "PROXMOX_TOKEN_ID": (
         "root@pam!unetlab",
-        "The Token ID associated to the Proxmox username.",
+        "The Token ID associated with the Proxmox user.",
     ),
     "PROXMOX_SECRET": (
         "",
-        "The secret used for logging into the Proxmox host.",
+        "The secret used to authenticate to the Proxmox host.",
     ),
     "PROXMOX_VERIFY_SSL": (
         True,
-        "True if the backend is required to verify the SSL certificates of the Proxmox host.",
+        "Whether to verify the SSL certificate for Proxmox.",
     ),
     "PROXMOX_SHARED_STORAGE": (
         False,
-        "True if the Proxmox host has shared storage for storing nodes and templates.",
+        "Indicates if the Proxmox host uses shared storage for nodes and templates.",
     ),
 }
+
+# ==============================================================================
+# HOST IDENTIFIER
+# ==============================================================================
 
 SOURCE = socket.gethostname().upper()

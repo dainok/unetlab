@@ -1,13 +1,9 @@
-"""UNetLab URL WebSocket Configuration (see asgi.py)."""
-
-__author__ = "Andrea Dainese"
-__contact__ = "andrea@adainese.it"
-__copyright__ = "Copyright 2024, Andrea Dainese"
-__license__ = "GPLv3"
+"""WebSocket URL routing configuration for UNetLab (used in asgi.py)."""
 
 from django.urls import re_path
 from unetlab import consumers
 
 websocket_urlpatterns = [
+    # Route WebSocket requests for actions to ActionConsumer
     re_path(r"ws/action", consumers.ActionConsumer.as_asgi()),
 ]

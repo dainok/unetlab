@@ -1,0 +1,87 @@
+[project]
+name = "unetlab"
+version = "3.0.0-dev"
+description = """
+UNetLab is a modular and extensible orchestration platform tailored for virtual network environments.
+It provides centralized control over distributed compute resources, enabling automated provisioning,
+scheduling, and lifecycle management of virtual nodes and jobs. Designed for testing and production,
+UNetLab ensures a scalable and secure foundation for building reproducible network labs and automation pipelines.
+"""
+readme = "README.md"
+requires-python = ">=3.10"
+
+authors = [
+    { name = "Andrea Dainese", email = "andrea@adainese.it" }
+]
+
+license = { file = "LICENSE" }
+
+keywords = ["virtualization", "orchestration", "network", "automation", "unetlab"]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Operating System :: POSIX :: Linux",
+    "Topic :: System :: Systems Administration",
+    "Topic :: Utilities",
+    "Topic :: Software Development :: Build Tools",
+]
+
+dependencies = [
+    "Django>=5.2,<6",
+    "djangorestframework>=3.16,<4",
+    "django-filter>=25.1,<26",
+    "channels>=4.2,<5",
+    "channels_redis>=4.2,<5",
+    "daphne>=4.2,<5",
+    "celery>=5.5,<6",
+    "django-constance>=4.3,<5",
+    "django-redis>=6.0,<7",
+    "proxmoxer>=2.2,<3",
+    "requests>=2.32,<3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pre-commit>=4.2,<5",
+    "pytest-django>=4.11,<5",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/unetlab"
+Repository = "https://github.com/yourusername/unetlab"
+Documentation = "https://unetlab.readthedocs.io"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+
+[tool.black]
+line-length = 88
+target-version = ['py310']
+exclude = '''
+/(
+  \.venv
+  | build
+  | dist
+  | migrations
+  | .*\.raw
+)/
+'''
+
+[tool.djlint]
+ignore = ["H021"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "unetlab.settings"
+python_files = ["test_*.py"]
+addopts = "-p no:warnings"
+
+[tool.pyright]
+extraPaths = ["./unetlab"]
+include = ["."]
+reportMissingImports = true

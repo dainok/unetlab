@@ -1,9 +1,0 @@
-{
-    "extraPaths": [
-        "./unetlab"
-    ],
-    "include": [
-        "."
-    ],
-    "reportMissingImports": true
-}
