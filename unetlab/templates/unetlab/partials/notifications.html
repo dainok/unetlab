@@ -18,7 +18,7 @@
         <div class="card">
             <div class="card-header d-flex">
                 <h3 class="card-title">Notifications</h3>
-                <div class="btn-close ms-auto" data-bs-dismiss="dropdown"></div>
+                <div class="btn btn-close ms-auto" data-bs-dismiss="dropdown"></div>
             </div>
             <div class="list-group list-group-flush list-group-hoverable latest-logs-container">
                 {% for latest_log in latest_logs %}
@@ -28,7 +28,7 @@
                                 class="status-dot status-dot-animated d-block{% if latest_log.get_severity_display == 'Error' %} bg-red{% elif latest_log.get_severity_display == 'Warning'%} bg-yellow{% endif %}"></span>
                             </div>
                             <div class="col text-truncate">
-                                <a href="#" class="text-body d-block">{{ latest_log.get_severity_display }}</a>
+                                <a href="#" class="text-body d-block">{{ latest_log.source }}</a>
                                 <div class="d-block text-secondary text-truncate mt-n1">{{ latest_log.message }}</div>
                             </div>
                         </div>
@@ -38,7 +38,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col">
-                        <a href="#" class="btn btn-2 w-100" onclick="markAllLogsRead()"> Mark all as read </a>
+                        <a href="#" class="btn btn-2 w-100 btn-dropdown-close" data-bs-dismiss="dropdown" onclick="markAllLogsRead()"> Mark all as read </a>
                     </div>
                 </div>
             </div>
@@ -46,8 +46,59 @@
     </div>
 </div>
 <script>
+    /**
+     * Prepends a log message to the top of the logs container.
+     * Adds a colored status dot based on severity.
+     *
+     * @param {string} severity - The severity level ("Error", "Warning", or others).
+     * @param {string} message - The log message text to display.
+     */
+    function prependLog(severity, message) {
+        // Select the container where logs are displayed
+        const container = document.querySelector('.latest-logs-container');
+
+        // Create a new log item element
+        const logItem = document.createElement('div');
+        logItem.className = 'list-group-item';
+
+        // Set the inner HTML structure for the log item
+        logItem.innerHTML = `
+            <div class="row align-items-center">
+                <div class="col-auto">
+                    <span class="status-dot status-dot-animated d-block"></span>
+                </div>
+                <div class="col text-truncate">
+                    <a href="#" class="text-body d-block"></a>
+                    <div class="d-block text-secondary text-truncate mt-n1"></div>
+                </div>
+            </div>
+        `;
+
+        // Get references to the elements inside the log item
+        const statusDot = logItem.querySelector('.status-dot');
+        const sourceLink = logItem.querySelector('a.text-body');
+        const messageDiv = logItem.querySelector('div.text-secondary');
+
+        // Set status dot color based on severity
+        if (severity === 'Error') {
+            statusDot.classList.add('bg-red');
+        } else if (severity === 'Warning') {
+            statusDot.classList.add('bg-yellow');
+        }
+
+        // Set values and insert the new log item at the beginning of the container
+        sourceLink.textContent = "UI";
+        messageDiv.textContent = message;
+        container.insertBefore(logItem, container.firstChild);
+    }
     function markAllLogsRead() {
-        fetch("/api/log/acknowledge/", {
+        /**
+         * Marks all logs as read by sending a POST request to the API.
+         * On success, clears the log list and removes the red badge.
+         * Uses prependLog() to display errors on API failure, HTTP errors, network errors, and timeouts.
+         */
+        url = "/api/log/acknowledge/";
+        fetch(url, {
             method: "POST",
             headers: {
                 "X-CSRFToken": "{{ csrf_token }}",
@@ -57,13 +108,20 @@
         .then(response => response.json())
         .then(data => {
             if (data.status === "ok") {
+                // Clear logs container and remove badge on success
                 document.querySelector(".latest-logs-container").innerHTML = "";
-                document.querySelector(".latest-logs-badge").classList.remove("bg-red");
+                const badge = document.querySelector(".latest-logs-badge");
+                if (badge && badge.classList.contains("bg-red")) {
+                    badge.classList.remove("bg-red");
+                }
             } else {
-                alert("Errore: " + data.message);
+                // API returned error status, show message using prependLog
+                prependLog("Error", `API error: ${data.message || "Unknown error"}`);
             }
-            console.log(data);
-            <!-- alert("Errore: " + data.message); -->
+        })
+        .catch(error => {
+            // Catch network errors, timeouts, and other exceptions, then prepend log
+            prependLog("Error", `Failed request to ${url}: ${error.message}`);
         });
     }
 </script>
