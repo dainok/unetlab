@@ -4,36 +4,6 @@
 {% block pageclass %}page page-center{% endblock pageclass %}
 
 {% block body %}
-{{ request.user.username }} is here
-<script>
-    const logSocket = new WebSocket(`ws://${window.location.host}/ws/action/`);
-
-    logSocket.onopen = function (e) {
-        console.log("The connection was setup successfully !");
-      };
-
-    logSocket.onclose = function (e) {
-        console.log("Something unexpected happened !");
-    };
-
-    logSocket.onmessage = function(event) {
-        const data = JSON.parse(event.data);
-
-        // const message = event.data;
-        console.log('Received message:', data);
-        // Display the message in the chat UI
-        var div = document.createElement("div");
-        div.innerHTML = data.username + " : " + data.message;
-        document.querySelector("#id_chat_item_container").appendChild(div);
-    };
-
-    setInterval(() => {
-        console.log("Sending message");
-        const obj = {name: "John", age: 30, city: "New York"};
-        const myJSON = JSON.stringify(obj);
-        logSocket.send(myJSON)
-    }, 10000);
-
-</script>
+aaa
 <div id="id_chat_item_container"></div>
 {% endblock body %}

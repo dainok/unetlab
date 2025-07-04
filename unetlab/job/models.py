@@ -35,6 +35,7 @@ class LogTypeChoices(models.TextChoices):
     HOST = "HOST", _("Host")
     NODE = "NODE", _("Node")
     SCHEDULER = "SCHEDULER", _("Scheduler")
+    UI = "UI", _("UI")
 
 
 class Job(models.Model):

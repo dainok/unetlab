@@ -77,3 +77,10 @@ class ActionConsumer(AsyncWebsocketConsumer):
         # TODO: must select the right channel
         await self.send(text_data=json.dumps(data))
         self.channel_layer.group_send("broadcast", data)
+
+    async def LOG(self, data):
+        """Forward external log to WebSockets."""
+        print("*** LOG MSG -> USER", data)
+        # TODO: must select the right channel
+        await self.send(text_data=json.dumps(data))
+        self.channel_layer.group_send("broadcast", data)

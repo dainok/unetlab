@@ -94,5 +94,65 @@
             });
         });
         </script>
+        <script>
+            // Create a new WebSocket connection to the server
+            const logSocket = new WebSocket(`ws://${window.location.host}/ws/action/`);
+
+            // Called when the WebSocket connection is established
+            logSocket.onopen = function (e) {
+                console.log("✅ WebSocket connection established.");
+            };
+
+            // Called when the WebSocket connection is closed unexpectedly
+            logSocket.onclose = function (e) {
+                console.warn("⚠️ WebSocket connection closed unexpectedly.");
+                // Attempt to reconnect after 3 seconds
+                setTimeout(() => {
+                    connectWebSocket();
+                }, 3000);
+            };
+
+            // Called whenever a message is received from the server
+            logSocket.onmessage = function (event) {
+                let data;
+                try {
+                    data = JSON.parse(event.data);
+                } catch (err) {
+                    console.error("❌ Failed to parse WebSocket message:", err);
+                    return;
+                }
+
+                console.log("📨 Received event:", data);
+
+                // If message is of type 'LOG', prepend it to the UI
+                if (data["type"] === "LOG") {
+                    console.log("📝 New log received");
+                    prependLog(data["data"]["severity"], data["data"]["message"], data["data"]["source"]);
+                    return; // Skip chat display for logs
+                }
+
+                // Otherwise, assume it's a chat/message format
+                if (data.username && data.message) {
+                    const div = document.createElement("div");
+                    div.textContent = `${data.username} : ${data.message}`;
+                    document.querySelector("#id_chat_item_container")?.appendChild(div);
+                }
+            };
+
+            // Send a JSON message to the server every 10 seconds (for testing)
+            setInterval(() => {
+                if (logSocket.readyState === WebSocket.OPEN) {
+                    const testMessage = {
+                        name: "John",
+                        age: 30,
+                        city: "New York"
+                    };
+                    logSocket.send(JSON.stringify(testMessage));
+                    console.log("📤 Sent test message to server");
+                } else {
+                    console.warn("WebSocket not open. Skipping send.");
+                }
+            }, 10000);
+        </script>
     </body>
 </html>

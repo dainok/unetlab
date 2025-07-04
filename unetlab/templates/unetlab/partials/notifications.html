@@ -10,9 +10,7 @@
             </path>
             <path d="M9 17v1a3 3 0 0 0 6 0v-1"></path>
         </svg>
-        {% if latest_logs %}
-            <span class="badge{% if latest_logs %} bg-red{% endif %} latest-logs-badge"></span>
-        {% endif %}
+        <span class="badge{% if latest_logs %} bg-red{% endif %} latest-logs-badge"></span>
     </a>
     <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-end dropdown-menu-card">
         <div class="card">
@@ -25,10 +23,10 @@
                     <div class="list-group-item">
                         <div class="row align-items-center">
                             <div class="col-auto"><span
-                                class="status-dot status-dot-animated d-block{% if latest_log.get_severity_display == 'Error' %} bg-red{% elif latest_log.get_severity_display == 'Warning'%} bg-yellow{% endif %}"></span>
+                                class="status-dot status-dot-animated d-block{% if latest_log.get_severity_display == 'Error' %} bg-red{% elif latest_log.get_severity_display == 'Warning' %} bg-yellow{% endif %}"></span>
                             </div>
                             <div class="col text-truncate">
-                                <a href="#" class="text-body d-block">{{ latest_log.source }}</a>
+                                <a href="#" class="text-body d-block">{{ latest_log.type }}</a>
                                 <div class="d-block text-secondary text-truncate mt-n1">{{ latest_log.message }}</div>
                             </div>
                         </div>
@@ -53,9 +51,12 @@
      * @param {string} severity - The severity level ("Error", "Warning", or others).
      * @param {string} message - The log message text to display.
      */
-    function prependLog(severity, message) {
+    function prependLog(severity, message, type) {
+        // Use "UI" as default type if none is provided
+        const logType = type && type.trim() !== "" ? type : "UI";
+
         // Select the container where logs are displayed
-        const container = document.querySelector('.latest-logs-container');
+        const logContainer = document.querySelector('.latest-logs-container');
 
         // Create a new log item element
         const logItem = document.createElement('div');
@@ -75,21 +76,28 @@
         `;
 
         // Get references to the elements inside the log item
-        const statusDot = logItem.querySelector('.status-dot');
-        const sourceLink = logItem.querySelector('a.text-body');
-        const messageDiv = logItem.querySelector('div.text-secondary');
+        const severityElement = logItem.querySelector('.status-dot');
+        const typeElement = logItem.querySelector('a.text-body');
+        const messageElement = logItem.querySelector('div.text-secondary');
 
         // Set status dot color based on severity
         if (severity === 'Error') {
-            statusDot.classList.add('bg-red');
+            severityElement.classList.add('bg-red');
         } else if (severity === 'Warning') {
-            statusDot.classList.add('bg-yellow');
+            severityElement.classList.add('bg-yellow');
         }
 
         // Set values and insert the new log item at the beginning of the container
-        sourceLink.textContent = "UI";
-        messageDiv.textContent = message;
-        container.insertBefore(logItem, container.firstChild);
+        typeElement.textContent = logType;
+        messageElement.textContent = message;
+        logContainer.insertBefore(logItem, logContainer.firstChild);
+
+        // Highlight the badge if not already highlighted
+        const notificationElement = document.querySelector(".latest-logs-badge");
+        console.log(notificationElement);
+        if (notificationElement && !notificationElement.classList.contains("bg-red")) {
+            notificationElement.classList.add("bg-red");
+        }
     }
     function markAllLogsRead() {
         /**
@@ -110,9 +118,9 @@
             if (data.status === "ok") {
                 // Clear logs container and remove badge on success
                 document.querySelector(".latest-logs-container").innerHTML = "";
-                const badge = document.querySelector(".latest-logs-badge");
-                if (badge && badge.classList.contains("bg-red")) {
-                    badge.classList.remove("bg-red");
+                const notificationElement = document.querySelector(".latest-logs-badge");
+                if (notificationElement && notificationElement.classList.contains("bg-red")) {
+                    notificationElement.classList.remove("bg-red");
                 }
             } else {
                 // API returned error status, show message using prependLog

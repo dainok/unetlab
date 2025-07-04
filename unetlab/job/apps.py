@@ -13,3 +13,12 @@ class JobConfig(AppConfig):
 
     name = "job"  # Python path to the app
     verbose_name = "Jobs"  # Human-readable app name
+
+    def ready(self):
+        """
+        Hook method for application startup.
+
+        Import and register signals to ensure they are connected
+        when the app is loaded by Django.
+        """
+        from job import signals  # noqa: F401 (import used for side effects only)
