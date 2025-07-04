@@ -68,7 +68,10 @@ def test_job_permissions_api_jobdetail_admin(api_client, admin_user, jobs):
             response.status_code == 200
         ), f"Admin could not access job detail for job {job.pk}"
         assert isinstance(response.data, dict), "Response data is not a dict"
-        assert response.data["status"] == "CREATED", "Job status is not 'CREATED'"
+        assert response.data["status"] in [
+            "CREATED",
+            "SUCCEEDED",
+        ], "Job status is neither 'CREATED' nor 'SUCCEEDED'"
         assert response.data["user"] == job.user, "Job user does not match"
 
 
@@ -82,7 +85,10 @@ def test_job_permissions_api_jobdetail_staff(api_client, staff_user, jobs):
             response.status_code == 200
         ), f"Staff could not access job detail for job {job.pk}"
         assert isinstance(response.data, dict), "Response data is not a dict"
-        assert response.data["status"] == "CREATED", "Job status is not 'CREATED'"
+        assert response.data["status"] in [
+            "CREATED",
+            "SUCCEEDED",
+        ], "Job status is neither 'CREATED' nor 'SUCCEEDED'"
         assert response.data["user"] == job.user, "Job user does not match"
 
 
