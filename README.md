@@ -51,7 +51,7 @@ To run all pre-commit checks and tests with coverage reporting:
 
 ```bash
 poetry run pre-commit run --all-files
-poetry run coverage run -m pytest
+poetry run coverage run --omit="unetlab/tests/*" -m pytest unetlab
 poetry run coverage report -m
 poetry run pytest -v
 ```
