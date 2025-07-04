@@ -24,6 +24,6 @@ def job_cancel_stale_jobs():
         )
         # Adding logs for stale jobs
         for job_obj in job_qs:
-            log(job_obj.pk, messages.job_task_canceled, 40, "SCHEDULER")
+            log(job_obj.pk, messages.JOB_TASK_CANCELED, 40, "SCHEDULER")
         # Marking jobs as canceled
         job_qs.update(status=JobStatusChoices.CANCELED.value)

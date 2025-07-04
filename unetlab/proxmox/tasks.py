@@ -23,16 +23,16 @@ def call_proxmox_api(func, *, job_id=None):
     except ResourceException as err:
         log(
             job_id,
-            f"{messages.proxmox_api_error} ({err.status_message.lower()})",
+            f"{messages.PROXMOX_API_ERROR} ({err.status_message.lower()})",
             40,
             "SCHEDULER",
         )
     except ConnectTimeout:
-        log(job_id, f"{messages.proxmox_api_error} (timeout)", 40, "SCHEDULER")
+        log(job_id, f"{messages.PROXMOX_API_ERROR} (timeout)", 40, "SCHEDULER")
     except ConnectionError:
-        log(job_id, f"{messages.proxmox_api_error} (connection error)", 40, "SCHEDULER")
+        log(job_id, f"{messages.PROXMOX_API_ERROR} (connection error)", 40, "SCHEDULER")
     except RequestException:
-        log(job_id, f"{messages.proxmox_api_error} (exception)", 40, "SCHEDULER")
+        log(job_id, f"{messages.PROXMOX_API_ERROR} (exception)", 40, "SCHEDULER")
 
 
 @shared_task
@@ -48,7 +48,7 @@ def job_rescan(job_id):
     )
 
     # Start the job
-    log(job_obj.pk, messages.proxmox_task_rescan_started, 20, "SCHEDULER")
+    log(job_obj.pk, messages.PROXMOX_TASK_RESCAN_STARTED, 20, "SCHEDULER")
     job_obj.status = JobStatusChoices.RUNNING.value
     job_obj.save()
 
@@ -71,7 +71,7 @@ def job_rescan(job_id):
     ProxmoxHost.objects.exclude(name__in=hosts).update(is_orphan=True)
 
     # End the job
-    log(job_obj.pk, messages.proxmox_task_rescan_completed, 20, "SCHEDULER")
+    log(job_obj.pk, messages.PROXMOX_TASK_RESCAN_COMPLETED, 20, "SCHEDULER")
     job_obj.status = JobStatusChoices.SUCCEEDED.value
     job_obj.save()
 
@@ -80,5 +80,5 @@ def do_rescan(user=None):
     """Rescan Proxmox infrastructure."""
     # Create job and log
     job_obj = Job.objects.create(user=user)
-    log(job_obj.pk, messages.proxmox_task_rescan_enqueued, 20, "APP")
+    log(job_obj.pk, messages.PROXMOX_TASK_RESCAN_ENQUEUED, 20, "APP")
     job_rescan.delay(job_obj.pk)

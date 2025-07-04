@@ -1,12 +1,10 @@
-"""User messages."""
+"""Centralized user-facing messages for UNetLab."""
 
-__author__ = "Andrea Dainese"
-__contact__ = "andrea@adainese.it"
-__copyright__ = "Copyright 2024, Andrea Dainese"
-__license__ = "GPLv3"
+# Generic job/task messages
+JOB_TASK_CANCELED = "Job canceled due to stale status."
 
-job_task_canceled = "Job canceled due to stale status."
-proxmox_task_rescan_completed = "Proxmox infrastructure rescan completed successfully."
-proxmox_task_rescan_enqueued = "Proxmox infrastructure rescan enqueued."
-proxmox_task_rescan_started = "Proxmox infrastructure rescan initiated."
-proxmox_api_error = "API request failed"
+# Proxmox messages (grouped by context)
+PROXMOX_TASK_RESCAN_COMPLETED = "Proxmox infrastructure rescan completed successfully."
+PROXMOX_TASK_RESCAN_ENQUEUED = "Proxmox infrastructure rescan enqueued."
+PROXMOX_TASK_RESCAN_STARTED = "Proxmox infrastructure rescan initiated."
+PROXMOX_API_ERROR = "Proxmox API request failed."

@@ -1,14 +1,13 @@
-"""Views, called by URLs."""
-
-__author__ = "Andrea Dainese"
-__contact__ = "andrea@adainese.it"
-__copyright__ = "Copyright 2024, Andrea Dainese"
-__license__ = "GPLv3"
+"""Views for UNetLab: entry points bound to URLs."""
 
 from django.views.generic import TemplateView
 
 
 class HomeView(TemplateView):
-    """Home page."""
+    """
+    Render the home page for authenticated users.
+
+    The template is loaded from: templates/unetlab/home.html
+    """
 
     template_name = "unetlab/home.html"
