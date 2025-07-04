@@ -4,23 +4,25 @@
     <head>
         <link rel="author" href="https://www.adainese.it"/>
         <link rel="icon" href="{% static 'unetlab/favicon.ico' %}" type="image/x-icon" sizes="16x16"/>
-        <title>{% block title %}Unified Networking Lab{% endblock %}</title>
+        <title>{% block title %}Unified Networking Lab{% endblock title %}</title>
         <meta charSet="utf-8"/>
         <meta name="author" content="Andrea Dainese"/>
+        <meta name="description" content="UNetLab is a modular and extensible orchestration platform tailored for virtual network environments. It provides centralized control over distributed compute resources, enabling automated provisioning, scheduling, and lifecycle management of virtual nodes and jobs. Designed for testing and production, UNetLab ensures a scalable and secure foundation for building reproducible network labs and automation pipelines.">
+        <meta name="keywords" content="virtualization, orchestration, network, automation, unetlab">
         <meta name="Content-Security-Policy" content="default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self';base-uri 'self';form-action 'self'"/>
         <meta name="robots" content="noindex, nofollow">
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
         <!-- CSS files -->
         <link href="{% static 'tabler/css/tabler.min.css' %}" rel="stylesheet"/>
     </head>
-    <body class="{% block bodyclass %}{% endblock %}">
+    <body class="{% block bodyclass %}{% endblock bodyclass %}">
         <!-- Banner -->
-        {% block banner %}{% endblock %}
-        <div class="{% block pageclass %}page{% endblock %}">
+        {% block banner %}{% endblock banner %}
+        <div class="{% block pageclass %}page{% endblock pageclass %}">
             <!-- Navbar -->
             {% block navbar %}
                 {% include "unetlab/partials/navbar.html" %}
-            {% endblock %}
+            {% endblock navbar %}
             <div class="page-wrapper">
                 <!-- Body -->
                 {% block body %}
@@ -29,30 +31,30 @@
                             <div class="container-xl">
                                 <div class="row g-2 align-items-center">
                                     <div class="col">
-                                        <h2 class="page-title">{% block page_title %}{% endblock %}</h2>
+                                        <h2 class="page-title">{% block page_title %}{% endblock page_title %}</h2>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    {% endblock %}
+                    {% endblock page_header %}
                     <div class="page-body">
                         <div class="container-xl">
                             <div class="row row-cards">
-                                {% block page_body %}{% endblock %}
+                                {% block page_body %}{% endblock page_body %}
                             </div>
                         </div>
                     </div>
-                {% endblock %}
+                {% endblock body %}
                 <!-- Footer -->
                 {% block footer %}
                     {% include "unetlab/partials/footer.html" %}
-                {% endblock %}
+                {% endblock footer %}
             </div>
         </div>
         <!-- Model -->
         {% block modal %}
             {% include "unetlab/partials/modal.html" %}
-        {% endblock %}
+        {% endblock modal %}
         <!-- Tabler Core -->
         <script src="{% static 'tabler/js/tabler.min.js' %}" defer></script>
     </body>

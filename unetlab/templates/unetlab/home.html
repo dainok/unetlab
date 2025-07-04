@@ -1,10 +1,10 @@
 {% extends "unetlab/base.html" %}
-{% block title %}UNetLab | Home{% endblock %}
-{% block bodyclass %}d-flex flex-column{% endblock %}
-{% block pageclass %}page page-center{% endblock %}
+{% block title %}UNetLab | Home{% endblock title %}
+{% block bodyclass %}d-flex flex-column{% endblock bodyclass %}
+{% block pageclass %}page page-center{% endblock pageclass %}
 
 {% block body %}
-{{request.user.username}} is here
+{{ request.user.username }} is here
 <script>
     const logSocket = new WebSocket(`ws://${window.location.host}/ws/action/`);
 
@@ -36,4 +36,4 @@
 
 </script>
 <div id="id_chat_item_container"></div>
-{% endblock %}
+{% endblock body %}

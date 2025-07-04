@@ -73,9 +73,6 @@ exclude = '''
 )/
 '''
 
-[tool.djlint]
-ignore = ["H021"]
-
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "unetlab.settings"
 python_files = ["test_*.py"]
