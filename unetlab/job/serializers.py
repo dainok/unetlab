@@ -1,36 +1,35 @@
 """Serializers, called by API View."""
 
-__author__ = "Andrea Dainese"
-__contact__ = "andrea@adainese.it"
-__copyright__ = "Copyright 2024, Andrea Dainese"
-__license__ = "GPLv3"
-
 from rest_framework import serializers
 from job.models import Job, Log
 
 
-class JobSerializer(serializers.ModelSerializer):
-    """Serialize job."""
-
-    # logs = LogSerializer(many=True, read_only=True)
-
-    class Meta:
-        """Serializer metadata."""
-
-        model = Job
-        fields = "__all__"
-        # fields = ['id', 'user', 'status', 'logs', 'created_at']
-
-
 class LogSerializer(serializers.ModelSerializer):
-    """Serialize log."""
-
-    # logs = LogSerializer(many=True, read_only=True)
+    """Serializer for Log model."""
 
     class Meta:
-        """Serializer metadata."""
-
         model = Log
         fields = "__all__"
-        # fields = ["id", "user", "status", "created_at"]
-        # fields = ['id', 'user', 'status', 'logs', 'created_at']
+        read_only_fields = [
+            "id",
+            "created_at",
+            "updated_at",
+        ]  # Rendiamo readonly alcuni campi
+
+
+class JobSerializer(serializers.ModelSerializer):
+    """Serializer for Job model.
+
+    Include related logs as nested representation in read-only mode.
+    """
+
+    logs = LogSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Job
+        fields = "__all__"
+        read_only_fields = [
+            "id",
+            "created_at",
+            "updated_at",
+        ]  # Rendiamo readonly alcuni campi

@@ -1,19 +1,15 @@
-"""App configuration."""
-
-__author__ = "Andrea Dainese"
-__contact__ = "andrea@adainese.it"
-__copyright__ = "Copyright 2024, Andrea Dainese"
-__license__ = "GPLv3"
+"""App configuration for the job management app."""
 
 from django.apps import AppConfig
 
 
-class UNetLabConfig(AppConfig):
-    """Config for job management app."""
+class JobConfig(AppConfig):
+    """
+    Configuration class for the 'job' Django app.
 
-    name = "job"
-    verbose_name = "Jobs"
+    This class is used by Django to set application-specific attributes
+    and execute startup logic like signal registration.
+    """
 
-    def ready(self):
-        """Registering signals."""
-        from . import signals  # noqa: F401
+    name = "job"  # Python path to the app
+    verbose_name = "Jobs"  # Human-readable app name

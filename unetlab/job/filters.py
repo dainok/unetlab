@@ -11,44 +11,45 @@ from job.models import Job, JobStatusChoices, Log, LogSeverityChoices
 
 
 class JobFilter(django_filters.FilterSet):
-    """Job filter used by ListView and ViewList."""
+    """Filter for Job model used in list views and APIs."""
 
     user = django_filters.ChoiceFilter(
         choices=[],
         widget=forms.Select(attrs={"class": "form-select"}),
+        label="User",
     )
     status = django_filters.ChoiceFilter(
-        choices=JobStatusChoices,
+        choices=JobStatusChoices.choices,
         widget=forms.Select(attrs={"class": "form-select"}),
+        label="Status",
     )
-    created_at = django_filters.DateFilter(
+    created_at__gte = django_filters.DateFilter(
+        field_name="created_at",
+        lookup_expr="gte",
         widget=forms.DateInput(attrs={"type": "date", "class": "form-control mb-2"}),
+        label="Created After",
+    )
+    created_at__lte = django_filters.DateFilter(
+        field_name="created_at",
+        lookup_expr="lte",
+        widget=forms.DateInput(attrs={"type": "date", "class": "form-control mb-2"}),
+        label="Created Before",
     )
 
     def __init__(self, *args, **kwargs):
-        """Override __init__."""
+        """Dynamically populate user choices from existing Jobs."""
         super().__init__(*args, **kwargs)
         users = Job.objects.order_by("user").values_list("user", flat=True).distinct()
         self.filters["user"].extra["choices"] = [(u, u) for u in users]
 
     class Meta:
-        """Filter metadata."""
-
         model = Job
-        fields = {
-            "status": ["exact"],
-            "user": ["exact"],
-            "created_at": ["date__gte", "date__lte"],
-        }
+        fields = ["user", "status", "created_at__gte", "created_at__lte"]
 
 
 class LogFilter(django_filters.FilterSet):
-    """Log filter used by ListView and ViewList."""
+    """Filter for Log model used in list views and APIs."""
 
-    # user = django_filters.ChoiceFilter(
-    #     choices=[],
-    #     widget=forms.Select(attrs={"class": "form-select"}),
-    # )
     acknowledged = django_filters.BooleanFilter(
         widget=forms.Select(
             attrs={"class": "form-select"},
@@ -58,29 +59,26 @@ class LogFilter(django_filters.FilterSet):
                 ("false", "No"),
             ],
         ),
+        label="Acknowledged",
     )
     severity = django_filters.ChoiceFilter(
-        choices=LogSeverityChoices,
-        widget=forms.Select(
-            attrs={"class": "form-select"},
-        ),
+        choices=LogSeverityChoices.choices,
+        widget=forms.Select(attrs={"class": "form-select"}),
+        label="Severity",
     )
-    created_at = django_filters.DateFilter(
+    created_at__gte = django_filters.DateFilter(
+        field_name="created_at",
+        lookup_expr="gte",
         widget=forms.DateInput(attrs={"type": "date", "class": "form-control mb-2"}),
+        label="Created After",
     )
-
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-    #     users = Log.objects.order_by("user").values_list("user", flat=True).distinct()
-    #     self.filters["user"].extra["choices"] = [(u, u) for u in users]
+    created_at__lte = django_filters.DateFilter(
+        field_name="created_at",
+        lookup_expr="lte",
+        widget=forms.DateInput(attrs={"type": "date", "class": "form-control mb-2"}),
+        label="Created Before",
+    )
 
     class Meta:
-        """Filter metadata."""
-
         model = Log
-        fields = {
-            "severity": ["exact"],
-            "acknowledged": ["exact"],
-            # "user": ["exact"],
-            "created_at": ["date__gte", "date__lte"],
-        }
+        fields = ["severity", "acknowledged", "created_at__gte", "created_at__lte"]
