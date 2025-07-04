@@ -11,6 +11,7 @@ from job.models import Log, Job
 from job.serializers import JobSerializer, LogSerializer
 from job.filters import JobFilter, LogFilter
 from unetlab.utils import db_fields_to_dict
+from unetlab.views import CommonMixin
 
 
 class JobQueryMixin:
@@ -72,7 +73,7 @@ class JobViewSet(
     queryset = Job.objects.all()
 
 
-class JobListView(JobQueryMixin, FilterView, ListView):
+class JobListView(JobQueryMixin, CommonMixin, FilterView, ListView):
     """HTML list view for Jobs with filtering and pagination."""
 
     model = Job
@@ -83,7 +84,7 @@ class JobListView(JobQueryMixin, FilterView, ListView):
     }
 
 
-class JobDetailView(JobQueryMixin, DetailView):
+class JobDetailView(JobQueryMixin, CommonMixin, DetailView):
     """HTML detail view for a single Job with its logs."""
 
     model = Job
@@ -162,7 +163,7 @@ class LogViewSet(
     queryset = Log.objects.all()
 
 
-class LogListView(LogQueryMixin, FilterView, ListView):
+class LogListView(LogQueryMixin, CommonMixin, FilterView, ListView):
     """HTML list view for Logs with filtering and pagination."""
 
     model = Log
@@ -174,7 +175,7 @@ class LogListView(LogQueryMixin, FilterView, ListView):
     }
 
 
-class LogDetailView(LogQueryMixin, DetailView):
+class LogDetailView(LogQueryMixin, CommonMixin, DetailView):
     """HTML detail view for a single Log."""
 
     model = Log

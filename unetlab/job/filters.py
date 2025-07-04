@@ -16,7 +16,7 @@ class JobFilter(django_filters.FilterSet):
     user = django_filters.ChoiceFilter(
         choices=[],
         widget=forms.Select(attrs={"class": "form-select"}),
-        label="User",
+        label="Owner",
     )
     status = django_filters.ChoiceFilter(
         choices=JobStatusChoices.choices,
