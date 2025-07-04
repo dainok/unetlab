@@ -1,4 +1,5 @@
 """Testing permissions in Job app."""
+
 import pytest
 from django.urls import reverse
 

@@ -1,4 +1,5 @@
 """Testing models in Job app."""
+
 import pytest
 from job.models import Job, Log, JobStatusChoices, LogSeverityChoices, LogTypeChoices
 

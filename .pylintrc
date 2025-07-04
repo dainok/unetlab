@@ -1,6 +1,33 @@
-[MAIN]
-init-hook="from pylint.config import find_pylintrc; import os, sys; sys.path.append(os.path.dirname(find_pylintrc())); sys.path.append(os.path.abspath('../netbox/netbox'));"
+[MASTER]
+# Add project root and app folders to PYTHONPATH for proper import resolution.
+init-hook=
+    import os, sys
+    from pylint.config import find_pylintrc
+    project_root = os.path.dirname(find_pylintrc())
+    sys.path.append(project_root)
+    sys.path.append(os.path.join(project_root, "unetlab"))
 
 [MESSAGES CONTROL]
-disable=similarities,R0903,R0901,R0913,R0914,R0912,R0911,R0915,R1702,C0302
-ignore=migrations
+# Disable messages that are often noisy or irrelevant in Django apps.
+disable=
+    missing-docstring,     # Allow missing docstrings in Django-generated code
+    no-member,             # Django ORM attributes can confuse pylint
+    no-self-use,           # Methods that don't use self are common in Django views/forms
+    too-few-public-methods,# Models and forms sometimes have few public methods
+    too-many-arguments,    # Views/forms may have multiple parameters
+    too-many-instance-attributes,
+    too-many-locals,
+    too-many-branches,
+    too-many-statements,
+    too-many-return-statements,
+    duplicate-code,        # Disable duplicate code warning (can be noisy)
+    invalid-name,          # Relax naming rules for Django conventions
+
+ignore=migrations         # Skip migrations (auto-generated code)
+
+[TYPECHECK]
+# Django's dynamic attributes confuse pylint; this suppresses false positives.
+generated-members=objects,DoesNotExist,MultipleObjectsReturned
+
+[FORMAT]
+max-line-length=120      # Allow longer lines for better readability in Django templates and views

@@ -1,4 +1,5 @@
 """Job tasks."""
+
 __author__ = "Andrea Dainese"
 __contact__ = "andrea@adainese.it"
 __copyright__ = "Copyright 2025, Andrea Dainese"

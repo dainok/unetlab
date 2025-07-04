@@ -3,10 +3,9 @@
 #   - pre-commit install
 #   - pre-commit run --all-files
 # See https://pre-commit.com/hooks.html for more hooks
-
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v5.0.0
     hooks:
       - id: trailing-whitespace
         exclude: \.raw|migrations|docker|venv|ntc_templates
@@ -22,18 +21,18 @@ repos:
         exclude: \.raw|migrations|docker|venv|library|ntc_templates
         files: \.yaml$|\.yml$
   - repo: https://github.com/adrienverge/yamllint
-    rev: v1.32.0
+    rev: v1.37.0
     hooks:
       - id: yamllint
         args: [--format, parsable, --strict]
         exclude: \.raw|migrations|docker|venv|ntc_templates
   - repo: https://github.com/google/yamlfmt
-    rev: v0.9.0
+    rev: v0.17.2
     hooks:
       - id: yamlfmt
         exclude: \.raw|migrations|docker|venv|ntc_templates
   - repo: https://github.com/tillig/json-sort-cli
-    rev: v1.1.0
+    rev: v3.0.0
     hooks:
       - id: json-sort
         exclude: \.raw|migrations|docker|venv|ntc_templates
@@ -44,17 +43,17 @@ repos:
           - --indent-style=space
           - --insert-final-newline=true
   - repo: https://github.com/psf/black
-    rev: 23.3.0
+    rev: 25.1.0
     hooks:
       - id: black
         exclude: \.raw|migrations|docker|venv|ntc_templates
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.7.5
+    rev: 1.8.5
     hooks:
       - id: bandit
         exclude: \.raw|migrations|docker|venv|ntc_templates|tests
   - repo: https://github.com/PyCQA/flake8
-    rev: 6.0.0
+    rev: 7.3.0
     hooks:
       - id: flake8
         exclude: \.raw|migrations|docker|venv|ntc_templates
@@ -64,7 +63,7 @@ repos:
       - id: pydocstyle
         exclude: \.raw|migrations|docker|venv
   - repo: https://github.com/Riverside-Healthcare/djLint
-    rev: v1.19.17
+    rev: v1.36.4
     hooks:
       - id: djlint-django
         files: "netdoc/templates"

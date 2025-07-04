@@ -1,4 +1,5 @@
-# Snyk (https://snyk.io) policy file
+# Snyk policy configuration
 exclude:
+  # Exclude the tests directory globally from Snyk scans
   global:
     - unetlab/tests

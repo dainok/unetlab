@@ -1,4 +1,9 @@
+# yamlfmt configuration
 formatter:
-  type: basic
-  include_document_start: false
-  pad_line_comments: 2
+  type: basic                      # Use the basic formatter type
+  include_document_start: false   # Do not insert '---' at the beginning of files
+  pad_line_comments: 2            # Pad comments with 2 spaces for better readability
+  indent: 2                       # Use 2 spaces for indentation (common YAML style)
+  wrap_comments: true             # Enable wrapping long comments for clarity
+  align_colons: true              # Align colons in mappings for better visual structure
+  trim_trailing_whitespace: true  # Remove trailing spaces at line ends

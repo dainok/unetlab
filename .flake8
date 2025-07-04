@@ -1,6 +1,19 @@
 [flake8]
-# E501: Line length is enforced by Black, so flake8 doesn't need to check it
-# W503: Black disagrees with this rule, as does PEP 8; Black wins
+# Ignore line length (E501) since Black handles formatting
+# Ignore W503 (line break before binary operator) to be compatible with Black's style
 ignore = E501, W503
+
+# Exclude common virtual environment folders and Django migration files
 exclude =
-    .venv
+    .venv,
+    venv,
+    env,
+    */migrations/*,
+    __pycache__,
+    .git,
+    .tox,
+    .eggs,
+    *.egg-info
+
+max-complexity = 10
+max-line-length = 120

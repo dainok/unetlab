@@ -1,4 +1,5 @@
 """Test UI authentication."""
+
 import pytest
 
 

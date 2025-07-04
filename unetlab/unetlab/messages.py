@@ -1,4 +1,5 @@
 """User messages."""
+
 __author__ = "Andrea Dainese"
 __contact__ = "andrea@adainese.it"
 __copyright__ = "Copyright 2024, Andrea Dainese"

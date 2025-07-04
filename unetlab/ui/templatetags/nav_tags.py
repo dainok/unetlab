@@ -1,4 +1,5 @@
 """Template Tags used by templates."""
+
 from django import template
 
 register = template.Library()

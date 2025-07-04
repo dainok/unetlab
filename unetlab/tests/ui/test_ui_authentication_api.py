@@ -1,4 +1,5 @@
 """Test API authentication."""
+
 from django.urls import reverse
 
 
