@@ -37,11 +37,29 @@ poetry run celery -A unetlab beat -l info
 
 ## Development
 
-To set up the development environment, including dev dependencies:
+### Setup Development Environment
+
+To set up the development environment, including dev dependencies, run:
 
 ```bash
 poetry install --with dev
-poetry lock
-poetry run pre-commit run -a
-poetry run pytest --ds=unetlab.settings --cov=. -v
+```
+
+### Run Checks and Tests
+
+To run all pre-commit checks and tests with coverage reporting:
+
+```bash
+poetry run pre-commit run --all-files
+poetry run coverage run -m pytest
+poetry run coverage report -m
+poetry run pytest -v
+```
+
+### Adding New Libraries
+
+To add new packages as development dependencies (for example, pytest and coverage):
+
+```bash
+poetry add --dev pytest pytest-django coverage
 ```

@@ -82,3 +82,8 @@ addopts = "-p no:warnings"
 extraPaths = ["./unetlab"]
 include = ["."]
 reportMissingImports = true
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.4.1"
+pytest-django = "^4.11.1"
+coverage = "^7.9.2"
