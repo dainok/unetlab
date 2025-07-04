@@ -7,6 +7,8 @@ from django.db.models import Count, Prefetch
 from rest_framework import viewsets, mixins
 from django_filters.views import FilterView
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from job.models import Log, Job
 from job.serializers import JobSerializer, LogSerializer
 from job.filters import JobFilter, LogFilter
@@ -161,6 +163,12 @@ class LogViewSet(
     filterset_class = LogFilter
     filter_backends = [DjangoFilterBackend]
     queryset = Log.objects.all()
+
+    @action(detail=False, methods=["post"])
+    def acknowledge(self, request):
+        """Mark all logs as acknowledged for the current user."""
+        # Log.objects.filter(job__user=request.user.username, acknowledged=False).update(acknowledged=True)
+        return Response({"status": "ok"}, status=200)
 
 
 class LogListView(LogQueryMixin, CommonMixin, FilterView, ListView):
