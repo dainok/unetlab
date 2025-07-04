@@ -1,6 +1,6 @@
 # yamlfmt configuration
 formatter:
-  type: basic                      # Use the basic formatter type
+  type: basic                     # Use the basic formatter type
   include_document_start: false   # Do not insert '---' at the beginning of files
   pad_line_comments: 2            # Pad comments with 2 spaces for better readability
   indent: 2                       # Use 2 spaces for indentation (common YAML style)
