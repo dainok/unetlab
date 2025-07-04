@@ -1,10 +1,5 @@
 """Views, called by URLs."""
 
-__author__ = "Andrea Dainese"
-__contact__ = "andrea@adainese.it"
-__copyright__ = "Copyright 2025, Andrea Dainese"
-__license__ = "GPLv3"
-
 from django.core.exceptions import PermissionDenied
 from django.views.generic import ListView, DetailView
 from django.conf import settings
@@ -19,10 +14,17 @@ from unetlab.utils import db_fields_to_dict
 
 
 class JobQueryMixin:
-    """Set common behaviour between UI and REST API."""
+    """Mixin to encapsulate common Job queryset and permissions logic.
+
+    Used by both UI and API views.
+    """
 
     def get_queryset(self):
-        """Implement queryset filters."""
+        """Return a filtered queryset annotated with log count.
+
+        - Staff and superusers see all jobs.
+        - Regular users only see their own jobs.
+        """
         qs = super().get_queryset()
         qs = qs.annotate(log_count=Count("logs"))
         user = self.request.user
@@ -31,33 +33,38 @@ class JobQueryMixin:
         return qs.filter(user=user.username)
 
     def get_object(self):
-        """Implement object filter."""
+        """Return object only if user has permission."""
         obj = super().get_object()
         user = self.request.user
         if user.is_staff or user.is_superuser or obj.user == user.username:
             return obj
-        raise PermissionDenied()
+        raise PermissionDenied("You do not have permission to access this object.")
 
     def get_paginate_by(self, queryset):
-        """Implement pagination."""
+        """Allow client to customize pagination via 'per_page' query param.
+
+        Enforces a maximum of 100 per page; defaults to 10.
+        """
         per_page = self.request.GET.get("per_page")
         try:
             per_page = int(per_page)
             if per_page > 100:
                 return 100
-            return per_page
+            if per_page > 0:
+                return per_page
         except (TypeError, ValueError):
-            return 10  # default
+            pass
+        return 10
 
 
 class JobViewSet(
     JobQueryMixin,
-    mixins.ListModelMixin,  # GET /object/
-    mixins.RetrieveModelMixin,  # GET /object/<id>/
-    mixins.DestroyModelMixin,  # DELETE /object/<id>/
+    mixins.ListModelMixin,  # GET /jobs/
+    mixins.RetrieveModelMixin,  # GET /jobs/{id}/
+    mixins.DestroyModelMixin,  # DELETE /jobs/{id}/
     viewsets.GenericViewSet,
 ):
-    """Implement API class."""
+    """REST API endpoints for Job model."""
 
     serializer_class = JobSerializer
     filterset_class = JobFilter
@@ -66,7 +73,7 @@ class JobViewSet(
 
 
 class JobListView(JobQueryMixin, FilterView, ListView):
-    """Implement list view class."""
+    """HTML list view for Jobs with filtering and pagination."""
 
     model = Job
     filterset_class = JobFilter
@@ -77,18 +84,18 @@ class JobListView(JobQueryMixin, FilterView, ListView):
 
 
 class JobDetailView(JobQueryMixin, DetailView):
-    """Implement detail view class."""
+    """HTML detail view for a single Job with its logs."""
 
     model = Job
 
     def get_queryset(self):
-        """Implement queryset filters."""
+        """Prefetch logs ordered by creation date for performance."""
         return Job.objects.prefetch_related(
             Prefetch("logs", queryset=Log.objects.order_by("created_at"))
         )
 
     def get_context_data(self, **kwargs):
-        """Provide additional content to the template."""
+        """Add job and log field metadata and logs list to context."""
         context = super().get_context_data(**kwargs)
         context["job_fields"] = db_fields_to_dict(Job._meta.fields)
         context["log_fields"] = db_fields_to_dict(Log._meta.fields)
@@ -97,10 +104,17 @@ class JobDetailView(JobQueryMixin, DetailView):
 
 
 class LogQueryMixin:
-    """Set common behaviour between UI and REST API."""
+    """Mixin to encapsulate common Log queryset and permissions logic.
+
+    Used by both UI and API views.
+    """
 
     def get_queryset(self):
-        """Implement queryset filters."""
+        """Return a filtered queryset.
+
+        - Staff and superusers see all logs.
+        - Regular users see logs only for their jobs.
+        """
         qs = super().get_queryset()
         qs = qs.select_related("job")
         user = self.request.user
@@ -109,33 +123,38 @@ class LogQueryMixin:
         return qs.filter(job__user=user.username)
 
     def get_object(self):
-        """Implement object filter."""
+        """Return object only if user has permission."""
         obj = super().get_object()
         user = self.request.user
         if user.is_staff or user.is_superuser or obj.job.user == user.username:
             return obj
-        raise PermissionDenied()
+        raise PermissionDenied("You do not have permission to access this object.")
 
     def get_paginate_by(self, queryset):
-        """Implement pagination."""
+        """Allow client to customize pagination via 'per_page' query param.
+
+        Enforces a maximum of 100 per page; defaults to 10.
+        """
         per_page = self.request.GET.get("per_page")
         try:
             per_page = int(per_page)
             if per_page > 100:
                 return 100
-            return per_page
+            if per_page > 0:
+                return per_page
         except (TypeError, ValueError):
-            return 10  # default
+            pass
+        return 10
 
 
 class LogViewSet(
     LogQueryMixin,
-    mixins.ListModelMixin,  # GET /object/
-    mixins.RetrieveModelMixin,  # GET /object/<id>/
-    mixins.DestroyModelMixin,  # DELETE /object/<id>/
+    mixins.ListModelMixin,  # GET /logs/
+    mixins.RetrieveModelMixin,  # GET /logs/{id}/
+    mixins.DestroyModelMixin,  # DELETE /logs/{id}/
     viewsets.GenericViewSet,
 ):
-    """Implement API class."""
+    """REST API endpoints for Log model."""
 
     serializer_class = LogSerializer
     filterset_class = LogFilter
@@ -144,7 +163,7 @@ class LogViewSet(
 
 
 class LogListView(LogQueryMixin, FilterView, ListView):
-    """Implement list view class."""
+    """HTML list view for Logs with filtering and pagination."""
 
     model = Log
     filterset_class = LogFilter
@@ -156,12 +175,12 @@ class LogListView(LogQueryMixin, FilterView, ListView):
 
 
 class LogDetailView(LogQueryMixin, DetailView):
-    """Implement detail view class."""
+    """HTML detail view for a single Log."""
 
     model = Log
 
     def get_context_data(self, **kwargs):
-        """Provide additional content to the template."""
+        """Add job and log field metadata to context."""
         context = super().get_context_data(**kwargs)
         context["job_fields"] = db_fields_to_dict(Job._meta.fields)
         context["log_fields"] = db_fields_to_dict(Log._meta.fields)

@@ -1,10 +1,5 @@
 """Define ORM models for logs."""
 
-__author__ = "Andrea Dainese"
-__contact__ = "andrea@adainese.it"
-__copyright__ = "Copyright 2024, Andrea Dainese"
-__license__ = "GPLv3"
-
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -12,7 +7,7 @@ from django.contrib import messages
 
 
 class JobStatusChoices(models.TextChoices):
-    """Job status."""
+    """Enumeration for Job status."""
 
     CREATED = "CREATED", _("Created")
     RUNNING = "RUNNING", _("Running")
@@ -22,7 +17,10 @@ class JobStatusChoices(models.TextChoices):
 
 
 class LogSeverityChoices(models.IntegerChoices):
-    """Log severity mapped to Django messages."""
+    """
+    Enumeration for log severity, mapped to Django's message levels.
+    Uses integers as per django.contrib.messages constants.
+    """
 
     ERROR = messages.ERROR  # 40
     WARNING = messages.WARNING  # 30
@@ -31,7 +29,7 @@ class LogSeverityChoices(models.IntegerChoices):
 
 
 class LogTypeChoices(models.TextChoices):
-    """Log type."""
+    """Enumeration for log types/categories."""
 
     APP = "APP", _("App")
     HOST = "HOST", _("Host")
@@ -40,104 +38,92 @@ class LogTypeChoices(models.TextChoices):
 
 
 class Job(models.Model):
-    """Model for Job."""
+    """Model representing a background or system Job."""
 
     status = models.CharField(
-        null=False,
-        blank=False,
-        default=JobStatusChoices.CREATED.value,
-        help_text="Current status of the job.",
-        verbose_name="Status",
         max_length=256,
-        choices=JobStatusChoices,
+        choices=JobStatusChoices.choices,
+        default=JobStatusChoices.CREATED,
+        verbose_name=_("Status"),
+        help_text=_("Current status of the job."),
         editable=False,
     )
     user = models.CharField(
-        null=False,
-        blank=False,
-        help_text="User who started the job.",
-        verbose_name="Owner",
         max_length=256,
+        verbose_name=_("Owner"),
+        help_text=_("User who started the job."),
         editable=False,
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        """Database metadata."""
-
         db_table = "jobs"
         ordering = ["-created_at"]
-        verbose_name = "Job"
-        verbose_name_plural = "Jobs"
+        verbose_name = _("Job")
+        verbose_name_plural = _("Jobs")
 
-    def __str__(self):
-        """Return a human readable name when the object is printed."""
+    def __str__(self) -> str:
+        """Return string representation of the job (its primary key)."""
         return str(self.pk)
 
-    def get_absolute_url(self):
-        """Return the absolute url."""
+    def get_absolute_url(self) -> str:
+        """Return absolute URL for the job detail view."""
         return reverse("job-detail-view", args=[str(self.pk)])
 
 
 class Log(models.Model):
-    """Model for Log."""
+    """Model representing a log entry linked to a job."""
 
     acknowledged = models.BooleanField(
         default=False,
-        help_text="True if log has been acknowledged.",
-        verbose_name="Acknowledged",
-    )  # True if the log has been acknowledged.
+        verbose_name=_("Acknowledged"),
+        help_text=_("True if the log has been acknowledged."),
+    )
     job = models.ForeignKey(
-        Job, on_delete=models.CASCADE, related_name="logs"
-    )  # Associated job
+        Job,
+        on_delete=models.CASCADE,
+        related_name="logs",
+        verbose_name=_("Job"),
+        help_text=_("Job associated with this log."),
+    )
     message = models.TextField(
-        null=False,
-        blank=False,
+        verbose_name=_("Message"),
+        help_text=_("Log message content."),
         editable=False,
-        help_text="Log message.",
-        verbose_name="Message",
     )
     severity = models.IntegerField(
-        null=False,
-        blank=False,
-        help_text="Log severity.",
-        verbose_name="Severity",
-        choices=LogSeverityChoices,
+        choices=LogSeverityChoices.choices,
+        verbose_name=_("Severity"),
+        help_text=_("Severity level of the log."),
         editable=False,
     )
     source = models.CharField(
-        null=False,
-        blank=False,
-        help_text="Source of the log.",
-        verbose_name="Source",
         max_length=256,
+        verbose_name=_("Source"),
+        help_text=_("Source of the log."),
         editable=False,
     )
     type = models.CharField(
-        null=False,
-        blank=False,
-        help_text="Type of the log.",
-        verbose_name="Type",
         max_length=256,
-        choices=LogTypeChoices,
+        choices=LogTypeChoices.choices,
+        verbose_name=_("Type"),
+        help_text=_("Type/category of the log."),
         editable=False,
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        """Database metadata."""
-
         db_table = "logs"
         ordering = ["-created_at"]
-        verbose_name = "Log"
-        verbose_name_plural = "Logs"
+        verbose_name = _("Log")
+        verbose_name_plural = _("Logs")
 
-    def __str__(self):
-        """Return a human readable name when the object is printed."""
+    def __str__(self) -> str:
+        """Return string representation of the log (its primary key)."""
         return str(self.pk)
 
-    def get_absolute_url(self):
-        """Return the absolute url."""
+    def get_absolute_url(self) -> str:
+        """Return absolute URL for the log detail view."""
         return reverse("log-detail-view", args=[str(self.pk)])
