@@ -13,27 +13,33 @@
     </div>
     <ul class="pagination m-0 ms-auto">
         {% if page_obj.has_previous %}
-            {% if page_obj.previous_page_number > 2 %}
-                <li class="page-item"><a class="page-link cursor-pointer" href="?page=1" data-i="1" data-page="20">1</a></li>
-                <li class="page-item disabled"><a class="page-link cursor-pointer">...</a></li>
-            {% endif %}
-            {% if page_obj.previous_page_number == 2 %}
-                <li class="page-item"><a class="page-link cursor-pointer" href="?page=1" data-i="1" data-page="20">1</a></li>
-            {% endif %}
-            <li class="page-item"><a class="page-link cursor-pointer" href="?page={{ page_obj.previous_page_number }}" data-i="{{ page_obj.previous_page_number }}" data-page="20">{{ page_obj.previous_page_number }}</a></li>
+        {% if page_obj.previous_page_number > 2 %}
+        <li class="page-item"><a class="page-link cursor-pointer" href="?page=1" data-i="1" data-page="20">1</a></li>
+        <li class="page-item disabled"><a class="page-link cursor-pointer">...</a></li>
+        {% endif %}
+        {% if page_obj.previous_page_number == 2 %}
+        <li class="page-item"><a class="page-link cursor-pointer" href="?page=1" data-i="1" data-page="20">1</a></li>
+        {% endif %}
+        <li class="page-item"><a class="page-link cursor-pointer" href="?page={{ page_obj.previous_page_number }}"
+                data-i="{{ page_obj.previous_page_number }}" data-page="20">{{ page_obj.previous_page_number }}</a></li>
         {% endif %}
 
-        <li class="page-item active"><a class="page-link cursor-pointer" data-i="{{ page_obj.number }}" data-page="20">{{ page_obj.number }}</a></li>
+        <li class="page-item active"><a class="page-link cursor-pointer" data-i="{{ page_obj.number }}"
+                data-page="20">{{ page_obj.number }}</a></li>
 
         {% if page_obj.has_next %}
-            <li class="page-item"><a class="page-link cursor-pointer" href="?page={{ page_obj.next_page_number }}" data-i="{{ page_obj.next_page_number }}" data-page="20">{{ page_obj.next_page_number }}</a></li>
-            {% if page_obj.paginator.num_pages|add:-1 == page_obj.next_page_number %}
-                <li class="page-item"><a class="page-link cursor-pointer" href="?page={{ page_obj.next_page_number|add:1 }}" data-i="{{ page_obj.next_page_number|add:1 }}" data-page="20">{{ page_obj.next_page_number|add:1 }}</a></li>
-            {% endif %}
-            {% if page_obj.paginator.num_pages|add:-1 > page_obj.next_page_number %}
-                <li class="page-item disabled"><a class="page-link cursor-pointer">...</a></li>
-                <li class="page-item"><a class="page-link cursor-pointer" href="?page={{ page_obj.paginator.num_pages }}" data-i="{{ page_obj.paginator.num_pages }}" data-page="20">{{ page_obj.paginator.num_pages }}</a></li>
-            {% endif %}
+        <li class="page-item"><a class="page-link cursor-pointer" href="?page={{ page_obj.next_page_number }}"
+                data-i="{{ page_obj.next_page_number }}" data-page="20">{{ page_obj.next_page_number }}</a></li>
+        {% if page_obj.paginator.num_pages|add:-1 == page_obj.next_page_number %}
+        <li class="page-item"><a class="page-link cursor-pointer" href="?page={{ page_obj.next_page_number|add:1 }}"
+                data-i="{{ page_obj.next_page_number|add:1 }}" data-page="20">{{ page_obj.next_page_number|add:1 }}</a>
+        </li>
+        {% endif %}
+        {% if page_obj.paginator.num_pages|add:-1 > page_obj.next_page_number %}
+        <li class="page-item disabled"><a class="page-link cursor-pointer">...</a></li>
+        <li class="page-item"><a class="page-link cursor-pointer" href="?page={{ page_obj.paginator.num_pages }}"
+                data-i="{{ page_obj.paginator.num_pages }}" data-page="20">{{ page_obj.paginator.num_pages }}</a></li>
+        {% endif %}
         {% endif %}
     </ul>
 </div>
