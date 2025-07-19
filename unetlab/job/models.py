@@ -42,21 +42,23 @@ class Job(models.Model):
     """Model representing a background or system Job."""
 
     status = models.CharField(
-        max_length=256,
+        max_length=255,
         choices=JobStatusChoices.choices,
         default=JobStatusChoices.CREATED,
         verbose_name=_("Status"),
         help_text=_("Current status of the job."),
         editable=False,
+        db_index=True,
     )
     user = models.CharField(
-        max_length=256,
+        max_length=255,
         verbose_name=_("Owner"),
         help_text=_("User who started the job."),
         editable=False,
+        db_index=True,
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
 
     class Meta:
         db_table = "jobs"
@@ -80,6 +82,7 @@ class Log(models.Model):
         default=False,
         verbose_name=_("Acknowledged"),
         help_text=_("True if the log has been acknowledged."),
+        db_index=True,
     )
     job = models.ForeignKey(
         Job,
@@ -98,22 +101,25 @@ class Log(models.Model):
         verbose_name=_("Severity"),
         help_text=_("Severity level of the log."),
         editable=False,
+        db_index=True,
     )
     source = models.CharField(
-        max_length=256,
+        max_length=255,
         verbose_name=_("Source"),
         help_text=_("Source of the log."),
         editable=False,
+        db_index=True,
     )
     type = models.CharField(
-        max_length=256,
+        max_length=255,
         choices=LogTypeChoices.choices,
         verbose_name=_("Type"),
         help_text=_("Type/category of the log."),
         editable=False,
+        db_index=True,
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
 
     class Meta:
         db_table = "logs"

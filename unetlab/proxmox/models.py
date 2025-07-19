@@ -18,12 +18,13 @@ class ProxmoxHost(models.Model):
 
     name = models.CharField(
         primary_key=True,
-        max_length=256,
+        max_length=255,
         null=False,
         blank=False,
         editable=False,
         help_text="Hostname retrived from Proxmox host.",
         verbose_name="Hostname",
+        db_index=True,
     )
     ip_address = models.GenericIPAddressField(
         null=False,
@@ -32,21 +33,24 @@ class ProxmoxHost(models.Model):
         editable=False,
         help_text="IP address retrieved from Proxmox host.",
         verbose_name="IP Address",
+        db_index=True,
     )
     is_online = models.BooleanField(
         default=False,
         editable=False,
         help_text="True if Proxmox host is reported as online.",
         verbose_name="Online",
+        db_index=True,
     )  # True if the host is reported as online in the Proxmox cluster.
     is_orphan = models.BooleanField(
         default=True,
         editable=False,
         help_text="True if Proxmox host is not found in the Proxmox cluster.",
         verbose_name="Orphan",
+        db_index=True,
     )  # True if the host does not exist in the Proxmox cluster.
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
 
     class Meta:
         """Database metadata."""

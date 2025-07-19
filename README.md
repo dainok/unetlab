@@ -13,6 +13,8 @@ Install the production dependencies:
 
 ```bash
 poetry install --without dev
+poetry run ./manage.py migrate
+poetry run ./manage.py createsuperuser
 ```
 
 Start the Django development server:
@@ -54,6 +56,7 @@ poetry run pre-commit run --all-files
 poetry run coverage run --omit="unetlab/tests/*" -m pytest unetlab
 poetry run coverage report -m
 poetry run pytest -v
+poetry run ./manage.py makemigrations ui job proxmox
 ```
 
 ### Adding New Libraries

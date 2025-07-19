@@ -15,7 +15,7 @@ Fixtures:
 
 import pytest
 from rest_framework.test import APIClient
-from django.contrib.auth.models import User
+from ui.models import User
 from job.models import Job, Log, LogSeverityChoices, LogTypeChoices, JobStatusChoices
 
 
