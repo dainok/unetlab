@@ -10,7 +10,7 @@ class CommonMixin:
     def get_log_queryset(self):
         """Return un-ancknoledged logs, owned by the user."""
         user = self.request.user
-        qs = Log.objects.filter(acknowledged=False, job__user=user).order_by(
+        qs = Log.objects.filter(acknowledged=False, job__username=user.username).order_by(
             "-created_at"
         )[:10]
         return qs

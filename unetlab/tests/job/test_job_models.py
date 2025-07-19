@@ -14,7 +14,7 @@ def test_job_models_job_create():
     - The string representation returns the primary key as a string.
     - The default status is set to 'CREATED'.
     """
-    job = Job.objects.create(user="admin")
+    job = Job.objects.create(username="admin")
 
     # Check that __str__ returns the primary key as string
     assert str(job) == str(job.pk), "Job __str__ should return primary key as string"
@@ -25,7 +25,7 @@ def test_job_models_job_create():
     ), "Default job status should be CREATED"
 
     # Check that the user is set correctly
-    assert job.user == "admin", "Job user should match the provided value"
+    assert job.username == "admin", "Job user should match the provided value"
 
 
 @pytest.mark.django_db
@@ -40,14 +40,14 @@ def test_job_models_log_create():
     - Default acknowledged field is False.
     - All provided fields (severity, source, type) are set correctly.
     """
-    job = Job.objects.create(user="admin")
+    job = Job.objects.create(username="admin")
 
     # Verify Job creation
     assert str(job) == str(job.pk), "Job __str__ should return primary key as string"
     assert (
         job.status == JobStatusChoices.CREATED.value
     ), "Default job status should be CREATED"
-    assert job.user == "admin", "Job user should match the provided value"
+    assert job.username == "admin", "Job user should match the provided value"
 
     # Create a Log entry associated with the Job
     log = Log.objects.create(

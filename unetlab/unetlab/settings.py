@@ -235,7 +235,7 @@ CONSTANCE_CONFIG = {
         "The username used to log in to the Proxmox host.",
     ),
     "PROXMOX_TOKEN_ID": (
-        "root@pam!unetlab",
+        "unetlab",
         "The Token ID associated with the Proxmox user.",
     ),
     "PROXMOX_SECRET": (

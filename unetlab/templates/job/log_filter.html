@@ -9,7 +9,7 @@
                 <thead>
                     <tr>
                         <th>{{ log_fields.id }}</th>
-                        <th>{{ job_fields.user }}</th>
+                        <th>{{ job_fields.username }}</th>
                         <th>{{ log_fields.type }}</th>
                         <th>{{ log_fields.source }}</th>
                         <th>{{ log_fields.severity }}</th>
@@ -23,7 +23,7 @@
                     {% for log in log_list %}
                     <tr>
                         <td>{{ log.id }}</td>
-                        <td>{{ log.job.user }}</td>
+                        <td>{{ log.job.username }}</td>
                         <td>{{ log.type }}</td>
                         <td>{{ log.source }}</td>
                         <td>

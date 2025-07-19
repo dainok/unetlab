@@ -17,7 +17,7 @@ urlpatterns = [
     ),
     path(
         "account/logout",
-        auth_views.LogoutView.as_view(next_page="login"),
+        auth_views.LogoutView.as_view(template_name="unetlab/logout.html", next_page="login"),
         name="logout",
     ),
     # API token authentication

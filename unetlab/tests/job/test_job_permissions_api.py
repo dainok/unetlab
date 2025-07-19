@@ -72,7 +72,7 @@ def test_job_permissions_api_jobdetail_admin(api_client, admin_user, jobs):
             "CREATED",
             "SUCCEEDED",
         ], "Job status is neither 'CREATED' nor 'SUCCEEDED'"
-        assert response.data["user"] == job.user, "Job user does not match"
+        assert response.data["username"] == job.username, "Job user does not match"
 
 
 @pytest.mark.django_db
@@ -89,7 +89,7 @@ def test_job_permissions_api_jobdetail_staff(api_client, staff_user, jobs):
             "CREATED",
             "SUCCEEDED",
         ], "Job status is neither 'CREATED' nor 'SUCCEEDED'"
-        assert response.data["user"] == job.user, "Job user does not match"
+        assert response.data["username"] == job.username, "Job user does not match"
 
 
 @pytest.mark.django_db
@@ -107,7 +107,7 @@ def test_job_permissions_api_jobdetail_user(api_client, user, jobs):
     assert response.status_code == 200, "User could not access own job detail"
     assert isinstance(response.data, dict), "Response data is not a dict"
     assert response.data["status"] == "CREATED", "Job status is not 'CREATED'"
-    assert response.data["user"] == jobs["user"].user, "Job user does not match"
+    assert response.data["username"] == jobs["user"].username, "Job user does not match"
 
 
 @pytest.mark.django_db
@@ -119,3 +119,6 @@ def test_job_permissions_api_jobdetail_guest(api_client, jobs):
         assert (
             response.status_code == 401
         ), f"Guest accessed job detail {job.pk} without authentication"
+
+
+# TODO: LOG

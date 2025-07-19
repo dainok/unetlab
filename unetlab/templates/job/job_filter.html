@@ -9,7 +9,7 @@
                 <thead>
                     <tr>
                         <th>{{ job_fields.id }}</th>
-                        <th>{{ job_fields.user }}</th>
+                        <th>{{ job_fields.username }}</th>
                         <th>{{ job_fields.status }}</th>
                         <th>{{ job_fields.created_at }}</th>
                         <th>{{ job_fields.updated_at }}</th>
@@ -21,7 +21,7 @@
                     {% for job in job_list %}
                     <tr>
                         <td>{{ job.id }}</td>
-                        <td>{{ job.user }}</td>
+                        <td>{{ job.username }}</td>
                         <td>
                             {% if job.status == "FAILED" %}
                             <span class="badge bg-red text-red-fg">{{ job.status }}</span>
@@ -64,10 +64,10 @@
                         {{ filter.form.status }}
                     </div>
                     <div>
-                        <label for="{{ filter.form.user.id_for_label }}" class="form-label">
-                            {{ filter.form.user.label }}
+                        <label for="{{ filter.form.username.id_for_label }}" class="form-label">
+                            {{ filter.form.username.label }}
                         </label>
-                        {{ filter.form.user }}
+                        {{ filter.form.username }}
                     </div>
                     <div>
                         <label for="{{ filter.form.created_at.id_for_label }}" class="form-label">

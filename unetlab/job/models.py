@@ -50,7 +50,7 @@ class Job(models.Model):
         editable=False,
         db_index=True,
     )
-    user = models.CharField(
+    username = models.CharField(
         max_length=255,
         verbose_name=_("Owner"),
         help_text=_("User who started the job."),

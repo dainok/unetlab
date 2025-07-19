@@ -99,7 +99,7 @@ def jobs(admin_user, staff_user, user):
     Returns:
         dict: Dictionary with keys 'admin', 'staff', 'user' containing the corresponding Job instances.
     """
-    admin_job = Job.objects.create(user=admin_user.username)
+    admin_job = Job.objects.create(username=admin_user.username)
     Log.objects.create(
         job=admin_job,
         message="Admin log message",
@@ -108,7 +108,7 @@ def jobs(admin_user, staff_user, user):
         type=LogTypeChoices.APP,
     )
     staff_job = Job.objects.create(
-        user=staff_user.username, status=JobStatusChoices.SUCCEEDED
+        username=staff_user.username, status=JobStatusChoices.SUCCEEDED
     )
     Log.objects.create(
         job=staff_job,
@@ -117,7 +117,7 @@ def jobs(admin_user, staff_user, user):
         source="testhost",
         type=LogTypeChoices.APP,
     )
-    user_job = Job.objects.create(user=user.username)
+    user_job = Job.objects.create(username=user.username)
     Log.objects.create(
         job=user_job,
         message="User log message",
@@ -125,7 +125,7 @@ def jobs(admin_user, staff_user, user):
         source="testhost",
         type=LogTypeChoices.APP,
     )
-    other_job = Job.objects.create(user="other")
+    other_job = Job.objects.create(username="other")
     Log.objects.create(
         job=other_job,
         message="Other log message",

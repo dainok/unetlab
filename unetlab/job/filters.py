@@ -10,19 +10,19 @@ from job.models import Job, JobStatusChoices, Log, LogSeverityChoices
 
 
 class JobFilter(django_filters.FilterSet):
-    """FilterSet for filtering Job instances by user, status, and creation date.
+    """FilterSet for filtering Job instances by username, status, and creation date.
 
     This filter is used primarily in list views and APIs to narrow down
     Job records based on selected criteria.
 
     Filters:
-        - user: Dropdown choice of job owners dynamically populated
+        - username: Dropdown choice of job owners dynamically populated
         - status: Job status, using JobStatusChoices enum
         - created_at__gte: Filter jobs created on or after a given date
         - created_at__lte: Filter jobs created on or before a given date
     """
 
-    user = django_filters.ChoiceFilter(
+    username = django_filters.ChoiceFilter(
         choices=[],  # Populated dynamically in __init__
         widget=forms.Select(attrs={"class": "form-select"}),
         label="Owner",
@@ -51,12 +51,12 @@ class JobFilter(django_filters.FilterSet):
         based on distinct users currently owning jobs.
         """
         super().__init__(*args, **kwargs)
-        users = Job.objects.order_by("user").values_list("user", flat=True).distinct()
-        self.filters["user"].extra["choices"] = [(u, u) for u in users]
+        usernames = Job.objects.order_by("username").values_list("username", flat=True).distinct()
+        self.filters["username"].extra["choices"] = [(u, u) for u in usernames]
 
     class Meta:
         model = Job
-        fields = ["user", "status", "created_at__gte", "created_at__lte"]
+        fields = ["username", "status", "created_at__gte", "created_at__lte"]
 
 
 class LogFilter(django_filters.FilterSet):

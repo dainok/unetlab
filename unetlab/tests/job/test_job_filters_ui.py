@@ -10,7 +10,7 @@ def test_job_filters_user(jobs):
     """
     Test filtering Jobs by user using the pre-created jobs fixture.
     """
-    qs = JobFilter(data={"user": "user"}).qs
+    qs = JobFilter(data={"username": "user"}).qs
     assert list(qs) == [jobs["user"]]
 
 

@@ -33,13 +33,13 @@ class JobQueryMixin:
         user = self.request.user
         if user.is_staff or user.is_superuser:
             return qs
-        return qs.filter(user=user.username)
+        return qs.filter(username=user.username)
 
     def get_object(self):
         """Return object only if user has permission."""
         obj = super().get_object()
         user = self.request.user
-        if user.is_staff or user.is_superuser or obj.user == user.username:
+        if user.is_staff or user.is_superuser or obj.username == user.username:
             return obj
         raise PermissionDenied("You do not have permission to access this object.")
 
@@ -123,7 +123,7 @@ class LogQueryMixin:
         user = self.request.user
         if user.is_staff or user.is_superuser:
             return qs
-        return qs.filter(job__user=user.username)
+        return qs.filter(job__username=user.username)
 
     def get_object(self):
         """Return object only if user has permission."""
@@ -167,7 +167,7 @@ class LogViewSet(
     @action(detail=False, methods=["post"])
     def acknowledge(self, request):
         """Mark all logs as acknowledged for the current user."""
-        Log.objects.filter(job__user=request.user.username, acknowledged=False).update(
+        Log.objects.filter(job__username=request.user.username, acknowledged=False).update(
             acknowledged=True
         )
         return Response({"status": "ok"}, status=200)
