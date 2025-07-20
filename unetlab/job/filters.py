@@ -51,7 +51,11 @@ class JobFilter(django_filters.FilterSet):
         based on distinct users currently owning jobs.
         """
         super().__init__(*args, **kwargs)
-        usernames = Job.objects.order_by("username").values_list("username", flat=True).distinct()
+        usernames = (
+            Job.objects.order_by("username")
+            .values_list("username", flat=True)
+            .distinct()
+        )
         self.filters["username"].extra["choices"] = [(u, u) for u in usernames]
 
     class Meta:

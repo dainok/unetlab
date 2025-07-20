@@ -1,7 +1,7 @@
 """UNetLab URL Configuration."""
 
 from django.contrib import admin
-from django.contrib.auth import views as auth_views
+from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import path, include
 from rest_framework.authtoken.views import obtain_auth_token
 from unetlab import views
@@ -9,6 +9,17 @@ from unetlab import views
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", views.HomeView.as_view(), name="home"),
+    # Authentication URLs (standard users cannot use admin/login.html)
+    path(
+        "account/login",
+        LoginView.as_view(template_name="admin/login.html"),
+        name="login",
+    ),
+    path(
+        "account/logout",
+        LogoutView.as_view(next_page="login"),
+        name="logout",
+    ),
     # API token authentication
     path("api/token/", obtain_auth_token, name="api_token"),
     # Include URLs from the local apps

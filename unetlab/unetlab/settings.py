@@ -204,13 +204,12 @@ CELERY_BEAT_SCHEDULE = {
 # ==============================================================================
 
 LOGIN_REDIRECT_URL = "home"
-LOGOUT_REDIRECT_URL = "admin:login"
+LOGOUT_REDIRECT_URL = "login"
 
 # Public URLs excluded from login-required middleware
 PUBLIC_URLS = [
-    "admin:login",
-    # "logout",
-    "admin:reset",
+    "login",
+    "logout",
 ]
 
 # ==============================================================================

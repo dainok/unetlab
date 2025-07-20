@@ -169,9 +169,9 @@ class LogViewSet(
     @action(detail=False, methods=["post"])
     def acknowledge(self, request):
         """Mark all logs as acknowledged for the current user."""
-        Log.objects.filter(job__username=request.user.username, acknowledged=False).update(
-            acknowledged=True
-        )
+        Log.objects.filter(
+            job__username=request.user.username, acknowledged=False
+        ).update(acknowledged=True)
         return Response({"status": "ok"}, status=200)
 
 
