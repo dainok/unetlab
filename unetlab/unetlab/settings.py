@@ -115,12 +115,6 @@ DATABASES = {
 }
 
 # ==============================================================================
-# Custom User Model Configuration
-# ==============================================================================
-
-AUTH_USER_MODEL = "ui.User"
-
-# ==============================================================================
 # PASSWORD VALIDATORS
 # ==============================================================================
 
@@ -210,13 +204,13 @@ CELERY_BEAT_SCHEDULE = {
 # ==============================================================================
 
 LOGIN_REDIRECT_URL = "home"
-LOGOUT_REDIRECT_URL = "login"
+LOGOUT_REDIRECT_URL = "admin:login"
 
 # Public URLs excluded from login-required middleware
 PUBLIC_URLS = [
-    "login",
-    "logout",
-    "reset",
+    "admin:login",
+    # "logout",
+    "admin:reset",
 ]
 
 # ==============================================================================

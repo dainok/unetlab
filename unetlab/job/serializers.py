@@ -14,7 +14,7 @@ class LogSerializer(serializers.ModelSerializer):
             "id",
             "created_at",
             "updated_at",
-        ]  # Rendiamo readonly alcuni campi
+        ]  # Make some fields read-only
 
 
 class JobSerializer(serializers.ModelSerializer):
@@ -32,4 +32,4 @@ class JobSerializer(serializers.ModelSerializer):
             "id",
             "created_at",
             "updated_at",
-        ]  # Rendiamo readonly alcuni campi
+        ]  # Make some fields read-only

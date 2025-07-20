@@ -81,6 +81,7 @@ class JobListView(JobQueryMixin, CommonMixin, FilterView, ListView):
     model = Job
     filterset_class = JobFilter
     paginate_by = settings.REST_FRAMEWORK["PAGE_SIZE"]
+    template_name = "objects/job_list.html"
     extra_context = {
         "job_fields": db_fields_to_dict(Job._meta.fields),
     }
@@ -90,6 +91,7 @@ class JobDetailView(JobQueryMixin, CommonMixin, DetailView):
     """HTML detail view for a single Job with its logs."""
 
     model = Job
+    template_name = "objects/job_detail.html"
 
     def get_queryset(self):
         """Prefetch logs ordered by creation date for performance."""
@@ -179,6 +181,7 @@ class LogListView(LogQueryMixin, CommonMixin, FilterView, ListView):
     model = Log
     filterset_class = LogFilter
     paginate_by = settings.REST_FRAMEWORK["PAGE_SIZE"]
+    template_name = "objects/log_list.html"
     extra_context = {
         "log_fields": db_fields_to_dict(Log._meta.fields),
         "job_fields": db_fields_to_dict(Job._meta.fields),
@@ -189,6 +192,7 @@ class LogDetailView(LogQueryMixin, CommonMixin, DetailView):
     """HTML detail view for a single Log."""
 
     model = Log
+    template_name = "objects/log_detail.html"
 
     def get_context_data(self, **kwargs):
         """Add job and log field metadata to context."""
