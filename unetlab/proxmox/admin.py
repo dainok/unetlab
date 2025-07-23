@@ -17,8 +17,6 @@ from proxmox.tasks import do_rescan
 class ProxmoxHostAdmin(admin.ModelAdmin):
     """List Proxmox hosts."""
 
-    change_list_template = "admin/proxmox_change_list.html"
-
     fields = [
         "name",
         "ip_address",

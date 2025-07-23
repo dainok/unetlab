@@ -62,9 +62,9 @@ class JobQueryMixin:
 
 class JobViewSet(
     JobQueryMixin,
-    mixins.ListModelMixin,  # GET /jobs/
-    mixins.RetrieveModelMixin,  # GET /jobs/{id}/
-    mixins.DestroyModelMixin,  # DELETE /jobs/{id}/
+    mixins.ListModelMixin,  # GET /job/
+    mixins.RetrieveModelMixin,  # GET /job/{id}/
+    mixins.DestroyModelMixin,  # DELETE /job/{id}/
     viewsets.GenericViewSet,
 ):
     """REST API endpoints for Job model."""
@@ -154,9 +154,9 @@ class LogQueryMixin:
 
 class LogViewSet(
     LogQueryMixin,
-    mixins.ListModelMixin,  # GET /logs/
-    mixins.RetrieveModelMixin,  # GET /logs/{id}/
-    mixins.DestroyModelMixin,  # DELETE /logs/{id}/
+    mixins.ListModelMixin,  # GET /log/
+    mixins.RetrieveModelMixin,  # GET /log/{id}/
+    mixins.DestroyModelMixin,  # DELETE /log/{id}/
     viewsets.GenericViewSet,
 ):
     """REST API endpoints for Log model."""

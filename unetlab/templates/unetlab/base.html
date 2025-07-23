@@ -1,6 +1,7 @@
 {% load i18n static %}
+{% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
 <!DOCTYPE html>
-<html dir="ltr" lang="en">
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" dir="{{ LANGUAGE_BIDI|yesno:'rtl,ltr,auto' }}">
 
 <head>
     <link rel="author" href="https://www.adainese.it" />
@@ -57,7 +58,7 @@
         </div>
         {% endblock page %}
     </div>
-    <!-- Model -->
+    <!-- Modal -->
     {% block modal %}
     {% include "unetlab/partials/modal.html" %}
     {% endblock modal %}

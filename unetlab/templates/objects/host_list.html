@@ -1,0 +1,105 @@
+{% extends "unetlab/base.html" %}
+{% block title %}UNetLab | Hosts > List{% endblock title %}
+{% block page_title %}Hosts > List{% endblock page_title %}
+{% block page_body %}
+<div class="col-lg-9">
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-vcenter card-table">
+                <thead>
+                    <tr>
+                        <th>{{ host_fields.id }}</th>
+                        <th>{{ host_fields.name }}</th>
+                        <th>{{ host_fields.ip_address }}</th>
+                        <th>{{ host_fields.is_online }}</th>
+                        <th>{{ host_fields.is_orphan }}</th>
+                        <th>{{ host_fields.created_at }}</th>
+                        <th>{{ host_fields.updated_at }}</th>
+                        <th>Logs</th>
+                        <th class="w-1"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for job in host_list %}
+                    <tr>
+                        <td>{{ host.id }}</td>
+                        <td>{{ host.name }}</td>
+                        <td>{{ host.ip_address }}</td>
+                        <td>
+                            {% if host.is_online %}
+                            <span class="text-green">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="currentColor"
+                                    class="icon icon-tabler icons-tabler-filled icon-tabler-square-check">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                    <path
+                                        d="M18.333 2c1.96 0 3.56 1.537 3.662 3.472l.005 .195v12.666c0 1.96 -1.537 3.56 -3.472 3.662l-.195 .005h-12.666a3.667 3.667 0 0 1 -3.662 -3.472l-.005 -.195v-12.666c0 -1.96 1.537 -3.56 3.472 -3.662l.195 -.005h12.666zm-2.626 7.293a1 1 0 0 0 -1.414 0l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.32 1.497l2 2l.094 .083a1 1 0 0 0 1.32 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z" />
+                                </svg>
+                            </span>
+                            {% endif %}
+                        </td>
+                            {% if host.is_orphan %}
+                            <span class="text-green">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="currentColor"
+                                    class="icon icon-tabler icons-tabler-filled icon-tabler-square-check">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                    <path
+                                        d="M18.333 2c1.96 0 3.56 1.537 3.662 3.472l.005 .195v12.666c0 1.96 -1.537 3.56 -3.472 3.662l-.195 .005h-12.666a3.667 3.667 0 0 1 -3.662 -3.472l-.005 -.195v-12.666c0 -1.96 1.537 -3.56 3.472 -3.662l.195 -.005h12.666zm-2.626 7.293a1 1 0 0 0 -1.414 0l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.32 1.497l2 2l.094 .083a1 1 0 0 0 1.32 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z" />
+                                </svg>
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>{{ host.created_at }}</td>
+                        <td>{{ host.updated_at }}</td>
+                        <td>
+                            <div class="btn-list flex-nowrap">
+                                <a href="{% url 'host_detail' host.id %}" class="btn btn-1"> View </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% include "unetlab/partials/pagination.html" %}
+    </div>
+</div>
+<div class="col-lg-3">
+    <div class="card">
+        <form method="get" class="card">
+            <div class="card-header">
+                <h3 class="card-title">Filters</h3>
+            </div>
+            <div class="card-body">
+                <div class="space-y">
+                    <div>
+                        <label for="{{ filter.form.status.id_for_label }}" class="form-label">
+                            {{ filter.form.status.label }}
+                        </label>
+                        {{ filter.form.status }}
+                    </div>
+                    <div>
+                        <label for="{{ filter.form.username.id_for_label }}" class="form-label">
+                            {{ filter.form.username.label }}
+                        </label>
+                        {{ filter.form.username }}
+                    </div>
+                    <div>
+                        <label for="{{ filter.form.created_at.id_for_label }}" class="form-label">
+                            {{ filter.form.created_at.label }}
+                        </label>
+                        {{ filter.form.created_at }}
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer text-end">
+                <div class="d-flex">
+                    <a href="{% url 'host_list' %}" class="btn btn-link">Cancel</a>
+                    <button type="submit" class="btn btn-primary ms-auto">Filter</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock page_body %}
