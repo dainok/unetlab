@@ -4,16 +4,21 @@ from django.core.exceptions import PermissionDenied
 from django.views.generic import ListView, DetailView
 from django.conf import settings
 from django.db.models import Count, Prefetch
-from rest_framework import viewsets, mixins
 from django_filters.views import FilterView
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import viewsets, mixins
+from rest_framework.permissions import IsAuthenticated, BasePermission
+from rest_framework import status, permissions
 from proxmox.models import ProxmoxHost
 from proxmox.serializers import ProxmoxHostSerializer
 from proxmox.filters import ProxmoxHostFilter
+from proxmox.tasks import do_rescan
 from unetlab.utils import db_fields_to_dict
 from unetlab.views import CommonMixin
+from unetlab.permissions import IsAdminOrStaff
 
 
 class ProxmoxHostQueryMixin:
@@ -76,3 +81,13 @@ class ProxmoxHostDetailView(ProxmoxHostQueryMixin, CommonMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context["host_fields"] = db_fields_to_dict(ProxmoxHost._meta.fields)
         return context
+
+
+class ProxmoxRescanView(APIView):
+    """Manage rescan action."""
+
+    permission_classes = [IsAuthenticated, IsAdminOrStaff]
+
+    def post(self, request):
+        do_rescan(username=request.user.username)
+        return Response({"status": "rescan triggered"})

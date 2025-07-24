@@ -156,7 +156,7 @@
                 logSocket.send(JSON.stringify(testMessage));
                 console.log("📤 Sent test message to server");
             } else {
-                console.warn("WebSocket not open. Skipping send.");
+                console.warn("❌ WebSocket not open. Skipping send.");
             }
         }, 10000);
     </script>

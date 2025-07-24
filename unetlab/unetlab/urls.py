@@ -24,5 +24,6 @@ urlpatterns = [
     path("api/token/", obtain_auth_token, name="api_token"),
     # Include URLs from the local apps
     path("", include("job.urls")),
+    path("", include("proxmox.urls")),
     # path("", include("ui.urls")),
 ]
