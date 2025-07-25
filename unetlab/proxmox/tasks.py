@@ -56,7 +56,6 @@ def job_rescan(job_id):
     data = call_proxmox_api(lambda: proxmox.cluster.status.get(), job_id=job_obj.pk)
     if not data:
         # No data, mark the job as failed
-        log(job_obj.pk, messages.PROXMOX_API_ERROR, 40, "SCHEDULER")
         job_obj.status = JobStatusChoices.FAILED.value
         job_obj.save()
         return

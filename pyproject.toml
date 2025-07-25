@@ -42,12 +42,7 @@ dependencies = [
     "django-redis>=6.0,<7",
     "proxmoxer>=2.2,<3",
     "requests>=2.32,<3",
-]
-
-[project.optional-dependencies]
-dev = [
-    "pre-commit>=4.2,<5",
-    "pytest-django>=4.11,<5",
+    "django-tables2 (>=2.7.5,<3.0.0)",
 ]
 
 [project.urls]
@@ -87,3 +82,4 @@ reportMissingImports = true
 pytest = "^8.4.1"
 pytest-django = "^4.11.1"
 coverage = "^7.9.2"
+pre-commit = "^4.2.0"

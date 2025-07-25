@@ -131,9 +131,9 @@
             console.log("📨 Received event:", data);
 
             // If message is of type 'LOG', prepend it to the UI
-            if (data["type"] === "LOG") {
+            if (data["type"] === "event" && data["command"] === "log-add") {
                 console.log("📝 New log received");
-                prependLog(data["data"]["severity"], data["data"]["message"], data["data"]["source"]);
+                prependLog(data["data"]["severity"], data["data"]["message"], data["data"]["type"]);
                 return; // Skip chat display for logs
             }
 

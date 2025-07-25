@@ -68,7 +68,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # Custom middlewares
     "unetlab.middleware.LoginRequiredMiddleware",
-    "unetlab.middleware.APIExceptionMiddleware",
 ]
 
 # ==============================================================================
@@ -182,6 +181,7 @@ REST_FRAMEWORK = {
         "unetlab.renderers.CustomJSONRenderer",
     ],
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
+    "EXCEPTION_HANDLER": "unetlab.exception_handler.custom_exception_handler",
     "PAGE_SIZE": 10,
 }
 

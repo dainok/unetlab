@@ -66,3 +66,58 @@ To add new packages as development dependencies (for example, pytest and coverag
 ```bash
 poetry add --dev pytest pytest-django coverage
 ```
+
+## Data Exchange via API
+
+The APIs are built using Django REST Framework, with the output format customized to always include certain fields. The response format is as follows:
+
+```json
+{
+    "status": "success", // Either "success" or "error"
+    "http": {
+        "code": 200, // HTTP status code
+        "message": "OK", // HTTP status message
+        "url": "/api/log", // The requested URL
+    },
+    "type": "response", // For API requests, this is always "response"
+    "command": "log-list", // The reverse view name used by the API
+    "data": [], // The server response data, if present
+    "traceback": "", // Present only in case of errors (with debug enabled)
+}
+```
+
+## Data Exchange via WebSocket
+
+The same API response model is adapted for WebSocket communication. Server -> Client messages follow this format:
+
+```json
+{
+    "type": "event", // For server-to-client events, this is always "event"
+    "command": "log-add", // The reverse view name as used by the API
+    "data": {}, // The data payload to be sent to the client, if present
+}
+```
+
+In this case, the client does not need to acknowledge the server's request but simply handle the event.
+
+Client -> Server messages follow this format:
+
+```json
+{
+    "type": "request", // For client-to-server requests, this is always "request"
+    "command": "host-rescan", // The reverse view name as used by the API
+    "data": {}, // The data payload to send to the server
+}
+```
+
+Server responses to client requests follow this format:
+
+```json
+{
+    "status": "success", // Either "success" or "error"
+    "type": "response", // For responses to client requests, this is always "response"
+    "command": "host-rescan", // The command requested by the client
+    "data": {}, // The response payload to send back to the client
+    "traceback": "", // Present only in case of errors (with debug enabled)
+}
+```

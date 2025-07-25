@@ -1,5 +1,5 @@
 from rest_framework.renderers import JSONRenderer
-from rest_framework.reverse import reverse
+
 
 class CustomJSONRenderer(JSONRenderer):
     def render(self, data, accepted_media_type=None, renderer_context=None):
@@ -11,9 +11,11 @@ class CustomJSONRenderer(JSONRenderer):
 
         wrapped = {
             "status": status_type,
-            "code": status_code,
-            "message": response.status_text,
-            "url": request.get_full_path(),
+            "http": {
+                "code": status_code,
+                "message": response.status_text,
+                "url": request.get_full_path(),
+            },
             "type": "reponse",
             "command": command,
             "data": data,

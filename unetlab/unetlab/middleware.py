@@ -1,51 +1,10 @@
 """Custom middlewares."""
 
-import traceback
-from django.conf import settings
-from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.conf import settings
 from django.urls import resolve
 
 
-class APIExceptionMiddleware:
-    """
-    Middleware to catch unhandled exceptions and return JSON response
-    with a standardized error format for API requests (paths starting with /api/).
-    
-    For non-API paths, lets Django handle errors normally (shows HTML debug page or error page).
-    """
-
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        """Main entry point for the middleware."""
-        response = None
-        try:
-            response = self.get_response(request)
-        except Exception as exc:
-            # Only respond with JSON if path starts with /api/
-            if request.path.startswith("/api/"):
-                # Optional: Include traceback if DEBUG=True (you can control this as needed)
-                response = {
-                    "status": "error",
-                    "code": 500,
-                    "message": "Internal Server Error",
-                    "errors": None,
-                }
-                if settings.DEBUG:
-                    response["message"] = str(exc)
-                    response["traceback"] = traceback.format_exc()
-                return JsonResponse(response, status=500)
-
-            # For non-API requests re-raise the exception (to let default Django handle it)
-            raise
-
-        # Ensure we always return a valid response
-        return response
-
-    
 class LoginRequiredMiddleware:
     """
     Middleware that blocks access to views unless the user is authenticated,

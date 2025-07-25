@@ -65,22 +65,25 @@ class ActionConsumer(AsyncWebsocketConsumer):
         # queue = django_rq.get_queue("actions")
         # queue.enqueue(proxmox.delete, node_id=32)
 
-    async def HOST(self, data):
-        """Forward external log to WebSockets."""
-        print("*** HOST MSG -> UPDATE", data)
-        await self.send(text_data=json.dumps(data))
-        self.channel_layer.group_send("broadcast", data)
+    # async def HOST(self, data):
+    #     """Forward external log to WebSockets."""
+    #     print("*** HOST MSG -> UPDATE", data)
+    #     await self.send(text_data=json.dumps(data))
+    #     self.channel_layer.group_send("broadcast", data)
 
-    async def NODE(self, data):
-        """Forward external log to WebSockets."""
-        print("*** NODE MSG -> USER", data)
-        # TODO: must select the right channel
-        await self.send(text_data=json.dumps(data))
-        self.channel_layer.group_send("broadcast", data)
+    # async def NODE(self, data):
+    #     """Forward external log to WebSockets."""
+    #     print("*** NODE MSG -> USER", data)
+    #     # TODO: must select the right channel
+    #     await self.send(text_data=json.dumps(data))
+    #     self.channel_layer.group_send("broadcast", data)
 
-    async def LOG(self, data):
-        """Forward external log to WebSockets."""
-        print("*** LOG MSG -> USER", data)
-        # TODO: must select the right channel
-        await self.send(text_data=json.dumps(data))
-        self.channel_layer.group_send("broadcast", data)
+    async def event(self, data):
+        if data["command"] == "log-add":
+            # Forward external log to WebSockets.
+            print("*** LOG MSG -> USER", data)
+            # TODO: must select the right channel
+            await self.send(text_data=json.dumps(data))
+            self.channel_layer.group_send("broadcast", data)
+        else:
+            print("UNKOWN EVENT COMMAND", data)

@@ -32,9 +32,9 @@
                             <div class="dropdown">
                                 <a href="#" class="btn" data-bs-toggle="dropdown">
                                     <!-- Download SVG icon from http://tabler.io/icons/icon/dots -->
-                                    <svg class="d-block" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round" class="icon icon-1">
+                                        stroke-linejoin="round" class="icon icon-1 d-block">
                                         <path d="M5 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
                                         <path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
                                         <path d="M19 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
@@ -92,7 +92,7 @@
                             </tr>
                         </thead>
                         <tbody class="table-tbody">
-                    {% for job in host_list %}
+                    {% for host in proxmoxhost_list %}
                         <tr>
                             <td>
                                 <input class="form-check-input m-0 align-middle table-selectable-check"
@@ -127,11 +127,11 @@
                                 </span>
                                 {% endif %}
                             </td>
-                            <td class="sort-created_at">{{ host.created_at }}</td>
-                            <td class="sort-updated_at">{{ host.updated_at }}</td>
+                            <td class="sort-created_at">{{ host.created_at | date:"Y-m-d" }}</td>
+                            <td class="sort-updated_at">{{ host.updated_at | date:"Y-m-d H:m" }}</td>
                             <td>
                                 <div class="btn-list flex-nowrap">
-                                    <a href="{% url 'host_detail' host.id %}" class="btn btn-1"> View </a>
+                                    <a href="% url 'proxmoxhost_detail' host.id %" class="btn btn-1"> View </a>
                                 </div>
                             </td>
                         </tr>
@@ -198,16 +198,16 @@
         })
             .then(response => response.json())
             .then(data => {
-                if (data.status === "ok") {
-                    prependLog("Info", `${data.message}`);
+                if (data.status === "success") {
+                    // Just wait for websocket event
                 } else {
                     // API returned error status, show message using prependLog
-                    prependLog("Error", `API error: ${data.message || "Unknown error"}`);
+                    prependLog(40, `API error: ${data.message || "Unknown error"}`);
                 }
             })
             .catch(error => {
                 // Catch network errors, timeouts, and other exceptions, then prepend log
-                prependLog("Error", `Failed request to ${url}: ${error.message}`);
+                prependLog(30, `Failed request to ${url}: ${error.message}`);
             });
     }
 </script>

@@ -41,8 +41,9 @@ def post_save_log(sender, instance, created, **kwargs):
 
         # Construct the event dict expected by Channels consumers.
         event = {
+            "type": "event",  # This type is used in unetlab.consumers to identify the message.
+            "command": "log-add",
             "data": log.data,
-            "type": "LOG",  # This type is used in unetlab.consumers to identify the message.
         }
 
         # Use async_to_sync to call async channel_layer.group_send from sync context.

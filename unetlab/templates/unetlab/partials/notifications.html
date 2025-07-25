@@ -55,11 +55,11 @@
         const logType = type && type.trim() !== "" ? type : "UI";
 
         // Select the container where logs are displayed
-        const logContainer = document.querySelector('.latest-logs-container');
+        const logContainer = document.querySelector(".latest-logs-container");
 
         // Create a new log item element
-        const logItem = document.createElement('div');
-        logItem.className = 'list-group-item';
+        const logItem = document.createElement("div");
+        logItem.className = "list-group-item";
 
         // Set the inner HTML structure for the log item
         logItem.innerHTML = `
@@ -75,15 +75,15 @@
         `;
 
         // Get references to the elements inside the log item
-        const severityElement = logItem.querySelector('.status-dot');
-        const typeElement = logItem.querySelector('a.text-body');
-        const messageElement = logItem.querySelector('div.text-secondary');
+        const severityElement = logItem.querySelector(".status-dot");
+        const typeElement = logItem.querySelector("a.text-body");
+        const messageElement = logItem.querySelector("div.text-secondary");
 
         // Set status dot color based on severity
-        if (severity === 'Error') {
-            severityElement.classList.add('bg-red');
-        } else if (severity === 'Warning') {
-            severityElement.classList.add('bg-yellow');
+        if (severity === 40) {
+            severityElement.classList.add("bg-red");
+        } else if (severity === 30) {
+            severityElement.classList.add("bg-yellow");
         }
 
         // Set values and insert the new log item at the beginning of the container
@@ -113,7 +113,7 @@
         })
             .then(response => response.json())
             .then(data => {
-                if (data.status === "ok") {
+                if (data.status === "success") {
                     // Clear logs container and remove badge on success
                     document.querySelector(".latest-logs-container").innerHTML = "";
                     const notificationElement = document.querySelector(".latest-logs-badge");
@@ -122,12 +122,12 @@
                     }
                 } else {
                     // API returned error status, show message using prependLog
-                    prependLog("Error", `API error: ${data.message || "Unknown error"}`);
+                    prependLog(40, `API error: ${data.message || "Unknown error"}`);
                 }
             })
             .catch(error => {
                 // Catch network errors, timeouts, and other exceptions, then prepend log
-                prependLog("Error", `Failed request to ${url}: ${error.message}`);
+                prependLog(40, `Failed request to ${url}: ${error.message}`);
             });
     }
 </script>
