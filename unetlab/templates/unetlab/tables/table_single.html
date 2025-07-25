@@ -1,0 +1,60 @@
+{% load django_tables2 %}
+<div id="advanced-table">
+    <div class="table-responsive">
+        <table class="table table-vcenter table-selectable">
+            <thead>
+                <tr>
+                    {% if "select" not in table.exclude %}
+                    <th class="w-1"></th>
+                    {% endif %}
+                    {% for column in table.columns %}
+                    <th {{ column.attrs.th.as_html }}>
+                        {% if column.orderable %}
+                        <a class="{{ column.attrs.th.class }} btn btn-action table-sort d-flex justify-content-between"
+                            data-sort="sort-{{ column.accessor | lower }}"
+                            href="{% querystring table.prefixed_order_by_field=column.order_by_alias.next %}">
+                            {{ column.header }}</a>
+                        {% else %}
+                        {{ column.header }}
+                        {% endif %}
+                    </th>
+                    {% endfor %}
+                    {% if "actions" not in table.exclude %}
+                    <th class="w-1"></th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody class="table-tbody">
+                {% for row in table.page %}
+                <tr>
+                    {% if "select" not in table.exclude %}
+                    <td>
+                        <input class="form-check-input m-0 align-middle table-selectable-check" type="checkbox"
+                            aria-label="Select invoice" value="true">
+                    </td>
+                    {% endif %}
+                    {% for column, cell in row.items %}
+                    <td {{ column.attrs.td.as_html }}>
+                        {{ cell }}
+                    </td>
+                    {% endfor %}
+                    {% if "actions" not in table.exclude %}
+                    <td>
+                        <div class="btn-list flex-nowrap">
+                            <a href="% url 'proxmoxhost_detail' host.id %" class="btn btn-1"> View </a>
+                        </div>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="{{ table.columns|length }}" class="text-center text-muted">
+                        No records found
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include "unetlab/tables/pagination.html" %}
+</div>

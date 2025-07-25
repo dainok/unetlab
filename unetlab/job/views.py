@@ -9,9 +9,11 @@ from django_filters.views import FilterView
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django_tables2 import SingleTableView
 from job.models import Log, Job
 from job.serializers import JobSerializer, LogSerializer
 from job.filters import JobFilter, LogFilter
+from job.tables import LogTable
 from unetlab.utils import db_fields_to_dict
 from unetlab.views import CommonMixin
 
@@ -175,17 +177,24 @@ class LogViewSet(
         return Response({"status": "ok"}, status=200)
 
 
-class LogListView(LogQueryMixin, CommonMixin, FilterView, ListView):
-    """HTML list view for Logs with filtering and pagination."""
+# class LogListView(LogQueryMixin, CommonMixin, FilterView, ListView):
+#     """HTML list view for Logs with filtering and pagination."""
 
+#     model = Log
+#     filterset_class = LogFilter
+#     paginate_by = settings.REST_FRAMEWORK["PAGE_SIZE"]
+#     template_name = "objects/log_list.html"
+#     extra_context = {
+#         "log_fields": db_fields_to_dict(Log._meta.fields),
+#         "job_fields": db_fields_to_dict(Job._meta.fields),
+#     }
+
+
+class LogListView(SingleTableView):
     model = Log
-    filterset_class = LogFilter
-    paginate_by = settings.REST_FRAMEWORK["PAGE_SIZE"]
-    template_name = "objects/log_list.html"
-    extra_context = {
-        "log_fields": db_fields_to_dict(Log._meta.fields),
-        "job_fields": db_fields_to_dict(Job._meta.fields),
-    }
+    table_class = LogTable
+    template_name = "objects/object_list.html"
+    paginate_by = settings.DJANGO_TABLES2_PAGE_SIZE
 
 
 class LogDetailView(LogQueryMixin, CommonMixin, DetailView):

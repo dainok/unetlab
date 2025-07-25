@@ -11,6 +11,8 @@ from rest_framework.permissions import IsAuthenticated
 from proxmox.models import ProxmoxHost
 from proxmox.serializers import ProxmoxHostSerializer
 from proxmox.filters import ProxmoxHostFilter
+from django_tables2 import SingleTableView
+from proxmox.tables import ProxmoxHostTable
 from proxmox.tasks import do_rescan
 from unetlab.utils import db_fields_to_dict
 from unetlab.views import CommonMixin
@@ -54,16 +56,22 @@ class ProxmoxHostViewSet(
     queryset = ProxmoxHost.objects.all()
 
 
-class ProxmoxHostListView(ProxmoxHostQueryMixin, CommonMixin, FilterView, ListView):
-    """HTML list view for ProxmoxHost with filtering and pagination."""
+# class ProxmoxHostListView(ProxmoxHostQueryMixin, CommonMixin, FilterView, ListView):
+#     """HTML list view for ProxmoxHost with filtering and pagination."""
 
+#     model = ProxmoxHost
+#     filterset_class = ProxmoxHostFilter
+#     paginate_by = settings.REST_FRAMEWORK["PAGE_SIZE"]
+#     template_name = "objects/host_list.html"
+#     extra_context = {
+#         "host_fields": db_fields_to_dict(ProxmoxHost._meta.fields),
+#     }
+
+class ProxmoxHostListView(SingleTableView):
     model = ProxmoxHost
-    filterset_class = ProxmoxHostFilter
+    table_class = ProxmoxHostTable
+    template_name = "objects/object_list.html"
     paginate_by = settings.REST_FRAMEWORK["PAGE_SIZE"]
-    template_name = "objects/host_list.html"
-    extra_context = {
-        "host_fields": db_fields_to_dict(ProxmoxHost._meta.fields),
-    }
 
 
 class ProxmoxHostDetailView(ProxmoxHostQueryMixin, CommonMixin, DetailView):

@@ -41,8 +41,9 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Third-party apps
     "channels",  # WebSocket support
-    "django_filters",  # Filtering for REST API
-    "rest_framework",
+    "django_filters", # Filters
+    "django_tables2", # Tables
+    "rest_framework", # API
     "rest_framework.authtoken",
     "constance",  # Dynamic settings backend
     # Local apps
@@ -254,3 +255,10 @@ CONSTANCE_CONFIG = {
 # ==============================================================================
 
 SOURCE = socket.gethostname().upper()
+
+# ==============================================================================
+# TABLES2 SETTINGS
+# ==============================================================================
+
+DJANGO_TABLES2_PAGE_SIZE = REST_FRAMEWORK["PAGE_SIZE"]
+DJANGO_TABLES2_TEMPLATE = "unetlab/tables/table_single.html"
