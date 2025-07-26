@@ -21,3 +21,13 @@ class BooleanColumn(tables.TemplateColumn):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("template_name", "unetlab/tables/column_boolean.html")
         super().__init__(*args, **kwargs)
+
+class SeverityColumn(tables.TemplateColumn):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("template_name", "unetlab/tables/column_severity.html")
+        super().__init__(*args, **kwargs)
+
+class SeverityAllColumn(tables.TemplateColumn):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("template_name", "unetlab/tables/column_severity_all.html")
+        super().__init__(*args, **kwargs)

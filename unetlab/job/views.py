@@ -177,24 +177,14 @@ class LogViewSet(
         return Response({"status": "ok"}, status=200)
 
 
-# class LogListView(LogQueryMixin, CommonMixin, FilterView, ListView):
-#     """HTML list view for Logs with filtering and pagination."""
+class LogListView(FilterView, CommonMixin, SingleTableView):
+    """HTML table view for Logs with filtering and pagination."""
 
-#     model = Log
-#     filterset_class = LogFilter
-#     paginate_by = settings.REST_FRAMEWORK["PAGE_SIZE"]
-#     template_name = "objects/log_list.html"
-#     extra_context = {
-#         "log_fields": db_fields_to_dict(Log._meta.fields),
-#         "job_fields": db_fields_to_dict(Job._meta.fields),
-#     }
-
-
-class LogListView(SingleTableView):
     model = Log
     table_class = LogTable
     template_name = "objects/object_list.html"
     paginate_by = settings.DJANGO_TABLES2_PAGE_SIZE
+    filterset_class = LogFilter
 
 
 class LogDetailView(LogQueryMixin, CommonMixin, DetailView):

@@ -1,63 +1,10 @@
 {% extends "unetlab/base.html" %}
 {% load render_table from django_tables2 %}
-{% load i18n static %}
-{% block title %}UNetLab | Hosts > List{% endblock title %}
-{% block page_title %}Hosts > List{% endblock page_title %}
+{% block title %}UNetLab | {{ table.attrs.title }} > List{% endblock title %}
+{% block page_title %}{{ table.attrs.title }} > List{% endblock page_title %}
 {% block page_body %}
 <div class="col-lg-9">
-    <div class="card">
-        <div class="card-table">
-            <div class="card-header">
-                <div class="row w-full">
-                    <div class="col">
-                        <h3 class="card-title mb-0">Hosts list</h3>
-                        <p class="text-secondary m-0">Table description.</p>
-                    </div>
-                    <div class="col-md-auto col-sm-12">
-                        <div class="ms-auto d-flex flex-wrap btn-list">
-                            <div class="input-group input-group-flat w-auto">
-                                <span class="input-group-text">
-                                    <!-- Download SVG icon from http://tabler.io/icons/icon/search -->
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round" class="icon icon-1">
-                                        <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path>
-                                        <path d="M21 21l-6 -6"></path>
-                                    </svg>
-                                </span>
-                                <input id="advanced-table-search" type="text" class="form-control" autocomplete="off">
-                                <span class="input-group-text">
-                                    <kbd>ctrl + K</kbd>
-                                </span>
-                            </div>
-                            <div class="dropdown">
-                                <a href="#" class="btn" data-bs-toggle="dropdown">
-                                    <!-- Download SVG icon from http://tabler.io/icons/icon/dots -->
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round" class="d-block">
-                                        <path d="M5 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
-                                        <path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
-                                        <path d="M19 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
-                                    </svg>
-                                </a>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="#">Action</a>
-                                    <a class="dropdown-item" href="#">Another action</a>
-                                    <a class="dropdown-item" href="#">Third action</a>
-                                </div>
-                            </div>
-                            <form id="rescan-form" method="post" action="{% url 'host-rescan' %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-primary" onclick="rescanHost()">{% translate "Rescan" %}</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% render_table table %}
-        </div>
-    </div>
+    {% render_table table %}
 </div>
 <div class="col-lg-3">
     <div class="card">
@@ -96,34 +43,4 @@
         </form>
     </div>
 </div>
-<script>
-    function rescanHost() {
-        /**
-         * Trigger a rescan of the Proxmox infrastructure by sending a POST request to the API.
-         * Uses prependLog() to display errors on API failure, HTTP errors, network errors, and timeouts.
-         */
-         event.preventDefault();  // Prevent standard submit
-        url = "/api/host/rescan/";
-        fetch(url, {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": "{{ csrf_token }}",
-                "Content-Type": "application/json"
-            },
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === "success") {
-                    // Just wait for websocket event
-                } else {
-                    // API returned error status, show message using prependLog
-                    prependLog(40, `API error: ${data.message || "Unknown error"}`);
-                }
-            })
-            .catch(error => {
-                // Catch network errors, timeouts, and other exceptions, then prepend log
-                prependLog(30, `Failed request to ${url}: ${error.message}`);
-            });
-    }
-</script>
 {% endblock page_body %}

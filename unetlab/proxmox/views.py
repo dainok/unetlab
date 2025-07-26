@@ -1,6 +1,6 @@
 """Views, called by URLs."""
 
-from django.views.generic import ListView, DetailView
+from django.views.generic import DetailView
 from django.conf import settings
 from django_filters.views import FilterView
 from django_filters.rest_framework import DjangoFilterBackend
@@ -67,7 +67,8 @@ class ProxmoxHostViewSet(
 #         "host_fields": db_fields_to_dict(ProxmoxHost._meta.fields),
 #     }
 
-class ProxmoxHostListView(SingleTableView):
+
+class ProxmoxHostListView(SingleTableView, CommonMixin, FilterView):
     model = ProxmoxHost
     table_class = ProxmoxHostTable
     template_name = "objects/object_list.html"

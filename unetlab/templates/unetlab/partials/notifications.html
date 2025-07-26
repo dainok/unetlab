@@ -21,7 +21,7 @@
                 <div class="list-group-item">
                     <div class="row align-items-center">
                         <div class="col-auto"><span
-                                class="status-dot status-dot-animated d-block{% if latest_log.get_severity_display == 'Error' %} bg-red{% elif latest_log.get_severity_display == 'Warning' %} bg-yellow{% endif %}"></span>
+                                class="status-dot status-dot-animated d-block{% if latest_log.get_severity_display == 'Error' %} bg-danger{% elif latest_log.get_severity_display == 'Warning' %} bg-warning{% endif %}"></span>
                         </div>
                         <div class="col text-truncate">
                             <a href="#" class="text-body d-block">{{ latest_log.type }}</a>
@@ -81,11 +81,10 @@
 
         // Set status dot color based on severity
         if (severity === 40) {
-            severityElement.classList.add("bg-red");
+            severityElement.classList.add("bg-danger");
         } else if (severity === 30) {
-            severityElement.classList.add("bg-yellow");
+            severityElement.classList.add("bg-warning");
         }
-
         // Set values and insert the new log item at the beginning of the container
         typeElement.textContent = logType;
         messageElement.textContent = message;

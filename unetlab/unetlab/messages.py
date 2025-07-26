@@ -2,6 +2,14 @@
 
 from django.utils.translation import gettext_lazy as _
 
+# Tables
+TABLE_LOG_TITLE = _("Logs")
+TABLE_LOG_DESCRIPTION = _("All system logs.")
+TABLE_JOB_TITLE = _("Jobs")
+TABLE_JOB_DESCRIPTION = _("All jobs.")
+TABLE_HOST_TITLE = _("Hosts")
+TABLE_HOST_DESCRIPTION = _("All Proxmox hosts.")
+
 # Generic job/task messages
 JOB_TASK_CANCELED = _("Job canceled due to stale status.")
 
