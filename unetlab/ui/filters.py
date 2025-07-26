@@ -1,6 +1,7 @@
 import django_filters
 from django.db.models import Q
 
+
 class BaseSearchFilterSet(django_filters.FilterSet):
     search = django_filters.CharFilter(method="filter_search")
 

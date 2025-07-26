@@ -18,61 +18,59 @@
         </div>
     </div>
     <ul class="pagination m-0 ms-auto">
-        <ul class="pagination justify-content-center">
-            {# Previous page #}
-            {% if table.page.has_previous %}
-            <li class="page-item">
-
-                <a class="page-link" href="{% querystring page=table.page.previous_page_number %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                        class="icon icon-1">
-                        <path d="M15 6l-6 6l6 6"></path>
-                    </svg>
-                </a>
-            </li>
-            {% else %}
-            <li class="page-item disabled">
-                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                        class="icon icon-1">
-                        <path d="M15 6l-6 6l6 6"></path>
-                    </svg>
-                </a>
-            </li>
-            {% endif %}
-            {# Pages #}
-            {% for i in table.paginator.page_range %}
-            {% if i == table.page.number %}
-            {# Current page #}
-            <li class="page-item active"><span class="page-link">{{ i }}</span></li>
-            {% else %}
-            <li class="page-item"><a class="page-link" href="{% querystring page=i %}">{{ i }}</a></li>
-            {% endif %}
-            {% endfor %}
-            {# Next page #}
-            {% if table.page.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="?page={% querystring page=table.page.next_page_number %}" aria-label="Next">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                        class="icon icon-1">
-                        <path d="M9 6l6 6l-6 6"></path>
-                    </svg>
-                </a>
-            </li>
-            {% else %}
-            <li class="page-item disabled">
-                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                        class="icon icon-1">
-                        <path d="M9 6l6 6l-6 6"></path>
-                    </svg>
-                </a>
-            </li>
-            {% endif %}
-        </ul>
+        {# Previous page #}
+        {% if table.page.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="{% querystring page=table.page.previous_page_number %}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="icon icon-1">
+                    <path d="M15 6l-6 6l6 6"></path>
+                </svg>
+            </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="icon icon-1">
+                    <path d="M15 6l-6 6l6 6"></path>
+                </svg>
+            </a>
+        </li>
+        {% endif %}
+        {# Pages #}
+        {% for i in table.paginator.page_range %}
+        {% if i == table.page.number %}
+        {# Current page #}
+        <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+        {% else %}
+        <li class="page-item"><a class="page-link" href="{% querystring page=i %}">{{ i }}</a></li>
+        {% endif %}
+        {% endfor %}
+        {# Next page #}
+        {% if table.page.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={% querystring page=table.page.next_page_number %}" aria-label="Next">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="icon icon-1">
+                    <path d="M9 6l6 6l-6 6"></path>
+                </svg>
+            </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="icon icon-1">
+                    <path d="M9 6l6 6l-6 6"></path>
+                </svg>
+            </a>
+        </li>
+        {% endif %}
+    </ul>
 </div>
 {% endif %}
