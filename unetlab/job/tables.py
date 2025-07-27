@@ -46,6 +46,7 @@ class LogTable(tables.Table):
             "search": True,
         }
 
+
 class LogHomeTable(tables.Table):
     severity = SeverityAllColumn(
         orderable=True, verbose_name="Sev", attrs={"td": {"class": "text-center"}}
