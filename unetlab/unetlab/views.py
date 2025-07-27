@@ -5,9 +5,10 @@ from django.conf import settings
 from django_tables2 import SingleTableView
 from django_filters.views import FilterView
 from django_tables2 import RequestConfig
-from job.models import Log
+from job.models import Log, Job
 from job.tables import JobTable, LogHomeTable
-from proxmox.tables import ProxmoxHostTable
+from proxmox.tables import ProxmoxHostHomeTable
+from proxmox.models import ProxmoxHost
 
 
 class CommonMixin:
@@ -101,5 +102,11 @@ class HomeView(CommonMixin, TemplateView):
         log_table = LogHomeTable(log_qs)
         RequestConfig(self.request, paginate=False).configure(log_table)
         context["log_table"] = log_table
+
+        # Host table
+        host_qs = ProxmoxHost.objects.all()
+        host_table = ProxmoxHostHomeTable(host_qs)
+        RequestConfig(self.request, paginate=False).configure(host_table)
+        context["host_table"] = host_table
 
         return context
