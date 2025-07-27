@@ -1,0 +1,23 @@
+<div class="card">
+    <form method="get" class="card">
+        <div class="card-header">
+            <h3 class="card-title">Filters</h3>
+        </div>
+        <div class="card-body">
+            <div class="space-y">
+                {% for field in filter.form %}
+                <div>
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="card-footer text-end">
+            <div class="d-flex">
+                <a href="{% url request.resolver_match.url_name %}" class="btn btn-link">Cancel</a>
+                <button type="submit" class="btn btn-primary ms-auto">Filter</button>
+            </div>
+        </div>
+    </form>
+</div>

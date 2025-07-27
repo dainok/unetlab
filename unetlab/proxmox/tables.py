@@ -17,6 +17,7 @@ class ProxmoxHostTable(tables.Table):
     class Meta:
         model = ProxmoxHost
         exclude = ["select", "actions"]
+        order_by = "hostname"
         attrs = {
             "title": messages.TABLE_HOST_TITLE,
             "description": messages.TABLE_HOST_DESCRIPTION,

@@ -1,7 +1,7 @@
 """Views, called by URLs."""
 
 from django.core.exceptions import PermissionDenied
-from django.views.generic import ListView, DetailView
+from django.views.generic import DetailView
 from django.conf import settings
 from django.db.models import Count, Prefetch
 from rest_framework import viewsets, mixins
@@ -87,6 +87,7 @@ class JobViewSet(
 #     extra_context = {
 #         "job_fields": db_fields_to_dict(Job._meta.fields),
 #     }
+
 
 class JobListView(FilterView, JobQueryMixin, CommonMixin, SingleTableView):
     """HTML table view for Jobs with filtering and pagination."""

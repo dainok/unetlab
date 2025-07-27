@@ -68,7 +68,9 @@ class ProxmoxHostViewSet(
 #     }
 
 
-class ProxmoxHostListView(SingleTableView, ProxmoxHostQueryMixin, CommonMixin, FilterView):
+class ProxmoxHostListView(
+    SingleTableView, ProxmoxHostQueryMixin, CommonMixin, FilterView
+):
     model = ProxmoxHost
     table_class = ProxmoxHostTable
     template_name = "objects/object_list.html"
