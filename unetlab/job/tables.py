@@ -5,15 +5,15 @@ from unetlab import messages
 
 
 class JobTable(tables.Table):
-    severity = SeverityAllColumn(
-        orderable=True, verbose_name="Sev", attrs={"td": {"class": "text-center"}}
-    )
+    log_count = tables.Column(orderable=False, verbose_name="Logs", attrs={"td": {"class": "text-center"}})
     created_at = tables.DateColumn(orderable=True, format="Y-m-d H:i")
+    updated_at = tables.DateColumn(orderable=True, format="Y-m-d H:i")
 
     class Meta:
         model = Job
-        sequence = ["id", "severity", "acknowledged", "type", "..."]
-        exclude = ["select"]
+        sequence = ["username", "status", "log_count", "..."]
+        fields = [f.name for f in Job._meta.fields] + ["log_count"]
+        exclude = ["select", "id"]
         attrs = {
             "title": messages.TABLE_JOB_TITLE,
             "description": messages.TABLE_JOB_DESCRIPTION,

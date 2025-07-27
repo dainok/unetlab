@@ -39,7 +39,7 @@ class ProxmoxHostQueryMixin:
                 return per_page
         except (TypeError, ValueError):
             pass
-        return 10
+        return settings.REST_FRAMEWORK["PAGE_SIZE"]
 
 
 class ProxmoxHostViewSet(
@@ -68,7 +68,7 @@ class ProxmoxHostViewSet(
 #     }
 
 
-class ProxmoxHostListView(SingleTableView, CommonMixin, FilterView):
+class ProxmoxHostListView(SingleTableView, ProxmoxHostQueryMixin, CommonMixin, FilterView):
     model = ProxmoxHost
     table_class = ProxmoxHostTable
     template_name = "objects/object_list.html"

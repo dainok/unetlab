@@ -85,7 +85,7 @@
                         {% for row in table.page %}
                         <tr>
                             {% if "select" not in table.exclude %}
-                            <td>
+                            <td class="{{ table.attrs.td }}">
                                 <input class="form-check-input m-0 align-middle table-selectable-check" type="checkbox"
                                     aria-label="Select invoice" value="true">
                             </td>
