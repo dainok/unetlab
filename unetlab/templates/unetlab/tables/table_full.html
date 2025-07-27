@@ -29,6 +29,8 @@
                             </div>
                         </form>
                         {% endif %}
+                        <!-- Actions -->
+                         {% if actions %}
                         <div class="dropdown">
                             <a href="#" class="btn" data-bs-toggle="dropdown">
                                 <!-- Download SVG icon from http://tabler.io/icons/icon/dots -->
@@ -41,17 +43,24 @@
                                 </svg>
                             </a>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" href="#">Action</a>
-                                <a class="dropdown-item" href="#">Another action</a>
-                                <a class="dropdown-item" href="#">Third action</a>
+                                {% for action in actions %}
+                                <a class="dropdown-item" href="#">{{ dropdown }}</a>
+                                {% endfor %}
                             </div>
                         </div>
-                        <form id="rescan-form" method="post" action="{% url 'host-rescan' %}">
+                        {% endif %}
+                        {{ actions }}
+                        {{ vip_actions }}
+                        {% if vip_actions %}
+                        {% for action in vip_actions %}
+                        <form id="{{ action }}-form" method="post" action="{% url action %}">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-primary" onclick="rescanHost()">
                                 {% translate "Rescan" %}
                             </button>
                         </form>
+                        {% endfor %}
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -82,7 +91,7 @@
                         </tr>
                     </thead>
                     <tbody class="table-tbody">
-                        {% for row in table.page %}
+                        {% for row in table.page.object_list|default:table.rows %}
                         <tr>
                             {% if "select" not in table.exclude %}
                             <td class="{{ table.attrs.td }}">

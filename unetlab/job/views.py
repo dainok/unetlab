@@ -15,7 +15,7 @@ from job.serializers import JobSerializer, LogSerializer
 from job.filters import JobFilter, LogFilter
 from job.tables import LogTable, JobTable
 from unetlab.utils import db_fields_to_dict
-from unetlab.views import CommonMixin
+from unetlab.views import CommonMixin, BaseListView
 
 
 class JobQueryMixin:
@@ -77,19 +77,7 @@ class JobViewSet(
     queryset = Job.objects.all()
 
 
-# class JobListView(JobQueryMixin, CommonMixin, FilterView, ListView):
-#     """HTML list view for Jobs with filtering and pagination."""
-
-#     model = Job
-#     filterset_class = JobFilter
-#     paginate_by = settings.REST_FRAMEWORK["PAGE_SIZE"]
-#     template_name = "objects/job_list.html"
-#     extra_context = {
-#         "job_fields": db_fields_to_dict(Job._meta.fields),
-#     }
-
-
-class JobListView(FilterView, JobQueryMixin, CommonMixin, SingleTableView):
+class JobListView(BaseListView):
     """HTML table view for Jobs with filtering and pagination."""
 
     model = Job
@@ -187,7 +175,7 @@ class LogViewSet(
         return Response({"status": "ok"}, status=200)
 
 
-class LogListView(FilterView, LogQueryMixin, CommonMixin, SingleTableView):
+class LogListView(BaseListView):
     """HTML table view for Logs with filtering and pagination."""
 
     model = Log
@@ -195,6 +183,7 @@ class LogListView(FilterView, LogQueryMixin, CommonMixin, SingleTableView):
     template_name = "objects/object_list.html"
     paginate_by = settings.DJANGO_TABLES2_PAGE_SIZE
     filterset_class = LogFilter
+    vip_actions = ["acknowledge"]
 
 
 class LogDetailView(LogQueryMixin, CommonMixin, DetailView):

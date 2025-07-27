@@ -1,9 +1,27 @@
 {% extends "unetlab/base.html" %}
+{% load django_tables2 %}
 {% block title %}UNetLab | Home{% endblock title %}
 {% block bodyclass %}d-flex flex-column{% endblock bodyclass %}
 {% block pageclass %}page page-center{% endblock pageclass %}
-
 {% block body %}
-aaa
-<div id="id_chat_item_container"></div>
+<div class="page-header d-print-none" aria-label="Page header">
+    <div class="container-xl">
+        <div class="row g-2 align-items-center">
+            <div class="col">
+                <!-- Page pre-title -->
+                <div class="page-pretitle">Overview</div>
+                <h2 class="page-title">Dashboard</h2>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="page-body">
+    <div class="container-xl">
+        <div class="row row-deck row-cards">
+            <div class="col-sm-12 col-lg-6">
+                {% render_table log_table %}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock body %}

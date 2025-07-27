@@ -45,3 +45,19 @@ class LogTable(tables.Table):
             "detail_view": "log_detail",
             "search": True,
         }
+
+class LogHomeTable(tables.Table):
+    severity = SeverityAllColumn(
+        orderable=True, verbose_name="Sev", attrs={"td": {"class": "text-center"}}
+    )
+    created_at = tables.DateColumn(orderable=True, format="Y-m-d H:i")
+
+    class Meta:
+        model = Log
+        sequence = ["id", "severity", "type", "..."]
+        exclude = ["select", "source", "job", "updated_at"]
+        attrs = {
+            "title": messages.TABLE_LOG_TITLE,
+            "detail_view": "log_detail",
+            "search": False,
+        }

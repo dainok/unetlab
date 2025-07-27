@@ -6,10 +6,12 @@
         <div class="card-body">
             <div class="space-y">
                 {% for field in filter.form %}
+                {% if field.name != "search" %}
                 <div>
                     <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
                     {{ field }}
                 </div>
+                {% endif %}
                 {% endfor %}
             </div>
         </div>
