@@ -55,7 +55,7 @@
       when: created_node.rc == 2 or "stopped" in created_node.stdout
     - name: "Request manual configuration"
       ansible.builtin.debug:
-        msg: |
+        msg: |-
           Login as vyos:vyos and install image to disk with:
           > install image
           Set credentials, accept defaults, then reboot.

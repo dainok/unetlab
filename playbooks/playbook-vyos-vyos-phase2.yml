@@ -28,7 +28,7 @@
     - name: "Exporting node disk"
       ansible.builtin.shell:
         cmd: "qemu-img convert -f raw /dev/zvol/unetlab/vm-{{ id }}-disk-0 -O qcow2 /var/tmp/template-vyos-vyos-{{ image  }}-unl.qcow2"
-    - name: "Downloading node disk"
-      ansible.builtin.fetch:
-        src: "/var/tmp/template-vyos-vyos-{{ image  }}-unl.qcow2"
-        dest: "./template-vyos-vyos-{{ image  }}-unl.qcow2"
+    - name: "Manually download node disk"
+      ansible.builtin.debug:
+        msg: |-
+          Download /var/tmp/template-vyos-vyos-{{ image  }}-unl.qcow2 from {{ inventory_hostname_short }}

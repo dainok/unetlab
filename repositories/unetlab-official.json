@@ -3,6 +3,7 @@
     ],
     "templates": [
         {
+            "checksum": "746affd5cd3c94c9484b7aa72d6fa84b",
             "cpu": 1,
             "extra": "unl",
             "mgmt": 0,
