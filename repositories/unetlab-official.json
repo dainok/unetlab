@@ -1,0 +1,17 @@
+{
+    "labs": [
+    ],
+    "templates": [
+        {
+            "cpu": 1,
+            "extra": "unl",
+            "mgmt": 0,
+            "nics": 4,
+            "os": "VyOS",
+            "ram": 2,
+            "url": "",
+            "vendor": "VyOS",
+            "version": "2025.07.28-0022"
+        }
+    ]
+}
