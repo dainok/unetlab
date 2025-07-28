@@ -24,6 +24,7 @@ class ProxmoxHostTable(tables.Table):
             "detail_view": "host_detail",
         }
 
+
 class ProxmoxHostHomeTable(tables.Table):
     is_online = GreenRedBooleanColumn(
         orderable=True, attrs={"td": {"class": "text-center"}}

@@ -1,0 +1,71 @@
+#!/usr/bin/env ansible-playbook
+# Usage (tested commands):
+# ./playbook-vyos-vyos-phase1.yml -e image=2025.07.28-0022 -e signature=ad3df856c8234a5e413a9b4503b8ddc4 -e id=1000 -k
+- name: "UNetLab image builder | VyOS rolling release | Phase 1"
+  hosts: image_builder
+  gather_facts: false
+  vars:
+    ansible_user: root
+  tasks:
+    - name: "Looking up image"
+      ansible.builtin.shell:
+        cmd: "pvesh get /nodes/proxmox1/storage/unetlab-iso/content/iso/vyos-vyos-{{ image }}.iso --output-format=json"
+      register: uploaded_image
+      changed_when: false
+      failed_when: uploaded_image.rc != 0 and uploaded_image.rc != 2
+    - block:
+        - name: "Looking up image file"
+          ansible.builtin.stat:
+            path: "/var/tmp/pveupload-{{ image | md5 }}"
+            checksum_algorithm: md5
+            get_checksum: true
+          register: existing_image
+        - name: "Verifying image file"
+          ansible.builtin.set_fact:
+            force_download: "{{ existing_image.stat.checksum != signature }}"
+          when: existing_image.stat.exists
+        - name: "Downloading image file from Internet"
+          ansible.builtin.get_url:
+            url: "https://github.com/vyos/vyos-nightly-build/releases/download/{{ image }}-rolling/vyos-{{ image }}-rolling-generic-amd64.iso"
+            dest: "/var/tmp/pveupload-{{ image | md5 }}"
+            mode: "0644"
+            checksum: "md5:{{ signature }}"
+            force: "{{ force_download | default('false') }}"
+        - name: "Uploading image file to Proxmox host"
+          ansible.builtin.shell:
+            cmd: "pvesh create /nodes/proxmox1/storage/unetlab-iso/upload -content iso -filename vyos-vyos-{{ image }}.iso -tmpfilename /var/tmp/pveupload-{{ image | md5 }} --output-format=json"
+      when: uploaded_image.rc == 2
+    - name: "Looking up node"
+      ansible.builtin.shell:
+        cmd: "pvesh get /nodes/{{ inventory_hostname_short }}/qemu/{{ id }}/status/current --output-format=json"
+      register: created_node
+      changed_when: false
+      failed_when: created_node.rc != 0 and created_node.rc != 2
+    - name: "Failing because of duplicated ID"
+      ansible.builtin.fail:
+        msg: "Node ID {{ id }} is already used."
+      when: created_node.rc == 0 and image not in created_node.stdout
+    - name: "Creating node"
+      ansible.builtin.shell:
+        cmd: "pvesh create /nodes/{{ inventory_hostname_short }}/qemu -cores 1 -cpu host -cdrom /unetlab/template/iso/vyos-vyos-{{ image }}.iso,media=cdrom -memory 2048 -name build-vyos-vyos-{{ image }} -net0 virtio,bridge=vmbr0 -ostype other -scsihw virtio-scsi-single -sockets 1 -tags 'unl;build' -virtio0 unetlab:2,iothread=on -vmid {{ id }} -serial0 socket -vga none --output-format=json"
+      when: created_node.rc == 2
+    - name: "Starting node"
+      ansible.builtin.shell:
+        cmd: "pvesh create /nodes/{{ inventory_hostname_short }}/qemu/{{ id }}/status/start"
+      when: created_node.rc == 2 or "stopped" in created_node.stdout
+    - name: "Request manual configuration"
+      ansible.builtin.debug:
+        msg: |
+          Login as vyos:vyos and install image to disk with:
+          > install image
+          Set credentials, accept defaults, then reboot.
+          Configure the system as following
+          > configure
+          > set vrf name mgmt
+          > set vrf name mgmt table 100
+          > set interface ethernet eth0  vrf mgmt
+          > set interface ethernet eth0 address dhcp
+          > set service ssh vrf mgmt
+          > delete interface ethernet eth0 hw-id
+          > commit
+          > save

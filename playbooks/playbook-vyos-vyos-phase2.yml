@@ -1,0 +1,34 @@
+#!/usr/bin/env ansible-playbook
+# Usage (tested commands):
+# ./playbook-vyos-vyos-phase2.yml -e image=2025.07.28-0022 -e id=1000 -k
+# Disk should be /dev/zvol/unetlab/vm-1000-disk-0
+# In case of errors, please use the following commands:
+# - pvesm list unetlab --vmid 1000
+# - pvesm path unetlab:vm-1000-disk-0
+- name: "UNetLab image builder | VyOS rolling release | Phase 2"
+  hosts: image_builder
+  gather_facts: false
+  vars:
+    ansible_user: root
+  tasks:
+    - name: "Looking up node"
+      ansible.builtin.shell:
+        cmd: "pvesh get /nodes/{{ inventory_hostname_short }}/qemu/{{ id }}/status/current --output-format=json"
+      register: created_node
+      changed_when: false
+      failed_when: created_node.rc != 0 and created_node.rc != 2
+    - name: "Failing because of duplicated ID"
+      ansible.builtin.fail:
+        msg: "Node ID {{ id }} is already used."
+      when: created_node.rc == 0 and image not in created_node.stdout
+    - name: "Stopping node"
+      ansible.builtin.shell:
+        cmd: "pvesh create /nodes/{{ inventory_hostname_short }}/qemu/{{ id }}/status/shutdown"
+      when: created_node.rc == 2 or "running" in created_node.stdout
+    - name: "Exporting node disk"
+      ansible.builtin.shell:
+        cmd: "qemu-img convert -f raw /dev/zvol/unetlab/vm-{{ id }}-disk-0 -O qcow2 /var/tmp/template-vyos-vyos-{{ image  }}-unl.qcow2"
+    - name: "Downloading node disk"
+      ansible.builtin.fetch:
+        src: "/var/tmp/template-vyos-vyos-{{ image  }}-unl.qcow2"
+        dest: "./template-vyos-vyos-{{ image  }}-unl.qcow2"

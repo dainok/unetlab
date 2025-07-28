@@ -8,8 +8,10 @@
             "mgmt": 0,
             "nics": 4,
             "os": "VyOS",
+            "password": "vyos",
             "ram": 2,
             "url": "",
+            "username": "vyos",
             "vendor": "VyOS",
             "version": "2025.07.28-0022"
         }
