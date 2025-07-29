@@ -25,7 +25,6 @@ class Repository(models.Model):
         verbose_name = _("Repository")
         verbose_name_plural = _("Repositories")
 
-
     def __str__(self):
         """Return a human readable name when the object is printed."""
         return self.name

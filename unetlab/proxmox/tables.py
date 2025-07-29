@@ -22,6 +22,12 @@ class ProxmoxHostTable(tables.Table):
             "title": messages.TABLE_HOST_TITLE,
             "description": messages.TABLE_HOST_DESCRIPTION,
             "detail_view": "host_detail",
+            "vip_actions": [
+                {
+                    "action": "Rescan",
+                    "js": "rescan('host')",
+                },
+            ],
         }
 
 

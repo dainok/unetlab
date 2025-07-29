@@ -30,7 +30,7 @@
                         </form>
                         {% endif %}
                         <!-- Actions -->
-                         {% if actions %}
+                         {% if table.attrs.actions %}
                         <div class="dropdown">
                             <a href="#" class="btn" data-bs-toggle="dropdown">
                                 <!-- Download SVG icon from http://tabler.io/icons/icon/dots -->
@@ -43,22 +43,22 @@
                                 </svg>
                             </a>
                             <div class="dropdown-menu">
-                                {% for action in actions %}
-                                <a class="dropdown-item" href="#">{{ dropdown }}</a>
+                                {% for action in table.attrs.actions %}
+                                <a class="dropdown-item" href="#">{{ action.action }}</a>
                                 {% endfor %}
                             </div>
                         </div>
                         {% endif %}
-                        {{ actions }}
-                        {{ vip_actions }}
-                        {% if vip_actions %}
-                        {% for action in vip_actions %}
-                        <form id="{{ action }}-form" method="post" action="{% url action %}">
+                        {% if table.attrs.vip_actions %}
+                        {% for action in table.attrs.vip_actions %}
+                        {% if action.js %}
+                        <form id="{{ action.action | lower }}-form">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-primary" onclick="rescanHost()">
+                            <button type="submit" class="btn btn-primary" onclick="{{ action.js }}">
                                 {% translate "Rescan" %}
                             </button>
                         </form>
+                        {% endif %}
                         {% endfor %}
                         {% endif %}
                     </div>
@@ -131,13 +131,13 @@
 </div>
 
 <script>
-    function rescanHost() {
+    function rescan(object) {
         /**
          * Trigger a rescan of the Proxmox infrastructure by sending a POST request to the API.
          * Uses prependLog() to display errors on API failure, HTTP errors, network errors, and timeouts.
          */
         event.preventDefault();  // Prevent standard submit
-        url = "/api/host/rescan/";
+        url = `/api/${object}/rescan/`;
         fetch(url, {
             method: "POST",
             headers: {

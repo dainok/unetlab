@@ -24,6 +24,7 @@ def test_job_filters_status(jobs):
     qs_succeeded = JobFilter(data={"status": JobStatusChoices.SUCCEEDED}).qs
     assert len(qs_succeeded) == 1, "Expected 1 job with status 'SUCCEEDED'."
 
+
 # TODO Log
 # @pytest.mark.django_db
 # def test_log_filter_by_severity():

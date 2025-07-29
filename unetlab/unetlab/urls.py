@@ -25,5 +25,6 @@ urlpatterns = [
     # Include URLs from the local apps
     path("", include("job.urls")),
     path("", include("proxmox.urls")),
+    path("", include("repository.urls")),
     # path("", include("ui.urls")),
 ]

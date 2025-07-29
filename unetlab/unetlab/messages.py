@@ -9,6 +9,8 @@ TABLE_JOB_TITLE = _("Jobs")
 TABLE_JOB_DESCRIPTION = _("All jobs.")
 TABLE_HOST_TITLE = _("Hosts")
 TABLE_HOST_DESCRIPTION = _("All Proxmox hosts.")
+TABLE_REPOSITORY_TITLE = _("Repositories")
+TABLE_REPOSITORY_DESCRIPTION = _("All repositories.")
 
 # Generic job/task messages
 JOB_TASK_CANCELED = _("Job canceled due to stale status.")
