@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "ui",
     "job",
     "proxmox",
+    "repository",
     # Optional: OpenAPI docs
     # "drf_spectacular",
     # "drf_spectacular_sidecar",
