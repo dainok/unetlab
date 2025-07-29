@@ -5,13 +5,15 @@
         {
             "checksum": "746affd5cd3c94c9484b7aa72d6fa84b",
             "cpu": 1,
+            "disks": [
+                "..."
+            ],
             "extra": "unl",
             "mgmt": 0,
             "nics": 4,
             "os": "VyOS",
             "password": "vyos",
             "ram": 2,
-            "url": "",
             "username": "vyos",
             "vendor": "VyOS",
             "version": "2025.07.28-0022"

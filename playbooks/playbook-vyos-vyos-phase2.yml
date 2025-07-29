@@ -1,34 +1,51 @@
 #!/usr/bin/env ansible-playbook
 # Usage (tested commands):
 # ./playbook-vyos-vyos-phase2.yml -e image=2025.07.28-0022 -e id=1000 -k
-# Disk should be /dev/zvol/unetlab/vm-1000-disk-0
-# In case of errors, please use the following commands:
-# - pvesm list unetlab --vmid 1000
-# - pvesm path unetlab:vm-1000-disk-0
-- name: "UNetLab image builder | VyOS rolling release | Phase 2"
-  hosts: image_builder
+- name: "UNetLab template builder | VyOS rolling release | Phase 2"
+  hosts: template_builder
   gather_facts: false
   vars:
     ansible_user: root
   tasks:
-    - name: "Looking up node"
+    - name: "Looking up template"
       ansible.builtin.shell:
         cmd: "pvesh get /nodes/{{ inventory_hostname_short }}/qemu/{{ id }}/status/current --output-format=json"
-      register: created_node
+      register: created_template
       changed_when: false
-      failed_when: created_node.rc != 0 and created_node.rc != 2
     - name: "Failing because of duplicated ID"
       ansible.builtin.fail:
         msg: "Node ID {{ id }} is already used."
-      when: created_node.rc == 0 and image not in created_node.stdout
-    - name: "Stopping node"
+      when: image not in created_template.stdout
+    - name: "Stopping template"
       ansible.builtin.shell:
         cmd: "pvesh create /nodes/{{ inventory_hostname_short }}/qemu/{{ id }}/status/shutdown"
-      when: created_node.rc == 2 or "running" in created_node.stdout
-    - name: "Exporting node disk"
+      when: '"running" in created_template.stdout'
+    - name: "Looking up template configuration"
       ansible.builtin.shell:
-        cmd: "qemu-img convert -f raw /dev/zvol/unetlab/vm-{{ id }}-disk-0 -O qcow2 /var/tmp/template-vyos-vyos-{{ image  }}-unl.qcow2"
-    - name: "Manually download node disk"
-      ansible.builtin.debug:
-        msg: |-
-          Download /var/tmp/template-vyos-vyos-{{ image  }}-unl.qcow2 from {{ inventory_hostname_short }}
+        cmd: "pvesh get /nodes/{{ inventory_hostname_short }}/qemu/{{ id }}/config --output-format=json"
+      register: config_template
+      changed_when: false
+    - name: "Removing CDROM"
+      ansible.builtin.shell:
+        cmd: "pvesh set /nodes/{{ inventory_hostname_short }}/qemu/{{ id }}/config -delete cdrom"
+      when: '"media=cdrom" in config_template.stdout'
+    - name: "Setting boot order"
+      ansible.builtin.shell:
+        cmd: "pvesh set /nodes/{{ inventory_hostname_short }}/qemu/{{ id }}/config -boot legacy=c"
+      when: '"legacy=c" not in config_template.stdout'
+    - name: "Marking as template"
+      ansible.builtin.shell:
+        cmd: "pvesh create /nodes/{{ inventory_hostname_short }}/qemu/{{ id }}/template"
+      register: converted_template
+      failed_when: 'converted_template.rc != 0 and "convert a template to a template" not in converted_template.stderr'
+      changed_when: '"convert a template to a template" not in converted_template.stderr'
+    - name: "Exporting template"
+      ansible.builtin.shell:
+        cmd: "pvesh create /nodes/{{ inventory_hostname_short }}/vzdump -storage local -vmid {{ id }} -mode stop"
+    - name: "Request manual download"
+      ansible.builtin.pause:
+        seconds: 1
+        prompt: |-
+          Download latest vzdump-qemu-1000-*.vma file
+          from {{ inventory_hostname_short }}:/var/lib/vz/dump
+          and rename it to vzdump-qemu-template-vyos-vyos-{{ image }}.vma
