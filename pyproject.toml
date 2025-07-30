@@ -43,6 +43,7 @@ dependencies = [
     "proxmoxer>=2.2,<3",
     "requests>=2.32,<3",
     "django-tables2 (>=2.7.5,<3.0.0)",
+    "django-crispy-forms (>=2.4,<3.0)",
 ]
 
 [project.urls]

@@ -5,6 +5,10 @@ from unetlab import messages
 
 
 class JobTable(tables.Table):
+    id = tables.LinkColumn(
+        "job_detail",
+        args=[tables.A("pk")],
+    )
     log_count = tables.Column(
         orderable=False, verbose_name="Logs", attrs={"td": {"class": "text-center"}}
     )
@@ -13,9 +17,9 @@ class JobTable(tables.Table):
 
     class Meta:
         model = Job
-        sequence = ["username", "status", "log_count", "..."]
+        sequence = ["id", "username", "status", "log_count", "..."]
         fields = [f.name for f in Job._meta.fields] + ["log_count"]
-        exclude = ["select", "id"]
+        exclude = ["select"]
         order_by = "-created_at"
         attrs = {
             "title": messages.TABLE_JOB_TITLE,
@@ -26,6 +30,10 @@ class JobTable(tables.Table):
 
 
 class LogTable(tables.Table):
+    id = tables.LinkColumn(
+        "log_detail",
+        args=[tables.A("pk")],
+    )
     acknowledged = GreenBooleanColumn(
         orderable=True, verbose_name="Ack", attrs={"td": {"class": "text-center"}}
     )

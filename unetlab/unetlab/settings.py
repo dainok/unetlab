@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "channels",  # WebSocket support
     "django_filters",  # Filters
     "django_tables2",  # Tables
+    "crispy_forms",  # Forms
     "rest_framework",  # API
     "rest_framework.authtoken",
     "constance",  # Dynamic settings backend
