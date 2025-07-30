@@ -3,7 +3,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from template.views import (
+from node.views import (
     NodeTemplateViewSet,
     NodeTemplateListView,
     NodeTemplateDetailView,

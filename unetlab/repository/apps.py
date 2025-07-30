@@ -8,8 +8,8 @@ __license__ = "GPLv3"
 from django.apps import AppConfig
 
 
-class UNetLabConfig(AppConfig):
+class RepositoryConfig(AppConfig):
     """Config for Repositories management app."""
 
-    name = "repository"
-    verbose_name = "Repositories"
+    name = "repository"  # Python path to the app
+    verbose_name = "Repositories"  # Human-readable app name

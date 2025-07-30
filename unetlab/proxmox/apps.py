@@ -8,8 +8,8 @@ __license__ = "GPLv3"
 from django.apps import AppConfig
 
 
-class UNetLabConfig(AppConfig):
+class ProxmoxConfig(AppConfig):
     """Config for Proxmox hosts management app."""
 
-    name = "proxmox"
-    verbose_name = "Proxmox hosts"
+    name = "proxmox"  # Python path to the app
+    verbose_name = "Proxmox"  # Human-readable app name

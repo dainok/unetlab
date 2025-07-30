@@ -8,13 +8,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import viewsets, mixins
 from rest_framework.permissions import IsAuthenticated
-from template.models import NodeTemplate
-from template.serializers import NodeTemplateSerializer
-from template.filters import NodeTemplateFilter
+from node.models import NodeTemplate
+from node.serializers import NodeTemplateSerializer
+from node.filters import NodeTemplateFilter
 from django_tables2 import SingleTableView
-from template.tables import NodeTemplateTable
+from node.tables import NodeTemplateTable
 
-# from template.tasks import do_rescan
+# from node.tasks import do_rescan
 from unetlab.utils import db_fields_to_dict
 from unetlab.views import CommonMixin, BaseListView
 from unetlab.permissions import IsAdminOrStaff

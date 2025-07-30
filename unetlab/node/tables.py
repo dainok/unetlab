@@ -1,5 +1,5 @@
 import django_tables2 as tables
-from template.models import NodeTemplate
+from node.models import NodeTemplate
 from ui.tables import GreenRedBooleanColumn, GreenRedReverseBooleanColumn, URLColum
 from unetlab import messages
 

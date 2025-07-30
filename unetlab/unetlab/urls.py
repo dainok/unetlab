@@ -26,6 +26,6 @@ urlpatterns = [
     path("", include("job.urls")),
     path("", include("proxmox.urls")),
     path("", include("repository.urls")),
-    path("", include("template.urls")),
+    path("", include("node.urls")),
     # path("", include("ui.urls")),
 ]

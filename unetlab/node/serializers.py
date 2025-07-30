@@ -1,7 +1,7 @@
 """Serializers, called by API View."""
 
 from rest_framework import serializers
-from template.models import NodeTemplate
+from node.models import NodeTemplate
 
 
 class NodeTemplateSerializer(serializers.ModelSerializer):

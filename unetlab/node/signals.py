@@ -4,7 +4,7 @@ Django signals module.
 This module intercepts database events and triggers functions.
 """
 
-from template.models import NodeTemplate
+from node.models import NodeTemplate
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 

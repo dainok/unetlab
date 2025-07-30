@@ -47,11 +47,11 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "constance",  # Dynamic settings backend
     # Local apps
-    "ui",
     "job",
+    "node",
     "proxmox",
     "repository",
-    "template",
+    "ui",
     # Optional: OpenAPI docs
     # "drf_spectacular",
     # "drf_spectacular_sidecar",
