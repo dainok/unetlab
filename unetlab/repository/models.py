@@ -14,6 +14,11 @@ class Repository(models.Model):
 
     name = models.CharField(primary_key=True, max_length=255)
     uri = models.CharField(max_length=255)
+    is_enabled = models.BooleanField(
+        default=True,
+        help_text="False if Repository is disabled and should not be used.",
+        verbose_name="Enabled",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
 

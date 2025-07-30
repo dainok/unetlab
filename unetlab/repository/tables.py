@@ -1,12 +1,19 @@
 import django_tables2 as tables
 from repository.models import Repository
 from unetlab import messages
-
+from ui.tables import GreenRedBooleanColumn, GreenRedReverseBooleanColumn
 
 class RepositoryTable(tables.Table):
+    name = tables.LinkColumn(
+        "repository_detail",
+        args=[tables.A("pk")],
+    )
     uri = tables.TemplateColumn(
         orderable=False,
         template_code="{{ record.uri|truncatechars:60 }}",
+    )
+    is_enabled = GreenRedBooleanColumn(
+        orderable=True, attrs={"td": {"class": "text-center"}}
     )
     created_at = tables.DateColumn(orderable=True, format="Y-m-d")
     updated_at = tables.DateColumn(orderable=True, format="Y-m-d H:i")
@@ -29,6 +36,16 @@ class RepositoryTable(tables.Table):
                     "action": "Delete",
                     "method": "POST",
                     "view": "repository-add",
+                },
+                {
+                    "action": "Disable",
+                    "method": "POST",
+                    "view": "repository-disable",
+                },
+                {
+                    "action": "Enable",
+                    "method": "POST",
+                    "view": "repository-enable",
                 },
             ],
             "vip_actions": [

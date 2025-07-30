@@ -44,7 +44,7 @@ def job_rescan(job_id):
         local_repo.save()
 
     # Scanning remote repositories
-    for repo_obj in Repository.objects.all():
+    for repo_obj in Repository.objects.filter(is_enabled=True):
         if repo_obj.name == "local":
             # Local repository
             # Create local template dir

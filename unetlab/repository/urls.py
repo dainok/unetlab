@@ -19,7 +19,7 @@ urlpatterns = [
     # List and detail views for Repository (HTML views)
     path("repository/", RepositoryListView.as_view(), name="repository_list"),
     path(
-        "repository/<int:pk>/", RepositoryDetailView.as_view(), name="repository_detail"
+        "repository/<str:pk>/", RepositoryDetailView.as_view(), name="repository_detail"
     ),
     # Custom API endpoints
     path(
