@@ -56,7 +56,7 @@ poetry run pre-commit run --all-files
 poetry run coverage run --omit="unetlab/tests/*" -m pytest unetlab
 poetry run coverage report -m
 poetry run pytest -v
-poetry run ./manage.py makemigrations ui job proxmox repository
+poetry run ./manage.py makemigrations ui job proxmox repository template
 ```
 
 ### Adding New Libraries

@@ -5,8 +5,8 @@ from django.conf import settings
 from django_tables2 import SingleTableView
 from django_filters.views import FilterView
 from django_tables2 import RequestConfig
-from job.models import Log, Job
-from job.tables import JobTable, LogHomeTable
+from job.models import Log
+from job.tables import LogHomeTable
 from proxmox.tables import ProxmoxHostHomeTable
 from proxmox.models import ProxmoxHost
 

@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "job",
     "proxmox",
     "repository",
+    "template",
     # Optional: OpenAPI docs
     # "drf_spectacular",
     # "drf_spectacular_sidecar",
