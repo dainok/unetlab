@@ -13,8 +13,6 @@ from django.dispatch import receiver
 def set_name(sender, instance, **kwargs):
     """Signal handler triggered before a Template instance is saved."""
     if instance.extra:
-        instance.name = (
-            f"{instance.vendor}-{instance.os}-{instance.version}-{instance.extra}"
-        )
+        instance.name = f"template-{instance.repository.name}-{instance.vendor}-{instance.os}-{instance.version}-{instance.extra}".lower()
     else:
-        instance.name = f"{instance.vendor}-{instance.os}-{instance.version}"
+        instance.name = f"template-{instance.repository.name}-{instance.vendor}-{instance.os}-{instance.version}".lower()

@@ -246,9 +246,9 @@ CONSTANCE_CONFIG = {
         True,
         "Whether to verify the SSL certificate for Proxmox.",
     ),
-    "PROXMOX_SHARED_STORAGE": (
-        False,
-        "Indicates if the Proxmox host uses shared storage for nodes and templates.",
+    "TEMPLATE_DIR": (
+        f"{BASE_DIR.parent}/templates/local.json",
+        "Directory where to store Proxmox templates.",
     ),
 }
 

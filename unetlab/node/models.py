@@ -3,6 +3,7 @@
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.urls import reverse
+from repository.models import Repository
 
 
 class NodeTemplate(models.Model):
@@ -12,6 +13,13 @@ class NodeTemplate(models.Model):
     The details of Repository are retrieved and cached.
     """
 
+    repository = models.ForeignKey(
+        Repository,
+        on_delete=models.CASCADE,
+        related_name="templates",
+        verbose_name=_("Repository"),
+        help_text=_("Repository associated with this template."),
+    )
     name = models.CharField(
         primary_key=True,
         max_length=255,
@@ -50,7 +58,7 @@ class NodeTemplate(models.Model):
     )
     mgmt = models.IntegerField(
         default=0,
-        verbose_name=_("Management ID"),
+        verbose_name=_("Management interface"),
         help_text=_("Management interface, starting from 0."),
     )
     disks = models.JSONField(

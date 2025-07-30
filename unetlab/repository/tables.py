@@ -1,11 +1,13 @@
 import django_tables2 as tables
 from repository.models import Repository
-from ui.tables import GreenRedBooleanColumn, GreenRedReverseBooleanColumn, URLColum
 from unetlab import messages
 
 
 class RepositoryTable(tables.Table):
-    uri = URLColum(orderable=False)
+    uri = tables.TemplateColumn(
+        orderable=False,
+        template_code="{{ record.uri|truncatechars:60 }}",
+    )
     created_at = tables.DateColumn(orderable=True, format="Y-m-d")
     updated_at = tables.DateColumn(orderable=True, format="Y-m-d H:i")
 
