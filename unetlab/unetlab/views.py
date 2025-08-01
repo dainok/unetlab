@@ -76,6 +76,8 @@ class BaseListView(CommonMixin, CommonListMixin, SingleTableView, FilterView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        filterset = self.get_filterset(self.get_filterset_class())
+        context["filter"] = filterset
         context["actions"] = self.get_actions()
         context["vip_actions"] = self.get_vip_actions()
         return context
