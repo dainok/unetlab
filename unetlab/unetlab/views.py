@@ -35,22 +35,6 @@ class CommonListMixin:
     actions = []  # General actions (e.g., 'delete', 'add')
     vip_actions = []  # VIP actions (e.g., 'host-rescan')
 
-    def get_paginate_by(self, queryset):
-        """Allow client to customize pagination via 'per_page' query param.
-
-        Enforces a maximum of 100 per page; defaults to 10.
-        """
-        # TODO: not working
-        per_page = self.request.GET.get("per_page")
-        try:
-            per_page = int(per_page)
-            if per_page > 100:
-                return 100
-            if per_page > 0:
-                return per_page
-        except (TypeError, ValueError):
-            pass
-        return settings.REST_FRAMEWORK["PAGE_SIZE"]
 
     def get_context_data(self, **kwargs):
         """Add latest logs to context."""
@@ -72,7 +56,45 @@ class CommonListMixin:
 class BaseListView(CommonMixin, CommonListMixin, SingleTableView, FilterView):
     """Base list view with tables2 and django-filters."""
 
-    paginate_by = settings.REST_FRAMEWORK["PAGE_SIZE"]
+    paginate_by = settings.DJANGO_TABLES2_PAGE_SIZE
+    template_name = "objects/object_list.html"
+
+    def get_table(self, **kwargs):
+        # PAGINATE NOT WORKING TODO
+        table = super().get_table(**kwargs)
+        print("paginate_by in view:", self.get_paginate_by(table.data))
+        return table
+    
+    def get_paginate_by(self, queryset):
+        # PAGINATE NOT WORKING TODO
+        """Allow client to customize pagination via 'per_page' query param.
+
+        Enforces a maximum of DJANGO_TABLES2_MAX_PAGE_SIZE per page; defaults to DJANGO_TABLES2_PAGE_SIZE.
+        """
+        try:
+            per_page = int(self.request.GET.get("per_page", 0))
+            print(per_page)
+            if per_page <= 0:
+                return settings.DJANGO_TABLES2_PAGE_SIZE
+            print("FIX")
+            print(min(per_page, settings.DJANGO_TABLES2_MAX_PAGE_SIZE))
+            return min(per_page, settings.DJANGO_TABLES2_MAX_PAGE_SIZE)
+        except (TypeError, ValueError):
+            # return super().get_paginate_by(queryset)
+            return settings.DJANGO_TABLES2_PAGE_SIZE
+        # table = super().get_table(**kwargs)
+        # try:
+        #     per_page = int(self.request.GET.get("per_page", 0))
+        #     if per_page <= 0:
+        #         per_page = settings.DJANGO_TABLES2_PAGE_SIZE
+        #     else:
+        #         per_page = min(per_page, settings.DJANGO_TABLES2_MAX_PAGE_SIZE)
+        #         per_page = 5 # REMOVE TODO
+        # except (TypeError, ValueError):
+        #     per_page = settings.DJANGO_TABLES2_PAGE_SIZE
+        # print(per_page)
+        # RequestConfig(self.request, paginate={"per_page": per_page}).configure(table)
+        # return table
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     "channels",  # WebSocket support
     "django_filters",  # Filters
     "django_tables2",  # Tables
-    "crispy_forms",  # Forms
+    # "crispy_forms",  # Forms
+    # "crispy_bootstrap5",
     "rest_framework",  # API
     "rest_framework.authtoken",
     "constance",  # Dynamic settings backend
@@ -180,13 +181,14 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.TokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ],
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "DEFAULT_PAGINATION_CLASS": "ui.pagination.CustomPagination",
     "DEFAULT_RENDERER_CLASSES": [
         "unetlab.renderers.CustomJSONRenderer",
     ],
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
     "EXCEPTION_HANDLER": "unetlab.exception_handler.custom_exception_handler",
     "PAGE_SIZE": 10,
+    "MAX_PAGE_SIZE": 100,
 }
 
 # ==============================================================================
@@ -264,4 +266,12 @@ SOURCE = socket.gethostname().upper()
 # ==============================================================================
 
 DJANGO_TABLES2_PAGE_SIZE = REST_FRAMEWORK["PAGE_SIZE"]
+DJANGO_TABLES2_MAX_PAGE_SIZE = REST_FRAMEWORK["MAX_PAGE_SIZE"]
 DJANGO_TABLES2_TEMPLATE = "unetlab/tables/table_full.html"
+
+# ==============================================================================
+# CRISPY SETTINGS
+# ==============================================================================
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = ["bootstrap5"]
+CRISPY_TEMPLATE_PACK = "bootstrap5"

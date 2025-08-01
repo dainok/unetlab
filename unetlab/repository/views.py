@@ -24,22 +24,6 @@ class RepositoryQueryMixin:
     Used by both UI and API views.
     """
 
-    def get_paginate_by(self, queryset):
-        """Allow client to customize pagination via 'per_page' query param.
-
-        Enforces a maximum of 100 per page; defaults to 10.
-        """
-        per_page = self.request.GET.get("per_page")
-        try:
-            per_page = int(per_page)
-            if per_page > 100:
-                return 100
-            if per_page > 0:
-                return per_page
-        except (TypeError, ValueError):
-            pass
-        return settings.REST_FRAMEWORK["PAGE_SIZE"]
-
 
 class RepositoryViewSet(
     RepositoryQueryMixin,
@@ -57,8 +41,6 @@ class RepositoryViewSet(
 class RepositoryListView(BaseListView):
     model = Repository
     table_class = RepositoryTable
-    template_name = "objects/object_list.html"
-    paginate_by = settings.REST_FRAMEWORK["PAGE_SIZE"]
     actions = ["delete"]
     vip_actions = ["repository-rescan"]
 

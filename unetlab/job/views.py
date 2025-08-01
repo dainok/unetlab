@@ -45,21 +45,7 @@ class JobQueryMixin:
             return obj
         raise PermissionDenied("You do not have permission to access this object.")
 
-    def get_paginate_by(self, queryset):
-        """Allow client to customize pagination via 'per_page' query param.
 
-        Enforces a maximum of 100 per page; defaults to 10.
-        """
-        per_page = self.request.GET.get("per_page")
-        try:
-            per_page = int(per_page)
-            if per_page > 100:
-                return 100
-            if per_page > 0:
-                return per_page
-        except (TypeError, ValueError):
-            pass
-        return settings.REST_FRAMEWORK["PAGE_SIZE"]
 
 
 class JobViewSet(
@@ -82,8 +68,6 @@ class JobListView(BaseListView):
 
     model = Job
     table_class = JobTable
-    template_name = "objects/object_list.html"
-    paginate_by = settings.DJANGO_TABLES2_PAGE_SIZE
     filterset_class = JobFilter
 
 
@@ -135,22 +119,6 @@ class LogQueryMixin:
             return obj
         raise PermissionDenied("You do not have permission to access this object.")
 
-    def get_paginate_by(self, queryset):
-        """Allow client to customize pagination via 'per_page' query param.
-
-        Enforces a maximum of 100 per page; defaults to 10.
-        """
-        per_page = self.request.GET.get("per_page")
-        try:
-            per_page = int(per_page)
-            if per_page > 100:
-                return 100
-            if per_page > 0:
-                return per_page
-        except (TypeError, ValueError):
-            pass
-        return settings.REST_FRAMEWORK["PAGE_SIZE"]
-
 
 class LogViewSet(
     LogQueryMixin,
@@ -180,10 +148,10 @@ class LogListView(BaseListView):
 
     model = Log
     table_class = LogTable
-    template_name = "objects/object_list.html"
-    paginate_by = settings.DJANGO_TABLES2_PAGE_SIZE
     filterset_class = LogFilter
     vip_actions = ["acknowledge"]
+
+        
 
 
 class LogDetailView(LogQueryMixin, CommonMixin, DetailView):
