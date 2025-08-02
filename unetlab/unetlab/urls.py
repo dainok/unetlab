@@ -3,11 +3,15 @@
 from django.contrib import admin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import path, include
+from django.conf.urls.static import static
+from django.views.generic import RedirectView
+from django.conf import settings
 from rest_framework.authtoken.views import obtain_auth_token
 from unetlab import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path('favicon.ico', RedirectView.as_view(url="/static/unetlab/favicon.ico")),
     path("", views.HomeView.as_view(), name="home"),
     # Authentication URLs (standard users cannot use admin/login.html)
     path(
@@ -28,4 +32,4 @@ urlpatterns = [
     path("", include("repository.urls")),
     path("", include("node.urls")),
     # path("", include("ui.urls")),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
