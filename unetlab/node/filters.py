@@ -23,24 +23,26 @@ class NodeTemplateFilter(django_filters.FilterSet):
         - created_at__lte: Filter Templates created on or before a given date
     """
 
-    username = django_filters.ChoiceFilter(
-        choices=[],  # Populated dynamically in __init__
-        widget=forms.Select(attrs={"class": "form-select"}),
-        label="Owner",
-    )
-    created_at__gte = django_filters.DateFilter(
-        field_name="created_at",
-        lookup_expr="gte",
-        widget=forms.DateInput(attrs={"type": "date", "class": "form-control mb-2"}),
-        label="Created After",
-    )
-    created_at__lte = django_filters.DateFilter(
-        field_name="created_at",
-        lookup_expr="lte",
-        widget=forms.DateInput(attrs={"type": "date", "class": "form-control mb-2"}),
-        label="Created Before",
-    )
+    search_fields = ["name", "checksum"]
+    # username = django_filters.ChoiceFilter(
+    #     choices=[],  # Populated dynamically in __init__
+    #     widget=forms.Select(attrs={"class": "form-select"}),
+    #     label="Owner",
+    # )
+    # created_at__gte = django_filters.DateFilter(
+    #     field_name="created_at",
+    #     lookup_expr="gte",
+    #     widget=forms.DateInput(attrs={"type": "date", "class": "form-control mb-2"}),
+    #     label="Created After",
+    # )
+    # created_at__lte = django_filters.DateFilter(
+    #     field_name="created_at",
+    #     lookup_expr="lte",
+    #     widget=forms.DateInput(attrs={"type": "date", "class": "form-control mb-2"}),
+    #     label="Created Before",
+    # )
 
     class Meta:
         model = NodeTemplate
-        fields = ["name", "created_at__gte", "created_at__lte"]
+        fields = ["repository", "os", "vendor", "version", "extra", "username"]
+        # fields = ["name", "created_at__gte", "created_at__lte"]

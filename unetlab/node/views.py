@@ -44,6 +44,7 @@ class NodeTemplateViewSet(
 class NodeTemplateListView(BaseListView):
     model = NodeTemplate
     table_class = NodeTemplateTable
+    filterset_class = NodeTemplateFilter
     actions = ["delete"]
     vip_actions = ["Template-rescan"]
 
