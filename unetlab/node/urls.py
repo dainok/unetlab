@@ -18,7 +18,7 @@ urlpatterns = [
     # List and detail views for Template (HTML views)
     path("template/", NodeTemplateListView.as_view(), name="template_list"),
     path(
-        "template/<int:pk>/", NodeTemplateDetailView.as_view(), name="template_detail"
+        "template/<str:pk>/", NodeTemplateDetailView.as_view(), name="template_detail"
     ),
     # Include API routes from DRF router
     path("api/", include(router.urls)),

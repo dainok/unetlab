@@ -5,6 +5,10 @@ from unetlab import messages
 
 
 class ProxmoxHostTable(tables.Table):
+    name = tables.LinkColumn(
+        "host_detail",
+        args=[tables.A("name")],
+    )
     is_online = GreenRedBooleanColumn(
         orderable=True, attrs={"td": {"class": "text-center"}}
     )
@@ -17,7 +21,7 @@ class ProxmoxHostTable(tables.Table):
     class Meta:
         model = ProxmoxHost
         exclude = ["select", "actions"]
-        order_by = "hostname"
+        order_by = "name"
         attrs = {
             "title": messages.TABLE_HOST_TITLE,
             "description": messages.TABLE_HOST_DESCRIPTION,

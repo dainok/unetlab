@@ -1,53 +1,75 @@
+from typing import Any
 from django import forms
 from django.views.generic.detail import DetailView
-from crispy_forms.layout import Layout, HTML
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout
+from django.utils.module_loading import import_string
+from django_tables2.columns import Column
+from django_tables2 import TemplateColumn
+from django.template import Template, Context
 
-class ReadOnlyDetailMixin:
-    """
-    Mixin per DetailView che genera un form readonly da un model,
-    usando Crispy Forms e supportando `fields`, `exclude` e `field_order`.
-    """
-    fields = None
-    exclude = None
-    field_order = None
 
-    def get_readonly_form_class(self):
-        model = self.model
+class ObjectDetailView(DetailView):
+    exclude = []
+    sequence = []
+    attrs = {
+        "title": "",
+        "description": ""
+    }
+    template_name = "objects/object_detail.html"
+    list_view = None
 
-        class _ReadOnlyForm(forms.ModelForm):
-            class Meta:
-                model = self.model
-                fields = self.fields or "__all__"
-                exclude = self.exclude
+    def get_list_view(self):
+        if self.list_view is not None:
+            return self.list_view
+        # Se non definito, calcola da model
+        return f"{self.model._meta.model_name}_list"
 
-            def __init__(self_inner, *args, **kwargs):
-                super().__init__(*args, **kwargs)
-                for field in self_inner.fields.values():
-                    field.disabled = True
-                self_inner.helper = FormHelper()
-                self_inner.helper.form_tag = False
-                layout_fields = self.field_order or list(self_inner.fields)
-                self_inner.helper.layout = Layout(*layout_fields)
-
-        return _ReadOnlyForm
+    def get_column_fields(self):
+        """
+        Restituisce gli attributi della classe che sono istanze di django_tables2 Column.
+        """
+        return {
+            attr_name: getattr(self.__class__, attr_name)
+            for attr_name in dir(self.__class__)
+            if isinstance(getattr(self.__class__, attr_name), Column)
+        }
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        Form = self.get_readonly_form_class()
-        form = Form(instance=self.object)
-        helper = FormHelper()
-        helper.form_tag = False
-        layout = []
-        for name in form.fields.keys():
-            label = form.fields[name].label or name
-            value = getattr(self.object, name)
-            layout.append(HTML(f'<div><strong>{label}:</strong> {value}</div>'))
-        helper.layout = Layout(*layout)
-        form.helper = helper
-        context['form'] = form
+        obj = self.object
+        fields = obj._meta.fields
+
+        column_fields = self.get_column_fields()
+        data = {}
+
+        for field in fields:
+            field_name = field.name
+            if field_name in self.exclude:
+                continue
+
+            value = getattr(obj, field_name)
+            # column = column_fields.get(field_name)
+
+            # if isinstance(column, TemplateColumn):
+            #     template = Template(column.template_code)
+            #     ctx = Context({"record": obj, "value": value})
+            #     value = template.render(ctx)
+            # Altri tipi di colonne possono essere gestiti qui se vuoi
+
+            data[field_name] = value
+
+        # Ordina secondo sequence, se presente
+        if self.sequence:
+            ordered_data = {k: data[k] for k in self.sequence if k in data}
+            for k in data:
+                if k not in ordered_data:
+                    ordered_data[k] = data[k]
+            data = ordered_data
+
+
+        context["object"] = data
+        context["attrs"] = {
+            "title": self.attrs.get("title", ""),
+            "description": self.attrs.get("description", ""),
+        }
+        context["list_view"] = self.get_list_view()
         return context
-    
-class ObjectDetailView(ReadOnlyDetailMixin, DetailView):
-    template_name = "objects/object_detail.html"

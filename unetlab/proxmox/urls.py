@@ -18,7 +18,7 @@ router.register(r"host", ProxmoxHostViewSet, basename="host")
 urlpatterns = [
     # List and detail views for ProxmoxHost (HTML views)
     path("host/", ProxmoxHostListView.as_view(), name="host_list"),
-    path("host/<int:pk>/", ProxmoxHostDetailView.as_view(), name="host_detail"),
+    path("host/<str:pk>/", ProxmoxHostDetailView.as_view(), name="host_detail"),
     # Custom API endpoints
     path("api/host/rescan/", ProxmoxRescanView.as_view(), name="host-rescan"),
     # Include API routes from DRF router

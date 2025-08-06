@@ -13,6 +13,7 @@ from node.serializers import NodeTemplateSerializer
 from node.filters import NodeTemplateFilter
 from django_tables2 import SingleTableView
 from node.tables import NodeTemplateTable
+from ui.views import ObjectDetailView
 
 # from node.tasks import do_rescan
 from unetlab.utils import db_fields_to_dict
@@ -49,14 +50,10 @@ class NodeTemplateListView(BaseListView):
     vip_actions = ["Template-rescan"]
 
 
-class NodeTemplateDetailView(NodeTemplateQueryMixin, CommonMixin, DetailView):
-    """HTML detail view for a single template."""
-
+class NodeTemplateDetailView(ObjectDetailView):
     model = NodeTemplate
-    template_name = "objects/host_detail.html"
+    exclude=["id"]
+    sequence=["name", "created_at", "description"]
+    list_view = "template_list"
+    # is_enabled = GreenRedBooleanColumn()
 
-    def get_context_data(self, **kwargs):
-        """Add host field metadata and logs list to context."""
-        context = super().get_context_data(**kwargs)
-        context["host_fields"] = db_fields_to_dict(NodeTemplate._meta.fields)
-        return context

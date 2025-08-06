@@ -11,11 +11,16 @@ from rest_framework.permissions import IsAuthenticated
 from repository.models import Repository
 from repository.serializers import RepositorySerializer
 from django_tables2 import SingleTableView
+from django import forms
+from django.views.generic.edit import UpdateView, CreateView
 from repository.tables import RepositoryTable
 from repository.tasks import do_rescan
+from repository.filters import RepositoryFilter
 from unetlab.utils import db_fields_to_dict
 from unetlab.views import CommonMixin, BaseListView
 from unetlab.permissions import IsAdminOrStaff
+from ui.views import ObjectDetailView
+from ui.tables import GreenRedBooleanColumn
 
 
 class RepositoryQueryMixin:
@@ -41,21 +46,16 @@ class RepositoryViewSet(
 class RepositoryListView(BaseListView):
     model = Repository
     table_class = RepositoryTable
+    filterset_class = RepositoryFilter
     actions = ["delete"]
     vip_actions = ["repository-rescan"]
 
 
-class RepositoryDetailView(RepositoryQueryMixin, CommonMixin, DetailView):
-    """HTML detail view for a single Repository."""
-
+class RepositoryDetailView(ObjectDetailView):
     model = Repository
-    template_name = "objects/host_detail.html"
-
-    def get_context_data(self, **kwargs):
-        """Add host field metadata and logs list to context."""
-        context = super().get_context_data(**kwargs)
-        context["host_fields"] = db_fields_to_dict(Repository._meta.fields)
-        return context
+    exclude=["id"]
+    sequence=["name", "created_at", "description"]
+    # is_enabled = GreenRedBooleanColumn()
 
 
 class RepositoriesRescanView(APIView):
@@ -66,3 +66,6 @@ class RepositoriesRescanView(APIView):
     def post(self, request):
         do_rescan(username=request.user.username)
         return Response({"status": "rescan triggered"})
+
+
+

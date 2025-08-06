@@ -11,7 +11,7 @@ class NodeTemplateTable(tables.Table):
         model = NodeTemplate
         exclude = [
             "select",
-            "actions",
+            # "actions",
             "name",
             "checksum",
             "mgmt",

@@ -108,7 +108,7 @@
                             <td>
                                 {% if table.attrs.detail_view %}
                                 <div class="btn-list flex-nowrap">
-                                    <a href="{% url table.attrs.detail_view row.record.id %}" class="btn btn-1"> View
+                                    <a href="{% url table.attrs.detail_view row.record.pk %}" class="btn btn-1"> View
                                     </a>
                                 </div>
                                 {% endif %}

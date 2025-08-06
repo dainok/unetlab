@@ -17,6 +17,7 @@ from proxmox.tasks import do_rescan
 from unetlab.utils import db_fields_to_dict
 from unetlab.views import CommonMixin, BaseListView
 from unetlab.permissions import IsAdminOrStaff
+from ui.views import ObjectDetailView
 
 
 class ProxmoxHostQueryMixin:
@@ -44,19 +45,16 @@ class ProxmoxHostListView(BaseListView):
     model = ProxmoxHost
     table_class = ProxmoxHostTable
     filterset_class = ProxmoxHostFilter
+    list_view = "host_list"
 
 
-class ProxmoxHostDetailView(ProxmoxHostQueryMixin, CommonMixin, DetailView):
+
+class ProxmoxHostDetailView(ObjectDetailView):
     """HTML detail view for a single ProxmoxHost."""
-
     model = ProxmoxHost
-    template_name = "objects/host_detail.html"
-
-    def get_context_data(self, **kwargs):
-        """Add host field metadata and logs list to context."""
-        context = super().get_context_data(**kwargs)
-        context["host_fields"] = db_fields_to_dict(ProxmoxHost._meta.fields)
-        return context
+    list_view = "host_list"
+    # exclude=["id"]
+    # sequence=["name", "created_at", "description"]
 
 
 class ProxmoxRescanView(APIView):
