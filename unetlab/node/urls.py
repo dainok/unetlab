@@ -7,6 +7,8 @@ from node.views import (
     NodeTemplateViewSet,
     NodeTemplateListView,
     NodeTemplateDetailView,
+    NodeTemplateChangeView,
+    NodeTemplateCreateView,
 )
 
 # DRF router for API endpoints of Template viewsets
@@ -17,6 +19,10 @@ router.register(r"template", NodeTemplateViewSet, basename="template")
 urlpatterns = [
     # List and detail views for Template (HTML views)
     path("template/", NodeTemplateListView.as_view(), name="template_list"),
+    path("template/create", NodeTemplateCreateView.as_view(), name="template_create"),
+    path(
+        "template/<str:pk>/update", NodeTemplateChangeView.as_view(), name="template_update"
+    ),
     path(
         "template/<str:pk>/", NodeTemplateDetailView.as_view(), name="template_detail"
     ),

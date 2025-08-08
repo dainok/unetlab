@@ -13,7 +13,7 @@ from node.serializers import NodeTemplateSerializer
 from node.filters import NodeTemplateFilter
 from django_tables2 import SingleTableView
 from node.tables import NodeTemplateTable
-from ui.views import ObjectDetailView
+from ui.views import ObjectDetailView, ObjectChangeView, ObjectCreateView
 
 # from node.tasks import do_rescan
 from unetlab.utils import db_fields_to_dict
@@ -57,3 +57,13 @@ class NodeTemplateDetailView(ObjectDetailView):
     list_view = "template_list"
     # is_enabled = GreenRedBooleanColumn()
 
+
+
+class NodeTemplateCreateView(ObjectCreateView):
+    model = NodeTemplate
+
+class NodeTemplateChangeView(ObjectChangeView):
+    model = NodeTemplate
+    # fields = '__all__'
+    # template_name = 'object_form.html'
+    # success_url = reverse_lazy('home')

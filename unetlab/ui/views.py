@@ -1,6 +1,7 @@
 from typing import Any
 from django import forms
 from django.views.generic.detail import DetailView
+from django.views.generic.edit import UpdateView, CreateView
 from django.utils.module_loading import import_string
 from django_tables2.columns import Column
 from django_tables2 import TemplateColumn
@@ -73,3 +74,13 @@ class ObjectDetailView(DetailView):
         }
         context["list_view"] = self.get_list_view()
         return context
+
+class ObjectCreateView(CreateView):
+    fields = '__all__'
+    template_name = 'objects/object_form.html'
+    # success_url = reverse_lazy('home')
+
+class ObjectChangeView(UpdateView):
+    fields = '__all__'
+    template_name = 'objects/object_form.html'
+    # success_url = reverse_lazy('home')

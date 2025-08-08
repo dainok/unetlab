@@ -1,0 +1,45 @@
+{% extends "unetlab/base.html" %}
+{% block title %}UNetLab | {{ object.name }} > Detail{% endblock title %}
+{% block page_title %}{{ object.name }} > Detail{% endblock page_title %}
+{% block page_body %}
+<div class="col-lg-12">
+    <div class="card">
+        <form method="post" novalidate>
+            <div class="card-table">
+                {% if attrs.title %}
+                <div class="card-header">
+                    <div class="row w-full">
+                        <div class="col">
+                            <h3 class="card-title mb-0">{{ attrs.title }}</h3>
+                            <p class="text-secondary m-0">{{ attrs.description }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="datagrid">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                        <div class="form-text">{{ field.help_text }}</div>
+                        {% endif %}
+                        {% for error in field.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex">
+                                <button type="submit" class="btn btn-primary">
+                        {% if oggetto %}Aggiorna{% else %}Crea{% endif %}
+                    </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock page_body %}
