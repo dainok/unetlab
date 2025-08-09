@@ -83,6 +83,11 @@ class DiskTemplateCreateAPIView(APIView):
             "url": url
         }
 
+        # Upload
+        # curl -X POST -H "Authorization: Token d94fef88dbd7c4f70cdec97e880ea7b92286bde0" -F "file=@repositories/vyos/vyos/vzdump-qemu-vyos-vyos-2025.07.28-0022.vma" http://localhost:8000/api/template/6/disk
+        # Download
+        # curl -L -X GET -H "Authorization: Token d94fef88dbd7c4f70cdec97e880ea7b92286bde0" http://localhost:8000/files/vyos-vyos/template-local-vyos-vyos-2025.07.28-0022-unl.vma --output a
+
         # Aggiorna la lista disks del template (aggiunge il nuovo file)
         template.disk_checksum = checksum.hexdigest()
         template.save()

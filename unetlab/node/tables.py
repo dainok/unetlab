@@ -16,7 +16,7 @@ class NodeTemplateTable(tables.Table):
             "name",
             "checksum",
             "mgmt",
-            "disks",
+            "disk_checksum",
             "username",
             "password",
             "created_at",
