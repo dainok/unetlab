@@ -67,6 +67,12 @@ To add new packages as development dependencies (for example, pytest and coverag
 poetry add --dev pytest pytest-django coverage
 ```
 
+## Testing API using a token
+
+```bash
+curl -X POST -H "Authorization: Token d94fef88dbd7c4f70cdec97e880ea7b92286bde0" http://localhost:8000/api
+```
+
 ## Data Exchange via API
 
 The APIs are built using Django REST Framework, with the output format customized to always include certain fields. The response format is as follows:

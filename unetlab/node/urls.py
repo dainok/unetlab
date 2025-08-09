@@ -9,6 +9,7 @@ from node.views import (
     NodeTemplateDetailView,
     NodeTemplateChangeView,
     NodeTemplateCreateView,
+    DiskTemplateCreateAPIView,
 )
 
 # DRF router for API endpoints of Template viewsets
@@ -24,7 +25,19 @@ urlpatterns = [
         "template/<str:pk>/update", NodeTemplateChangeView.as_view(), name="template_update"
     ),
     path(
+        "template/<str:pk>/disk/create", NodeTemplateChangeView.as_view(), name="template_disk_create"
+    ),
+    path(
+        "template/<str:pk>/disk/<str:disk_checksum>", NodeTemplateChangeView.as_view(), name="template_disk_delete"
+    ),
+    path(
         "template/<str:pk>/", NodeTemplateDetailView.as_view(), name="template_detail"
+    ),
+    # Custom API endpoints
+    path(
+        "api/template/<str:pk>/disk",
+        DiskTemplateCreateAPIView.as_view(),
+        name="disk-create",
     ),
     # Include API routes from DRF router
     path("api/", include(router.urls)),

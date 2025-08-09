@@ -14,3 +14,6 @@ class NodeTemplateSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]  # Make some fields read-only
+
+class UploadDiskSerializer(serializers.Serializer):
+    file = serializers.FileField()

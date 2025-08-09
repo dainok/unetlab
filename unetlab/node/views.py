@@ -1,15 +1,18 @@
 """Views, called by URLs."""
 
+import hashlib
 from django.views.generic import DetailView
 from django.conf import settings
 from django_filters.views import FilterView
+from django.core.files.storage import default_storage
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import status
 from rest_framework import viewsets, mixins
 from rest_framework.permissions import IsAuthenticated
 from node.models import NodeTemplate
-from node.serializers import NodeTemplateSerializer
+from node.serializers import NodeTemplateSerializer, UploadDiskSerializer
 from node.filters import NodeTemplateFilter
 from django_tables2 import SingleTableView
 from node.tables import NodeTemplateTable
@@ -44,6 +47,50 @@ class NodeTemplateViewSet(
     queryset = NodeTemplate.objects.all()
 
 
+
+class DiskTemplateCreateAPIView(APIView):
+    """Add disk."""
+
+    permission_classes = [IsAuthenticated, IsAdminOrStaff]
+
+    def post(self, request, pk):
+        template = NodeTemplate.objects.filter(pk=pk).first()
+        # TODO
+        # if not template:
+        #     return Response({"detail": "Template non trovato"}, status=status.HTTP_404_NOT_FOUND)
+            # return Response({"status": "rescan triggered"})
+
+        serializer = UploadDiskSerializer(data=request.data)
+        # TODO
+        serializer.is_valid()
+        # if not serializer.is_valid():
+        #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+        f = serializer.validated_data['file']
+        checksum = hashlib.md5()
+        for chunk in f.chunks():
+            checksum.update(chunk)
+        f.seek(0)
+
+        disk_filename = f"{template.name}.vma"
+        path = default_storage.save(f'{template.vendor}-{template.os}/{disk_filename}'.lower(), f)
+        url = default_storage.url(path)
+
+        disk = {
+            "filename": disk_filename,
+            "checksum": checksum.hexdigest(),
+            "url": url
+        }
+
+        # Aggiorna la lista disks del template (aggiunge il nuovo file)
+        template.disk_checksum = checksum.hexdigest()
+        template.save()
+
+        return Response({"disk": disk}, status=status.HTTP_201_CREATED)
+
+
+
 class NodeTemplateListView(BaseListView):
     model = NodeTemplate
     table_class = NodeTemplateTable
@@ -64,9 +111,20 @@ class NodeTemplateDetailView(ObjectDetailView):
 class NodeTemplateCreateView(ObjectCreateView):
     model = NodeTemplate
     form_class = NodeTemplateForm
+    # attrs = {
+    #     # "title": messages.TABLE_TEMPLATE_TITLE,
+    #     # "description": messages.TABLE_TEMPLATE_DESCRIPTION,
+    #     "actions": [
+    #         {
+    #             "action": "Add disk",
+    #             "view": "template_disk",
+    #         },
+    #     ],
+    # }
     def get_success_url(self):
         # instance è l'oggetto appena creato
         return reverse('template_detail', kwargs={'pk': self.object.pk})
+    
 
 class NodeTemplateChangeView(ObjectChangeView):
     model = NodeTemplate

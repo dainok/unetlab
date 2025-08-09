@@ -29,9 +29,6 @@ class NodeTemplate(models.Model):
         validators=[AlphanumericValidator],
         help_text=_("Template name."),
     )
-    checksum = models.CharField(
-        max_length=255, verbose_name=_("Checksum"), help_text=_("Template checksum."), editable=False,
-    )
     os = models.CharField(
         max_length=255, verbose_name=_("OS"), help_text=_("Template Operating System."), 
         validators=[AlphanumericValidator],
@@ -68,10 +65,13 @@ class NodeTemplate(models.Model):
         verbose_name=_("Management interface"),
         help_text=_("Management interface, starting from 0."),
     )
-    disks = models.JSONField(
-        default=list,
-        verbose_name=_("Disks"),
-        help_text=_("List of URI to download disks."), editable=False
+    disk_checksum = models.CharField(
+        max_length=255,
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name=_("Disk checksum"),
+        help_text=_("MD5 hash."), editable=False
     )
     username = models.CharField(
         max_length=255, verbose_name=_("Username"), help_text=_("Username to login."),
