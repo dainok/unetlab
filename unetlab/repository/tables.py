@@ -27,26 +27,26 @@ class RepositoryTable(tables.Table):
             "description": messages.TABLE_REPOSITORY_DESCRIPTION,
             "detail_view": "repository_detail",
             "actions": [
-                {
-                    "action": "Add",
-                    "method": "POST",
-                    "view": "repository-add",
-                },
-                {
-                    "action": "Delete",
-                    "method": "POST",
-                    "view": "repository-add",
-                },
-                {
-                    "action": "Disable",
-                    "method": "POST",
-                    "view": "repository-disable",
-                },
-                {
-                    "action": "Enable",
-                    "method": "POST",
-                    "view": "repository-enable",
-                },
+                # {
+                #     "action": "Add",
+                #     "method": "POST",
+                #     "view": "repository-add",
+                # },
+                # {
+                #     "action": "Delete",
+                #     "method": "POST",
+                #     "view": "repository-add",
+                # },
+                # {
+                #     "action": "Disable",
+                #     "method": "POST",
+                #     "view": "repository-disable",
+                # },
+                # {
+                #     "action": "Enable",
+                #     "method": "POST",
+                #     "view": "repository-enable",
+                # },
             ],
             "vip_actions": [
                 {

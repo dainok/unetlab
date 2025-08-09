@@ -12,6 +12,7 @@ class NodeTemplateTable(tables.Table):
         exclude = [
             "select",
             # "actions",
+            "id",
             "name",
             "checksum",
             "mgmt",
@@ -30,14 +31,13 @@ class NodeTemplateTable(tables.Table):
             "actions": [
                 {
                     "action": "Add",
-                    "method": "POST",
-                    "view": "template-add",
+                    "view": "template_create",
                 },
-                {
-                    "action": "Delete",
-                    "method": "POST",
-                    "view": "template-delete",
-                },
+                # {
+                #     "action": "Delete",
+                #     "method": "POST",
+                #     "view": "template-delete",
+                # },
             ],
         }
 

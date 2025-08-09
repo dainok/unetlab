@@ -14,6 +14,8 @@ from node.filters import NodeTemplateFilter
 from django_tables2 import SingleTableView
 from node.tables import NodeTemplateTable
 from ui.views import ObjectDetailView, ObjectChangeView, ObjectCreateView
+from django.urls import reverse
+from node.forms import NodeTemplateForm
 
 # from node.tasks import do_rescan
 from unetlab.utils import db_fields_to_dict
@@ -61,9 +63,14 @@ class NodeTemplateDetailView(ObjectDetailView):
 
 class NodeTemplateCreateView(ObjectCreateView):
     model = NodeTemplate
+    form_class = NodeTemplateForm
+    def get_success_url(self):
+        # instance è l'oggetto appena creato
+        return reverse('template_detail', kwargs={'pk': self.object.pk})
 
 class NodeTemplateChangeView(ObjectChangeView):
     model = NodeTemplate
+    form_class = NodeTemplateForm
     # fields = '__all__'
     # template_name = 'object_form.html'
     # success_url = reverse_lazy('home')

@@ -76,11 +76,9 @@ class ObjectDetailView(DetailView):
         return context
 
 class ObjectCreateView(CreateView):
-    fields = '__all__'
     template_name = 'objects/object_form.html'
     # success_url = reverse_lazy('home')
 
 class ObjectChangeView(UpdateView):
-    fields = '__all__'
     template_name = 'objects/object_form.html'
     # success_url = reverse_lazy('home')

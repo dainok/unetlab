@@ -23,7 +23,6 @@ class NodeTemplate(models.Model):
         editable=False,
     )
     name = models.CharField(
-        primary_key=True,
         max_length=255,
         editable=False,
         verbose_name=_("Name"),
@@ -55,23 +54,19 @@ class NodeTemplate(models.Model):
     )
     cpu = models.IntegerField(
         default=1, verbose_name=_("CPU"), help_text=_("Minimum CPU required."),
-        validators=[DecimalValidator]
     )
     ram = models.IntegerField(
         default=2, verbose_name=_("RAM"), help_text=_("Minimum GB of RAM required."),
-        validators=[DecimalValidator]
     )
     nics = models.IntegerField(
         default=4,
         verbose_name=_("NIC"),
         help_text=_("Template default network interfaces."),
-        validators=[DecimalValidator]
     )
     mgmt = models.IntegerField(
         default=0,
         verbose_name=_("Management interface"),
         help_text=_("Management interface, starting from 0."),
-        validators=[DecimalValidator]
     )
     disks = models.JSONField(
         default=list,
