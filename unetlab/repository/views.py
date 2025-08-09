@@ -58,7 +58,7 @@ class RepositoryDetailView(ObjectDetailView):
     # is_enabled = GreenRedBooleanColumn()
 
 
-class RepositoriesRescanView(APIView):
+class RepositoriesRescanAPIView(APIView):
     """Manage rescan action."""
 
     permission_classes = [IsAuthenticated, IsAdminOrStaff]

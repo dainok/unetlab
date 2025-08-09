@@ -44,6 +44,10 @@ class LoginRequiredMiddleware:
         if request.path.startswith("/admin/"):
             return self.get_response(request)
 
+        # Allow Django files
+        if request.path.startswith(settings.MEDIA_URL):
+            return self.get_response(request)
+
         # For other URLs, check authentication
         if not request.user.is_authenticated:
             resolver_match = resolve(request.path)

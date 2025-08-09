@@ -7,7 +7,7 @@ from repository.views import (
     RepositoryViewSet,
     RepositoryListView,
     RepositoryDetailView,
-    RepositoriesRescanView,
+    RepositoriesRescanAPIView,
 )
 
 # DRF router for API endpoints of Repository viewsets
@@ -24,7 +24,7 @@ urlpatterns = [
     # Custom API endpoints
     path(
         "api/repository/rescan/",
-        RepositoriesRescanView.as_view(),
+        RepositoriesRescanAPIView.as_view(),
         name="repository-rescan",
     ),
     # Include API routes from DRF router

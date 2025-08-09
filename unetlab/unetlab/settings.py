@@ -268,8 +268,10 @@ DJANGO_TABLES2_MAX_PAGE_SIZE = REST_FRAMEWORK["MAX_PAGE_SIZE"]
 DJANGO_TABLES2_TEMPLATE = "unetlab/tables/table_full.html"
 
 # ==============================================================================
-# CRISPY SETTINGS
+# FILE UPLOAD
 # ==============================================================================
 
-CRISPY_ALLOWED_TEMPLATE_PACKS = ["bootstrap5"]
-CRISPY_TEMPLATE_PACK = "bootstrap5"
+FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440
+DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600
+MEDIA_ROOT = BASE_DIR / ".." / "uploads"
+MEDIA_URL = "/files/"
