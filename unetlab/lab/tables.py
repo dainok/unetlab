@@ -1,14 +1,14 @@
 import django_tables2 as tables
-from node.models import NodeTemplate
+from lab.models import Lab
 from ui import messages
 
 
-class NodeTemplateTable(tables.Table):
+class LabTable(tables.Table):
     created_at = tables.DateColumn(orderable=True, format="Y-m-d")
     updated_at = tables.DateColumn(orderable=True, format="Y-m-d H:i")
 
     class Meta:
-        model = NodeTemplate
+        model = Lab
         exclude = [
             "select",
             # "actions",
@@ -42,12 +42,12 @@ class NodeTemplateTable(tables.Table):
         }
 
 
-class NodeTemplateHomeTable(tables.Table):
+class LabHomeTable(tables.Table):
     created_at = tables.DateColumn(orderable=True, format="Y-m-d")
     updated_at = tables.DateColumn(orderable=True, format="Y-m-d H:i")
 
     class Meta:
-        model = NodeTemplate
+        model = Lab
         exclude = ["select", "actions", "name"]
         order_by = ["vendor", "os", "version", "extra"]
         attrs = {

@@ -53,8 +53,8 @@ class RepositoryListView(BaseListView):
 
 class RepositoryDetailView(ObjectDetailView):
     model = Repository
-    exclude=["id"]
-    sequence=["name", "created_at", "description"]
+    exclude = ["id"]
+    sequence = ["name", "created_at", "description"]
     # is_enabled = GreenRedBooleanColumn()
 
 
@@ -66,6 +66,3 @@ class RepositoriesRescanAPIView(APIView):
     def post(self, request):
         do_rescan(username=request.user.username)
         return Response({"status": "rescan triggered"})
-
-
-

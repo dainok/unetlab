@@ -49,8 +49,8 @@ class LoginRequiredMiddleware:
         if request.path.startswith(settings.MEDIA_URL):
             # return self.get_response(request)
             # Recupera token dall'header Authorization
-            auth_header = request.META.get('HTTP_AUTHORIZATION', '')
-            if auth_header.startswith('Token '):
+            auth_header = request.META.get("HTTP_AUTHORIZATION", "")
+            if auth_header.startswith("Token "):
                 token_key = auth_header.split()[1]
                 try:
                     token = Token.objects.get(key=token_key)
@@ -58,9 +58,11 @@ class LoginRequiredMiddleware:
                     return self.get_response(request)
                 except Token.DoesNotExist:
                     from django.http import HttpResponseForbidden
+
                     return HttpResponseForbidden("Token non valido")
             else:
                 from django.http import HttpResponseForbidden
+
                 return HttpResponseForbidden("Token mancante")
 
         # For other URLs, check authentication

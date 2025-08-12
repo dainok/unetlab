@@ -11,7 +11,7 @@ from unetlab import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('favicon.ico', RedirectView.as_view(url="/static/unetlab/favicon.ico")),
+    path("favicon.ico", RedirectView.as_view(url="/static/unetlab/favicon.ico")),
     path("", views.HomeView.as_view(), name="home"),
     # Authentication URLs (standard users cannot use admin/login.html)
     path(
@@ -31,6 +31,7 @@ urlpatterns = [
     path("", include("proxmox.urls")),
     path("", include("repository.urls")),
     path("", include("node.urls")),
+    path("", include("ui.urls")),
     # path("", include("ui.urls")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

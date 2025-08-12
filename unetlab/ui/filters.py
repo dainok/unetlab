@@ -1,5 +1,7 @@
-import django_filters
 from django.db.models import Q
+from django.contrib.auth.models import Group, User
+from rest_framework.authtoken.models import Token
+import django_filters
 
 
 class BaseSearchFilterSet(django_filters.FilterSet):
@@ -14,3 +16,7 @@ class BaseSearchFilterSet(django_filters.FilterSet):
         for field in self.search_fields:
             q_objects |= Q(**{f"{field}__icontains": value})
         return queryset.filter(q_objects)
+
+
+class GroupFilter(BaseSearchFilterSet):
+    search_fields = ["name"]

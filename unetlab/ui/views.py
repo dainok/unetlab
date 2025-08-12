@@ -6,15 +6,22 @@ from django.utils.module_loading import import_string
 from django_tables2.columns import Column
 from django_tables2 import TemplateColumn
 from django.template import Template, Context
+from django.contrib.auth.models import Group, User
+from rest_framework.authtoken.models import Token
+from unetlab.views import CommonMixin, BaseListView
+from ui.tables import UserTable, GroupTable, TokenTable
+from django.core.exceptions import PermissionDenied
+from rest_framework import viewsets, permissions
+from ui.serializers import UserSerializer
+from django_filters.rest_framework import DjangoFilterBackend
+from ui.forms import UserForm, GroupForm, TokenForm
+from ui.filters import GroupFilter
 
 
 class ObjectDetailView(DetailView):
     exclude = []
     sequence = []
-    attrs = {
-        "title": "",
-        "description": ""
-    }
+    attrs = {"title": "", "description": ""}
     template_name = "objects/object_detail.html"
     list_view = None
 
@@ -66,7 +73,6 @@ class ObjectDetailView(DetailView):
                     ordered_data[k] = data[k]
             data = ordered_data
 
-
         context["object"] = data
         context["attrs"] = {
             "title": self.attrs.get("title", ""),
@@ -75,10 +81,148 @@ class ObjectDetailView(DetailView):
         context["list_view"] = self.get_list_view()
         return context
 
+
 class ObjectCreateView(CreateView):
-    template_name = 'objects/object_form.html'
+    template_name = "objects/object_form.html"
     # success_url = reverse_lazy('home')
 
+
 class ObjectChangeView(UpdateView):
-    template_name = 'objects/object_form.html'
+    template_name = "objects/object_form.html"
     # success_url = reverse_lazy('home')
+
+
+class UserQueryMixin:
+    """Mixin to encapsulate common Job queryset and permissions logic.
+
+    Used by both UI and API views.
+    """
+
+    def get_queryset(self):
+        """Return a filtered queryset annotated with log count.
+
+        - Staff and superusers see all jobs.
+        - Regular users only see their own jobs.
+        """
+        qs = super().get_queryset()
+        user = self.request.user
+        if user.is_staff or user.is_superuser:
+            return qs
+        return qs.filter(username=user.username)
+
+    def get_object(self):
+        """Return object only if user has permission."""
+        obj = super().get_object()
+        user = self.request.user
+        if user.is_staff or user.is_superuser or obj.username == user.username:
+            return obj
+        raise PermissionDenied("You do not have permission to access this object.")
+
+
+class UserViewSet(
+    UserQueryMixin,
+    viewsets.ModelViewSet,
+):
+    """REST API endpoints for Job model."""
+
+    serializer_class = UserSerializer
+    # filterset_class = UserFilter
+    filter_backends = [DjangoFilterBackend]
+
+
+class UserListView(UserQueryMixin, BaseListView):
+    model = User
+    table_class = UserTable
+    # filterset_class = ProxmoxHostFilter
+    list_view = "user_list"
+
+
+class UserDetailView(CommonMixin, ObjectDetailView):
+    """HTML detail view for a single ProxmoxHost."""
+
+    model = User
+    list_view = "user_list"
+    # exclude=["id"]
+    # sequence=["name", "created_at", "description"]
+
+
+class UserCreateView(ObjectCreateView):
+    model = User
+    form_class = UserForm
+
+    # attrs = {
+    #     # "title": messages.TABLE_TEMPLATE_TITLE,
+    #     # "description": messages.TABLE_TEMPLATE_DESCRIPTION,
+    #     "actions": [
+    #         {
+    #             "action": "Add disk",
+    #             "view": "template_disk",
+    #         },
+    #     ],
+    # }
+    def get_success_url(self):
+        # instance è l'oggetto appena creato
+        return reverse("user_detail", kwargs={"pk": self.object.pk})
+
+
+class UserChangeView(ObjectChangeView):
+    model = User
+    form_class = UserForm
+    # fields = '__all__'
+    # template_name = 'object_form.html'
+    # success_url = reverse_lazy('home')
+
+
+# class GroupViewSet(ViewSet):
+#     """REST API endpoints for Log model."""
+
+#     serializer_class = LogSerializer
+#     filterset_class = LogFilter
+#     filter_backends = [DjangoFilterBackend]
+#     queryset = Log.objects.all()
+
+
+class GroupListView(BaseListView):
+    model = Group
+    table_class = GroupTable
+    filterset_class = GroupFilter
+    list_view = "group_list"
+    search = True
+
+
+class GroupDetailView(ObjectDetailView):
+    """HTML detail view for a single ProxmoxHost."""
+
+    model = Group
+    list_view = "group_list"
+    # exclude=["id"]
+    # sequence=["name", "created_at", "description"]
+
+
+class GroupCreateView(ObjectCreateView):
+    model = Group
+    form_class = GroupForm
+
+
+class GroupChangeView(ObjectChangeView):
+    model = Group
+    form_class = GroupForm
+    # fields = '__all__'
+    # template_name = 'object_form.html'
+    # success_url = reverse_lazy('home')
+
+
+class TokenListView(BaseListView):
+    model = Token
+    table_class = TokenTable
+    # filterset_class = ProxmoxHostFilter
+    list_view = "token_list"
+
+
+class TokenDetailView(ObjectDetailView):
+    """HTML detail view for a single ProxmoxHost."""
+
+    model = Token
+    list_view = "token_detail"
+    # exclude=["id"]
+    # sequence=["name", "created_at", "description"]

@@ -35,7 +35,6 @@ class CommonListMixin:
     actions = []  # General actions (e.g., 'delete', 'add')
     vip_actions = []  # VIP actions (e.g., 'host-rescan')
 
-
     def get_context_data(self, **kwargs):
         """Add latest logs to context."""
         # TODO: not working
@@ -64,7 +63,7 @@ class BaseListView(CommonMixin, CommonListMixin, SingleTableView, FilterView):
         table = super().get_table(**kwargs)
         print("paginate_by in view:", self.get_paginate_by(table.data))
         return table
-    
+
     def get_paginate_by(self, queryset):
         # PAGINATE NOT WORKING TODO
         """Allow client to customize pagination via 'per_page' query param.

@@ -15,4 +15,3 @@ def is_active(context, *view_names):
     if current_view in view_names:
         return " active"
     return ""
-

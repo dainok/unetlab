@@ -2,6 +2,11 @@
 
 from django.utils.translation import gettext_lazy as _
 
+# Messages
+ADD = _("Add")
+DELETE = _("Delete")
+VIEW = _("View")
+
 # Tables
 TABLE_LOG_TITLE = _("Logs")
 TABLE_LOG_DESCRIPTION = _("All system logs.")
@@ -13,6 +18,10 @@ TABLE_REPOSITORY_TITLE = _("Repositories")
 TABLE_REPOSITORY_DESCRIPTION = _("All repositories.")
 TABLE_TEMPLATE_TITLE = _("Templates")
 TABLE_TEMPLATE_DESCRIPTION = _("All templates.")
+TABLE_GROUP_TITLE = _("Groups")
+TABLE_GROUP_DESCRIPTION = _("All groups.")
+TABLE_USER_TITLE = _("Users")
+TABLE_USER_DESCRIPTION = _("All users.")
 
 # Generic job/task messages
 JOB_TASK_CANCELED = _("Job canceled due to stale status.")

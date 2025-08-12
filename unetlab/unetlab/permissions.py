@@ -1,5 +1,5 @@
 from rest_framework.permissions import BasePermission
-from unetlab import messages
+from ui import messages
 
 
 class IsAdminOrStaff(BasePermission):

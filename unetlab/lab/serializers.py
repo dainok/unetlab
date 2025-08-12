@@ -1,20 +1,16 @@
 """Serializers, called by API View."""
 
 from rest_framework import serializers
-from node.models import NodeTemplate
+from lab.models import Labs
 
 
-class NodeTemplateSerializer(serializers.ModelSerializer):
+class LabSerializer(serializers.ModelSerializer):
     """Serializer for Template model."""
 
     class Meta:
-        model = NodeTemplate
+        model = Lab
         fields = "__all__"
         read_only_fields = [
             "created_at",
             "updated_at",
         ]  # Make some fields read-only
-
-
-class UploadDiskSerializer(serializers.Serializer):
-    file = serializers.FileField()

@@ -47,7 +47,6 @@ class NodeTemplateViewSet(
     queryset = NodeTemplate.objects.all()
 
 
-
 class DiskTemplateCreateAPIView(APIView):
     """Add disk."""
 
@@ -58,7 +57,7 @@ class DiskTemplateCreateAPIView(APIView):
         # TODO
         # if not template:
         #     return Response({"detail": "Template non trovato"}, status=status.HTTP_404_NOT_FOUND)
-            # return Response({"status": "rescan triggered"})
+        # return Response({"status": "rescan triggered"})
 
         serializer = UploadDiskSerializer(data=request.data)
         # TODO
@@ -66,22 +65,19 @@ class DiskTemplateCreateAPIView(APIView):
         # if not serializer.is_valid():
         #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-        f = serializer.validated_data['file']
+        f = serializer.validated_data["file"]
         checksum = hashlib.md5()
         for chunk in f.chunks():
             checksum.update(chunk)
         f.seek(0)
 
         disk_filename = f"{template.name}.vma"
-        path = default_storage.save(f'{template.vendor}-{template.os}/{disk_filename}'.lower(), f)
+        path = default_storage.save(
+            f"{template.vendor}-{template.os}/{disk_filename}".lower(), f
+        )
         url = default_storage.url(path)
 
-        disk = {
-            "filename": disk_filename,
-            "checksum": checksum.hexdigest(),
-            "url": url
-        }
+        disk = {"filename": disk_filename, "checksum": checksum.hexdigest(), "url": url}
 
         # Upload
         # curl -X POST -H "Authorization: Token d94fef88dbd7c4f70cdec97e880ea7b92286bde0" -F "file=@repositories/vyos/vyos/vzdump-qemu-vyos-vyos-2025.07.28-0022.vma" http://localhost:8000/api/template/6/disk
@@ -95,7 +91,6 @@ class DiskTemplateCreateAPIView(APIView):
         return Response({"disk": disk}, status=status.HTTP_201_CREATED)
 
 
-
 class NodeTemplateListView(BaseListView):
     model = NodeTemplate
     table_class = NodeTemplateTable
@@ -106,16 +101,16 @@ class NodeTemplateListView(BaseListView):
 
 class NodeTemplateDetailView(ObjectDetailView):
     model = NodeTemplate
-    exclude=["id"]
-    sequence=["name", "created_at", "description"]
+    exclude = ["id"]
+    sequence = ["name", "created_at", "description"]
     list_view = "template_list"
     # is_enabled = GreenRedBooleanColumn()
-
 
 
 class NodeTemplateCreateView(ObjectCreateView):
     model = NodeTemplate
     form_class = NodeTemplateForm
+
     # attrs = {
     #     # "title": messages.TABLE_TEMPLATE_TITLE,
     #     # "description": messages.TABLE_TEMPLATE_DESCRIPTION,
@@ -128,8 +123,8 @@ class NodeTemplateCreateView(ObjectCreateView):
     # }
     def get_success_url(self):
         # instance è l'oggetto appena creato
-        return reverse('template_detail', kwargs={'pk': self.object.pk})
-    
+        return reverse("template_detail", kwargs={"pk": self.object.pk})
+
 
 class NodeTemplateChangeView(ObjectChangeView):
     model = NodeTemplate

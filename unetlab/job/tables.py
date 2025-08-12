@@ -1,7 +1,7 @@
 import django_tables2 as tables
 from job.models import Log, Job
 from ui.tables import GreenBooleanColumn, SeverityAllColumn
-from unetlab import messages
+from ui import messages
 
 
 class JobTable(tables.Table):

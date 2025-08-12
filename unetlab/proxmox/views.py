@@ -48,9 +48,9 @@ class ProxmoxHostListView(BaseListView):
     list_view = "host_list"
 
 
-
 class ProxmoxHostDetailView(ObjectDetailView):
     """HTML detail view for a single ProxmoxHost."""
+
     model = ProxmoxHost
     list_view = "host_list"
     # exclude=["id"]

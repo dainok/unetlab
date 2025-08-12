@@ -46,8 +46,6 @@ class JobQueryMixin:
         raise PermissionDenied("You do not have permission to access this object.")
 
 
-
-
 class JobViewSet(
     JobQueryMixin,
     mixins.ListModelMixin,  # GET /job/
@@ -150,8 +148,6 @@ class LogListView(BaseListView):
     table_class = LogTable
     filterset_class = LogFilter
     vip_actions = ["acknowledge"]
-
-        
 
 
 class LogDetailView(LogQueryMixin, CommonMixin, DetailView):

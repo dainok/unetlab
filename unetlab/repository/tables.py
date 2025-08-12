@@ -1,7 +1,8 @@
 import django_tables2 as tables
 from repository.models import Repository
-from unetlab import messages
+from ui import messages
 from ui.tables import GreenRedBooleanColumn, GreenRedReverseBooleanColumn
+
 
 class RepositoryTable(tables.Table):
     name = tables.LinkColumn(

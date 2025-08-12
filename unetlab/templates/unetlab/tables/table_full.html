@@ -30,7 +30,7 @@
                         </form>
                         {% endif %}
                         <!-- Actions -->
-                         {% if table.attrs.actions %}
+                         {% if table.attrs.table_actions %}
                         <div class="dropdown">
                             <a href="#" class="btn" data-bs-toggle="dropdown">
                                 <!-- Download SVG icon from http://tabler.io/icons/icon/dots -->
@@ -43,21 +43,24 @@
                                 </svg>
                             </a>
                             <div class="dropdown-menu">
-                                {% for action in table.attrs.actions %}
-                                <a class="dropdown-item" href="{% url action.view %}">{{ action.action }}</a>
+                                {% for action in table.attrs.table_actions %}
+                                {% if action.view %}
+                                <a class="dropdown-item" href="{% url action.view %}">{{ action.button }}</a>
+                                {% elif action.js %}
+                                <a class="dropdown-item" href="#" onclick="{{ action.js }}">{{ action.button }}</a>
+                                {% endif %}
                                 {% endfor %}
                             </div>
                         </div>
                         {% endif %}
-                        {% if table.attrs.vip_actions %}
-                        {% for action in table.attrs.vip_actions %}
-                        {% if action.js %}
-                        <form id="{{ action.action | lower }}-form">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-primary" onclick="{{ action.js }}">
-                                {% translate "Rescan" %}
-                            </button>
-                        </form>
+                        {% if table.attrs.table_vip_actions %}
+                        {% for action in table.attrs.table_vip_actions %}
+                        {% if action.view %}
+                        <a href="{% url action.view %}" class="btn btn-1">{{ action.button }}</a>
+                        {% elif action.js %}
+                        <button type="submit" class="btn btn-primary" onclick="{{ action.js }}">
+                            {{ action.button }}
+                        </button>
                         {% endif %}
                         {% endfor %}
                         {% endif %}
