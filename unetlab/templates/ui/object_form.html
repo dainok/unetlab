@@ -1,4 +1,4 @@
-{% extends "unetlab/base.html" %}
+{% extends "ui/base.html" %}
 {% block title %}UNetLab | {{ object.name }} > Detail{% endblock title %}
 {% block page_title %}{{ object.name }} > Detail{% endblock page_title %}
 {% block page_body %}
@@ -16,15 +16,16 @@
                     </div>
                 </div>
                 {% endif %}
+                
                 <div class="card-body">
                     {% csrf_token %}
-            {% if form.errors and form.non_field_errors %}
-            <div class="alert alert-danger">
-                {% for error in form.non_field_errors %}
-                {{ error }}
-                {% endfor %}
-            </div>
-            {% endif %}
+                    {% if form.errors and form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        {{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                     {% for field in form %}
                     <div class="mb-3 row">
                         <label for="{{ field.id_for_label }}" class="col-3 col-form-label required">
@@ -41,6 +42,7 @@
                     </div>
                     {% endfor %}
                 </div>
+                
                 <div class="card-footer">
                     <div class="d-flex">
                         <button type="submit" class="btn btn-primary">

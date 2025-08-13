@@ -1,4 +1,4 @@
-{% extends "unetlab/base.html" %}
+{% extends "ui/base.html" %}
 {% load render_table from django_tables2 %}
 {% block title %}UNetLab | {{ table.attrs.title }} > List{% endblock title %}
 {% block page_title %}{{ table.attrs.title }} > List{% endblock page_title %}
@@ -8,7 +8,7 @@
 </div>
 {% if filter.form.visible_fields|length > 0 and filter.form.visible_fields.0.name != 'search' %}
 <div class="col-lg-3">
-    {% include "unetlab/tables/filters.html" %}
+    {% include "ui/tables/filters.html" %}
 </div>
 {% endif %}
 {% endblock page_body %}

@@ -1,4 +1,4 @@
-{% extends "unetlab/base.html" %}
+{% extends "ui/base.html" %}
 {% block title %}UNetLab | {{ object.name }} > Detail{% endblock title %}
 {% block page_title %}{{ object.name }} > Detail{% endblock page_title %}
 {% block page_body %}
@@ -15,6 +15,7 @@
                 </div>
             </div>
             {% endif %}
+
             <div class="card-body">
                 <div class="datagrid">
                     {% for field, value in object.items %}
@@ -25,6 +26,7 @@
                     {% endfor %}
                 </div>
             </div>
+            
             <div class="card-footer">
                 <div class="d-flex">
                     <a href="{% url list_view %}" class="btn btn-primary ms-auto">Back to list</a>

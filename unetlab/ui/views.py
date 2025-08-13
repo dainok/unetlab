@@ -1,28 +1,35 @@
-from typing import Any
-from django import forms
-from django.views.generic.detail import DetailView
-from django.views.generic.edit import UpdateView, CreateView
-from django.utils.module_loading import import_string
-from django_tables2.columns import Column
-from django_tables2 import TemplateColumn
-from django.template import Template, Context
-from django.contrib.auth.models import Group, User
-from rest_framework.authtoken.models import Token
-from unetlab.views import CommonMixin, BaseListView
-from ui.tables import UserTable, GroupTable, TokenTable
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.contrib.auth.models import Group, User
+from django.views.generic.detail import DetailView
+from django.views.generic.edit import CreateView, UpdateView
+from rest_framework.authtoken.models import Token
 from rest_framework import viewsets, permissions
-from ui.serializers import UserSerializer
+from django_filters.views import FilterView
 from django_filters.rest_framework import DjangoFilterBackend
-from ui.forms import UserForm, GroupForm, TokenForm
+from django_tables2 import SingleTableView
+from django_tables2.columns import Column
 from ui.filters import GroupFilter
+from ui.forms import GroupForm, TokenForm, UserForm
+from ui.serializers import UserSerializer
+from ui.tables import GroupTable, TokenTable, UserTable
+from unetlab.views import CommonMixin, BaseListView, LogListMixin
 
+
+class ObjectChangeView(UpdateView):
+    template_name = "ui/object_form.html"
+    # success_url = reverse_lazy('home')
+
+
+class ObjectCreateView(CreateView):
+    template_name = "ui/object_form.html"
+    # success_url = reverse_lazy('home')
 
 class ObjectDetailView(DetailView):
     exclude = []
     sequence = []
     attrs = {"title": "", "description": ""}
-    template_name = "objects/object_detail.html"
+    template_name = "ui/object_detail.html"
     list_view = None
 
     def get_list_view(self):
@@ -82,14 +89,57 @@ class ObjectDetailView(DetailView):
         return context
 
 
-class ObjectCreateView(CreateView):
-    template_name = "objects/object_form.html"
-    # success_url = reverse_lazy('home')
 
+class ObjectListView(LogListMixin, SingleTableView, FilterView):
+    """Base list view with tables2 and django-filters."""
 
-class ObjectChangeView(UpdateView):
-    template_name = "objects/object_form.html"
-    # success_url = reverse_lazy('home')
+    paginate_by = settings.DJANGO_TABLES2_PAGE_SIZE
+    template_name = "ui/object_list.html"
+
+    def get_table(self, **kwargs):
+        # PAGINATE NOT WORKING TODO
+        table = super().get_table(**kwargs)
+        print("paginate_by in view:", self.get_paginate_by(table.data))
+        return table
+
+    def get_paginate_by(self, queryset):
+        # PAGINATE NOT WORKING TODO
+        """Allow client to customize pagination via 'per_page' query param.
+
+        Enforces a maximum of DJANGO_TABLES2_MAX_PAGE_SIZE per page; defaults to DJANGO_TABLES2_PAGE_SIZE.
+        """
+        try:
+            per_page = int(self.request.GET.get("per_page", 0))
+            print(per_page)
+            if per_page <= 0:
+                return settings.DJANGO_TABLES2_PAGE_SIZE
+            print("FIX")
+            print(min(per_page, settings.DJANGO_TABLES2_MAX_PAGE_SIZE))
+            return min(per_page, settings.DJANGO_TABLES2_MAX_PAGE_SIZE)
+        except (TypeError, ValueError):
+            # return super().get_paginate_by(queryset)
+            return settings.DJANGO_TABLES2_PAGE_SIZE
+        # table = super().get_table(**kwargs)
+        # try:
+        #     per_page = int(self.request.GET.get("per_page", 0))
+        #     if per_page <= 0:
+        #         per_page = settings.DJANGO_TABLES2_PAGE_SIZE
+        #     else:
+        #         per_page = min(per_page, settings.DJANGO_TABLES2_MAX_PAGE_SIZE)
+        #         per_page = 5 # REMOVE TODO
+        # except (TypeError, ValueError):
+        #     per_page = settings.DJANGO_TABLES2_PAGE_SIZE
+        # print(per_page)
+        # RequestConfig(self.request, paginate={"per_page": per_page}).configure(table)
+        # return table
+
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     filterset = self.get_filterset(self.get_filterset_class())
+    #     context["filter"] = filterset
+    #     context["actions"] = self.get_actions()
+    #     context["vip_actions"] = self.get_vip_actions()
+    #     return context
 
 
 class UserQueryMixin:
@@ -130,7 +180,7 @@ class UserViewSet(
     filter_backends = [DjangoFilterBackend]
 
 
-class UserListView(UserQueryMixin, BaseListView):
+class UserListView(UserQueryMixin, ObjectListView):
     model = User
     table_class = UserTable
     # filterset_class = ProxmoxHostFilter
@@ -182,12 +232,15 @@ class UserChangeView(ObjectChangeView):
 #     queryset = Log.objects.all()
 
 
-class GroupListView(BaseListView):
+class GroupListView(ObjectListView):
     model = Group
     table_class = GroupTable
     filterset_class = GroupFilter
     list_view = "group_list"
     search = True
+    # model = Job
+    # table_class = JobTable
+    # filterset_class = JobFilter
 
 
 class GroupDetailView(ObjectDetailView):
@@ -197,7 +250,6 @@ class GroupDetailView(ObjectDetailView):
     list_view = "group_list"
     # exclude=["id"]
     # sequence=["name", "created_at", "description"]
-
 
 class GroupCreateView(ObjectCreateView):
     model = Group

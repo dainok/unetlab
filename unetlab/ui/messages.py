@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 ADD = _("Add")
 DELETE = _("Delete")
 VIEW = _("View")
+EDIT = _("Edit")
 
 # Tables
 TABLE_LOG_TITLE = _("Logs")

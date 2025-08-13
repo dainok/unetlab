@@ -27,7 +27,7 @@
         {% block page %}
         <!-- Navbar -->
         {% block navbar %}
-        {% include "unetlab/partials/navbar.html" %}
+        {% include "ui/partials/navbar.html" %}
         {% endblock navbar %}
         <div class="page-wrapper">
             <!-- Body -->
@@ -53,14 +53,14 @@
             {% endblock body %}
             <!-- Footer -->
             {% block footer %}
-            {% include "unetlab/partials/footer.html" %}
+            {% include "ui/partials/footer.html" %}
             {% endblock footer %}
         </div>
         {% endblock page %}
     </div>
     <!-- Modal -->
     {% block modal %}
-    {% include "unetlab/partials/modal.html" %}
+    {% include "ui/partials/modal.html" %}
     {% endblock modal %}
     <!-- Tabler Core -->
     <script src="{% static 'tabler/js/tabler.min.js' %}"></script>

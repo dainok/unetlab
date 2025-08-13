@@ -18,7 +18,7 @@ class BooleanColumn(tables.TemplateColumn):
     def __init__(self, *args, **kwargs):
         """
         Inizializza l'oggetto applicando il template."""
-        kwargs.setdefault("template_name", "unetlab/tables/column_boolean.html")
+        kwargs.setdefault("template_name", "ui/tables/column_boolean.html")
         super().__init__(*args, **kwargs)
 
 
@@ -36,7 +36,7 @@ class GreenBooleanColumn(tables.TemplateColumn):
     def __init__(self, *args, **kwargs):
         """
         Inizializza l'oggetto applicando il template."""
-        kwargs.setdefault("template_name", "unetlab/tables/column_boolean_green.html")
+        kwargs.setdefault("template_name", "ui/tables/column_boolean_green.html")
         super().__init__(*args, **kwargs)
 
 
@@ -56,7 +56,7 @@ class GreenRedBooleanColumn(tables.TemplateColumn):
         Inizializza l'oggetto applicando il template."""
 
         kwargs.setdefault(
-            "template_name", "unetlab/tables/column_boolean_green_red.html"
+            "template_name", "ui/tables/column_boolean_green_red.html"
         )
         super().__init__(*args, **kwargs)
 
@@ -76,7 +76,7 @@ class GreenRedReverseBooleanColumn(tables.TemplateColumn):
         """
         Inizializza l'oggetto applicando il template."""
         kwargs.setdefault(
-            "template_name", "unetlab/tables/column_boolean_green_red_reverse.html"
+            "template_name", "ui/tables/column_boolean_green_red_reverse.html"
         )
         super().__init__(*args, **kwargs)
 
@@ -95,7 +95,7 @@ class SeverityColumn(tables.TemplateColumn):
     def __init__(self, *args, **kwargs):
         """
         Inizializza l'oggetto applicando il template."""
-        kwargs.setdefault("template_name", "unetlab/tables/column_severity.html")
+        kwargs.setdefault("template_name", "ui/tables/column_severity.html")
         super().__init__(*args, **kwargs)
 
 
@@ -113,7 +113,7 @@ class SeverityAllColumn(tables.TemplateColumn):
     def __init__(self, *args, **kwargs):
         """
         Inizializza l'oggetto applicando il template."""
-        kwargs.setdefault("template_name", "unetlab/tables/column_severity_all.html")
+        kwargs.setdefault("template_name", "ui/tables/column_severity_all.html")
         super().__init__(*args, **kwargs)
 
 
@@ -191,7 +191,15 @@ class ObjectTable(tables.Table):
                 {
                     "button": messages.VIEW,
                     "view": f"{model_name}_detail",
-                }
+                },
+                {
+                    "button": messages.EDIT,
+                    "view": f"{model_name}_edit",
+                },
+                {
+                    "button": messages.DELETE,
+                    "view": f"{model_name}_delete",
+                },
             ]
             self.attrs["row_actions"] = row_actions
         if "table_actions" not in self.attrs:

@@ -11,7 +11,7 @@ from proxmox.tables import ProxmoxHostHomeTable
 from proxmox.models import ProxmoxHost
 
 
-class CommonMixin:
+class LogListMixin:
     """HTML list view with filtering and pagination."""
 
     def get_log_queryset(self):
@@ -29,7 +29,7 @@ class CommonMixin:
         return context
 
 
-class CommonListMixin:
+class CommonMixin:
     """HTML list view with filtering and pagination."""
 
     actions = []  # General actions (e.g., 'delete', 'add')
@@ -52,11 +52,11 @@ class CommonListMixin:
         return self.vip_actions
 
 
-class BaseListView(CommonMixin, CommonListMixin, SingleTableView, FilterView):
+class BaseListView(LogListMixin, SingleTableView, FilterView):
     """Base list view with tables2 and django-filters."""
 
     paginate_by = settings.DJANGO_TABLES2_PAGE_SIZE
-    template_name = "objects/object_list.html"
+    template_name = "ui/object_list.html"
 
     def get_table(self, **kwargs):
         # PAGINATE NOT WORKING TODO
@@ -95,13 +95,13 @@ class BaseListView(CommonMixin, CommonListMixin, SingleTableView, FilterView):
         # RequestConfig(self.request, paginate={"per_page": per_page}).configure(table)
         # return table
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        filterset = self.get_filterset(self.get_filterset_class())
-        context["filter"] = filterset
-        context["actions"] = self.get_actions()
-        context["vip_actions"] = self.get_vip_actions()
-        return context
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     filterset = self.get_filterset(self.get_filterset_class())
+    #     context["filter"] = filterset
+    #     context["actions"] = self.get_actions()
+    #     context["vip_actions"] = self.get_vip_actions()
+    #     return context
 
 
 class HomeView(CommonMixin, TemplateView):
@@ -111,7 +111,7 @@ class HomeView(CommonMixin, TemplateView):
     The template is loaded from: templates/unetlab/home.html
     """
 
-    template_name = "unetlab/home.html"
+    template_name = "home.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

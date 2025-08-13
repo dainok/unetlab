@@ -265,7 +265,7 @@ SOURCE = socket.gethostname().upper()
 
 DJANGO_TABLES2_PAGE_SIZE = REST_FRAMEWORK["PAGE_SIZE"]
 DJANGO_TABLES2_MAX_PAGE_SIZE = REST_FRAMEWORK["MAX_PAGE_SIZE"]
-DJANGO_TABLES2_TEMPLATE = "unetlab/tables/table_full.html"
+DJANGO_TABLES2_TEMPLATE = "ui/tables/table_full.html"
 
 # ==============================================================================
 # FILE UPLOAD
