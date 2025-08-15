@@ -16,8 +16,8 @@ from proxmox.tables import ProxmoxHostTable
 from proxmox.tasks import do_rescan
 from unetlab.utils import db_fields_to_dict
 from unetlab.views import CommonMixin, BaseListView
-from unetlab.permissions import IsAdminOrStaff
-from ui.views import ObjectDetailView
+from ui.include.permissions import IsAdminOrStaff
+from ui.include.views import ObjectDetailView
 
 
 class ProxmoxHostQueryMixin:

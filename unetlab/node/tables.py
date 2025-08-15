@@ -1,6 +1,6 @@
 import django_tables2 as tables
 from node.models import NodeTemplate
-from ui import messages
+from ui.include import messages
 
 
 class NodeTemplateTable(tables.Table):

@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.urls import reverse
 from repository.models import Repository
-from ui.validators import (
+from ui.include.validators import (
     AlphanumericValidator,
     VersionValidator,
     SimplePasswordalidator,

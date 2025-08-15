@@ -16,7 +16,7 @@ from job.filters import JobFilter, LogFilter
 from job.tables import LogTable, JobTable
 from unetlab.utils import db_fields_to_dict
 from unetlab.views import CommonMixin, BaseListView
-from ui.views import ObjectListView
+from ui.include.views import ObjectListView
 
 
 class JobQueryMixin:

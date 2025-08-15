@@ -18,9 +18,9 @@ from repository.tasks import do_rescan
 from repository.filters import RepositoryFilter
 from unetlab.utils import db_fields_to_dict
 from unetlab.views import CommonMixin, BaseListView
-from unetlab.permissions import IsAdminOrStaff
-from ui.views import ObjectDetailView
-from ui.tables import GreenRedBooleanColumn
+from ui.include.permissions import IsAdminOrStaff
+from ui.include.views import ObjectDetailView
+from ui.include.tables import GreenRedBooleanColumn
 
 
 class RepositoryQueryMixin:

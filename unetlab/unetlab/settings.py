@@ -179,7 +179,7 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.TokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ],
-    "DEFAULT_PAGINATION_CLASS": "ui.pagination.CustomPagination",
+    "DEFAULT_PAGINATION_CLASS": "ui.include.pagination.CustomPagination",
     "DEFAULT_RENDERER_CLASSES": [
         "unetlab.renderers.CustomJSONRenderer",
     ],

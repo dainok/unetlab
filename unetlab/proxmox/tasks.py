@@ -10,7 +10,7 @@ from proxmoxer import ProxmoxAPI
 from proxmoxer.core import ResourceException
 from requests.exceptions import ConnectTimeout, ConnectionError, RequestException
 from constance import config
-from ui import messages
+from ui.include import messages
 from proxmox.models import ProxmoxHost
 from job.models import Job, JobStatusChoices
 from job.utils import log

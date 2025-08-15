@@ -1,7 +1,7 @@
 import django_tables2 as tables
 from proxmox.models import ProxmoxHost
-from ui.tables import GreenRedBooleanColumn, GreenRedReverseBooleanColumn
-from ui import messages
+from ui.include.tables import GreenRedBooleanColumn, GreenRedReverseBooleanColumn
+from ui.include import messages
 
 
 class ProxmoxHostTable(tables.Table):

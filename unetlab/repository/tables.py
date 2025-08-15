@@ -1,7 +1,7 @@
 import django_tables2 as tables
 from repository.models import Repository
-from ui import messages
-from ui.tables import GreenRedBooleanColumn, GreenRedReverseBooleanColumn
+from ui.include import messages
+from ui.include.tables import GreenRedBooleanColumn, GreenRedReverseBooleanColumn
 
 
 class RepositoryTable(tables.Table):

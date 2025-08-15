@@ -32,9 +32,11 @@
                             {{ field.label }}
                         </label>
                         <div class="col">
-                            <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" id="{{ field.id_for_label }}" class="form-control{% if field.errors %} is-invalid{% endif %}" aria-describedby="id_{{ field.name }}_helptext" aplaceholder="{{ field.label }}" value="{{ field.value|default:field.field.initial|default_if_none:'' }}">
+                            {{ field }}
                             {% if field.errors %}
-                            <div class="invalid-feedback">{{ field.help_text }} ({% for error in form.password.errors %}{{ error }}{% endfor %})</div>
+                            <div class="invalid-feedback">
+                                {{ field.help_text }} ({% for error in form.password.errors %}{{ error }}{% endfor %})
+                            </div>
                             {% elif field.help_text %}
                             <small id="id_{{ field.name }}_helptext" class="form-hint">{{ field.help_text }}</small>
                             {% endif %}
@@ -46,7 +48,7 @@
                 <div class="card-footer">
                     <div class="d-flex">
                         <button type="submit" class="btn btn-primary">
-                            {% if oggetto %}Aggiorna{% else %}Crea{% endif %}
+                            {% if object %}Update{% else %}Create{% endif %}
                         </button>
                     </div>
                 </div>

@@ -1,13 +1,7 @@
 from django import forms
 from django.contrib.auth.models import Group, User
 from rest_framework.authtoken.models import Token
-
-
-class ObjectModelForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for visible in self.visible_fields():
-            visible.field.widget.attrs["class"] = "form-control"
+from ui.include.forms import ObjectModelForm
 
 
 class UserForm(ObjectModelForm):
@@ -20,7 +14,7 @@ class GroupForm(ObjectModelForm):
     users = forms.ModelMultipleChoiceField(
         queryset=User.objects.all(),
         required=False,
-        widget=forms.SelectMultiple(attrs={"size": "10"})
+        widget=forms.SelectMultiple
     )
 
     class Meta:

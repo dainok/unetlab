@@ -1,5 +1,5 @@
 from rest_framework.permissions import BasePermission
-from ui import messages
+from ui.include import messages
 
 
 class IsAdminOrStaff(BasePermission):

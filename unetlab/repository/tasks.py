@@ -12,7 +12,7 @@ from proxmoxer import ProxmoxAPI
 from proxmoxer.core import ResourceException
 from requests.exceptions import ConnectTimeout, ConnectionError, RequestException
 from constance import config
-from ui import messages
+from ui.include import messages
 from repository.models import Repository
 from node.models import NodeTemplate
 from job.models import Job, JobStatusChoices

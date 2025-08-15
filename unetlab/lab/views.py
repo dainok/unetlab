@@ -16,14 +16,14 @@ from node.serializers import LabSerializer, UploadDiskSerializer
 from node.filters import LabFilter
 from django_tables2 import SingleTableView
 from node.tables import LabTable
-from ui.views import ObjectDetailView, ObjectChangeView, ObjectCreateView
+from ui.include.views import ObjectDetailView, ObjectChangeView, ObjectCreateView
 from django.urls import reverse
 from node.forms import LabForm
 
 # from node.tasks import do_rescan
 from unetlab.utils import db_fields_to_dict
 from unetlab.views import CommonMixin, BaseListView
-from unetlab.permissions import IsAdminOrStaff
+from ui.include.permissions import IsAdminOrStaff
 
 
 class LabQueryMixin:

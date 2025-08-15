@@ -5,7 +5,7 @@ from django.db import models
 from django.urls import reverse
 from repository.models import Repository
 from node.models import Node
-from ui.validators import AlphanumericValidator, VersionValidator, SimplePasswordalidator, AlphanumericPhraseValidator
+from ui.include.validators import AlphanumericValidator, VersionValidator, SimplePasswordalidator, AlphanumericPhraseValidator
 from django.core.validators import DecimalValidator
 from django.contrib.auth.models import User, Group
 
