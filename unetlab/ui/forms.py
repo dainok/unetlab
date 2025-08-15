@@ -17,12 +17,33 @@ class UserForm(ObjectModelForm):
 
 
 class GroupForm(ObjectModelForm):
+    users = forms.ModelMultipleChoiceField(
+        queryset=User.objects.all(),
+        required=False,
+        widget=forms.SelectMultiple(attrs={"size": "10"})
+    )
+
     class Meta:
         model = Group
-        fields = ["name"]
+        fields = ["name", "users"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Precompila il campo users con quelli già nel gruppo
+        if self.instance.pk:
+            self.fields["users"].initial = self.instance.user_set.all()
+
+    def save(self, commit=True):
+        group = super().save(commit=False)
+        if commit:
+            group.save()
+            group.user_set.set(self.cleaned_data["users"])
+        return group
+
 
 
 class TokenForm(ObjectModelForm):
     class Meta:
         model = Token
         fields = "__all__"
+

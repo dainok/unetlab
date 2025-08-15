@@ -179,9 +179,10 @@ class ObjectTable(tables.Table):
                 messages, f"TABLE_{model_name.upper()}_DESCRIPTION"
             )
             self.attrs["description"] = default_description
-        if "detail_view" not in self.attrs:
-            default_detail_view = f"{model_name}_detail"
-            self.attrs["detail_view"] = default_detail_view
+        # TODO: delete, moved to row_actions
+        # if "detail_view" not in self.attrs:
+        #     default_detail_view = f"{model_name}_detail"
+        #     self.attrs["detail_view"] = default_detail_view
         if "search" not in self.attrs:
             self.attrs["search"] = True
 
@@ -194,11 +195,11 @@ class ObjectTable(tables.Table):
                 },
                 {
                     "button": messages.EDIT,
-                    "view": f"{model_name}_edit",
+                    "view": f"{model_name}_update",
                 },
                 {
                     "button": messages.DELETE,
-                    "view": f"{model_name}_delete",
+                    "js": f"{model_name}_delete",
                 },
             ]
             self.attrs["row_actions"] = row_actions
