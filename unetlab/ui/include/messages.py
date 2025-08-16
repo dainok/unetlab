@@ -1,42 +1,86 @@
-"""Centralized user-facing messages for UNetLab."""
+"""Centralized, user-facing messages for UNetLab.
+
+This module defines all the standardized messages used across
+the UI, API responses, and tables, to ensure consistency.
+"""
 
 from django.utils.translation import gettext_lazy as _
 
-# Actions
+
+#############################################################################
+# General actions
+#############################################################################
+
+
 ADD = _("Add")
 DELETE = _("Delete")
-VIEW = _("View")
 EDIT = _("Edit")
+VIEW = _("View")
 
+
+#############################################################################
 # Permissions
+#############################################################################
+
+
+PERMISSION_ADMIN = _("You must be an admin user to access this resource.")
 PERMISSION_DENIED = _("You do not have permission to access this object.")
+PERMISSION_STAFF = _("You must be a staff or admin user to access this resource.")
 
-# Tables
-TABLE_LOG_TITLE = _("Logs")
-TABLE_LOG_DESCRIPTION = _("All system logs.")
-TABLE_JOB_TITLE = _("Jobs")
-TABLE_JOB_DESCRIPTION = _("All jobs.")
-TABLE_HOST_TITLE = _("Hosts")
-TABLE_HOST_DESCRIPTION = _("All Proxmox hosts.")
-TABLE_REPOSITORY_TITLE = _("Repositories")
-TABLE_REPOSITORY_DESCRIPTION = _("All repositories.")
-TABLE_TEMPLATE_TITLE = _("Templates")
-TABLE_TEMPLATE_DESCRIPTION = _("All templates.")
+
+#############################################################################
+# Validators
+#############################################################################
+
+
+ALPHANUMERIC_PHRASE_ERROR = _(
+    "This field may only contain alphanumeric characters and spaces."
+)
+ALPHANUMERIC_ERROR = _("This field may only contain alphanumeric characters.")
+SIMPLE_PASSWORD_ERROR = _(
+    "Only letters, numbers, spaces, and common punctuation are allowed."
+)
+VERSION_ERROR = _("Only letters, numbers, dots, and hyphens are allowed.")
+
+
+#############################################################################
+# Table titles and descriptions
+#############################################################################
+
+
 TABLE_GROUP_TITLE = _("Groups")
-TABLE_GROUP_DESCRIPTION = _("All groups.")
+TABLE_GROUP_DESCRIPTION = _("List of all user groups in the system.")
+
+TABLE_HOST_TITLE = _("Hosts")
+TABLE_HOST_DESCRIPTION = _("List of all Proxmox hosts managed by the system.")
+
+TABLE_JOB_TITLE = _("Jobs")
+TABLE_JOB_DESCRIPTION = _("Displays all scheduled and completed jobs.")
+
+TABLE_LOG_TITLE = _("System Logs")
+TABLE_LOG_DESCRIPTION = _("Displays all system logs with relevant details.")
+
+TABLE_REPOSITORY_TITLE = _("Repositories")
+TABLE_REPOSITORY_DESCRIPTION = _("All configured repositories and their metadata.")
+
+TABLE_TEMPLATE_TITLE = _("Templates")
+TABLE_TEMPLATE_DESCRIPTION = _("All available templates for virtual machines.")
+
+
 TABLE_USER_TITLE = _("Users")
-TABLE_USER_DESCRIPTION = _("All users.")
+TABLE_USER_DESCRIPTION = _("List of all registered users.")
 
-# Generic job/task messages
-JOB_TASK_CANCELED = _("Job canceled due to stale status.")
 
-# Proxmox messages (grouped by context)
+#############################################################################
+# Job/task messages
+#############################################################################
+
+
+JOB_TASK_CANCELED = _("Job was canceled due to a stale or invalid status.")
+
 PROXMOX_TASK_RESCAN_COMPLETED = _(
     "Proxmox infrastructure rescan completed successfully."
 )
-PROXMOX_TASK_RESCAN_ENQUEUED = _("Proxmox infrastructure rescan enqueued.")
-PROXMOX_TASK_RESCAN_STARTED = _("Proxmox infrastructure rescan initiated.")
-PROXMOX_API_ERROR = _("Proxmox API request failed.")
-
-# Permissions
-PERMISSION_ADMIN = _("You must be a staff or admin user to access this resource.")
+PROXMOX_TASK_RESCAN_ENQUEUED = _("Proxmox infrastructure rescan has been queued.")
+PROXMOX_TASK_RESCAN_STARTED = _("Proxmox infrastructure rescan has started.")
+PROXMOX_API_ERROR = _("Failed to execute the request on the Proxmox API.")

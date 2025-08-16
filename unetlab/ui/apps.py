@@ -1,4 +1,4 @@
-"""App configuration."""
+"""Django application configuration for the UI app."""
 
 __author__ = "Andrea Dainese"
 __contact__ = "andrea@adainese.it"
@@ -9,7 +9,10 @@ from django.apps import AppConfig
 
 
 class UNetLabConfig(AppConfig):
-    """Config for UI app."""
+    """Application configuration for the `ui` app.
+
+    Defines metadata used by Django when loading the app.
+    """
 
     name = "ui"
     verbose_name = "User Interface"

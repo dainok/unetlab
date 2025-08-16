@@ -7,7 +7,7 @@ from repository.models import Repository
 from ui.include.validators import (
     AlphanumericValidator,
     VersionValidator,
-    SimplePasswordalidator,
+    SimplePasswordValidator,
 )
 from django.core.validators import DecimalValidator
 from proxmox.models import ProxmoxHost
@@ -99,7 +99,7 @@ class NodeTemplate(models.Model):
         max_length=255,
         verbose_name=_("Password"),
         help_text=_("Password to login."),
-        validators=[SimplePasswordalidator],
+        validators=[SimplePasswordValidator],
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

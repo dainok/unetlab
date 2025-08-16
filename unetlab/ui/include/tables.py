@@ -1,5 +1,3 @@
-from django.contrib.auth.models import Group, User
-from rest_framework.authtoken.models import Token
 import django_tables2 as tables
 from ui.include import messages
 
