@@ -59,6 +59,7 @@ class GroupTable(ObjectTable):
         # record è l'istanza di Group
         return ", ".join(user.username for user in record.user_set.all())
 
+
 class TokenTable(tables.Table):
     """Definisce la tabella Group e il formato delle colonne.
 

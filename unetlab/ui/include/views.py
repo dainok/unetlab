@@ -8,23 +8,41 @@ from django.urls import reverse, reverse_lazy
 from django_filters.views import FilterView
 from django_tables2 import SingleTableView
 from django_tables2.columns import Column
+from rest_framework.mixins import DestroyModelMixin, ListModelMixin, RetrieveModelMixin
+from rest_framework.viewsets import ModelViewSet
 from unetlab.views import CommonMixin, BaseListView, LogListMixin
+
+
+class APICRUDViewSet(ModelViewSet):
+    filterset_class = None
+    serializer_class = None
+    queryset = None
+
+
+class APIRDViewSet(DestroyModelMixin, ListModelMixin, RetrieveModelMixin):
+    filterset_class = None
+    serializer_class = None
+    queryset = None
 
 
 class ObjectChangeView(UpdateView):
     model = None
     template_name = "ui/object_form.html"
     form_class = None
+
     def get_success_url(self):
         model_name = self.model._meta.model_name
         return reverse(f"{model_name}_detail", kwargs={"pk": self.object.pk})
 
+
 class ObjectCreateView(CreateView):
     model = None
     template_name = "ui/object_form.html"
+
     def get_success_url(self):
         model_name = self.model._meta.model_name
         return reverse(f"{model_name}_list")
+
 
 class ObjectDeleteView(DeleteView):
     model = None
@@ -39,21 +57,20 @@ class ObjectBulkDeleteView(View):
     model = None
     template_name = "ui/object_confirm_delete.html"  # template di conferma
 
-
     def get_success_url(self):
         model_name = self.model._meta.model_name
         return reverse_lazy(f"{model_name}_list")
-    
 
     """
     Cancella più gruppi selezionati tramite checkbox in POST.
     """
+
     def post(self, request, *args, **kwargs):
         # 'selected_ids' sarà una lista di ID passata dal form
         ids = request.POST.getlist("selected_ids")
         if not ids:
             return redirect(self.get_success_url())
-            
+
         queryset = self.model.objects.filter(id__in=ids)
         if not queryset:
             return redirect(self.get_success_url())
@@ -63,9 +80,13 @@ class ObjectBulkDeleteView(View):
             return redirect(self.get_success_url())
 
         # altrimenti mostra la conferma
-        return render(request, self.template_name, {
-            "object_list": queryset,
-        })
+        return render(
+            request,
+            self.template_name,
+            {
+                "object_list": queryset,
+            },
+        )
 
 
 class ObjectDetailView(DetailView):
@@ -124,7 +145,6 @@ class ObjectDetailView(DetailView):
                     ordered_data[k] = data[k]
             data = ordered_data
 
-
         context["object"] = data
         context["attrs"] = {
             "title": self.attrs.get("title", ""),
@@ -133,7 +153,6 @@ class ObjectDetailView(DetailView):
         context["model_name"] = self.model._meta.model_name
         context["pk"] = obj.pk
         return context
-
 
 
 class ObjectListView(LogListMixin, SingleTableView, FilterView):
@@ -186,9 +205,8 @@ class ObjectListView(LogListMixin, SingleTableView, FilterView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["model_name"] = self.model._meta.model_name
-    #     filterset = self.get_filterset(self.get_filterset_class())
-    #     context["filter"] = filterset
-    #     context["actions"] = self.get_actions()
-    #     context["vip_actions"] = self.get_vip_actions()
+        #     filterset = self.get_filterset(self.get_filterset_class())
+        #     context["filter"] = filterset
+        #     context["actions"] = self.get_actions()
+        #     context["vip_actions"] = self.get_vip_actions()
         return context
-

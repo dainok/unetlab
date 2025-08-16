@@ -2,11 +2,14 @@
 
 from django.utils.translation import gettext_lazy as _
 
-# Messages
+# Actions
 ADD = _("Add")
 DELETE = _("Delete")
 VIEW = _("View")
 EDIT = _("Edit")
+
+# Permissions
+PERMISSION_DENIED = _("You do not have permission to access this object.")
 
 # Tables
 TABLE_LOG_TITLE = _("Logs")

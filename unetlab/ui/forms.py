@@ -12,9 +12,7 @@ class UserForm(ObjectModelForm):
 
 class GroupForm(ObjectModelForm):
     users = forms.ModelMultipleChoiceField(
-        queryset=User.objects.all(),
-        required=False,
-        widget=forms.SelectMultiple
+        queryset=User.objects.all(), required=False, widget=forms.SelectMultiple
     )
 
     class Meta:
@@ -35,9 +33,7 @@ class GroupForm(ObjectModelForm):
         return group
 
 
-
 class TokenForm(ObjectModelForm):
     class Meta:
         model = Token
         fields = "__all__"
-

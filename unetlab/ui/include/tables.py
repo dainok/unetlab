@@ -55,9 +55,7 @@ class GreenRedBooleanColumn(tables.TemplateColumn):
         """
         Inizializza l'oggetto applicando il template."""
 
-        kwargs.setdefault(
-            "template_name", "ui/tables/column_boolean_green_red.html"
-        )
+        kwargs.setdefault("template_name", "ui/tables/column_boolean_green_red.html")
         super().__init__(*args, **kwargs)
 
 
@@ -215,4 +213,3 @@ class ObjectTable(tables.Table):
                 },
             ]
             self.attrs["table_actions"] = table_actions
-

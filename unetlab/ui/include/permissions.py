@@ -12,6 +12,7 @@ class IsAdminOrStaff(BasePermission):
     def has_permission(self, request, view):
         return request.user and (request.user.is_staff or request.user.is_superuser)
 
+
 class IsAdmin(BasePermission):
     """
     Allows access only to admin users.
@@ -21,4 +22,3 @@ class IsAdmin(BasePermission):
 
     def has_permission(self, request, view):
         return request.user and request.user.is_superuser
-
