@@ -5,9 +5,15 @@ from django.db import models
 from django.urls import reverse
 from repository.models import Repository
 from node.models import Node
-from ui.include.validators import AlphanumericValidator, VersionValidator, SimplePasswordalidator, AlphanumericPhraseValidator
+from ui.include.validators import (
+    AlphanumericValidator,
+    VersionValidator,
+    SimplePasswordalidator,
+    AlphanumericPhraseValidator,
+)
 from django.core.validators import DecimalValidator
 from django.contrib.auth.models import User, Group
+
 
 class Lab(models.Model):
     """
@@ -22,10 +28,12 @@ class Lab(models.Model):
         help_text=_("Template name."),
     )
     hld = models.JSONField(
-        verbose_name=_("HLD"), help_text=_("High Level Design"),
+        verbose_name=_("HLD"),
+        help_text=_("High Level Design"),
     )
     lld = models.JSONField(
-        verbose_name=_("LLD"), help_text=_("Low Level Design"),
+        verbose_name=_("LLD"),
+        help_text=_("Low Level Design"),
     )
     instances = models.ForeignKey(
         Instance,
@@ -33,20 +41,11 @@ class Lab(models.Model):
         related_name="instances",
         blank=True,
     )
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="labs"
-    )
-    shared_groups = models.ManyToManyField(
-        Group,
-        related_name="labs",
-        blank=True
-    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="labs")
+    shared_groups = models.ManyToManyField(Group, related_name="labs", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-   
     class Meta:
         """Database metadata."""
 
@@ -69,23 +68,15 @@ class Instance(models.Model):
     Model for lab instance.
     """
 
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="labs"
-    )
-    nodes = models.ForeignKey(
-        Node,
-        on_delete=models.CASCADE,
-        related_name="labs"
-    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="labs")
+    nodes = models.ForeignKey(Node, on_delete=models.CASCADE, related_name="labs")
     running_lld = models.JSONField(
-        verbose_name=_("LLD"), help_text=_("Low Level Design"),
+        verbose_name=_("LLD"),
+        help_text=_("Low Level Design"),
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-   
     class Meta:
         """Database metadata."""
 

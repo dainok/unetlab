@@ -7,7 +7,7 @@ to enable users to filter Template and Log records by relevant fields.
 from django import forms
 import django_filters
 from node.models import NodeTemplate
-from ui.filters import BaseSearchFilterSet
+from ui.include.filters import SearchFilterSet
 
 
 class NodeTemplateFilter(django_filters.FilterSet):

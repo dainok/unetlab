@@ -7,7 +7,7 @@ to enable users to filter Job and Log records by relevant fields.
 from django import forms
 import django_filters
 from job.models import Job, JobStatusChoices, Log, LogSeverityChoices
-from ui.filters import BaseSearchFilterSet
+from ui.include.filters import SearchFilterSet
 
 
 class JobFilter(django_filters.FilterSet):
@@ -64,7 +64,7 @@ class JobFilter(django_filters.FilterSet):
         fields = ["username", "status", "created_at__gte", "created_at__lte"]
 
 
-class LogFilter(BaseSearchFilterSet):
+class LogFilter(SearchFilterSet):
     """FilterSet for filtering Log instances by severity, acknowledgment, and creation date.
 
     This filter supports:

@@ -47,7 +47,6 @@ class LabViewSet(
     queryset = Lab.objects.all()
 
 
-
 class LabListView(BaseListView):
     model = Lab
     table_class = LabTable
@@ -58,16 +57,16 @@ class LabListView(BaseListView):
 
 class LabDetailView(ObjectDetailView):
     model = Lab
-    exclude=["id"]
-    sequence=["name", "created_at", "description"]
+    exclude = ["id"]
+    sequence = ["name", "created_at", "description"]
     list_view = "template_list"
     # is_enabled = GreenRedBooleanColumn()
-
 
 
 class LabCreateView(ObjectCreateView):
     model = Lab
     form_class = LabForm
+
     # attrs = {
     #     # "title": messages.TABLE_TEMPLATE_TITLE,
     #     # "description": messages.TABLE_TEMPLATE_DESCRIPTION,
@@ -80,8 +79,8 @@ class LabCreateView(ObjectCreateView):
     # }
     def get_success_url(self):
         # instance è l'oggetto appena creato
-        return reverse('template_detail', kwargs={'pk': self.object.pk})
-    
+        return reverse("template_detail", kwargs={"pk": self.object.pk})
+
 
 class LabChangeView(ObjectChangeView):
     model = Lab

@@ -16,7 +16,7 @@
                     </div>
                 </div>
                 {% endif %}
-                
+
                 <div class="card-body">
                     {% csrf_token %}
                     {% if form.errors and form.non_field_errors %}
@@ -44,7 +44,7 @@
                     </div>
                     {% endfor %}
                 </div>
-                
+
                 <div class="card-footer">
                     <div class="text-end">
                         {% if request.GET.back %}

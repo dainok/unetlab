@@ -21,12 +21,8 @@ urlpatterns = [
     # List and detail views for Template (HTML views)
     path("lab/", LabListView.as_view(), name="lab_list"),
     path("lab/create", LabCreateView.as_view(), name="lab_create"),
-    path(
-        "lab/<str:pk>/update", LabChangeView.as_view(), name="lab_update"
-    ),
-    path(
-        "lab/<str:pk>/", LabDetailView.as_view(), name="lab_detail"
-    ),
+    path("lab/<str:pk>/update", LabChangeView.as_view(), name="lab_update"),
+    path("lab/<str:pk>/", LabDetailView.as_view(), name="lab_detail"),
     # Custom API endpoints
     # path(
     #     "api/lab/<str:pk>/disk",
