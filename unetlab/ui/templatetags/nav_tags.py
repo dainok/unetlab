@@ -1,4 +1,4 @@
-"""Template Tags used by templates."""
+"""Template tags for dynamic template behavior in Django."""
 
 from django import template
 
@@ -7,7 +7,15 @@ register = template.Library()
 
 @register.simple_tag(takes_context=True)
 def is_active(context, *view_names):
-    """Return " active" if the current view is in input list."""
+    """Determine if the current view matches any of the given view names.
+
+    Args:
+        context (dict): Template context, must contain 'request'.
+        *view_names (str): One or more view names to compare with the current view.
+
+    Returns:
+        str: " active" if the current view matches any view_name, otherwise an empty string.
+    """
     request = context.get("request")
     if not request:
         return ""
