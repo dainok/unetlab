@@ -199,7 +199,7 @@ class ObjectTable(tables.Table):
                 },
                 {
                     "button": messages.DELETE,
-                    "js": f"{model_name}_delete",
+                    "view": f"{model_name}_delete",
                 },
             ]
             self.attrs["row_actions"] = row_actions
@@ -211,7 +211,7 @@ class ObjectTable(tables.Table):
                 },
                 {
                     "button": messages.DELETE,
-                    "js": f"deleteSelected('{model_name}')",
+                    "js": f"ObjectBulkDeleteView('{model_name}')",
                 },
             ]
             self.attrs["table_actions"] = table_actions

@@ -28,8 +28,12 @@
             </div>
             
             <div class="card-footer">
-                <div class="d-flex">
-                    <a href="{% url list_view %}" class="btn btn-primary ms-auto">Back to list</a>
+                <div class="text-end">
+                    <a href="{% url model_name|add:'_delete' pk %}" class="btn">Delete</a>
+                    {% if request.GET.back %}
+                    <a href="{% url request.GET.back %}" class="btn">Back</a>
+                    {% endif %}
+                    <a href="{% url model_name|add:'_update' pk %}" class="btn btn-primary ms-auto">Edit</a>
                 </div>
             </div>
         </div>

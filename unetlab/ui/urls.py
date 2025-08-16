@@ -5,7 +5,7 @@ from rest_framework.routers import DefaultRouter
 
 from ui.views import (
     UserDetailView, UserListView, GroupDetailView, GroupListView, TokenDetailView, TokenListView,
-    UserChangeView, UserCreateView, GroupChangeView, GroupCreateView
+    UserChangeView, UserCreateView, GroupChangeView, GroupCreateView, GroupDeleteView, GroupBulkDeleteView
 )
 
 # DRF router for API endpoints of Template viewsets
@@ -15,6 +15,9 @@ router = DefaultRouter()
 # URL patterns for class-based views and API endpoints
 urlpatterns = [
     # List and detail views for Template (HTML views)
+    #########################################################################
+    # User
+    #########################################################################
     path("user/", UserListView.as_view(), name="user_list"),
     path("user/create", UserCreateView.as_view(), name="user_create"),
     path(
@@ -23,14 +26,22 @@ urlpatterns = [
     path(
         "user/<int:pk>/", UserDetailView.as_view(), name="user_detail"
     ),
+    #########################################################################
+    # Group
+    #########################################################################
     path("group/", GroupListView.as_view(), name="group_list"),
     path("group/create", GroupCreateView.as_view(), name="group_create"),
+    path("group/delete", GroupBulkDeleteView.as_view(), name="group_bulkdelete"),
+    path("group/<int:pk>/delete/", GroupDeleteView.as_view(), name="group_delete"),
     path(
         "group/<str:pk>/update", GroupChangeView.as_view(), name="group_update"
     ),
     path(
         "group/<int:pk>/", GroupDetailView.as_view(), name="group_detail"
     ),
+    #########################################################################
+    # Token
+    #########################################################################
     path("token/", TokenListView.as_view(), name="token_list"),
     # path("token/create", LabCreateView.as_view(), name="token_create"),
     # path(

@@ -99,7 +99,9 @@
                             {% if "select" not in table.exclude %}
                             <td class="{{ table.attrs.td }}">
                                 <input class="form-check-input m-0 align-middle table-selectable-check" type="checkbox"
-                                    aria-label="Select invoice" value="true">
+                                    name="selected_pks"
+                                    value="{{ row.record.pk }}"
+                                    aria-label="Select invoice">
                             </td>
                             {% endif %}
                             {% for column, cell in row.items %}
@@ -113,7 +115,7 @@
                                     {% if table.attrs.row_actions|length == 1 %}
                                     {% with action=table.attrs.row_actions.0 %}
                                     {% if action.view %}
-                                    <a class="btn btn-1" href="{% url action.view row.record.pk %}"> {{ action.button }}</a>
+                                    <a class="btn btn-1" href="{% url action.view row.record.pk %}?back={{ request.resolver_match.view_name }}"> {{ action.button }}</a>
                                     {% elif action.js %}
                                     <a class="btn btn-1" href="#" onclick="{{ action.js }}"> {{ action.button }}</a>
                                     {% endif %}
@@ -133,7 +135,7 @@
                                         <div class="dropdown-menu">
                                             {% for action in table.attrs.row_actions %}
                                             {% if action.view %}
-                                            <a class="dropdown-item" href="{% url action.view row.record.pk %}">{{ action.button }}</a>
+                                            <a class="dropdown-item" href="{% url action.view row.record.pk %}?back={{ request.resolver_match.view_name }}">{{ action.button }}</a>
                                             {% elif action.js %}
                                             <a class="dropdown-item" href="#" onclick="{{ action.js }}">{{ action.button }}</a>
                                             {% endif %}
@@ -161,6 +163,42 @@
 </div>
 
 <script>
+    function ObjectBulkDeleteView(model_name) {
+        event.preventDefault();  // Prevent standard submit
+
+       // Seleziona tutti i checkbox selezionati
+        let selected = document.querySelectorAll('input[name="selected_pks"]:checked');
+
+        // Raccogli tutti gli ID
+        let ids = Array.from(selected).map(cb => cb.value);
+
+        // Crea un form dinamico per la POST
+        let form = document.createElement("form");
+        form.method = "POST";
+        form.action = `/${model_name}/delete`;  // adatta l'URL se serve
+
+        // Aggiungi CSRF token
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        let csrfInput = document.createElement("input");
+        csrfInput.type = "hidden";
+        csrfInput.name = "csrfmiddlewaretoken";
+        csrfInput.value = csrftoken;
+        form.appendChild(csrfInput);
+
+        // Aggiungi gli ID selezionati
+        ids.forEach(id => {
+            let input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "selected_ids"; // nome atteso dalla tua view
+            input.value = id;
+            form.appendChild(input);
+        });
+
+        // Aggiungi il form al body e submit
+        document.body.appendChild(form);
+        form.submit();
+        
+    }
     function rescan(object) {
         /**
          * Trigger a rescan of the Proxmox infrastructure by sending a POST request to the API.

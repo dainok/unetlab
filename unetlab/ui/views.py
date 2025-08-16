@@ -9,7 +9,8 @@ from django_filters.views import FilterView
 from django_filters.rest_framework import DjangoFilterBackend
 from django_tables2 import SingleTableView
 from django_tables2.columns import Column
-from ui.include.views import ObjectListView, ObjectDetailView, ObjectCreateView, ObjectChangeView
+from ui.include.permissions import IsAdmin
+from ui.include.views import ObjectListView, ObjectDetailView, ObjectCreateView, ObjectChangeView, ObjectDeleteView, ObjectBulkDeleteView
 from ui.filters import GroupFilter
 from ui.forms import GroupForm, TokenForm, UserForm
 from ui.serializers import UserSerializer
@@ -108,36 +109,39 @@ class UserChangeView(ObjectChangeView):
 #     queryset = Log.objects.all()
 
 
-class GroupListView(ObjectListView):
+#############################################################################
+# Group
+#############################################################################
+class GroupDeleteView(ObjectDeleteView):
     model = Group
-    table_class = GroupTable
-    filterset_class = GroupFilter
-    list_view = "group_list"
-    search = True
-    # model = Job
-    # table_class = JobTable
-    # filterset_class = JobFilter
 
+class GroupBulkDeleteView(ObjectBulkDeleteView):
+    model = Group
 
 class GroupDetailView(ObjectDetailView):
-    """HTML detail view for a single ProxmoxHost."""
-
     model = Group
-    list_view = "group_list"
-    # exclude=["id"]
-    # sequence=["name", "created_at", "description"]
 
-class GroupCreateView(ObjectCreateView):
+class GroupListView(ObjectListView):
+    filterset_class = GroupFilter
     model = Group
-    form_class = GroupForm
-
+    table_class = GroupTable
 
 class GroupChangeView(ObjectChangeView):
     model = Group
     form_class = GroupForm
-    # fields = '__all__'
-    # template_name = 'object_form.html'
-    # success_url = reverse_lazy('home')
+    permission_classes = [IsAdmin]
+
+class GroupCreateView(ObjectCreateView):
+    model = Group
+    form_class = GroupForm
+    permission_classes = [IsAdmin]
+
+
+
+
+#############################################################################
+# Token
+#############################################################################
 
 
 class TokenListView(BaseListView):
