@@ -4,10 +4,9 @@ from rest_framework.authtoken.models import Token
 from ui.include.forms import ObjectModelForm
 
 
-class UserForm(ObjectModelForm):
-    class Meta:
-        model = User
-        fields = "__all__"
+#############################################################################
+# Group
+#############################################################################
 
 
 class GroupForm(ObjectModelForm):
@@ -21,7 +20,7 @@ class GroupForm(ObjectModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Precompila il campo users con quelli già nel gruppo
+        # Pre-populate the users field with those already in the group
         if self.instance.pk:
             self.fields["users"].initial = self.instance.user_set.all()
 
@@ -33,7 +32,23 @@ class GroupForm(ObjectModelForm):
         return group
 
 
+#############################################################################
+# Token
+#############################################################################
+
+
 class TokenForm(ObjectModelForm):
     class Meta:
         model = Token
+        fields = "__all__"
+
+
+#############################################################################
+# User
+#############################################################################
+
+
+class UserForm(ObjectModelForm):
+    class Meta:
+        model = User
         fields = "__all__"

@@ -4,7 +4,20 @@ This module defines all the standardized messages used across
 the UI, API responses, and tables, to ensure consistency.
 """
 
+from django.db import models
 from django.utils.translation import gettext_lazy as _
+
+
+#############################################################################
+# General choices
+#############################################################################
+
+
+CHOICES_YES_NO = [
+    ("", "---------"),
+    (True, "Yes"),
+    (False, "No"),
+]
 
 
 #############################################################################
@@ -84,3 +97,14 @@ PROXMOX_TASK_RESCAN_COMPLETED = _(
 PROXMOX_TASK_RESCAN_ENQUEUED = _("Proxmox infrastructure rescan has been queued.")
 PROXMOX_TASK_RESCAN_STARTED = _("Proxmox infrastructure rescan has started.")
 PROXMOX_API_ERROR = _("Failed to execute the request on the Proxmox API.")
+
+
+#############################################################################
+# Filters
+#############################################################################
+
+FILTER_ACTIVE_USERS = _("Active users")
+FILTER_ADMIN_USERS = _("Admin users")
+FILTER_STAFF_USERS = _("Staff users")
+FILTER_LOGGED_BEFORE = _("Last login before")
+FILTER_LOGGED_AFTER = _("Last login after")

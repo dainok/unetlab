@@ -93,8 +93,8 @@ class UserTable(ObjectTable):
     """
 
     is_active = GreenRedBooleanColumn()
-    is_staff = GreenRedReverseBooleanColumn()
-    is_superuser = GreenRedReverseBooleanColumn()
+    is_staff = GreenRedReverseBooleanColumn(verbose_name="Admin")
+    is_superuser = GreenRedReverseBooleanColumn(verbose_name="Staff")
     username = tables.LinkColumn(
         "user_detail",
         args=[tables.A("pk")],
@@ -111,7 +111,7 @@ class UserTable(ObjectTable):
         """
 
         model = User
-        exclude = ["select", "actions", "id", "password", "date_joined"]
+        exclude = ["id", "password", "date_joined", "last_login"]
         sequence = [
             "username",
             "first_name",

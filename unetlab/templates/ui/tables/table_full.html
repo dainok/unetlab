@@ -163,18 +163,18 @@
     function ObjectBulkDeleteView(model_name) {
         event.preventDefault();  // Prevent standard submit
 
-       // Seleziona tutti i checkbox selezionati
+        // Select all selected checkboxes
         let selected = document.querySelectorAll('input[name="selected_pks"]:checked');
 
-        // Raccogli tutti gli ID
+        // Collect all IDs
         let ids = Array.from(selected).map(cb => cb.value);
 
-        // Crea un form dinamico per la POST
+        // Create a dynamic form for POST
         let form = document.createElement("form");
         form.method = "POST";
         form.action = `/${model_name}/delete`;  // adatta l'URL se serve
 
-        // Aggiungi CSRF token
+        // Add CSRF token
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         let csrfInput = document.createElement("input");
         csrfInput.type = "hidden";
@@ -182,7 +182,7 @@
         csrfInput.value = csrftoken;
         form.appendChild(csrfInput);
 
-        // Aggiungi gli ID selezionati
+        // Add selected IDs
         ids.forEach(id => {
             let input = document.createElement("input");
             input.type = "hidden";
@@ -191,7 +191,7 @@
             form.appendChild(input);
         });
 
-        // Aggiungi il form al body e submit
+        // Add the form to the body and submit
         document.body.appendChild(form);
         form.submit();
 

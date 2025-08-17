@@ -216,6 +216,15 @@ class ObjectListView(LogListMixin, SingleTableView, FilterView):
         print("paginate_by in view:", self.get_paginate_by(table.data))
         return table
 
+    def get_table_data(self):
+        """Return the queryset filtered by the FilterSet if present."""
+        queryset = super().get_table_data()
+        filterset_class = self.get_filterset_class()
+        if filterset_class:
+            filterset = filterset_class(self.request.GET, queryset=queryset)
+            return filterset.qs
+        return queryset
+
     def get_paginate_by(self, queryset):
         """Allow client to customize pagination via 'per_page' query param.
 
@@ -238,9 +247,10 @@ class ObjectListView(LogListMixin, SingleTableView, FilterView):
     def get_context_data(self, **kwargs):
         """Add model name to context for template rendering."""
         context = super().get_context_data(**kwargs)
+        # Add model_name to create URLs via views
         context["model_name"] = self.model._meta.model_name
-        #     filterset = self.get_filterset(self.get_filterset_class())
-        #     context["filter"] = filterset
-        #     context["actions"] = self.get_actions()
-        #     context["vip_actions"] = self.get_vip_actions()
+        # Add filters
+        filterset = self.get_filterset(self.get_filterset_class())
+        if filterset:
+            context["filter"] = filterset
         return context
