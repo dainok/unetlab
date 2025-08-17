@@ -14,4 +14,10 @@ class ObjectModelForm(forms.ModelForm):
         """Initialize the form and apply CSS classes to visible fields."""
         super().__init__(*args, **kwargs)
         for visible in self.visible_fields():
-            visible.field.widget.attrs["class"] = "form-control"
+            widget_type = getattr(visible.field.widget, "input_type", None)
+            if widget_type in ["text", "email", "password", "number"]:
+                visible.field.widget.attrs["class"] = "form-control"
+            elif widget_type == "checkbox":
+                visible.field.widget.attrs["class"] = "form-check-input"
+            elif widget_type in ["select", "selectmultiple"]:
+                visible.field.widget.attrs["class"] = "form-select"
