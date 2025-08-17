@@ -95,6 +95,7 @@ class GroupDetailView(GroupQueryMixin, ObjectDetailView):
     """HTML view for displaying the details of a `Group`."""
 
     model = Group
+    exclude = ["id"]
 
 
 class GroupListView(GroupQueryMixin, ObjectListView):
@@ -191,6 +192,16 @@ class UserDetailView(UserQueryMixin, ObjectDetailView):
     """HTML view for displaying the details of a `User`."""
 
     model = User
+    exclude = ["id", "password"]
+    sequence = [
+        "username",
+        "first_name",
+        "last_name",
+        "email",
+        "is_active",
+        "is_superuser",
+        "is_staff",
+    ]
 
 
 class UserListView(UserQueryMixin, ObjectListView):
