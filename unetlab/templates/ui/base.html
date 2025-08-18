@@ -22,7 +22,15 @@
 
 <body class="{% block bodyclass %}{% endblock bodyclass %}">
     <!-- Banner -->
-    {% block banner %}{% endblock banner %}
+    {% block banner %}
+    {% if messages %}
+    <ul>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endblock banner %}
     <div class="{% block pageclass %}page{% endblock pageclass %}">
         {% block page %}
         <!-- Navbar -->

@@ -6,6 +6,7 @@ using Django REST Framework routers.
 
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+from ui.views import ConstanceListView, ConstanceUpdateView
 from ui.views import (
     GroupAPIViewSet,
     GroupBulkDeleteView,
@@ -34,6 +35,11 @@ router.register(r"user", UserAPIViewSet, basename="user")
 
 # URL patterns for class-based views and API endpoints
 urlpatterns = [
+    #########################################################################
+    # Contance settings (HTML)
+    #########################################################################
+    path("settings/edit", ConstanceUpdateView.as_view(), name="settings_update"),
+    path("settings/", ConstanceListView.as_view(), name="settings_list"),
     #########################################################################
     # Group views (HTML)
     #########################################################################

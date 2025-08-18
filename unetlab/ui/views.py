@@ -6,10 +6,14 @@ retrieval, and deletion.
 """
 
 from django.core.exceptions import PermissionDenied
+from django.contrib import messages as django_msgs
 from django.contrib.auth.models import Group, User
-from django.shortcuts import redirect
+from django.views.generic import TemplateView
+from django.shortcuts import redirect, render
+from constance import config
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
+from unetlab.views import CommonMixin
 from ui.include import messages
 from ui.include.permissions import IsAdmin
 from ui.include.views import (
@@ -25,6 +29,54 @@ from ui.filters import GroupFilter, TokenFilter, UserFilter
 from ui.forms import GroupForm, UserForm
 from ui.serializers import GroupSerializer, UserSerializer
 from ui.tables import GroupTable, TokenTable, UserTable
+
+
+#############################################################################
+# Contance settings
+#############################################################################
+
+
+class ConstanceListView(CommonMixin, TemplateView):
+    template_name = "ui/settings_list.html"
+
+    def get_variables(self):
+        return {key: getattr(config, key) for key in dir(config)}
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["variables"] = self.get_variables()
+        return context
+
+
+class ConstanceUpdateView(CommonMixin, TemplateView):
+    template_name = "ui/settings_form.html"
+
+    def get_variables(self):
+        # Restituisce tutte le variabili di Constance come dizionario
+        return {key: getattr(config, key) for key in dir(config)}
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data()
+        context["variables"] = self.get_variables()
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        for key in dir(config):
+            if key in request.POST:
+                value = request.POST[key]
+                default_value = getattr(config, key)
+                # Convertiamo il tipo
+                if isinstance(default_value, bool):
+                    value = value.lower() in ["true", "1", "on"]
+                elif isinstance(default_value, int):
+                    try:
+                        value = int(value)
+                    except ValueError:
+                        django_msgs.error(request, f"Valore per {key} non valido!")
+                        continue
+                config._backend.set(key, value)
+        django_msgs.success(request, "Configurazioni aggiornate con successo!")
+        return redirect("settings_list")
 
 
 #############################################################################

@@ -1,0 +1,56 @@
+{% extends "ui/base.html" %}
+{% block title %}UNetLab | {{ object.name }} > Detail{% endblock title %}
+{% block page_title %}{{ object.name }} > Detail{% endblock page_title %}
+{% block page_body %}
+<div class="col-lg-12">
+    <div class="card">
+        <form method="post" novalidate>
+            <div class="card-table">
+                {% if attrs.title %}
+                <div class="card-header">
+                    <div class="row w-full">
+                        <div class="col">
+                            <h3 class="card-title mb-0">{{ attrs.title }}</h3>
+                            <p class="text-secondary m-0">{{ attrs.description }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="card-body">
+                    {% csrf_token %}
+                    {% if form.errors and form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        {{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% for key, value in variables.items %}
+                    <div class="mb-3 row">
+                        <label for="key" class="col-3 col-form-label required">
+                            {{ key }}
+                        </label>
+                        <div class="col">
+                            <input class="form-control" type="text" name="{{ key }}" value="{{ value }}">
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="card-footer">
+                    <div class="text-end">
+                        {% if request.GET.back %}
+                        <a href="{% url 'settings_list' %}" class="btn"> Cancel </a>
+                        {% endif %}
+                        <button type="submit" class="btn btn-primary ms-auto">
+                            Update
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock page_body %}

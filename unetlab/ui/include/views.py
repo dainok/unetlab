@@ -7,9 +7,9 @@ django-tables2, and django-filters.
 """
 
 from django.conf import settings
+from django.contrib import messages
 from django.shortcuts import redirect, render
-from django.views import View
-from django.views.generic import DeleteView
+from django.views.generic import DeleteView, TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView
 from django.urls import reverse, reverse_lazy
@@ -45,7 +45,7 @@ class APIRDViewSet(DestroyModelMixin, ListModelMixin, RetrieveModelMixin):
     queryset = None
 
 
-class ObjectBulkDeleteView(CommonMixin, View):
+class ObjectBulkDeleteView(CommonMixin, TemplateView):
     """Generic view to delete multiple objects selected via checkboxes.
 
     Subclasses should define `model`.
