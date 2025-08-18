@@ -6,9 +6,7 @@ auth-related models.
 """
 
 from django import forms
-from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.models import Group, User
-from rest_framework.authtoken.models import Token
 from ui.include import messages
 from ui.include.forms import ObjectModelForm
 
@@ -72,34 +70,6 @@ class GroupForm(ObjectModelForm):
             group.save()
             group.user_set.set(self.cleaned_data["users"])
         return group
-
-
-#############################################################################
-# Token
-#############################################################################
-
-
-class TokenForm(ObjectModelForm):
-    """
-    Form for managing Django REST Framework auth Tokens.
-
-    Uses all fields from the Token model.
-
-    Methods:
-        No custom methods; uses default ObjectModelForm behavior.
-    """
-
-    class Meta:
-        """
-        Meta class for TokenForm.
-
-        Attributes:
-            model (Token): The DRF Token model this form operates on.
-            fields (str): '__all__' to include all model fields.
-        """
-
-        model = Token
-        fields = "__all__"
 
 
 #############################################################################

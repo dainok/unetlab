@@ -7,6 +7,7 @@ search functionality.
 from django import forms
 from django.contrib.auth.models import User
 import django_filters
+from rest_framework.authtoken.models import Token
 from ui.include.filters import SearchFilterSet
 from ui.include import messages
 
@@ -94,3 +95,50 @@ class UserFilter(SearchFilterSet):
 
         model = User
         fields = ["is_active", "is_superuser", "is_staff"]
+
+
+#############################################################################
+# Token
+#############################################################################
+
+
+class TokenFilter(SearchFilterSet):
+    """Filter class for the `Token` model.
+
+    Extends the base search functionality with additional filters for
+    common user attributes such as active status, staff/admin privileges,
+    and login activity.
+    """
+
+    user__is_active = django_filters.BooleanFilter(
+        widget=forms.Select(
+            attrs={"class": "form-select"},
+            choices=messages.CHOICES_YES_NO,
+        ),
+        label=messages.FILTER_ACTIVE_USERS,
+    )
+    user__is_staff = django_filters.BooleanFilter(
+        widget=forms.Select(
+            attrs={"class": "form-select"},
+            choices=messages.CHOICES_YES_NO,
+        ),
+        label=messages.FILTER_STAFF_USERS,
+    )
+    user__is_superuser = django_filters.BooleanFilter(
+        widget=forms.Select(
+            attrs={"class": "form-select"},
+            choices=messages.CHOICES_YES_NO,
+        ),
+        label=messages.FILTER_ADMIN_USERS,
+    )
+
+    class Meta:
+        """Meta configuration for `TokenFilter`.
+
+        Attributes:
+            model (Token): The model to filter.
+            fields (list[str]): List of filterable fields.
+        """
+
+        model = Token
+        fields = ["user__is_active", "user__is_superuser", "user__is_staff"]

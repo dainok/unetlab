@@ -88,6 +88,8 @@ TABLE_REPOSITORY_DESCRIPTION = _("All configured repositories and their metadata
 TABLE_TEMPLATE_TITLE = _("Templates")
 TABLE_TEMPLATE_DESCRIPTION = _("All available templates for virtual machines.")
 
+TABLE_TOKEN_TITLE = _("Tokens")
+TABLE_TOKEN_DESCRIPTION = _("List of all registered API tokens.")
 
 TABLE_USER_TITLE = _("Users")
 TABLE_USER_DESCRIPTION = _("List of all registered users.")

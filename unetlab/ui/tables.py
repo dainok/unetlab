@@ -54,14 +54,13 @@ class GroupTable(ObjectTable):
 #############################################################################
 
 
-class TokenTable(tables.Table):
+class TokenTable(ObjectTable):
     """Table definition for the `Token` model.
 
     Used in the `token_list` view.
     """
 
-    created_at = tables.DateColumn(orderable=True, format="Y-m-d")
-    updated_at = tables.DateColumn(orderable=True, format="Y-m-d H:i")
+    created = tables.DateColumn(orderable=True, format="Y-m-d")
 
     class Meta:
         """Meta options for the `TokenTable`.
@@ -72,12 +71,31 @@ class TokenTable(tables.Table):
         """
 
         model = Token
-        exclude = ["select", "actions"]
-        # order_by = "username"
+        exclude = []
+        sequence = [
+            "user",
+            "key",
+            "created",
+            "...",
+        ]
         attrs = {
-            "title": messages.TABLE_HOST_TITLE,
-            "description": messages.TABLE_HOST_DESCRIPTION,
-            "detail_view": "host_detail",
+            "search": False,
+            "table_actions": [
+                {
+                    "button": messages.ADD,
+                    "js": "TokenCreateView()",
+                },
+                {
+                    "button": messages.DELETE,
+                    "js": "ObjectBulkDeleteView('token')",
+                },
+            ],
+            "row_actions": [
+                {
+                    "button": messages.DELETE,
+                    "view": "token_delete",
+                },
+            ],
         }
 
 

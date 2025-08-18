@@ -559,7 +559,7 @@
                                     </a>
                                     <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                                         <a href="{% url 'user_detail' user_pk %}" class="dropdown-item">{% translate "Profile" %}</a>
-                                        <a href="#" class="dropdown-item">{% translate "API Tokens" %}</a>
+                                        <a href="{% url 'token_list' %}" class="dropdown-item">{% translate "API Tokens" %}</a>
                                         <div class="dropdown-divider"></div>
                                         <a href="#" class="dropdown-item">{% translate "Status" %}</a>
                                         <form id="logout-form" method="post" action="{% url 'logout' %}">

@@ -6,7 +6,6 @@ using Django REST Framework routers.
 
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-
 from ui.views import (
     GroupAPIViewSet,
     GroupBulkDeleteView,
@@ -15,8 +14,10 @@ from ui.views import (
     GroupDeleteView,
     GroupDetailView,
     GroupListView,
-    # TokenDetailView,
-    # TokenListView,
+    TokenBulkDeleteView,
+    TokenCreateView,
+    TokenDeleteView,
+    TokenListView,
     UserAPIViewSet,
     UserBulkDeleteView,
     UserChangeView,
@@ -39,7 +40,7 @@ urlpatterns = [
     path("group/", GroupListView.as_view(), name="group_list"),
     path("group/create", GroupCreateView.as_view(), name="group_create"),
     path("group/delete", GroupBulkDeleteView.as_view(), name="group_bulkdelete"),
-    path("group/<int:pk>/delete/", GroupDeleteView.as_view(), name="group_delete"),
+    path("group/<int:pk>/delete", GroupDeleteView.as_view(), name="group_delete"),
     path("group/<int:pk>/update", GroupChangeView.as_view(), name="group_update"),
     path("group/<int:pk>/", GroupDetailView.as_view(), name="group_detail"),
     #########################################################################
@@ -48,18 +49,16 @@ urlpatterns = [
     path("user/", UserListView.as_view(), name="user_list"),
     path("user/create", UserCreateView.as_view(), name="user_create"),
     path("user/delete", UserBulkDeleteView.as_view(), name="user_bulkdelete"),
-    path("user/<int:pk>/delete/", UserDeleteView.as_view(), name="user_delete"),
+    path("user/<int:pk>/delete", UserDeleteView.as_view(), name="user_delete"),
     path("user/<int:pk>/update", UserChangeView.as_view(), name="user_update"),
     path("user/<int:pk>/", UserDetailView.as_view(), name="user_detail"),
     #########################################################################
     # Token views (HTML)
     #########################################################################
-    # path("token/", TokenListView.as_view(), name="token_list"),
-    # path("token/create", LabCreateView.as_view(), name="token_create"),
-    # path(
-    #     "token/<str:pk>/update", LabChangeView.as_view(), name="token_update"
-    # ),
-    # path("token/<int:pk>/", TokenDetailView.as_view(), name="token_detail"),
+    path("token/", TokenListView.as_view(), name="token_list"),
+    path("token/create", TokenCreateView.as_view(), name="token_create"),
+    path("token/delete", TokenBulkDeleteView.as_view(), name="token_bulkdelete"),
+    path("token/<str:pk>/delete", TokenDeleteView.as_view(), name="token_delete"),
     #########################################################################
     # API endpoints
     #########################################################################

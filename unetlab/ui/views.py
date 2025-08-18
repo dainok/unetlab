@@ -7,10 +7,9 @@ retrieval, and deletion.
 
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import Group, User
-from django.shortcuts import get_object_or_404
-from django.urls import reverse
-from django.views.generic.edit import FormView
+from django.shortcuts import redirect
 from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.views import ObtainAuthToken
 from ui.include import messages
 from ui.include.permissions import IsAdmin
 from ui.include.views import (
@@ -22,13 +21,10 @@ from ui.include.views import (
     ObjectDetailView,
     ObjectListView,
 )
-from ui.filters import GroupFilter, UserFilter
-from ui.forms import GroupForm, TokenForm, UserForm
+from ui.filters import GroupFilter, TokenFilter, UserFilter
+from ui.forms import GroupForm, UserForm
 from ui.serializers import GroupSerializer, UserSerializer
 from ui.tables import GroupTable, TokenTable, UserTable
-from unetlab.views import CommonMixin
-from job.models import Job
-from job.utils import log
 
 
 #############################################################################
@@ -131,16 +127,6 @@ class GroupListView(GroupQueryMixin, ObjectListView):
 #############################################################################
 # User
 #############################################################################
-UserFields = [
-    "username",
-    "first_name",
-    "last_name",
-    "email",
-    "is_active",
-    "is_superuser",
-    "is_staff",
-    "groups",
-]
 
 
 class UserQueryMixin:
@@ -153,6 +139,7 @@ class UserQueryMixin:
         """Return the queryset of `User` objects accessible to the current user.
 
         - Superusers can access all `User` objects.
+        - Staff users can see users who share at least one group
         - Non-superusers can only access their own `User` object.
         """
         qs = User.objects.all()
@@ -160,6 +147,10 @@ class UserQueryMixin:
         if user.is_superuser:
             # Admin users can see all `User` objects
             return qs
+        if user.is_staff:
+            # Staff users can see users who share at least one group
+            groups = user.groups.all()
+            return qs.filter(groups__in=groups).distinct()
         # Non-admin users can only see their own user
         return qs.filter(username=user.username)
 
@@ -167,6 +158,7 @@ class UserQueryMixin:
         """Return a `User` object only if the user has permission.
 
         - Superusers can access any `User`.
+        - Staff users can see users who share at least one group.
         - Non-superusers can only access their own `User` object.
 
         Raises:
@@ -177,6 +169,14 @@ class UserQueryMixin:
         if user.is_superuser:
             # Admin users can see all `User` objects
             return obj
+        if user.is_staff:
+            if obj.is_superuser:
+                raise PermissionDenied(messages.PERMISSION_ADMIN)
+            # Staff users can see users who share at least one group
+            if user.groups.filter(
+                pk__in=obj.groups.values_list("pk", flat=True)
+            ).exists():
+                return obj
         if user == obj:
             # Non-admin users can only see the `Group` objects they belong to
             return obj
@@ -249,17 +249,86 @@ class UserListView(UserQueryMixin, ObjectListView):
 #############################################################################
 
 
-# class TokenListView(BaseListView):
-#     model = Token
-#     table_class = TokenTable
-#     # filterset_class = ProxmoxHostFilter
-#     list_view = "token_list"
+class TokenQueryMixin:
+    """Mixin encapsulating common queryset and permission logic for `Token`.
+
+    Used by both HTML views and API views.
+    """
+
+    def get_queryset(self):
+        """Return the queryset of `User` objects accessible to the current user.
+
+        - Superusers can access all `User` objects.
+        - Staff users can see users who share at least one group
+        - Non-superusers can only access their own `User` object.
+        """
+        qs = Token.objects.all()
+        user = self.request.user
+        if user.is_superuser:
+            # Admin users can see all `User` objects
+            return qs
+        if user.is_staff:
+            # Staff users can see users who share at least one group
+            groups = user.groups.all()
+            return qs.filter(user__groups__in=groups, is_superuser=False).distinct()
+        # Non-admin users can only see their own user
+        return qs.filter(user__username=user.username)
+
+    def get_object(self):
+        """Return a `User` object only if the user has permission.
+
+        - Superusers can access any `User`.
+        - Staff users can see users who share at least one group.
+        - Non-superusers can only access their own `User` object.
+
+        Raises:
+            PermissionDenied: If the user does not have access.
+        """
+        obj = super().get_object()
+        user = self.request.user
+        if user.is_superuser:
+            # Admin users can see all `User` objects
+            return obj
+        if user.is_staff:
+            if obj.is_superuser:
+                raise PermissionDenied(messages.PERMISSION_ADMIN)
+            # Staff users can see users who share at least one group
+            if user.groups.filter(
+                pk__in=obj.groups.values_list("pk", flat=True)
+            ).exists():
+                return obj
+        if user == obj:
+            # Non-admin users can only see the `Group` objects they belong to
+            return obj
+        raise PermissionDenied(messages.PERMISSION_DENIED)
 
 
-# class TokenDetailView(ObjectDetailView):
-#     """HTML detail view for a single ProxmoxHost."""
+class TokenBulkDeleteView(ObjectBulkDeleteView):
+    """HTML view for deleting multiple `Token` objects at once."""
 
-#     model = Token
-#     list_view = "token_detail"
-#     # exclude=["id"]
-#     # sequence=["name", "created_at", "description"]
+    model = Token
+    permission_classes = [IsAdmin]
+
+
+class TokenCreateView(ObtainAuthToken):
+    """
+    API per permettere a ciascun utente di generare il proprio token.
+    """
+
+    def post(self, request, *args, **kwargs):
+        Token.objects.get_or_create(user=request.user)
+        return redirect("token_list")
+
+
+class TokenDeleteView(ObjectDeleteView):
+    """HTML view for deleting a single `Token`."""
+
+    model = Token
+
+
+class TokenListView(TokenQueryMixin, ObjectListView):
+    """HTML view for displaying a table of `Token` objects."""
+
+    filterset_class = TokenFilter
+    model = Token
+    table_class = TokenTable

@@ -45,6 +45,52 @@ class APIRDViewSet(DestroyModelMixin, ListModelMixin, RetrieveModelMixin):
     queryset = None
 
 
+class ObjectBulkDeleteView(CommonMixin, View):
+    """Generic view to delete multiple objects selected via checkboxes.
+
+    Subclasses should define `model`.
+    """
+
+    model = None
+    template_name = "ui/object_confirm_delete.html"
+
+    def get_success_url(self):
+        """Redirect to the model's list view after deletion."""
+        model_name = self.model._meta.model_name
+        return reverse_lazy(f"{model_name}_list")
+
+    def post(self, request, *args, **kwargs):
+        """Handle bulk deletion from POST data.
+
+        Expects 'selected_ids' list from POST. If 'confirm' is present,
+        deletes the objects; otherwise renders a confirmation template.
+        """
+        # The list of IDs is passed as list selected_ids from the form
+        ids = request.POST.getlist("selected_ids")
+        if not ids:
+            # The list is empty, there is nothing to delete
+            return redirect(self.get_success_url())
+
+        queryset = self.model.objects.filter(pk__in=ids)
+        if not queryset:
+            # Objects do not exist, there is nothing to delete
+            return redirect(self.get_success_url())
+
+        if "confirm" in request.POST:
+            # Last step: the form has passed confirm, we proceed with the cancellation
+            queryset.delete()
+            return redirect(self.get_success_url())
+
+        # Penultimate step: the user must confirm the list of objects to be deleted
+        context = self.get_context_data()
+        context["object_list"] = queryset
+        return render(
+            request,
+            self.template_name,
+            context,
+        )
+
+
 class ObjectChangeView(CommonMixin, UpdateView):
     """Generic update view for any model object.
 
@@ -92,52 +138,6 @@ class ObjectDeleteView(CommonMixin, DeleteView):
         """Redirect to the list page of the model after deletion."""
         model_name = self.model._meta.model_name
         return reverse_lazy(f"{model_name}_list")
-
-
-class ObjectBulkDeleteView(CommonMixin, View):
-    """Generic view to delete multiple objects selected via checkboxes.
-
-    Subclasses should define `model`.
-    """
-
-    model = None
-    template_name = "ui/object_confirm_delete.html"
-
-    def get_success_url(self):
-        """Redirect to the model's list view after deletion."""
-        model_name = self.model._meta.model_name
-        return reverse_lazy(f"{model_name}_list")
-
-    def post(self, request, *args, **kwargs):
-        """Handle bulk deletion from POST data.
-
-        Expects 'selected_ids' list from POST. If 'confirm' is present,
-        deletes the objects; otherwise renders a confirmation template.
-        """
-        # The list of IDs is passed as list selected_ids from the form
-        ids = request.POST.getlist("selected_ids")
-        if not ids:
-            # The list is empty, there is nothing to delete
-            return redirect(self.get_success_url())
-
-        queryset = self.model.objects.filter(id__in=ids)
-        if not queryset:
-            # Objects do not exist, there is nothing to delete
-            return redirect(self.get_success_url())
-
-        if "confirm" in request.POST:
-            # Last step: the form has passed confirm, we proceed with the cancellation
-            queryset.delete()
-            return redirect(self.get_success_url())
-
-        # Penultimate step: the user must confirm the list of objects to be deleted
-        return render(
-            request,
-            self.template_name,
-            {
-                "object_list": queryset,
-            },
-        )
 
 
 class ObjectDetailView(CommonMixin, DetailView):
