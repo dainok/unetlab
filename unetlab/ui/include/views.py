@@ -7,7 +7,6 @@ django-tables2, and django-filters.
 """
 
 from django.conf import settings
-from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.views.generic import DeleteView, TemplateView
 from django.views.generic.detail import DetailView

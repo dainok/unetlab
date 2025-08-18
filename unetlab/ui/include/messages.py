@@ -114,8 +114,16 @@ PROXMOX_API_ERROR = _("Failed to execute the request on the Proxmox API.")
 # Filters
 #############################################################################
 
+
 FILTER_ACTIVE_USERS = _("Active users")
 FILTER_ADMIN_USERS = _("Admin users")
 FILTER_STAFF_USERS = _("Staff users")
 FILTER_LOGGED_BEFORE = _("Last login before")
 FILTER_LOGGED_AFTER = _("Last login after")
+
+
+#############################################################################
+# Bus messages
+#############################################################################
+MSG_VALUE_ERROR = _("Value error")
+MSG_CONFIG_UPDATED = _("Configuration updated.")

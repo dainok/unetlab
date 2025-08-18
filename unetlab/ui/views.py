@@ -37,45 +37,101 @@ from ui.tables import GroupTable, TokenTable, UserTable
 
 
 class ConstanceListView(CommonMixin, TemplateView):
+    """
+    View to display Constance settings as a list.
+
+    Inherits from:
+        CommonMixin
+        TemplateView
+    """
+
     template_name = "ui/settings_list.html"
 
     def get_variables(self):
+        """
+        Retrieve all Constance configuration variables.
+
+        Returns:
+            dict: A dictionary with variable names as keys and their values from the Constance config.
+        """
         return {key: getattr(config, key) for key in dir(config)}
 
     def get_context_data(self, **kwargs):
+        """
+        Add Constance variables to the template context.
+
+        Returns:
+            dict: Template context including Constance variables under the 'variables' key.
+        """
         context = super().get_context_data(**kwargs)
         context["variables"] = self.get_variables()
         return context
 
 
 class ConstanceUpdateView(CommonMixin, TemplateView):
+    """
+    View to display and update Constance settings via a form.
+
+    Inherits from:
+        CommonMixin
+        TemplateView
+    """
+
     template_name = "ui/settings_form.html"
 
     def get_variables(self):
-        # Restituisce tutte le variabili di Constance come dizionario
+        """
+        Retrieve all Constance configuration variables.
+
+        Returns:
+            dict: A dictionary with variable names as keys and their values from the Constance config.
+        """
         return {key: getattr(config, key) for key in dir(config)}
 
     def get(self, request, *args, **kwargs):
+        """
+        Handle GET request and render the settings form with current values.
+
+        Args:
+            request (HttpRequest): The current HTTP request object.
+
+        Returns:
+            HttpResponse: Rendered template with context including all Constance variables.
+        """
         context = self.get_context_data()
         context["variables"] = self.get_variables()
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
+        """
+        Handle POST request to update Constance settings.
+
+        Iterates through POSTed variables, converts them to the correct type,
+        updates the Constance backend, and displays success or error messages.
+
+        Args:
+            request (HttpRequest): The current HTTP request object.
+
+        Returns:
+            HttpResponseRedirect: Redirects to the settings list view after updating.
+        """
         for key in dir(config):
             if key in request.POST:
                 value = request.POST[key]
                 default_value = getattr(config, key)
-                # Convertiamo il tipo
+                # Convert type to match default
                 if isinstance(default_value, bool):
                     value = value.lower() in ["true", "1", "on"]
                 elif isinstance(default_value, int):
                     try:
                         value = int(value)
                     except ValueError:
-                        django_msgs.error(request, f"Valore per {key} non valido!")
+                        django_msgs.error(
+                            request, f"{messages.MSG_VALUE_ERROR} ({key})."
+                        )
                         continue
                 config._backend.set(key, value)
-        django_msgs.success(request, "Configurazioni aggiornate con successo!")
+        django_msgs.success(request, messages.MSG_CONFIG_UPDATED)
         return redirect("settings_list")
 
 
