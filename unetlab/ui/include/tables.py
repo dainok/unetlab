@@ -1,76 +1,71 @@
+"""
+Reusable table definitions using django-tables2.
+
+This module provides generic and customizable table columns and table classes
+for use in Django projects. It includes:
+"""
+
 import django_tables2 as tables
 from ui.include import messages
 
 
 class BooleanColumn(tables.TemplateColumn):
-    """Rappresenta in una tabella un valore booleano con ☑️ (True) e ❌ (False).
+    """Represents a boolean value in a table with ☑️ (True) and ❌ (False).
 
-    Esempio di utilizzo:
+    Example usage:
 
-    ```
-    class LogTable(tables.Table):
-        acknowledged = GreenBooleanColumn()
-    ````
+        class LogTable(tables.Table):
+            acknowledged = BooleanColumn()
     """
 
     def __init__(self, *args, **kwargs):
-        """
-        Inizializza l'oggetto applicando il template."""
+        """Initialize the column and apply the default template."""
         kwargs.setdefault("template_name", "ui/tables/column_boolean.html")
         super().__init__(*args, **kwargs)
 
 
 class GreenBooleanColumn(tables.TemplateColumn):
-    """Rappresenta in una tabella  un valore booleano con ✅ (True). False non viene rappresentato.
+    """Represents a boolean value in a table with ✅ (True). False is not displayed.
 
-    Esempio di utilizzo:
+    Example usage:
 
-    ```
-    class LogTable(tables.Table):
-        acknowledged = GreenBooleanColumn()
-    ````
+        class LogTable(tables.Table):
+            acknowledged = GreenBooleanColumn()
     """
 
     def __init__(self, *args, **kwargs):
-        """
-        Inizializza l'oggetto applicando il template."""
+        """Initialize the column and apply the default template."""
         kwargs.setdefault("template_name", "ui/tables/column_boolean_green.html")
         super().__init__(*args, **kwargs)
 
 
 class GreenRedBooleanColumn(tables.TemplateColumn):
-    """Rappresenta in una tabella  un valore booleano con ✅ (True) e ❌ (False).
+    """Represents a boolean value in a table with ✅ (True) and ❌ (False).
 
-    Esempio di utilizzo:
+    Example usage:
 
-    ```
-    class ProxmoxHostHomeTable(tables.Table):
-        is_online = GreenRedBooleanColumn()
-    ```
+        class ProxmoxHostHomeTable(tables.Table):
+            is_online = GreenRedBooleanColumn()
     """
 
     def __init__(self, *args, **kwargs):
-        """
-        Inizializza l'oggetto applicando il template."""
+        """Initialize the column and apply the default template."""
 
         kwargs.setdefault("template_name", "ui/tables/column_boolean_green_red.html")
         super().__init__(*args, **kwargs)
 
 
 class GreenRedReverseBooleanColumn(tables.TemplateColumn):
-    """Rappreenta in una tabella  un valore booleano con ❌ (True) e ✅ (False).
+    """Represents a boolean value in a table with ❌ (True) and ✅ (False).
 
-    Esempio di utilizzo:
+    Example usage:
 
-    ```
-    class ProxmoxHostHomeTable(tables.Table):
-        is_orphan = GreenRedReverseBooleanColumn()
-    ```
+        class ProxmoxHostHomeTable(tables.Table):
+            is_orphan = GreenRedReverseBooleanColumn()
     """
 
     def __init__(self, *args, **kwargs):
-        """
-        Inizializza l'oggetto applicando il template."""
+        """Initialize the column and apply the default template."""
         kwargs.setdefault(
             "template_name", "ui/tables/column_boolean_green_red_reverse.html"
         )
@@ -78,95 +73,65 @@ class GreenRedReverseBooleanColumn(tables.TemplateColumn):
 
 
 class SeverityColumn(tables.TemplateColumn):
-    """Rappresenta in una tabella  i valori di severity error e warning (integer) in modo grafico.
+    """Graphically represents severity values (integer) in a table.
 
-    Esempio di utilizzo:
+    Example usage:
 
-    ```
-        class LogTable(ObjectTable):
-        severity = SeverityColumn()
-    ```
+        class LogTable(tables.Table):
+            severity = SeverityColumn()
     """
 
     def __init__(self, *args, **kwargs):
-        """
-        Inizializza l'oggetto applicando il template."""
+        """Initialize the column and apply the default template."""
         kwargs.setdefault("template_name", "ui/tables/column_severity.html")
         super().__init__(*args, **kwargs)
 
 
 class SeverityAllColumn(tables.TemplateColumn):
-    """Rappresenta in una tabella  tutti i valori di severity in modo grafico.
+    """Graphically represents all severity values in a table.
 
-    Esempio di utilizzo:
+    Example usage:
 
-    ```
-        class LogTable(ObjectTable):
-        severity = SeverityAllColumn()
-    ```
+        class LogTable(tables.Table):
+            severity = SeverityAllColumn()
     """
 
     def __init__(self, *args, **kwargs):
-        """
-        Inizializza l'oggetto applicando il template."""
+        """Initialize the column and apply the default template."""
         kwargs.setdefault("template_name", "ui/tables/column_severity_all.html")
         super().__init__(*args, **kwargs)
 
 
 class ObjectTable(tables.Table):
-    """
-    Tabella per un oggetto generico.
+    """Generic table for a model object with default attributes and actions.
 
-    La tabella inizializza a default i seguenti attributi:
-    - title della tabella referenziando il valore in messages.TABLE_<model>_TITLE
-    - description della tabella referenziando il valore in messages.TABLE_<model>_DESCRIPTION
-    - detail_view con il valore <model>_detail
+    The table sets default values for:
+        - title: fetched from messages.TABLE_<model>_TITLE
+        - description: fetched from messages.TABLE_<model>_DESCRIPTION
+        - detail_view: default view for object detail
+        - search: enables search if not specified
 
-    I valori possono essere sovrascritti, anche singolarmente.
+    Default row and table actions are provided:
+        - Row actions: view, edit, delete
+        - Table actions: add, bulk delete
 
-    La tabella viene renderizzata di default con i valori definiti in unetlab.settings:
-    - DJANGO_TABLES2_PAGE_SIZE: la dimensione di default della pagina
-    - DJANGO_TABLES2_MAX_PAGE_SIZE: la dimensione massima della pagina
-    - DJANGO_TABLES2_TEMPLATE: il template di default
+    Example usage:
 
-    Il template aggiunge automaticamente:
-    - la colonna select, per selezionare manualmente più righe ed effettuare azioni
-    - la colonna row_actions, per effettuare azioni su una singola riga (default: view, delete, edit)
-
-    A livello di tabella sono inoltre presenti dei bottoni che permettono di effettuare azioni globalmente o su più righe. I bottono sono raggruppati in un meno a tendina (table_actions) o visibili direttamente (table_vip_actions).
-    Ciascuna azione è definita nel seguente modo:
-
-    ```
-    {
-        "button": "Delete", # Usata per descrivere il bottone
-        "view": "group_list", # Usata se il bottone porta ad una vista specifica
-        "js": "JsFunction", # Usata se il bottone richiama una specifica funzione JavaScript
-    }
-    ```
-
-    Esempio di utilizzo:
-
-    ```
-    class GroupTable(ObjectTable):
-        class Meta:
-            model = Group
-            template_name = "custom/table.html"
-            attrs = {
-                "title": "User groups"
-            }
-    ```
+        class GroupTable(ObjectTable):
+            class Meta:
+                model = Group
+                template_name = "custom/table.html"
+                attrs = {
+                    "title": "User groups"
+                }
     """
 
     def __init__(self, *args, **kwargs):
-        """
-        Inizializza l'oggetto lasciando che tables.Table applichi Meta.attrs.
-
-        I valori di title, description, detail_view e search vengono impostati se non presenti.
-        """
+        """Initialize the table, setting defaults if not provided."""
         super().__init__(*args, **kwargs)
         model_name = self.Meta.model._meta.model_name.lower()
 
-        # Imposta i valori di default se non presenti
+        # Set default title and description if not provided
         if "title" not in self.attrs:
             default_title = getattr(messages, f"TABLE_{model_name.upper()}_TITLE")
             self.attrs["title"] = default_title
@@ -175,14 +140,10 @@ class ObjectTable(tables.Table):
                 messages, f"TABLE_{model_name.upper()}_DESCRIPTION"
             )
             self.attrs["description"] = default_description
-        # TODO: delete, moved to row_actions
-        # if "detail_view" not in self.attrs:
-        #     default_detail_view = f"{model_name}_detail"
-        #     self.attrs["detail_view"] = default_detail_view
         if "search" not in self.attrs:
             self.attrs["search"] = True
 
-        # Imposta le azioni di default se non presenti
+        # Set default row actions if not provided
         if "row_actions" not in self.attrs:
             row_actions = [
                 {
