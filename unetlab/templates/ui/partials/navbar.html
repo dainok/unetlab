@@ -177,7 +177,7 @@
                                         {% translate "Tokens" %}
                                     </a>
                                     <a class="dropdown-item{% is_active 'admin:auth_user_changelist' %}"
-                                        href="{% url 'admin:auth_user_changelist' %}">
+                                        href="{% url 'user_list' %}">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round"
@@ -558,10 +558,10 @@
                                         </div>
                                     </a>
                                     <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                                        <a href="#" class="dropdown-item">{% translate "Status" %}</a>
-                                        <a href="./profile.html" class="dropdown-item">{% translate "Profile" %}</a>
+                                        <a href="{% url 'user_detail' user_pk %}" class="dropdown-item">{% translate "Profile" %}</a>
+                                        <a href="#" class="dropdown-item">{% translate "API Tokens" %}</a>
                                         <div class="dropdown-divider"></div>
-                                        <a href="./settings.html" class="dropdown-item">{% translate "Settings" %}</a>
+                                        <a href="#" class="dropdown-item">{% translate "Status" %}</a>
                                         <form id="logout-form" method="post" action="{% url 'logout' %}">
                                             {% csrf_token %}
                                             <button type="submit" class="dropdown-item">

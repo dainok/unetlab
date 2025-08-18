@@ -18,7 +18,7 @@ from django_tables2 import SingleTableView
 from django_tables2.columns import Column
 from rest_framework.mixins import DestroyModelMixin, ListModelMixin, RetrieveModelMixin
 from rest_framework.viewsets import ModelViewSet
-from unetlab.views import LogListMixin
+from unetlab.views import CommonMixin
 
 
 class APICRUDViewSet(ModelViewSet):
@@ -45,7 +45,7 @@ class APIRDViewSet(DestroyModelMixin, ListModelMixin, RetrieveModelMixin):
     queryset = None
 
 
-class ObjectChangeView(UpdateView):
+class ObjectChangeView(CommonMixin, UpdateView):
     """Generic update view for any model object.
 
     Subclasses should define `model` and `form_class`.
@@ -62,7 +62,7 @@ class ObjectChangeView(UpdateView):
         return reverse(f"{model_name}_detail", kwargs={"pk": self.object.pk})
 
 
-class ObjectCreateView(CreateView):
+class ObjectCreateView(CommonMixin, CreateView):
     """Generic create view for any model object.
 
     Subclasses should define `model` and optionally `form_class`.
@@ -78,7 +78,7 @@ class ObjectCreateView(CreateView):
         return reverse(f"{model_name}_list")
 
 
-class ObjectDeleteView(DeleteView):
+class ObjectDeleteView(CommonMixin, DeleteView):
     """Generic delete view with confirmation for a single object.
 
     Subclasses should define `model`.
@@ -94,7 +94,7 @@ class ObjectDeleteView(DeleteView):
         return reverse_lazy(f"{model_name}_list")
 
 
-class ObjectBulkDeleteView(View):
+class ObjectBulkDeleteView(CommonMixin, View):
     """Generic view to delete multiple objects selected via checkboxes.
 
     Subclasses should define `model`.
@@ -140,7 +140,7 @@ class ObjectBulkDeleteView(View):
         )
 
 
-class ObjectDetailView(DetailView):
+class ObjectDetailView(CommonMixin, DetailView):
     """Generic detail view for any model object.
 
     Provides field data as a dictionary, supports column ordering,
@@ -195,7 +195,7 @@ class ObjectDetailView(DetailView):
         return context
 
 
-class ObjectListView(LogListMixin, SingleTableView, FilterView):
+class ObjectListView(CommonMixin, SingleTableView, FilterView):
     """Base list view using django-tables2 and django-filters.
 
     Supports pagination customization via 'per_page' query param.

@@ -1,17 +1,16 @@
 """Views for UNetLab: entry points bound to URLs."""
 
-from django.views.generic import TemplateView
 from django.conf import settings
-from django_tables2 import SingleTableView
+from django.views.generic import TemplateView
 from django_filters.views import FilterView
-from django_tables2 import RequestConfig
+from django_tables2 import RequestConfig, SingleTableView
 from job.models import Log
 from job.tables import LogHomeTable
 from proxmox.tables import ProxmoxHostHomeTable
 from proxmox.models import ProxmoxHost
 
 
-class LogListMixin:
+class CommonMixin:
     """HTML list view with filtering and pagination."""
 
     def get_log_queryset(self):
@@ -26,33 +25,12 @@ class LogListMixin:
         """Add latest logs to context."""
         context = super().get_context_data(**kwargs)
         context["latest_logs"] = self.get_log_queryset()
+        """Add user ID."""
+        context["user_pk"] = self.request.user.pk
         return context
 
 
-class CommonMixin:
-    """HTML list view with filtering and pagination."""
-
-    actions = []  # General actions (e.g., 'delete', 'add')
-    vip_actions = []  # VIP actions (e.g., 'host-rescan')
-
-    def get_context_data(self, **kwargs):
-        """Add latest logs to context."""
-        # TODO: not working
-        context = super().get_context_data(**kwargs)
-        context["actions"] = self.get_actions()
-        context["vip_actions"] = self.get_vip_actions()
-        return context
-
-    def get_actions(self):
-        """Return standard actions, can be overridden."""
-        return self.actions
-
-    def get_vip_actions(self):
-        """Return VIP actions, can be overridden."""
-        return self.vip_actions
-
-
-class BaseListView(LogListMixin, SingleTableView, FilterView):
+class BaseListView(CommonMixin, SingleTableView, FilterView):
     """Base list view with tables2 and django-filters."""
 
     paginate_by = settings.DJANGO_TABLES2_PAGE_SIZE

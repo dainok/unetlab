@@ -6,8 +6,10 @@ auth-related models.
 """
 
 from django import forms
+from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.models import Group, User
 from rest_framework.authtoken.models import Token
+from ui.include import messages
 from ui.include.forms import ObjectModelForm
 
 
@@ -122,6 +124,19 @@ class UserForm(ObjectModelForm):
     groups = forms.ModelMultipleChoiceField(
         queryset=Group.objects.all(), required=False, widget=forms.SelectMultiple
     )
+    password1 = forms.CharField(
+        label="Password",
+        widget=forms.PasswordInput,
+        required=False,
+        help_text=messages.PASSWORD1_HELP,
+    )
+
+    password2 = forms.CharField(
+        label="Conferma Password",
+        widget=forms.PasswordInput,
+        required=False,
+        help_text=messages.PASSWORD2_HELP,
+    )
 
     class Meta:
         """
@@ -155,6 +170,20 @@ class UserForm(ObjectModelForm):
         if self.instance.pk:
             self.fields["groups"].initial = self.instance.groups.all()
 
+    def clean(self):
+        """
+        Check that password1 and password2 match.
+        """
+        cleaned_data = super().clean()
+        password1 = cleaned_data.get("password1")
+        password2 = cleaned_data.get("password2")
+
+        if password1 or password2:  # if one of the two is filled in
+            if password1 != password2:
+                raise forms.ValidationError(messages.PASSWORD_ERROR)
+
+        return cleaned_data
+
     def save(self, commit=True):
         """
         Save the user instance and update the associated groups.
@@ -166,6 +195,11 @@ class UserForm(ObjectModelForm):
             User: The saved user instance.
         """
         user = super().save(commit=False)
+
+        password1 = self.cleaned_data.get("password1")
+        if password1:  # only if set/modified
+            user.set_password(password1)
+
         if commit:
             user.save()
             user.groups.set(self.cleaned_data["groups"])

@@ -4,7 +4,6 @@ This module defines all the standardized messages used across
 the UI, API responses, and tables, to ensure consistency.
 """
 
-from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
@@ -29,6 +28,16 @@ ADD = _("Add")
 DELETE = _("Delete")
 EDIT = _("Edit")
 VIEW = _("View")
+
+
+#############################################################################
+# Forms
+#############################################################################
+
+
+PASSWORD1_HELP = "Leave blank to not change the password."
+PASSWORD2_HELP = "Repeat password to confirm."
+PASSWORD_ERROR = "The passwords do not match."
 
 
 #############################################################################
