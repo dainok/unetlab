@@ -43,11 +43,11 @@ class UserSerializer(ObjectSerializer):
             "last_name",
             "username",
         ]
-        extra_kwargs = {
-            "date_joined": {"read_only": True},
-            "last_login": {"read_only": True},
-            "password": {"write_only": True},
-        }
+        read_only_fields = [
+            "date_joined",
+            "last_login",
+            "password",
+        ]
 
     def update(self, instance, validated_data):
         """

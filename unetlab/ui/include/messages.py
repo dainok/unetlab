@@ -125,5 +125,7 @@ FILTER_LOGGED_AFTER = _("Last login after")
 #############################################################################
 # Bus messages
 #############################################################################
+
+
 MSG_VALUE_ERROR = _("Value error")
 MSG_CONFIG_UPDATED = _("Configuration updated.")
