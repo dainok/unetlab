@@ -8,16 +8,12 @@ __license__ = "GPLv3"
 import os
 import requests
 from celery import shared_task
-from proxmoxer import ProxmoxAPI
-from proxmoxer.core import ResourceException
-from requests.exceptions import ConnectTimeout, ConnectionError, RequestException
 from constance import config
-from ui.include import messages
-from repository.models import Repository
-from node.models import NodeTemplate
 from job.models import Job, JobStatusChoices
 from job.utils import log
-from constance import config
+from node.models import NodeTemplate
+from repository.models import Repository
+from ui.include import messages
 
 
 @shared_task

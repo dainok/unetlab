@@ -4,29 +4,52 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from repository.views import (
-    RepositoryViewSet,
-    RepositoryListView,
+    RepositoryAPIViewSet,
+    RepositoryBulkDeleteView,
+    RepositoryCreateView,
+    RepositoryDeleteView,
     RepositoryDetailView,
-    RepositoriesRescanAPIView,
+    RepositoryListView,
+    RepositoryRescanAPIView,
+    RepositoryChangeView,
 )
 
 # DRF router for API endpoints of Repository viewsets
 router = DefaultRouter()
-router.register(r"host", RepositoryViewSet, basename="host")
+router.register(r"host", RepositoryAPIViewSet, basename="host")
 
 # URL patterns for class-based views and API endpoints
 urlpatterns = [
-    # List and detail views for Repository (HTML views)
     path("repository/", RepositoryListView.as_view(), name="repository_list"),
+    path("repository/create", RepositoryCreateView.as_view(), name="repository_create"),
+    path(
+        "repository/delete",
+        RepositoryBulkDeleteView.as_view(),
+        name="repository_bulkdelete",
+    ),
+    path(
+        "repository/<str:pk>/delete",
+        RepositoryDeleteView.as_view(),
+        name="repository_delete",
+    ),
+    path(
+        "repository/<str:pk>/update",
+        RepositoryChangeView.as_view(),
+        name="repository_update",
+    ),
     path(
         "repository/<str:pk>/", RepositoryDetailView.as_view(), name="repository_detail"
     ),
+    #########################################################################
     # Custom API endpoints
+    #########################################################################
     path(
         "api/repository/rescan/",
-        RepositoriesRescanAPIView.as_view(),
+        RepositoryRescanAPIView.as_view(),
         name="repository-rescan",
     ),
-    # Include API routes from DRF router
+    #########################################################################
+    # API endpoints
+    #########################################################################
     path("api/", include(router.urls)),
 ]

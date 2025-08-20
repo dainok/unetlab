@@ -9,7 +9,7 @@ from django.apps import AppConfig
 
 
 class RepositoryConfig(AppConfig):
-    """Config for Repositories management app."""
+    """Application configuration for the `repository` app."""
 
     name = "repository"  # Python path to the app
     verbose_name = "Repositories"  # Human-readable app name

@@ -1,68 +1,103 @@
 """Views, called by URLs."""
 
-from django.views.generic import DetailView
-from django.conf import settings
-from django_filters.views import FilterView
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import viewsets, mixins
-from rest_framework.permissions import IsAuthenticated
 from repository.models import Repository
 from repository.serializers import RepositorySerializer
-from django_tables2 import SingleTableView
-from django import forms
-from django.views.generic.edit import UpdateView, CreateView
+from repository.filters import RepositoryFilter
+from repository.forms import RepositoryForm
 from repository.tables import RepositoryTable
 from repository.tasks import do_rescan
-from repository.filters import RepositoryFilter
-from unetlab.utils import db_fields_to_dict
-from unetlab.views import CommonMixin, BaseListView
-from ui.include.permissions import IsAdminOrStaff
-from ui.include.views import ObjectDetailView
-from ui.include.tables import GreenRedBooleanColumn
+from ui.include.permissions import IsAdmin, IsAdminOrStaff
+from ui.include.views import (
+    APICRUDViewSet,
+    ObjectBulkDeleteView,
+    ObjectChangeView,
+    ObjectCreateView,
+    ObjectDeleteView,
+    ObjectDetailView,
+    ObjectListView,
+)
 
 
 class RepositoryQueryMixin:
-    """Mixin to encapsulate common Repository queryset and permissions logic.
+    """Mixin encapsulating common queryset and permission logic for `Group`.
 
-    Used by both UI and API views.
+    Used by both HTML views and API views.
     """
 
-
-class RepositoryViewSet(
-    RepositoryQueryMixin,
-    mixins.ListModelMixin,  # GET /host/
-    mixins.RetrieveModelMixin,  # GET /host/{id}/
-    viewsets.GenericViewSet,
-):
-    """REST API endpoints for Repository model."""
-
-    serializer_class = RepositorySerializer
-    filter_backends = [DjangoFilterBackend]
     queryset = Repository.objects.all()
 
 
-class RepositoryListView(BaseListView):
-    model = Repository
-    table_class = RepositoryTable
+class RepositoryAPIViewSet(RepositoryQueryMixin, APICRUDViewSet):
+    """REST API endpoints for Repository model."""
+
+    serializer_class = RepositorySerializer
     filterset_class = RepositoryFilter
-    actions = ["delete"]
-    vip_actions = ["repository-rescan"]
 
 
-class RepositoryDetailView(ObjectDetailView):
+class RepositoryBulkDeleteView(ObjectBulkDeleteView):
+    """HTML view for deleting multiple `User` objects at once."""
+
     model = Repository
+    permission_classes = [IsAdmin]
+
+
+class RepositoryChangeView(ObjectChangeView):
+    """HTML view for updating an existing `User`."""
+
+    model = Repository
+    form_class = RepositoryForm
+    permission_classes = [IsAdmin]
+
+
+class RepositoryCreateView(ObjectCreateView):
+    """HTML view for creating a new `User`."""
+
+    model = Repository
+    form_class = RepositoryForm
+    permission_classes = [IsAdmin]
+
+
+class RepositoryDeleteView(ObjectDeleteView):
+    """HTML view for deleting a single `User`."""
+
+    model = Repository
+    permission_classes = [IsAdmin]
     exclude = ["id"]
     sequence = ["name", "created_at", "description"]
-    # is_enabled = GreenRedBooleanColumn()
 
 
-class RepositoriesRescanAPIView(APIView):
+class RepositoryDetailView(RepositoryQueryMixin, ObjectDetailView):
+    """HTML view for displaying the details of a `User`."""
+
+    model = Repository
+    # exclude = ["id", "password"]
+    # sequence = [
+    #     "username",
+    #     "first_name",
+    #     "last_name",
+    #     "email",
+    #     "is_active",
+    #     "is_superuser",
+    #     "is_staff",
+    # ]
+
+
+class RepositoryListView(RepositoryQueryMixin, ObjectListView):
+    """HTML view for displaying a table of `User` objects."""
+
+    filterset_class = RepositoryFilter
+    model = Repository
+    table_class = RepositoryTable
+
+
+class RepositoryRescanAPIView(APIView):
     """Manage rescan action."""
 
-    permission_classes = [IsAuthenticated, IsAdminOrStaff]
+    permission_classes = [IsAdminOrStaff]
 
     def post(self, request):
         do_rescan(username=request.user.username)
+        # TODO: review data model
         return Response({"status": "rescan triggered"})

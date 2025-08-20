@@ -45,6 +45,7 @@ class ConstanceListView(CommonMixin, TemplateView):
         TemplateView
     """
 
+    permission_classes = [IsAdmin]
     template_name = "ui/settings_list.html"
 
     def get_variables(self):
@@ -78,6 +79,7 @@ class ConstanceUpdateView(CommonMixin, TemplateView):
     """
 
     template_name = "ui/settings_form.html"
+    permission_classes = [IsAdmin]
 
     def get_variables(self):
         """

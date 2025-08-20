@@ -1,10 +1,15 @@
 import django_tables2 as tables
 from repository.models import Repository
-from ui.include import messages
-from ui.include.tables import GreenRedBooleanColumn, GreenRedReverseBooleanColumn
+from ui.include.tables import (
+    GreenRedBooleanColumn,
+    ObjectTable,
+)
 
 
-class RepositoryTable(tables.Table):
+class RepositoryTable(ObjectTable):
+    is_enabled = GreenRedBooleanColumn(
+        orderable=True, attrs={"td": {"class": "text-center"}}
+    )
     name = tables.LinkColumn(
         "repository_detail",
         args=[tables.A("pk")],
@@ -13,61 +18,18 @@ class RepositoryTable(tables.Table):
         orderable=False,
         template_code="{{ record.uri|truncatechars:60 }}",
     )
-    is_enabled = GreenRedBooleanColumn(
-        orderable=True, attrs={"td": {"class": "text-center"}}
-    )
     created_at = tables.DateColumn(orderable=True, format="Y-m-d")
     updated_at = tables.DateColumn(orderable=True, format="Y-m-d H:i")
 
     class Meta:
         model = Repository
-        exclude = ["select", "actions"]
+        exclude = ["updated_at"]
         order_by = "name"
         attrs = {
-            "title": messages.TABLE_REPOSITORY_TITLE,
-            "description": messages.TABLE_REPOSITORY_DESCRIPTION,
-            "detail_view": "repository_detail",
-            "actions": [
-                # {
-                #     "action": "Add",
-                #     "method": "POST",
-                #     "view": "repository-add",
-                # },
-                # {
-                #     "action": "Delete",
-                #     "method": "POST",
-                #     "view": "repository-add",
-                # },
-                # {
-                #     "action": "Disable",
-                #     "method": "POST",
-                #     "view": "repository-disable",
-                # },
-                # {
-                #     "action": "Enable",
-                #     "method": "POST",
-                #     "view": "repository-enable",
-                # },
-            ],
-            "vip_actions": [
+            "table_vip_actions": [
                 {
-                    "action": "Rescan",
+                    "button": "Rescan",
                     "js": "rescan('repository')",
                 },
             ],
-        }
-
-
-class RepositoryHomeTable(tables.Table):
-    created_at = tables.DateColumn(orderable=True, format="Y-m-d")
-    updated_at = tables.DateColumn(orderable=True, format="Y-m-d H:i")
-
-    class Meta:
-        model = Repository
-        exclude = ["select", "actions"]
-        order_by = "name"
-        attrs = {
-            "title": messages.TABLE_REPOSITORY_TITLE,
-            "description": messages.TABLE_REPOSITORY_DESCRIPTION,
-            # "detail_view": "host_detail",
         }
