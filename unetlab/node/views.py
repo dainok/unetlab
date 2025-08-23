@@ -1,29 +1,25 @@
 """Views, called by URLs."""
 
 import hashlib
-from django.views.generic import DetailView
-from django.conf import settings
-from django_filters.views import FilterView
 from django.core.files.storage import default_storage
-from django_filters.rest_framework import DjangoFilterBackend
+from django.urls import reverse
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status
-from rest_framework import viewsets, mixins
-from rest_framework.permissions import IsAuthenticated
+from node.filters import NodeTemplateFilter
 from node.models import NodeTemplate
 from node.serializers import NodeTemplateSerializer, UploadDiskSerializer
-from node.filters import NodeTemplateFilter
-from django_tables2 import SingleTableView
 from node.tables import NodeTemplateTable
-from ui.include.views import ObjectDetailView, ObjectChangeView, ObjectCreateView
-from django.urls import reverse
 from node.forms import NodeTemplateForm
-
-# from node.tasks import do_rescan
-from unetlab.utils import db_fields_to_dict
-from unetlab.views import CommonMixin, BaseListView
-from ui.include.permissions import IsAdminOrStaff
+from ui.include.permissions import IsAdmin, IsAdminOrStaff
+from ui.include.views import (
+    APICRUDViewSet,
+    ObjectBulkDeleteView,
+    ObjectChangeView,
+    ObjectCreateView,
+    ObjectDeleteView,
+    ObjectDetailView,
+    ObjectListView,
+)
 
 
 class NodeTemplateQueryMixin:
@@ -33,24 +29,17 @@ class NodeTemplateQueryMixin:
     """
 
 
-class NodeTemplateViewSet(
-    NodeTemplateQueryMixin,
-    mixins.ListModelMixin,  # GET /host/
-    mixins.RetrieveModelMixin,  # GET /host/{id}/
-    viewsets.GenericViewSet,
-):
+class NodeTemplateViewSet(APICRUDViewSet):
     """REST API endpoints for Template model."""
 
     serializer_class = NodeTemplateSerializer
-    filter_backends = [DjangoFilterBackend]
     filterset_class = NodeTemplateFilter
-    queryset = NodeTemplate.objects.all()
 
 
 class DiskTemplateCreateAPIView(APIView):
     """Add disk."""
 
-    permission_classes = [IsAuthenticated, IsAdminOrStaff]
+    permission_classes = [IsAdminOrStaff]
 
     def post(self, request, pk):
         template = NodeTemplate.objects.filter(pk=pk).first()
@@ -91,7 +80,7 @@ class DiskTemplateCreateAPIView(APIView):
         return Response({"disk": disk}, status=status.HTTP_201_CREATED)
 
 
-class NodeTemplateListView(BaseListView):
+class NodeTemplateListView(ObjectListView):
     model = NodeTemplate
     table_class = NodeTemplateTable
     filterset_class = NodeTemplateFilter

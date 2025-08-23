@@ -1,5 +1,6 @@
 """Views, called by URLs."""
 
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from repository.models import Repository
@@ -89,10 +90,4 @@ class RepositoryRescanAPIView(RepositoryQueryMixin, APIView):
 
     def post(self, request):
         do_rescan(username=request.user.username)
-        return Response(
-            {
-                "status": "queued",
-                "type": "response",
-                "command": "repository-rescan",
-            }
-        )
+        return Response({}, status=status.HTTP_202_ACCEPTED)

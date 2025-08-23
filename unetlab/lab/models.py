@@ -74,6 +74,7 @@ class Instance(models.Model):
         verbose_name=_("LLD"),
         help_text=_("Low Level Design"),
     )
+    shared_groups = models.ManyToManyField(Group, related_name="labs", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

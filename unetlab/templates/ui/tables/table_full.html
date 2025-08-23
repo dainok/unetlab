@@ -222,7 +222,7 @@
          * Uses prependLog() to display errors on API failure, HTTP errors, network errors, and timeouts.
          */
         event.preventDefault();  // Prevent standard submit
-        url = `/api/${model_name}/rescan`;
+        url = `/api/${model_name}/rescan/`;
         fetch(url, {
             method: "POST",
             headers: {

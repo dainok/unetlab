@@ -120,7 +120,7 @@ Server responses to client requests follow this format:
 
 ```json
 {
-    "status": "success", // Either "success" or "error"
+    "status": "success", // Either "success", "error", or "queued"
     "type": "response", // For responses to client requests, this is always "response"
     "command": "host-rescan", // The command requested by the client
     "data": {}, // The response payload to send back to the client
