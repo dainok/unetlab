@@ -14,4 +14,4 @@ class ProxmoxHostSerializer(serializers.ModelSerializer):
             "id",
             "created_at",
             "updated_at",
-        ]  # Make some fields read-only
+        ]

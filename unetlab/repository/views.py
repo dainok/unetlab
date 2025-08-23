@@ -36,14 +36,14 @@ class RepositoryAPIViewSet(RepositoryQueryMixin, APICRUDViewSet):
     filterset_class = RepositoryFilter
 
 
-class RepositoryBulkDeleteView(ObjectBulkDeleteView):
+class RepositoryBulkDeleteView(RepositoryQueryMixin, ObjectBulkDeleteView):
     """HTML view for deleting multiple `User` objects at once."""
 
     model = Repository
     permission_classes = [IsAdmin]
 
 
-class RepositoryChangeView(ObjectChangeView):
+class RepositoryChangeView(RepositoryQueryMixin, ObjectChangeView):
     """HTML view for updating an existing `User`."""
 
     model = Repository
@@ -51,7 +51,7 @@ class RepositoryChangeView(ObjectChangeView):
     permission_classes = [IsAdmin]
 
 
-class RepositoryCreateView(ObjectCreateView):
+class RepositoryCreateView(RepositoryQueryMixin, ObjectCreateView):
     """HTML view for creating a new `User`."""
 
     model = Repository
@@ -59,7 +59,7 @@ class RepositoryCreateView(ObjectCreateView):
     permission_classes = [IsAdmin]
 
 
-class RepositoryDeleteView(ObjectDeleteView):
+class RepositoryDeleteView(RepositoryQueryMixin, ObjectDeleteView):
     """HTML view for deleting a single `User`."""
 
     model = Repository
@@ -72,16 +72,6 @@ class RepositoryDetailView(RepositoryQueryMixin, ObjectDetailView):
     """HTML view for displaying the details of a `User`."""
 
     model = Repository
-    # exclude = ["id", "password"]
-    # sequence = [
-    #     "username",
-    #     "first_name",
-    #     "last_name",
-    #     "email",
-    #     "is_active",
-    #     "is_superuser",
-    #     "is_staff",
-    # ]
 
 
 class RepositoryListView(RepositoryQueryMixin, ObjectListView):
@@ -92,7 +82,7 @@ class RepositoryListView(RepositoryQueryMixin, ObjectListView):
     table_class = RepositoryTable
 
 
-class RepositoryRescanAPIView(APIView):
+class RepositoryRescanAPIView(RepositoryQueryMixin, APIView):
     """Manage rescan action."""
 
     permission_classes = [IsAdminOrStaff]

@@ -73,14 +73,14 @@ VERSION_ERROR = _("Only letters, numbers, dots, and hyphens are allowed.")
 TABLE_GROUP_TITLE = _("Groups")
 TABLE_GROUP_DESCRIPTION = _("List of all user groups in the system.")
 
-TABLE_HOST_TITLE = _("Hosts")
-TABLE_HOST_DESCRIPTION = _("List of all Proxmox hosts managed by the system.")
-
 TABLE_JOB_TITLE = _("Jobs")
 TABLE_JOB_DESCRIPTION = _("Displays all scheduled and completed jobs.")
 
 TABLE_LOG_TITLE = _("System Logs")
 TABLE_LOG_DESCRIPTION = _("Displays all system logs with relevant details.")
+
+TABLE_PROXMOXHOST_TITLE = _("Hosts")
+TABLE_PROXMOXHOST_DESCRIPTION = _("List of all Proxmox hosts managed by the system.")
 
 TABLE_REPOSITORY_TITLE = _("Repositories")
 TABLE_REPOSITORY_DESCRIPTION = _("All configured repositories and their metadata.")

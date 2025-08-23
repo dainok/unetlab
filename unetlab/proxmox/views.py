@@ -1,23 +1,18 @@
 """Views, called by URLs."""
 
-from django.views.generic import DetailView
-from django.conf import settings
-from django_filters.views import FilterView
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import viewsets, mixins
-from rest_framework.permissions import IsAuthenticated
 from proxmox.models import ProxmoxHost
 from proxmox.serializers import ProxmoxHostSerializer
 from proxmox.filters import ProxmoxHostFilter
-from django_tables2 import SingleTableView
 from proxmox.tables import ProxmoxHostTable
 from proxmox.tasks import do_rescan
-from unetlab.utils import db_fields_to_dict
-from unetlab.views import CommonMixin, BaseListView
 from ui.include.permissions import IsAdminOrStaff
-from ui.include.views import ObjectDetailView
+from ui.include.views import (
+    APIRViewSet,
+    ObjectDetailView,
+    ObjectListView,
+)
 
 
 class ProxmoxHostQueryMixin:
@@ -26,42 +21,34 @@ class ProxmoxHostQueryMixin:
     Used by both UI and API views.
     """
 
+    queryset = ProxmoxHost.objects.all()
 
-class ProxmoxHostViewSet(
-    ProxmoxHostQueryMixin,
-    mixins.ListModelMixin,  # GET /host/
-    mixins.RetrieveModelMixin,  # GET /host/{id}/
-    viewsets.GenericViewSet,
-):
+
+class ProxmoxHostAPIViewSet(ProxmoxHostQueryMixin, APIRViewSet):
     """REST API endpoints for ProxmoxHost model."""
 
     serializer_class = ProxmoxHostSerializer
     filterset_class = ProxmoxHostFilter
-    filter_backends = [DjangoFilterBackend]
-    queryset = ProxmoxHost.objects.all()
 
 
-class ProxmoxHostListView(BaseListView):
-    model = ProxmoxHost
-    table_class = ProxmoxHostTable
-    filterset_class = ProxmoxHostFilter
-    list_view = "host_list"
-
-
-class ProxmoxHostDetailView(ObjectDetailView):
+class ProxmoxHostDetailView(ProxmoxHostQueryMixin, ObjectDetailView):
     """HTML detail view for a single ProxmoxHost."""
 
     model = ProxmoxHost
-    list_view = "host_list"
-    # exclude=["id"]
-    # sequence=["name", "created_at", "description"]
 
 
-class ProxmoxRescanView(APIView):
+class ProxmoxHostListView(ProxmoxHostQueryMixin, ObjectListView):
+    filterset_class = ProxmoxHostFilter
+    model = ProxmoxHost
+    table_class = ProxmoxHostTable
+
+
+class ProxmoxRescanView(ProxmoxHostQueryMixin, APIView):
     """Manage rescan action."""
 
-    permission_classes = [IsAuthenticated, IsAdminOrStaff]
+    permission_classes = [IsAdminOrStaff]
 
     def post(self, request):
         do_rescan(username=request.user.username)
+        # TODO: review data model
         return Response({"status": "rescan triggered"})

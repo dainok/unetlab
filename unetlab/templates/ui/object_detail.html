@@ -29,11 +29,17 @@
 
             <div class="card-footer">
                 <div class="text-end">
+                    {% url model_name|add:'_delete' pk as delete_url %}
+                    {% if delete_url %}
                     <a href="{% url model_name|add:'_delete' pk %}" class="btn">Delete</a>
+                    {% endif %}
                     {% if request.GET.back %}
                     <a href="{% url request.GET.back %}" class="btn">Back</a>
                     {% endif %}
+                    {% url model_name|add:'_delete' pk as edit_url %}
+                    {% if edit_url %}
                     <a href="{% url model_name|add:'_update' pk %}" class="btn btn-primary ms-auto">Edit</a>
+                    {% endif %}
                 </div>
             </div>
         </div>

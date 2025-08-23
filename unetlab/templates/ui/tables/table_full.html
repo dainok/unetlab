@@ -216,13 +216,13 @@
         document.body.appendChild(form);
         form.submit();
     }
-    function rescan(object) {
+    function RescanView(model_name) {
         /**
          * Trigger a rescan of the Proxmox infrastructure by sending a POST request to the API.
          * Uses prependLog() to display errors on API failure, HTTP errors, network errors, and timeouts.
          */
         event.preventDefault();  // Prevent standard submit
-        url = `/api/${object}/rescan/`;
+        url = `/api/${model_name}/rescan/`;
         fetch(url, {
             method: "POST",
             headers: {

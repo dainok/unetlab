@@ -7,9 +7,10 @@ to enable users to filter ProxmoxHost records by relevant fields.
 from django import forms
 import django_filters
 from proxmox.models import ProxmoxHost
+from ui.include.filters import SearchFilterSet
 
 
-class ProxmoxHostFilter(django_filters.FilterSet):
+class ProxmoxHostFilter(SearchFilterSet):
     """FilterSet for filtering ProxmoxHost instances by username, status, and creation date.
     TODO
 

@@ -16,7 +16,7 @@ from django_filters.views import FilterView
 from django_tables2 import SingleTableView
 from django_tables2.columns import Column
 from rest_framework.mixins import DestroyModelMixin, ListModelMixin, RetrieveModelMixin
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from unetlab.views import CommonMixin
 
 
@@ -32,8 +32,22 @@ class APICRUDViewSet(ModelViewSet):
     queryset = None
 
 
-class APIRDViewSet(DestroyModelMixin, ListModelMixin, RetrieveModelMixin):
+class APIRDViewSet(
+    DestroyModelMixin, ListModelMixin, RetrieveModelMixin, GenericViewSet
+):
     """Read and delete only REST API viewset.
+
+    Provides list, retrieve, and delete endpoints.
+    Subclasses should define `queryset` and `serializer_class`.
+    """
+
+    filterset_class = None
+    serializer_class = None
+    queryset = None
+
+
+class APIRViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
+    """Read only REST API viewset.
 
     Provides list, retrieve, and delete endpoints.
     Subclasses should define `queryset` and `serializer_class`.

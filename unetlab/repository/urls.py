@@ -16,7 +16,7 @@ from repository.views import (
 
 # DRF router for API endpoints of Repository viewsets
 router = DefaultRouter()
-router.register(r"host", RepositoryAPIViewSet, basename="host")
+router.register(r"repository", RepositoryAPIViewSet, basename="repository")
 
 # URL patterns for class-based views and API endpoints
 urlpatterns = [

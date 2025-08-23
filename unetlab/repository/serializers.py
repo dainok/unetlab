@@ -11,6 +11,7 @@ class RepositorySerializer(serializers.ModelSerializer):
         model = Repository
         fields = "__all__"
         read_only_fields = [
+            "name",
             "created_at",
             "updated_at",
         ]

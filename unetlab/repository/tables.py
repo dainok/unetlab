@@ -29,7 +29,7 @@ class RepositoryTable(ObjectTable):
             "table_vip_actions": [
                 {
                     "button": "Rescan",
-                    "js": "rescan('repository')",
+                    "js": "RescanView",
                 },
             ],
         }

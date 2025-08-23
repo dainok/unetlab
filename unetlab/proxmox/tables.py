@@ -1,10 +1,13 @@
 import django_tables2 as tables
 from proxmox.models import ProxmoxHost
-from ui.include.tables import GreenRedBooleanColumn, GreenRedReverseBooleanColumn
-from ui.include import messages
+from ui.include.tables import (
+    GreenRedBooleanColumn,
+    GreenRedReverseBooleanColumn,
+    ObjectTable,
+)
 
 
-class ProxmoxHostTable(tables.Table):
+class ProxmoxHostTable(ObjectTable):
     name = tables.LinkColumn(
         "host_detail",
         args=[tables.A("name")],
@@ -23,13 +26,11 @@ class ProxmoxHostTable(tables.Table):
         exclude = ["select", "actions"]
         order_by = "name"
         attrs = {
-            "title": messages.TABLE_HOST_TITLE,
-            "description": messages.TABLE_HOST_DESCRIPTION,
-            "detail_view": "host_detail",
-            "vip_actions": [
+            "table_actions": [],
+            "table_vip_actions": [
                 {
-                    "action": "Rescan",
-                    "js": "rescan('host')",
+                    "button": "Rescan",
+                    "js": "RescanView",
                 },
             ],
         }
@@ -49,8 +50,3 @@ class ProxmoxHostHomeTable(tables.Table):
         model = ProxmoxHost
         exclude = ["select", "actions"]
         order_by = "hostname"
-        attrs = {
-            "title": messages.TABLE_HOST_TITLE,
-            "description": messages.TABLE_HOST_DESCRIPTION,
-            "detail_view": "host_detail",
-        }
