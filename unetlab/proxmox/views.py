@@ -50,5 +50,10 @@ class ProxmoxRescanView(ProxmoxHostQueryMixin, APIView):
 
     def post(self, request):
         do_rescan(username=request.user.username)
-        # TODO: review data model
-        return Response({"status": "rescan triggered"})
+        return Response(
+            {
+                "status": "queued",
+                "type": "response",
+                "command": "proxmoxhost-rescan",
+            }
+        )
