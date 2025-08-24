@@ -3,7 +3,6 @@
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from repository.models import Repository
 from repository.serializers import RepositorySerializer
 from repository.filters import RepositoryFilter
@@ -37,7 +36,7 @@ class RepositoryAPIViewSet(RepositoryQueryMixin, APICRUDViewSet):
     serializer_class = RepositorySerializer
     filterset_class = RepositoryFilter
 
-    @action(detail=False, methods=["post"])
+    @action(detail=False, methods=["post"], permission_classes=IsAdminOrStaff)
     def rescan(self, request):
         do_rescan(username=request.user.username)
         return Response({}, status=status.HTTP_202_ACCEPTED)
