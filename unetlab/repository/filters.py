@@ -17,7 +17,6 @@ class RepositoryFilter(SearchFilterSet):
     search_fields = ["name", "uri"]
     is_enabled = django_filters.BooleanFilter(
         widget=forms.Select(
-            attrs={"class": "form-select"},
             choices=messages.CHOICES_YES_NO,
         ),
     )

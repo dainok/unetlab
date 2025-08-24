@@ -9,7 +9,6 @@ from ui.include.validators import (
     VersionValidator,
     SimplePasswordValidator,
 )
-from django.core.validators import DecimalValidator
 from proxmox.models import ProxmoxHost
 
 
@@ -103,12 +102,6 @@ class NodeTemplate(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    # @property
-    # def download_uri(self):
-    #     if self.disk_checksum:
-    #         return f"/files/{self.vendor}-{self.os}/{self.name}.vma".lower()
-    #     return None
 
     class Meta:
         """Database metadata."""

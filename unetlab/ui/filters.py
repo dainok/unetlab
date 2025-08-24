@@ -53,21 +53,18 @@ class UserFilter(SearchFilterSet):
     search_fields = ["username"]
     is_active = django_filters.BooleanFilter(
         widget=forms.Select(
-            attrs={"class": "form-select"},
             choices=messages.CHOICES_YES_NO,
         ),
         label=messages.FILTER_ACTIVE_USERS,
     )
     is_staff = django_filters.BooleanFilter(
         widget=forms.Select(
-            attrs={"class": "form-select"},
             choices=messages.CHOICES_YES_NO,
         ),
         label=messages.FILTER_STAFF_USERS,
     )
     is_superuser = django_filters.BooleanFilter(
         widget=forms.Select(
-            attrs={"class": "form-select"},
             choices=messages.CHOICES_YES_NO,
         ),
         label=messages.FILTER_ADMIN_USERS,
@@ -75,13 +72,13 @@ class UserFilter(SearchFilterSet):
     last_login_before = django_filters.DateFilter(
         field_name="last_login",
         lookup_expr="lte",
-        widget=forms.DateInput(attrs={"type": "date", "class": "form-control mb-2"}),
+        widget=forms.DateInput(attrs={"type": "date"}),
         label=messages.FILTER_LOGGED_BEFORE,
     )
     last_login_after = django_filters.DateFilter(
         field_name="last_login",
         lookup_expr="gte",
-        widget=forms.DateInput(attrs={"type": "date", "class": "form-control mb-2"}),
+        widget=forms.DateInput(attrs={"type": "date"}),
         label=messages.FILTER_LOGGED_AFTER,
     )
 
@@ -112,21 +109,18 @@ class TokenFilter(SearchFilterSet):
 
     user__is_active = django_filters.BooleanFilter(
         widget=forms.Select(
-            attrs={"class": "form-select"},
             choices=messages.CHOICES_YES_NO,
         ),
         label=messages.FILTER_ACTIVE_USERS,
     )
     user__is_staff = django_filters.BooleanFilter(
         widget=forms.Select(
-            attrs={"class": "form-select"},
             choices=messages.CHOICES_YES_NO,
         ),
         label=messages.FILTER_STAFF_USERS,
     )
     user__is_superuser = django_filters.BooleanFilter(
         widget=forms.Select(
-            attrs={"class": "form-select"},
             choices=messages.CHOICES_YES_NO,
         ),
         label=messages.FILTER_ADMIN_USERS,

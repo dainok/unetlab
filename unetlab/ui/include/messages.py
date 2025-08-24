@@ -85,8 +85,8 @@ TABLE_PROXMOXHOST_DESCRIPTION = _("List of all Proxmox hosts managed by the syst
 TABLE_REPOSITORY_TITLE = _("Repositories")
 TABLE_REPOSITORY_DESCRIPTION = _("All configured repositories and their metadata.")
 
-TABLE_TEMPLATE_TITLE = _("Templates")
-TABLE_TEMPLATE_DESCRIPTION = _("All available templates for virtual machines.")
+TABLE_NODETEMPLATE_TITLE = _("Templates")
+TABLE_NODETEMPLATE_DESCRIPTION = _("All available templates for virtual machines.")
 
 TABLE_TOKEN_TITLE = _("Tokens")
 TABLE_TOKEN_DESCRIPTION = _("List of all registered API tokens.")

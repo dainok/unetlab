@@ -2,7 +2,7 @@
 
 import hashlib
 from django.core.files.storage import default_storage
-from django.urls import reverse
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from node.filters import NodeTemplateFilter
@@ -22,6 +22,11 @@ from ui.include.views import (
 )
 
 
+#############################################################################
+# Templates
+#############################################################################
+
+
 class NodeTemplateQueryMixin:
     """Mixin to encapsulate common Template queryset and permissions logic.
 
@@ -29,11 +34,53 @@ class NodeTemplateQueryMixin:
     """
 
 
-class NodeTemplateViewSet(APICRUDViewSet):
+class NodeTemplateAPIViewSet(NodeTemplateQueryMixin, APICRUDViewSet):
     """REST API endpoints for Template model."""
 
     serializer_class = NodeTemplateSerializer
     filterset_class = NodeTemplateFilter
+
+
+class NodeTemplateBulkDeleteView(ObjectBulkDeleteView):
+    """HTML view for deleting multiple `Group` objects at once."""
+
+    model = NodeTemplate
+    permission_classes = [IsAdmin]
+
+
+class NodeTemplateChangeView(ObjectChangeView):
+    model = NodeTemplate
+    form_class = NodeTemplateForm
+    permission_classes = [IsAdmin]
+
+
+class NodeTemplateCreateView(ObjectCreateView):
+    model = NodeTemplate
+    form_class = NodeTemplateForm
+
+
+class NodeTemplateDeleteView(ObjectDeleteView):
+    """HTML view for deleting a single `Group`."""
+
+    model = NodeTemplate
+    permission_classes = [IsAdmin]
+
+
+class NodeTemplateDetailView(ObjectDetailView):
+    model = NodeTemplate
+    exclude = ["id"]
+    sequence = ["name", "created_at", "description"]
+
+
+class NodeTemplateListView(ObjectListView):
+    model = NodeTemplate
+    table_class = NodeTemplateTable
+    filterset_class = NodeTemplateFilter
+
+
+#############################################################################
+# Disks
+#############################################################################
 
 
 class DiskTemplateCreateAPIView(APIView):
@@ -78,46 +125,3 @@ class DiskTemplateCreateAPIView(APIView):
         template.save()
 
         return Response({"disk": disk}, status=status.HTTP_201_CREATED)
-
-
-class NodeTemplateListView(ObjectListView):
-    model = NodeTemplate
-    table_class = NodeTemplateTable
-    filterset_class = NodeTemplateFilter
-    actions = ["delete"]
-    vip_actions = ["Template-rescan"]
-
-
-class NodeTemplateDetailView(ObjectDetailView):
-    model = NodeTemplate
-    exclude = ["id"]
-    sequence = ["name", "created_at", "description"]
-    list_view = "template_list"
-    # is_enabled = GreenRedBooleanColumn()
-
-
-class NodeTemplateCreateView(ObjectCreateView):
-    model = NodeTemplate
-    form_class = NodeTemplateForm
-
-    # attrs = {
-    #     # "title": messages.TABLE_TEMPLATE_TITLE,
-    #     # "description": messages.TABLE_TEMPLATE_DESCRIPTION,
-    #     "actions": [
-    #         {
-    #             "action": "Add disk",
-    #             "view": "template_disk",
-    #         },
-    #     ],
-    # }
-    def get_success_url(self):
-        # instance è l'oggetto appena creato
-        return reverse("template_detail", kwargs={"pk": self.object.pk})
-
-
-class NodeTemplateChangeView(ObjectChangeView):
-    model = NodeTemplate
-    form_class = NodeTemplateForm
-    # fields = '__all__'
-    # template_name = 'object_form.html'
-    # success_url = reverse_lazy('home')
