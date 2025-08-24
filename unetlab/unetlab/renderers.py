@@ -8,8 +8,9 @@ class CustomJSONRenderer(JSONRenderer):
         command = request.resolver_match.view_name
         status_code = response.status_code
         status_type = "success" if status_code < 400 else "error"
+        # Override codes
         if status_code == 202:
-            status_type = "queued"
+            status_type = "accepted"
 
         wrapped = {
             "status": status_type,

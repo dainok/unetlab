@@ -1,6 +1,7 @@
 """Views, called by URLs."""
 
 from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from proxmox.models import ProxmoxHost
@@ -31,6 +32,11 @@ class ProxmoxHostAPIViewSet(ProxmoxHostQueryMixin, APIRViewSet):
     serializer_class = ProxmoxHostSerializer
     filterset_class = ProxmoxHostFilter
 
+    @action(detail=False, methods=["post"])
+    def rescan(self, request):
+        do_rescan(username=request.user.username)
+        return Response({}, status=status.HTTP_202_ACCEPTED)
+
 
 class ProxmoxHostDetailView(ProxmoxHostQueryMixin, ObjectDetailView):
     """HTML detail view for a single ProxmoxHost."""
@@ -42,13 +48,3 @@ class ProxmoxHostListView(ProxmoxHostQueryMixin, ObjectListView):
     filterset_class = ProxmoxHostFilter
     model = ProxmoxHost
     table_class = ProxmoxHostTable
-
-
-class ProxmoxRescanView(ProxmoxHostQueryMixin, APIView):
-    """Manage rescan action."""
-
-    permission_classes = [IsAdminOrStaff]
-
-    def post(self, request):
-        do_rescan(username=request.user.username)
-        return Response({}, status=status.HTTP_202_ACCEPTED)

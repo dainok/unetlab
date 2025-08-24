@@ -10,7 +10,7 @@ from job.models import Job, JobStatusChoices, Log, LogSeverityChoices
 from ui.include.filters import SearchFilterSet
 
 
-class JobFilter(django_filters.FilterSet):
+class JobFilter(SearchFilterSet):
     """FilterSet for filtering Job instances by username, status, and creation date.
 
     This filter is used primarily in list views and APIs to narrow down

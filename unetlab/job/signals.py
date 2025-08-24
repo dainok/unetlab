@@ -7,9 +7,9 @@ corresponding UNetLab functions such as broadcasting logs over WebSocket channel
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
-from job.models import Log
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from job.models import Log
 from job.serializers import LogSerializer
 
 

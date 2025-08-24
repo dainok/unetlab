@@ -10,7 +10,6 @@ from repository.views import (
     RepositoryDeleteView,
     RepositoryDetailView,
     RepositoryListView,
-    RepositoryRescanAPIView,
     RepositoryChangeView,
 )
 
@@ -39,14 +38,6 @@ urlpatterns = [
     ),
     path(
         "repository/<str:pk>/", RepositoryDetailView.as_view(), name="repository_detail"
-    ),
-    #########################################################################
-    # Custom API endpoints
-    #########################################################################
-    path(
-        "api/repository/rescan/",
-        RepositoryRescanAPIView.as_view(),
-        name="repository-rescan",
     ),
     #########################################################################
     # API endpoints

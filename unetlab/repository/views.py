@@ -1,6 +1,7 @@
 """Views, called by URLs."""
 
 from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from repository.models import Repository
@@ -36,6 +37,11 @@ class RepositoryAPIViewSet(RepositoryQueryMixin, APICRUDViewSet):
     serializer_class = RepositorySerializer
     filterset_class = RepositoryFilter
 
+    @action(detail=False, methods=["post"])
+    def rescan(self, request):
+        do_rescan(username=request.user.username)
+        return Response({}, status=status.HTTP_202_ACCEPTED)
+
 
 class RepositoryBulkDeleteView(RepositoryQueryMixin, ObjectBulkDeleteView):
     """HTML view for deleting multiple `User` objects at once."""
@@ -65,8 +71,6 @@ class RepositoryDeleteView(RepositoryQueryMixin, ObjectDeleteView):
 
     model = Repository
     permission_classes = [IsAdmin]
-    exclude = ["id"]
-    sequence = ["name", "created_at", "description"]
 
 
 class RepositoryDetailView(RepositoryQueryMixin, ObjectDetailView):
@@ -81,13 +85,3 @@ class RepositoryListView(RepositoryQueryMixin, ObjectListView):
     filterset_class = RepositoryFilter
     model = Repository
     table_class = RepositoryTable
-
-
-class RepositoryRescanAPIView(RepositoryQueryMixin, APIView):
-    """Manage rescan action."""
-
-    permission_classes = [IsAdminOrStaff]
-
-    def post(self, request):
-        do_rescan(username=request.user.username)
-        return Response({}, status=status.HTTP_202_ACCEPTED)

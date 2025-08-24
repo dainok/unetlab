@@ -7,7 +7,6 @@ from proxmox.views import (
     ProxmoxHostAPIViewSet,
     ProxmoxHostListView,
     ProxmoxHostDetailView,
-    ProxmoxRescanView,
 )
 
 # DRF router for API endpoints of ProxmoxHost viewsets
@@ -18,10 +17,6 @@ router.register(r"host", ProxmoxHostAPIViewSet, basename="host")
 urlpatterns = [
     path("host/", ProxmoxHostListView.as_view(), name="host_list"),
     path("host/<str:pk>/", ProxmoxHostDetailView.as_view(), name="host_detail"),
-    #########################################################################
-    # Custom API endpoints
-    #########################################################################
-    path("api/host/rescan/", ProxmoxRescanView.as_view(), name="host-rescan"),
     #########################################################################
     # API endpoints
     #########################################################################

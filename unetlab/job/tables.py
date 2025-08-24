@@ -1,7 +1,11 @@
 import django_tables2 as tables
 from job.models import Log, Job
-from ui.include.tables import GreenBooleanColumn, SeverityAllColumn
 from ui.include import messages
+from ui.include.tables import (
+    GreenBooleanColumn,
+    SeverityAllColumn,
+    ObjectTable,
+)
 
 
 class JobTable(tables.Table):
@@ -24,12 +28,11 @@ class JobTable(tables.Table):
         attrs = {
             "title": messages.TABLE_JOB_TITLE,
             "description": messages.TABLE_JOB_DESCRIPTION,
-            "detail_view": "job_detail",
             "search": True,
         }
 
 
-class LogTable(tables.Table):
+class LogTable(ObjectTable):
     id = tables.LinkColumn(
         "log_detail",
         args=[tables.A("pk")],
@@ -48,14 +51,20 @@ class LogTable(tables.Table):
         exclude = ["select", "source", "job", "updated_at"]
         order_by = "-created_at"
         attrs = {
-            "title": messages.TABLE_LOG_TITLE,
-            "description": messages.TABLE_LOG_DESCRIPTION,
-            "detail_view": "log_detail",
             "search": True,
+            "table_actions": [],
+            "row_actions": [],
         }
 
 
-class LogHomeTable(tables.Table):
+class JobDetailLogTable(ObjectTable):
+    id = tables.LinkColumn(
+        "log_detail",
+        args=[tables.A("pk")],
+    )
+    acknowledged = GreenBooleanColumn(
+        orderable=True, verbose_name="Ack", attrs={"td": {"class": "text-center"}}
+    )
     severity = SeverityAllColumn(
         orderable=True, verbose_name="Sev", attrs={"td": {"class": "text-center"}}
     )
@@ -66,7 +75,30 @@ class LogHomeTable(tables.Table):
         sequence = ["id", "severity", "type", "..."]
         exclude = ["select", "source", "job", "updated_at"]
         attrs = {
-            "title": messages.TABLE_LOG_TITLE,
-            "detail_view": "log_detail",
-            "search": False,
+            "title": "Related Logs",
+            "table_actions": [],
+            "row_actions": [],
+        }
+
+
+class LogHomeTable(ObjectTable):
+    id = tables.LinkColumn(
+        "log_detail",
+        args=[tables.A("pk")],
+    )
+    acknowledged = GreenBooleanColumn(
+        orderable=True, verbose_name="Ack", attrs={"td": {"class": "text-center"}}
+    )
+    severity = SeverityAllColumn(
+        orderable=True, verbose_name="Sev", attrs={"td": {"class": "text-center"}}
+    )
+    created_at = tables.DateColumn(orderable=True, format="Y-m-d H:i")
+
+    class Meta:
+        model = Log
+        sequence = ["id", "severity", "type", "..."]
+        exclude = ["select", "source", "job", "updated_at"]
+        attrs = {
+            "table_actions": [],
+            "row_actions": [],
         }
