@@ -33,8 +33,7 @@
                         <ul class="navbar-nav">
                             <li class="nav-item{% is_active 'home' %}">
                                 <a class="nav-link" href="{% url 'home' %}">
-                                    <span
-                                        class="nav-link-icon d-md-none d-lg-inline-block">
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round" class="icon icon-1">
@@ -48,8 +47,7 @@
                             <li class="nav-item dropdown{% is_active 'job_list' 'job_detail' 'job_logs' %}">
                                 <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"
                                     data-bs-auto-close="outside" role="button" aria-expanded="false">
-                                    <span
-                                        class="nav-link-icon d-md-none d-lg-inline-block">
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round" class="icon icon-1">
@@ -62,8 +60,7 @@
                                     <span class="nav-link-title"> {% translate "System" %} </span>
                                 </a>
                                 <div class="dropdown-menu">
-                                    <a class="dropdown-item{% is_active 'group_list' %}"
-                                        href="{% url 'group_list' %}">
+                                    <a class="dropdown-item{% is_active 'group_list' %}" href="{% url 'group_list' %}">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round"
@@ -145,7 +142,8 @@
                                         </svg>
                                         {% translate "Settings" %}
                                     </a>
-                                    <a class="dropdown-item{% is_active 'nodetemplate_list' %}" href="{% url 'nodetemplate_list' %}">
+                                    <a class="dropdown-item{% is_active 'nodetemplate_list' %}"
+                                        href="{% url 'nodetemplate_list' %}">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round"
@@ -163,8 +161,7 @@
                                         </svg>
                                         {% translate "Templates" %}
                                     </a>
-                                    <a class="dropdown-item{% is_active 'token_list' %}"
-                                        href="{% url 'token_list' %}">
+                                    <a class="dropdown-item{% is_active 'token_list' %}" href="{% url 'token_list' %}">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round"
@@ -176,8 +173,7 @@
                                         </svg>
                                         {% translate "Tokens" %}
                                     </a>
-                                    <a class="dropdown-item{% is_active 'user_list' %}"
-                                        href="{% url 'user_list' %}">
+                                    <a class="dropdown-item{% is_active 'user_list' %}" href="{% url 'user_list' %}">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round"
@@ -193,8 +189,7 @@
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#navbar-layout" data-bs-toggle="dropdown"
                                     data-bs-auto-close="outside" role="button" aria-expanded="false">
-                                    <span
-                                        class="nav-link-icon d-md-none d-lg-inline-block">
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round" class="icon icon-1">
@@ -220,6 +215,19 @@
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="icon icon-tabler icons-tabler-outline icon-tabler-clipboard">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                    <path
+                                                        d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
+                                                    <path
+                                                        d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" />
+                                                </svg>
+                                                {% translate "Labs" %}
+                                            </a>
+                                            <a class="dropdown-item" href="./layout-boxed.html">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                                                     class="icon icon-tabler icons-tabler-outline icon-tabler-clipboard-data">
                                                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                                     <path
@@ -231,7 +239,7 @@
                                                     <path d="M15 17v-2" />
                                                     <path d="M12 17v-1" />
                                                 </svg>
-                                                {% translate "Labs" %}
+                                                {% translate "Running labs" %}
                                             </a>
                                             <a class="dropdown-item" href="./layout-combo.html">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -286,8 +294,7 @@
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#navbar-help" data-bs-toggle="dropdown"
                                     data-bs-auto-close="outside" role="button" aria-expanded="false">
-                                    <span
-                                        class="nav-link-icon d-md-none d-lg-inline-block">
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round" class="icon icon-1">
@@ -558,8 +565,10 @@
                                         </div>
                                     </a>
                                     <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                                        <a href="{% url 'user_detail' user_pk %}" class="dropdown-item">{% translate "Profile" %}</a>
-                                        <a href="{% url 'token_list' %}" class="dropdown-item">{% translate "API Tokens" %}</a>
+                                        <a href="{% url 'user_detail' user_pk %}" class="dropdown-item">{% translate
+                                            "Profile" %}</a>
+                                        <a href="{% url 'token_list' %}" class="dropdown-item">{% translate "API Tokens"
+                                            %}</a>
                                         <div class="dropdown-divider"></div>
                                         <a href="#" class="dropdown-item">{% translate "Status" %}</a>
                                         <form id="logout-form" method="post" action="{% url 'logout' %}">
