@@ -76,6 +76,12 @@ TABLE_GROUP_DESCRIPTION = _("List of all user groups in the system.")
 TABLE_JOB_TITLE = _("Jobs")
 TABLE_JOB_DESCRIPTION = _("Displays all scheduled and completed jobs.")
 
+TABLE_LAB_TITLE = _("Labs")
+TABLE_LAB_DESCRIPTION = _("All available labs.")
+
+TABLE_LABINSTANCE_TITLE = _("Running labs")
+TABLE_LABINSTANCE_DESCRIPTION = _("All available lab instances.")
+
 TABLE_LOG_TITLE = _("System Logs")
 TABLE_LOG_DESCRIPTION = _("Displays all system logs with relevant details.")
 

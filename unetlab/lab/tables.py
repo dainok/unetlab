@@ -1,5 +1,5 @@
 import django_tables2 as tables
-from lab.models import Lab
+from lab.models import Lab, LabInstance
 from ui.include.tables import (
     ObjectTable,
 )
@@ -22,8 +22,8 @@ class LabTable(ObjectTable):
             "created_at",
             "updated_at",
         ]
-        sequence = ["lab", "..."]
-        order_by = ["lab"]
+        sequence = ["name", "..."]
+        order_by = ["name"]
 
 
 #############################################################################
@@ -36,12 +36,18 @@ class LabInstanceTable(ObjectTable):
     updated_at = tables.DateColumn(orderable=True, format="Y-m-d H:i")
 
     class Meta:
-        model = Lab
+        model = LabInstance
         exclude = [
             # "select",
             # "actions",
-            "created_at",
+            "id",
+            "nodes",
+            "lld",
+            # "created_at",
             "updated_at",
         ]
-        sequence = ["name", "..."]
-        order_by = ["name"]
+        sequence = ["lab", "..."]
+        order_by = ["lab"]
+        attrs = {
+            "table_actions": [],
+        }
