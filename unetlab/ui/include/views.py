@@ -120,6 +120,13 @@ class ObjectChangeView(CommonMixin, UpdateView):
         model_name = self.model._meta.model_name
         return reverse(f"{model_name}_detail", kwargs={"pk": self.object.pk})
 
+    def get_form_kwargs(self):
+        # recupera i kwargs standard
+        kwargs = super().get_form_kwargs()
+        # aggiunge l'utente corrente
+        kwargs["user"] = self.request.user
+        return kwargs
+
 
 class ObjectCreateView(CommonMixin, CreateView):
     """Generic create view for any model object.
@@ -135,6 +142,13 @@ class ObjectCreateView(CommonMixin, CreateView):
         """Redirect to the list page of the model after creation."""
         model_name = self.model._meta.model_name
         return reverse(f"{model_name}_list")
+
+    def get_form_kwargs(self):
+        # recupera i kwargs standard
+        kwargs = super().get_form_kwargs()
+        # aggiunge l'utente corrente
+        kwargs["user"] = self.request.user
+        return kwargs
 
 
 class ObjectDeleteView(CommonMixin, DeleteView):

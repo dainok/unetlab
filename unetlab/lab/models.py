@@ -22,7 +22,6 @@ class Lab(models.Model):
 
     name = models.CharField(
         max_length=255,
-        editable=False,
         verbose_name=_("Name"),
         validators=[AlphanumericPhraseValidator],
         help_text=_("Template name."),
@@ -30,12 +29,17 @@ class Lab(models.Model):
     hld = models.JSONField(
         verbose_name=_("HLD"),
         help_text=_("High Level Design"),
+        default=dict,
     )
     lld = models.JSONField(
         verbose_name=_("LLD"),
         help_text=_("Low Level Design"),
+        default=dict,
+        editable=False,
     )
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="labs")
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="labs", editable=False
+    )
     shared_groups = models.ManyToManyField(Group, related_name="labs", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
