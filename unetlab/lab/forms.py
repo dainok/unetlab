@@ -17,8 +17,8 @@ from ui.include.forms import ObjectModelForm
 
 
 class LabForm(ObjectModelForm):
-    shared_groups = forms.ModelMultipleChoiceField(
-        queryset=Group.objects.none(), required=False, widget=forms.SelectMultiple
+    shared_group = forms.ModelChoiceField(
+        queryset=Group.objects.all(), required=False, widget=forms.Select
     )
 
     class Meta:
@@ -33,10 +33,17 @@ class LabForm(ObjectModelForm):
         super().__init__(*args, **kwargs)
         user = kwargs["user"]
         # Pre-populate groups if user exists
-        self.fields["shared_groups"].queryset = user.groups.all()
+        self.fields["shared_group"].queryset = user.groups.all()
         if self.instance.pk:
             # se sto modificando, pre-popoliamo i gruppi già associati al Lab
-            self.fields["shared_groups"].initial = self.instance.shared_groups.all()
+            self.fields["shared_group"].initial = self.instance.shared_group
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.user = self.user
+        if commit:
+            instance.save()
+        return instance
 
 
 #############################################################################

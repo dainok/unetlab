@@ -45,6 +45,7 @@ class LabQueryMixin:
             # Staff users can see users who share at least one group
             groups = user.groups.all()
             return qs.filter(user__groups__in=groups).distinct()
+        print("THERE")
         # Non-admin users can only see their own user
         return qs.filter(user=user)
 
@@ -80,40 +81,44 @@ class LabAPIViewSet(LabQueryMixin, APICRUDViewSet):
     serializer_class = LabSerializer
     filterset_class = LabFilter
 
+    def perform_create(self, serializer):
+        # Set user
+        serializer.save(user=self.request.user)
 
-class LabBulkDeleteView(ObjectBulkDeleteView):
+
+class LabBulkDeleteView(LabQueryMixin, ObjectBulkDeleteView):
     """HTML view for deleting multiple `User` objects at once."""
 
     model = Lab
 
 
-class LabChangeView(ObjectChangeView):
+class LabChangeView(LabQueryMixin, ObjectChangeView):
     """HTML view for updating an existing `User`."""
 
     model = Lab
     form_class = LabForm
 
 
-class LabCreateView(ObjectCreateView):
+class LabCreateView(LabQueryMixin, ObjectCreateView):
     """HTML view for creating a new `User`."""
 
     model = Lab
     form_class = LabForm
 
 
-class LabDeleteView(ObjectDeleteView):
+class LabDeleteView(LabQueryMixin, ObjectDeleteView):
     """HTML view for deleting a single `User`."""
 
     model = Lab
 
 
-class LabDetailView(ObjectDetailView):
+class LabDetailView(LabQueryMixin, ObjectDetailView):
     model = Lab
     exclude = ["id"]
     sequence = ["name", "created_at", "description"]
 
 
-class LabListView(ObjectListView):
+class LabListView(LabQueryMixin, ObjectListView):
     model = Lab
     table_class = LabTable
     filterset_class = LabFilter
@@ -182,32 +187,32 @@ class LabInstanceAPIViewSet(LabQueryMixin, APICRUDViewSet):
     filterset_class = LabInstanceFilter
 
 
-class LabInstanceBulkDeleteView(ObjectBulkDeleteView):
+class LabInstanceBulkDeleteView(LabInstanceQueryMixin, ObjectBulkDeleteView):
     """HTML view for deleting multiple `User` objects at once."""
 
     model = LabInstance
 
 
-class LabInstanceChangeView(ObjectChangeView):
+class LabInstanceChangeView(LabInstanceQueryMixin, ObjectChangeView):
     """HTML view for updating an existing `User`."""
 
     model = LabInstance
     form_class = LabInstanceForm
 
 
-class LabInstanceDeleteView(ObjectDeleteView):
+class LabInstanceDeleteView(LabInstanceQueryMixin, ObjectDeleteView):
     """HTML view for deleting a single `User`."""
 
     model = LabInstance
 
 
-class LabInstanceDetailView(ObjectDetailView):
+class LabInstanceDetailView(LabInstanceQueryMixin, ObjectDetailView):
     model = LabInstance
     exclude = ["id"]
     sequence = ["name", "created_at", "description"]
 
 
-class LabInstanceListView(ObjectListView):
+class LabInstanceListView(LabInstanceQueryMixin, ObjectListView):
     model = LabInstance
     table_class = LabInstanceTable
     filterset_class = LabInstanceFilter

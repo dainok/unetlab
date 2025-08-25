@@ -1,8 +1,8 @@
 """Define ORM models for Proxmox hosts."""
 
+from django.db import models
 from django.contrib.auth.models import User, Group
 from django.utils.translation import gettext_lazy as _
-from django.db import models
 from django.urls import reverse
 from node.models import Node
 from ui.include.validators import (
@@ -41,7 +41,9 @@ class Lab(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="labs", editable=False
     )
-    shared_groups = models.ManyToManyField(Group, related_name="labs", blank=True)
+    shared_group = models.ForeignKey(
+        Group, related_name="labs", on_delete=models.SET_NULL, blank=True, null=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
