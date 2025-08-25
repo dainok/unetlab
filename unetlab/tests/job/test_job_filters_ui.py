@@ -1,8 +1,9 @@
 import pytest
 from job.models import JobStatusChoices
 from job.filters import JobFilter
-from django.utils import timezone
-from datetime import timedelta
+
+# from django.utils import timezone
+# from datetime import timedelta
 
 
 @pytest.mark.django_db

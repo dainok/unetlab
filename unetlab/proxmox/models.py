@@ -24,7 +24,7 @@ class ProxmoxHost(models.Model):
     ip_address = models.GenericIPAddressField(
         null=False,
         blank=False,
-        default="0.0.0.0",  # nosec
+        default="0.0.0.0",  # nosec B104 # not binding to all interfaces
         editable=False,
         help_text="IP address retrieved from Proxmox host.",
         verbose_name="IP Address",

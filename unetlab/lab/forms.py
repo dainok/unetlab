@@ -1,7 +1,14 @@
-"""Serializers, called by API View."""
+"""
+Forms for managing Django Group, User, and Token models.
 
-from rest_framework import serializers
+This module provides reusable forms for CRUD operations on
+auth-related models.
+"""
+
+from django import forms
 from lab.models import Lab, LabInstance
+from ui.include import messages
+from ui.include.forms import ObjectModelForm
 
 
 #############################################################################
@@ -9,30 +16,21 @@ from lab.models import Lab, LabInstance
 #############################################################################
 
 
-class LabSerializer(serializers.ModelSerializer):
-    """Serializer for Template model."""
+class LabForm(ObjectModelForm):
 
     class Meta:
+
         model = Lab
         fields = "__all__"
-        read_only_fields = [
-            "created_at",
-            "updated_at",
-        ]  # Make some fields read-only
+
 
 
 #############################################################################
 # Instance
 #############################################################################
-
-
-class LabInstanceSerializer(serializers.ModelSerializer):
-    """Serializer for Template model."""
+class LabInstanceForm(ObjectModelForm):
 
     class Meta:
+
         model = LabInstance
         fields = "__all__"
-        read_only_fields = [
-            "created_at",
-            "updated_at",
-        ]  # Make some fields read-only

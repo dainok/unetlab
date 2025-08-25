@@ -1,18 +1,18 @@
 """Define ORM models for Proxmox hosts."""
 
+from django.contrib.auth.models import User, Group
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.urls import reverse
-from repository.models import Repository
 from node.models import Node
 from ui.include.validators import (
-    AlphanumericValidator,
-    VersionValidator,
-    SimplePasswordalidator,
     AlphanumericPhraseValidator,
 )
-from django.core.validators import DecimalValidator
-from django.contrib.auth.models import User, Group
+
+
+#############################################################################
+# Lab
+#############################################################################
 
 
 class Lab(models.Model):
@@ -34,12 +34,6 @@ class Lab(models.Model):
     lld = models.JSONField(
         verbose_name=_("LLD"),
         help_text=_("Low Level Design"),
-    )
-    instances = models.ForeignKey(
-        Instance,
-        on_delete=models.CASCADE,
-        related_name="instances",
-        blank=True,
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="labs")
     shared_groups = models.ManyToManyField(Group, related_name="labs", blank=True)
@@ -63,18 +57,29 @@ class Lab(models.Model):
         return reverse("lab-detail-view", args=[str(self.pk)])
 
 
-class Instance(models.Model):
+#############################################################################
+# Instance
+#############################################################################
+
+
+class LabInstance(models.Model):
     """
     Model for lab instance.
     """
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="labs")
-    nodes = models.ForeignKey(Node, on_delete=models.CASCADE, related_name="labs")
-    running_lld = models.JSONField(
+    lab = models.ForeignKey(
+        Lab,
+        on_delete=models.CASCADE,
+        related_name="instances",
+        blank=True,
+    )
+    lld = models.JSONField(
         verbose_name=_("LLD"),
         help_text=_("Low Level Design"),
     )
-    shared_groups = models.ManyToManyField(Group, related_name="labs", blank=True)
+    nodes = models.ForeignKey(Node, on_delete=models.CASCADE, related_name="instances")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="instances")
+    shared_groups = models.ManyToManyField(Group, related_name="instances", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

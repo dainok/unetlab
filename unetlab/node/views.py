@@ -102,7 +102,7 @@ class DiskTemplateCreateAPIView(APIView):
         #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         f = serializer.validated_data["file"]
-        checksum = hashlib.md5()
+        checksum = hashlib.md5()  # nosec B324 # not used for security
         for chunk in f.chunks():
             checksum.update(chunk)
         f.seek(0)

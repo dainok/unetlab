@@ -48,7 +48,7 @@ def job_rescan(job_id):
 
         else:
             # Remote repository
-            req = requests.get(repo_obj.uri)
+            req = requests.get(repo_obj.uri, timeout=5)
             if not req.ok:
                 log(
                     job_obj.pk,

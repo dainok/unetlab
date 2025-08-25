@@ -36,8 +36,8 @@ VIEW = _("View")
 
 
 PASSWORD1_HELP = "Leave blank to not change the password."
-PASSWORD2_HELP = "Repeat password to confirm."
-PASSWORD_ERROR = "The passwords do not match."
+PASSWORD2_HELP = "Repeat password to confirm."  # nosec B105 # not an hardcoded password
+PASSWORD_ERROR = "The passwords do not match."  # nosec B105 # not an hardcoded password
 
 
 #############################################################################

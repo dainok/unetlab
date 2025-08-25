@@ -19,7 +19,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ⚠️ WARNING: In production, set the secret key in an environment variable!
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",
-    "django-insecure-is*$9*-@-)qo_%a^xo8i%ppjg2#qx4y)tl+ymhk+w*dfh64%pi",  # nosec
+    "django-insecure-is*$9*-@-)qo_%a^xo8i%ppjg2#qx4y)tl+ymhk+w*dfh64%pi",  #
 )
 
 DEBUG = True  # Turn off in production
@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "constance",  # Dynamic settings backend
     # Local apps
     "job",
+    "lab",
     "node",
     "proxmox",
     "repository",
