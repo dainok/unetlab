@@ -30,6 +30,7 @@ class Lab(models.Model):
         verbose_name=_("HLD"),
         help_text=_("High Level Design"),
         default=dict,
+        blank=True,
     )
     lld = models.JSONField(
         verbose_name=_("LLD"),

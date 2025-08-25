@@ -35,7 +35,7 @@
                             {{ field }}
                             {% if field.errors %}
                             <div class="invalid-feedback">
-                                {{ field.help_text }} ({% for error in form.password.errors %}{{ error }}{% endfor %})
+                                {{ field.help_text }} ({% for error in field.errors %}{{ error }}{% endfor %})
                             </div>
                             {% elif field.help_text %}
                             <small id="id_{{ field.name }}_helptext" class="form-hint">{{ field.help_text }}</small>

@@ -20,15 +20,19 @@ class FormMixin:
         super().__init__(*args, **kwargs)
         for visible in self.visible_fields():
             widget_type = getattr(visible.field.widget, "input_type", None)
+            css_class = ""
             if widget_type == "password":
-                visible.field.widget.attrs["class"] = "form-control"
+                css_class = "form-control"
                 visible.field.widget.attrs["autocomplete"] = "new-password"
             elif widget_type in ["text", "email", "password", "number"]:
-                visible.field.widget.attrs["class"] = "form-control"
+                css_class = "form-control"
             elif widget_type == "checkbox":
-                visible.field.widget.attrs["class"] = "form-check-input"
+                css_class = "form-check-input"
             elif widget_type in ["select", "selectmultiple"]:
-                visible.field.widget.attrs["class"] = "form-select"
+                css_class = "form-select"
+            if visible.errors:
+                css_class = f"is-invalid {css_class}"
+            visible.field.widget.attrs["class"] = css_class
 
 
 class ObjectModelForm(FormMixin, forms.ModelForm):

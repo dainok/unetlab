@@ -32,7 +32,6 @@ class LabForm(ObjectModelForm):
         """
         super().__init__(*args, **kwargs)
         user = kwargs["user"]
-        print("USERAAA", user)
         # Pre-populate groups if user exists
         self.fields["shared_groups"].queryset = user.groups.all()
         if self.instance.pk:
