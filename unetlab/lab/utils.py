@@ -1,4 +1,3 @@
-
 from lab.models import Lab
 from node.models import NodeTemplate
 
@@ -24,8 +23,10 @@ interfaces:
   - ospf:area=0
 """
 
+
 def get_management_interface(teplate):
     pass
+
 
 def get_interface_name(template, id):
     return f"Ethernet{id}"
@@ -37,7 +38,6 @@ def get_template(prefix):
     if qs:
         return qs.first()
     return None
-
 
 
 def build_lld(lab_id):
@@ -66,7 +66,7 @@ def build_lld(lab_id):
         template_obj = get_template(template_prefix)
         if not template_obj:
             raise ValueError("Template non trovato")
-        
+
         # Create nodes
         for counter in range(1, count + 1):
             # Create unique name
@@ -77,16 +77,17 @@ def build_lld(lab_id):
                     node_names.append(name)
                     break
                 name_counter += 1
-            
+
             # Create node
             node = {
                 "id": node_id,
                 "template": template_obj.name,
                 "name": name,
+                "cpu": template_obj.cpu,
+                "ram": template_obj.ram,
             }
             if features:
                 node["features"] = features
-
 
             nodes[node_id] = node
             group_nodes.append(node)
@@ -99,15 +100,13 @@ def build_lld(lab_id):
                     groups[group_name] = []
                 groups[f"Group{group_id}"].append(node["name"])
 
-
-
         group_id += 1
 
         if topology == "full-mesh":
             for i in range(len(group_nodes)):
                 node_left = group_nodes[i]
                 # print(node_left)
-                for j in range(i+1, len(group_nodes)):
+                for j in range(i + 1, len(group_nodes)):
                     node_right = group_nodes[j]
                     # print(node_right)
 
@@ -115,11 +114,15 @@ def build_lld(lab_id):
                     node_id_left = node_left["id"]
                     node_name_left = node_left["name"]
                     iface_id_left = len(interfaces.get(node_id_left, {}))
-                    iface_name_left = get_interface_name(node_left["template"], iface_id_left)
+                    iface_name_left = get_interface_name(
+                        node_left["template"], iface_id_left
+                    )
                     node_id_right = node_right["id"]
                     node_name_right = node_right["name"]
                     iface_id_right = len(interfaces.get(node_id_right, {}))
-                    iface_name_right = get_interface_name(node_right["template"], iface_id_right)
+                    iface_name_right = get_interface_name(
+                        node_right["template"], iface_id_right
+                    )
 
                     # Define network
                     links[link_id] = {
@@ -131,22 +134,24 @@ def build_lld(lab_id):
                     # Adding interface to link
                     if not node_id_left in interfaces:
                         interfaces[node_id_left] = []
-                    interfaces[node_id_left].append({
-                        "id": iface_id_left,
-                        "name": iface_name_left,
-                        "link_id": link_id
-                    })
+                    interfaces[node_id_left].append(
+                        {
+                            "id": iface_id_left,
+                            "name": iface_name_left,
+                            "link_id": link_id,
+                        }
+                    )
                     if not node_id_right in interfaces:
                         interfaces[node_id_right] = []
-                    interfaces[node_id_right].append({
-                        "id": iface_id_right,
-                        "name": iface_name_right,
-                        "link_id": link_id
-                    })
+                    interfaces[node_id_right].append(
+                        {
+                            "id": iface_id_right,
+                            "name": iface_name_right,
+                            "link_id": link_id,
+                        }
+                    )
 
                     link_id += 1
-
-
 
     # Builing LLD
     lld = {
@@ -157,18 +162,16 @@ def build_lld(lab_id):
 
     for node_id, node in nodes.items():
         node["interfaces"] = interfaces[node_id]
+        interface_count = len(node["interfaces"])
+        node["nics"] = int(interface_count / 4) + (interface_count % 4 > 0) * 4
         lld["nodes"].append(node)
     for link_id, link in links.items():
         lld["links"].append(link)
     for group_name, group_members in groups.items():
-        lld["groups"].append({
-            "name": group_name,
-            "members": group_members
-        })
+        lld["groups"].append({"name": group_name, "members": group_members})
 
     lab.lld = lld
     lab.save()
-    # from pprint import pprint
-    # pprint(lld)
+    from pprint import pprint
 
-
+    pprint(lld)

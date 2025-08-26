@@ -66,6 +66,9 @@
                             <th>Name</th>
                             <th>Template</th>
                             <th>Features</th>
+                            <th>CPU</th>
+                            <th>RAM</th>
+                            <th>NICs</th>
                             <th>Interfaces</th>
                         </tr>
                     </thead>
@@ -76,6 +79,9 @@
                             <td>{{ row.name }}</td>
                             <td>{{ row.template }}</td>
                             <td>{{ row.features }}</td>
+                            <td>{{ row.cpu }}</td>
+                            <td>{{ row.ram }}</td>
+                            <td>{{ row.nics }}</td>
                             <td>{{ row.interfaces }}</td>
                         </tr>
                         {% endfor %}
