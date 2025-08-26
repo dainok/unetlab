@@ -25,6 +25,8 @@ class Lab(models.Model):
         verbose_name=_("Name"),
         validators=[AlphanumericPhraseValidator],
         help_text=_("Template name."),
+        unique=True,
+        db_index=True,
     )
     hld = models.JSONField(
         verbose_name=_("HLD"),

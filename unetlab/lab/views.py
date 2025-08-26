@@ -1,5 +1,6 @@
 """Views, called by URLs."""
 
+import yaml
 from django.core.exceptions import PermissionDenied
 from lab.models import Lab, LabInstance
 from lab.serializers import LabSerializer, LabInstanceSerializer
@@ -116,6 +117,25 @@ class LabDetailView(LabQueryMixin, ObjectDetailView):
     model = Lab
     exclude = ["id"]
     sequence = ["name", "created_at", "description"]
+    template_name = "lab_detail.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        lab = self.object
+
+        # Trasformo JSONField hld → YAML string
+        if lab.hld:
+            # JSON → YAML
+            context["hld_yaml"] = yaml.safe_dump(
+                lab.hld,
+                default_flow_style=False,
+                sort_keys=False,
+                allow_unicode=True,
+                indent=2,
+            )
+        else:
+            context["hld_yaml"] = ""
+        return context
 
 
 class LabListView(LabQueryMixin, ObjectListView):

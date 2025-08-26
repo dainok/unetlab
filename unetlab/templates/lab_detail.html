@@ -1,0 +1,21 @@
+{% extends "ui/base.html" %}
+{% block title %}UNetLab | {{ object.name }} > Detail{% endblock title %}
+{% block page_title %}{{ object.name }} > Detail{% endblock page_title %}
+{% block page_body %}
+<div class="col-lg-12">
+    <div class="card card-lg">
+        <div class="card-body markdown">
+            <h1>Lab {{ object.name }}</h1>
+            <ul>
+                <li>User: {{ object.user }}</li>
+                <li>Shared group: {{ object.shared_group }}</li>
+                <li>Created at: {{ object.created_at }}</li>
+                <li>Updated at: {{ object.updated_at }}</li>
+            </ul>
+            <h2>High Level Design:</h2>
+            <pre><code class="language-scss">{{ hld_yaml }}</code></pre>
+        </div>
+    </div>
+</div>
+{% block additional_details %}{% endblock additional_details %}
+{% endblock page_body %}
