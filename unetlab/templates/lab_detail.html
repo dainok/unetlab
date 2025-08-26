@@ -50,7 +50,11 @@
                         {% for row in object.lld.groups %}
                         <tr>
                             <td>{{ row.name }}</td>
-                            <td>{{ row.members }}</td>
+                            <td>
+                                {% for member in row.members %}
+                                    {{ member }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -78,11 +82,21 @@
                             <td>{{ row.id }}</td>
                             <td>{{ row.name }}</td>
                             <td>{{ row.template }}</td>
-                            <td>{{ row.features }}</td>
+                            <td>
+                                {% for feature in row.features %}
+                                    {{ feature }}
+                                {% endfor %}
+                            </td>
                             <td>{{ row.cpu }}</td>
                             <td>{{ row.ram }}</td>
                             <td>{{ row.nics }}</td>
-                            <td>{{ row.interfaces }}</td>
+                            <td>
+                                <ul>
+                                {% for interface in row.interfaces %}
+                                    <li>{{ interface.name }} ({{ interface.id }}) -> network {{ interface.link_id }}</li>
+                                {% endfor %}
+                                </ul>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -95,7 +109,7 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Name</th>
+                            <th>Description</th>
                             <th>Type</th>
                         </tr>
                     </thead>

@@ -72,7 +72,7 @@ def build_lld(lab_id):
             # Create unique name
             name_counter = counter
             while True:
-                name = f"{ prefix }{ name_counter }"
+                name = f"{prefix}{name_counter}"
                 if name not in node_names:
                     node_names.append(name)
                     break
@@ -93,12 +93,12 @@ def build_lld(lab_id):
             group_nodes.append(node)
             node_id += 1
 
-            # Builing group
-            for node in group_nodes:
-                group_name = f"Group{group_id}"
-                if not group_name in groups:
-                    groups[group_name] = []
-                groups[f"Group{group_id}"].append(node["name"])
+        # Builing group
+        for node in group_nodes:
+            group_name = f"Group{group_id}"
+            if group_name not in groups:
+                groups[group_name] = []
+            groups[f"Group{group_id}"].append(node["name"])
 
         group_id += 1
 
@@ -132,7 +132,7 @@ def build_lld(lab_id):
                     }
 
                     # Adding interface to link
-                    if not node_id_left in interfaces:
+                    if node_id_left not in interfaces:
                         interfaces[node_id_left] = []
                     interfaces[node_id_left].append(
                         {
@@ -141,7 +141,7 @@ def build_lld(lab_id):
                             "link_id": link_id,
                         }
                     )
-                    if not node_id_right in interfaces:
+                    if node_id_right not in interfaces:
                         interfaces[node_id_right] = []
                     interfaces[node_id_right].append(
                         {
