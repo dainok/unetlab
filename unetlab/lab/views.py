@@ -144,6 +144,11 @@ class LabListView(LabQueryMixin, ObjectListView):
     filterset_class = LabFilter
 
 
+class LabTopologyView(LabQueryMixin, ObjectDetailView):
+    model = LabInstance
+    template_name = "lab_topology.html"
+
+
 #############################################################################
 # Instance
 #############################################################################

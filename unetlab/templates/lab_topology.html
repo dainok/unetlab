@@ -1,0 +1,57 @@
+{% extends "ui/base.html" %}
+{% load i18n static %}
+{% block title %}UNetLab | {{ object.name }} > Detail{% endblock title %}
+{% block bodyclass %}d-flex flex-column vh-100{% endblock bodyclass %}
+{% block pageclass %}flex-grow-1{% endblock pageclass %}
+{% block page %}
+<div id="topology" class="h-100"></div>
+<script src="{% static 'cytoscape/js/cytoscape.min.js' %}"></script>
+<script>
+    const cy = cytoscape({
+        container: document.getElementById('topology'),
+        elements: [
+            {% for node in object.lld.nodes %}
+            { data: { id: '{{ node.id }}', label: '{{ node.name }}' } },
+            {% endfor %}
+            { data: { id: 'R1', label: 'R1' } },
+            { data: { id: 'R2', label: 'R2' } },
+            {
+                data: {
+                    id: 'link12', source: 'R1', target: 'R2',
+                        sourceLabel: 'eth0/0', targetLabel: 'eth1/2'
+                }
+            }
+        ],
+        style: [
+            {
+                selector: 'node',
+                style: {
+                    'label': 'data(label)',
+                    'text-valign': 'center',
+                    'text-halign': 'center',
+                    'shape': 'round-rectangle',
+                    'background-color': '#88c'
+                }
+            },
+            {
+                selector: 'edge',
+                style: {
+                    'width': 2,
+                    'line-color': '#555',
+                    'target-arrow-shape': 'none',
+                    'curve-style': 'bezier',
+                    'source-label': 'data(sourceLabel)',   /* Etichetta lato sorgente */
+                    'target-label': 'data(targetLabel)',   /* Etichetta lato destinazione */
+                    'source-text-offset': 20,
+                    'target-text-offset': 20,
+                    'font-size': 12,
+                    'text-background-color': '#fff',
+                    'text-background-opacity': 0.7,
+                    'text-background-shape': 'round-rectangle'
+                }
+            }
+        ],
+        layout: { name: 'grid' }
+    });
+</script>
+{% endblock page %}

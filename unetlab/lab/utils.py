@@ -7,7 +7,14 @@ groups:
   prefix: R
   count: 4
   topology: full-mesh
-  type: l2
+  type: l1
+  features:
+  - loopback:name=Loopback0
+- template: local-vyos-vyos
+  prefix: R
+  count: 4
+  topology: full-mesh
+  type: l1
   features:
   - loopback:name=Loopback0
 interfaces:

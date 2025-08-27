@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Rete con etichette su archi</title>
+  <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+  <style>
+    #rete { width: 900px; height: 600px; border: 1px solid lightgray; }
+  </style>
+</head>
+<body>
+  <h2>Topologia di rete</h2>
+  <div id="rete"></div>
+  
+  <script>
+    const cy = cytoscape({
+      container: document.getElementById('rete'),
+      elements: [
+        { data: { id: 'R1', label: 'R1' } },
+        { data: { id: 'R2', label: 'R2' } },
+        { 
+          data: { id: 'link12', source: 'R1', target: 'R2', 
+                  sourceLabel: 'eth0/0', targetLabel: 'eth1/2' } 
+        }
+      ],
+      style: [
+        {
+          selector: 'node',
+          style: {
+            'label': 'data(label)',
+            'text-valign': 'center',
+            'text-halign': 'center',
+            'shape': 'round-rectangle',
+            'background-color': '#88c'
+          }
+        },
+        {
+          selector: 'edge',
+          style: {
+            'width': 2,
+            'line-color': '#555',
+            'target-arrow-shape': 'none',
+            'curve-style': 'bezier',
+            'source-label': 'data(sourceLabel)',   /* Etichetta lato sorgente */
+            'target-label': 'data(targetLabel)',   /* Etichetta lato destinazione */
+            'source-text-offset': 20,
+            'target-text-offset': 20,
+            'font-size': 12,
+            'text-background-color': '#fff',
+            'text-background-opacity': 0.7,
+            'text-background-shape': 'round-rectangle'
+          }
+        }
+      ],
+      layout: { name: 'grid' }
+    });
+  </script>
+</body>
+</html>

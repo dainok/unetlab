@@ -22,6 +22,7 @@
 </head>
 
 <body class="{% block bodyclass %}{% endblock bodyclass %}">
+    <!-- VIEW: {{ request.resolver_match.view_name }} -->
     <!-- Banner -->
     {% block banner %}
     {% if messages %}
@@ -32,12 +33,12 @@
     </ul>
     {% endif %}
     {% endblock banner %}
+    {% block navbar %}
+    <!-- Navbar -->
+    {% include "ui/partials/navbar.html" %}
+    {% endblock navbar %}
     <div class="{% block pageclass %}page{% endblock pageclass %}">
         {% block page %}
-        <!-- Navbar -->
-        {% block navbar %}
-        {% include "ui/partials/navbar.html" %}
-        {% endblock navbar %}
         <div class="page-wrapper">
             <!-- Body -->
             {% block body %}

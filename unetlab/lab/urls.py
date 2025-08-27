@@ -18,6 +18,7 @@ from lab.views import (
     LabDeleteView,
     LabDetailView,
     LabListView,
+    LabTopologyView,
 )
 
 # DRF router for API endpoints of Template viewsets
@@ -33,9 +34,14 @@ urlpatterns = [
     path("lab/", LabListView.as_view(), name="lab_list"),
     path("lab/create", LabCreateView.as_view(), name="lab_create"),
     path("lab/delete", LabBulkDeleteView.as_view(), name="lab_bulkdelete"),
-    path("lab/<str:pk>/delete", LabDeleteView.as_view(), name="lab_delete"),
-    path("lab/<str:pk>/update", LabChangeView.as_view(), name="lab_update"),
-    path("lab/<str:pk>/", LabDetailView.as_view(), name="lab_detail"),
+    path(
+        "lab/<int:pk>/topology/<int:topology_id>",
+        LabTopologyView.as_view(),
+        name="lab_topology",
+    ),
+    path("lab/<int:pk>/delete", LabDeleteView.as_view(), name="lab_delete"),
+    path("lab/<int:pk>/update", LabChangeView.as_view(), name="lab_update"),
+    path("lab/<int:pk>/", LabDetailView.as_view(), name="lab_detail"),
     #########################################################################
     # Instance
     #########################################################################
@@ -47,17 +53,17 @@ urlpatterns = [
         name="labinstance_bulkdelete",
     ),
     path(
-        "instance/<str:pk>/delete",
+        "instance/<int:pk>/delete",
         LabInstanceDeleteView.as_view(),
         name="labinstance_delete",
     ),
     path(
-        "instance/<str:pk>/update",
+        "instance/<int:pk>/update",
         LabInstanceChangeView.as_view(),
         name="labinstance_update",
     ),
     path(
-        "instance/<str:pk>/", LabInstanceDetailView.as_view(), name="labinstance_detail"
+        "instance/<int:pk>/", LabInstanceDetailView.as_view(), name="labinstance_detail"
     ),
     #########################################################################
     # API endpoints
