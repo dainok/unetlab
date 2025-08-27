@@ -148,6 +148,46 @@ class LabTopologyView(LabQueryMixin, ObjectDetailView):
     model = LabInstance
     template_name = "lab_topology.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        lab = self.object
+
+        # Creo un array per i link nella forma src-dst
+        if lab.lld:
+            cy_nodes = [
+                {"data": {"id": node["name"], "label": node["name"]}}
+                for node in lab.lld.get("nodes", [])
+            ]
+            cy_edges = []
+
+            link_map = {}
+            for node in lab.lld.get("nodes", []):
+                for intf in node["interfaces"]:
+                    link_map.setdefault(intf["link_id"], []).append(
+                        {"node": node["name"], "ifName": intf["name"]}
+                    )
+            for link in lab.lld.get("links", []):
+                print(link)
+                endpoints = link_map.get(link["id"], [])
+                print(endpoints)
+                if len(endpoints) == 2:
+                    cy_edges.append(
+                        {
+                            "data": {
+                                "id": f"link{link['id']}",
+                                "source": endpoints[0]["node"],
+                                "target": endpoints[1]["node"],
+                                "sourceLabel": endpoints[0]["ifName"],
+                                "targetLabel": endpoints[1]["ifName"],
+                            }
+                        }
+                    )
+            context["elements"] = cy_nodes + cy_edges
+            from pprint import pprint
+
+            pprint(cy_edges)
+        return context
+
 
 #############################################################################
 # Instance

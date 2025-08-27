@@ -7,21 +7,10 @@
 <div id="topology" class="h-100"></div>
 <script src="{% static 'cytoscape/js/cytoscape.min.js' %}"></script>
 <script>
+    const elements = {{ elements|safe }};
     const cy = cytoscape({
         container: document.getElementById('topology'),
-        elements: [
-            {% for node in object.lld.nodes %}
-            { data: { id: '{{ node.id }}', label: '{{ node.name }}' } },
-            {% endfor %}
-            { data: { id: 'R1', label: 'R1' } },
-            { data: { id: 'R2', label: 'R2' } },
-            {
-                data: {
-                    id: 'link12', source: 'R1', target: 'R2',
-                        sourceLabel: 'eth0/0', targetLabel: 'eth1/2'
-                }
-            }
-        ],
+        elements: elements,
         style: [
             {
                 selector: 'node',
@@ -51,7 +40,7 @@
                 }
             }
         ],
-        layout: { name: 'grid' }
+        layout: { name: 'cose' } // try 'cose' grid, circle, breadthfirst
     });
 </script>
 {% endblock page %}

@@ -11,16 +11,16 @@
 <body>
   <h2>Topologia di rete</h2>
   <div id="rete"></div>
-  
+
   <script>
     const cy = cytoscape({
       container: document.getElementById('rete'),
       elements: [
         { data: { id: 'R1', label: 'R1' } },
         { data: { id: 'R2', label: 'R2' } },
-        { 
-          data: { id: 'link12', source: 'R1', target: 'R2', 
-                  sourceLabel: 'eth0/0', targetLabel: 'eth1/2' } 
+        {
+          data: { id: 'link12', source: 'R1', target: 'R2',
+                  sourceLabel: 'eth0/0', targetLabel: 'eth1/2' }
         }
       ],
       style: [
