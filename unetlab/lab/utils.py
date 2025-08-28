@@ -226,7 +226,7 @@ def make_topology_hub_spoke(
             link_id += 1
 
     # opzionale: link tra hub
-    if hubs > 1:
+    if connect_hubs and hubs > 1:
         for i in range(hubs):
             for j in range(i + 1, hubs):
                 hub1 = nodes[i]
@@ -266,65 +266,15 @@ def build_lld(lab_id):
         "nodes": [],
         "links": [],
     }
-    node_names = []
-    nodes = {}
-    interfaces = {}
-    links = {}
-    groups = {}
+    nodes = dict()
+    links = dict()
+    groups = hld.get("groups", list())
 
     link_id = 1
     node_id = 1
-    group_id = 1
-    for group_template in hld.get("groups", []):
-        # print(group_template)
-        # # For each group
-        # group_nodes = []
-        # template_prefix = group_template.get("template")
-        # if not template_prefix:
-        #     raise ValueError("Template è obbligatorio")
-        # count = group_template.get("count", 1)
-        # prefix = group_template.get("prefix", "N")
-        # features = group_template.get("features")
-        # topology = group_template.get("topology")
-        # link_type = group_template.get("type", "l2")
-        # template_obj = get_template(template_prefix)
-        # if not template_obj:
-        #     raise ValueError("Template non trovato")
 
-        # # Create nodes
-        # for counter in range(1, count + 1):
-        #     # Create unique name
-        #     name_counter = counter
-        #     while True:
-        #         name = f"{prefix}{name_counter}"
-        #         if name not in node_names:
-        #             node_names.append(name)
-        #             break
-        #         name_counter += 1
-
-        #     # Create node
-        #     node = {
-        #         "id": node_id,
-        #         "template": template_obj.name,
-        #         "name": name,
-        #         "cpu": template_obj.cpu,
-        #         "ram": template_obj.ram,
-        #     }
-        #     if features:
-        #         node["features"] = features
-
-        #     nodes[node_id] = node
-        #     group_nodes.append(node)
-        #     node_id += 1
-
-        # # Builing group
-        # for node in group_nodes:
-        #     group_name = f"Group{group_id}"
-        #     if group_name not in groups:
-        #         groups[group_name] = []
-        #     groups[f"Group{group_id}"].append(node["name"])
-
-        # group_id += 1
+    # Add gruop
+    for group_id, group_template in enumerate(groups):
         group_params = group_template.copy()
         topology = group_params.pop("topology")
         if topology == "full-mesh":
@@ -338,23 +288,18 @@ def build_lld(lab_id):
         else:
             raise ValueError("Topology not supported")
 
+        # Builing group:
         lld["nodes"] += nodes
         lld["links"] += links
+        lld["groups"].append(
+            {
+                "id": group_id,
+                "name": f"Group{group_id}",
+                "members": [node["name"] for node in nodes],
+            }
+        )
         node_id += len(nodes)
         link_id += len(links)
 
-    # for node_id, node in nodes.items():
-    #     node["interfaces"] = interfaces[node_id]
-    #     interface_count = len(node["interfaces"])
-    #     node["nics"] = int(interface_count / 4) + (interface_count % 4 > 0) * 4
-    #     lld["nodes"].append(node)
-    # for link_id, link in links.items():
-    #     lld["links"].append(link)
-    # for group_name, group_members in groups.items():
-    #     lld["groups"].append({"name": group_name, "members": group_members})
-
     lab.lld = lld
     lab.save()
-    from pprint import pprint
-
-    pprint(lld)
