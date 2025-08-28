@@ -275,16 +275,14 @@ def build_lld(lab_id):
 
     # Add gruop
     for group_id, group_template in enumerate(groups):
-        group_params = group_template.copy()
-        topology = group_params.pop("topology")
+        topology_params = group_template.copy()
+        topology_params["node_id"] = node_id
+        topology_params["link_id"] = link_id
+        topology = topology_params.pop("topology")
         if topology == "full-mesh":
-            nodes, links = make_topology_full_mesh(
-                node_id=node_id, link_id=link_id, **group_params
-            )
+            nodes, links = make_topology_full_mesh(**topology_params)
         elif topology == "hub-spoke":
-            nodes, links = make_topology_hub_spoke(
-                node_id=node_id, link_id=link_id, **group_params
-            )
+            nodes, links = make_topology_hub_spoke(**topology_params)
         else:
             raise ValueError("Topology not supported")
 
