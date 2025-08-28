@@ -19,6 +19,8 @@ class LabTable(ObjectTable):
         exclude = [
             # "select",
             # "actions",
+            "hld",
+            "lld",
             "created_at",
             "updated_at",
         ]
@@ -42,6 +44,7 @@ class LabInstanceTable(ObjectTable):
             # "actions",
             "id",
             "nodes",
+            "hld",
             "lld",
             # "created_at",
             "updated_at",

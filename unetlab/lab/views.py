@@ -46,7 +46,6 @@ class LabQueryMixin:
             # Staff users can see users who share at least one group
             groups = user.groups.all()
             return qs.filter(user__groups__in=groups).distinct()
-        print("THERE")
         # Non-admin users can only see their own user
         return qs.filter(user=user)
 
@@ -167,9 +166,7 @@ class LabTopologyView(LabQueryMixin, ObjectDetailView):
                         {"node": node["name"], "ifName": intf["name"]}
                     )
             for link in lab.lld.get("links", []):
-                print(link)
                 endpoints = link_map.get(link["id"], [])
-                print(endpoints)
                 if len(endpoints) == 2:
                     cy_edges.append(
                         {
@@ -183,9 +180,10 @@ class LabTopologyView(LabQueryMixin, ObjectDetailView):
                         }
                     )
             context["elements"] = cy_nodes + cy_edges
-            from pprint import pprint
 
-            pprint(cy_edges)
+            # from pprint import pprint
+            # pprint(context["elements"])
+            # pprint(lab.lld)
         return context
 
 
