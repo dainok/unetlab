@@ -22,9 +22,18 @@ groups:
   count: 6
   topology: hub-spoke
   hubs: 2
+  connect_hubs: true
   link_type: l1
   features:
   - loopback:name=Loopback0
+- topology: custom
+  link_type: l2
+  links:
+  - R1, R11
+  - R2, R12
+  - R5, R13
+  - R6, R14
+  - R3, R4, R7, R8
 interfaces:
 - match: Loopback0
   address: 192.168.0.1/16
@@ -147,6 +156,54 @@ def make_topology_linear():
 
 def make_topology_ring():
     pass
+
+
+def make_topology_custom(
+    nodes: list = list(),
+    node_id: int = 1,
+    link_id: int = 1,
+    links: list = list(),
+    prefix: str = "R",
+    template: str = "",
+    features: list = list(),
+    link_type: str = "l1",
+):
+    if template:
+        template_obj = get_template(template)
+
+    # if not template_obj:
+    #     raise ValueError("Template not found")
+
+    # nodi
+    node_map = {node["name"]: node for node in nodes}
+    print(node_map)
+    for link in links:
+        nodes = link.split(",")
+        for node_name in nodes:
+            if node_name in node_map:
+                node_id = node_map[node_name]["id"]
+        print(nodes)
+
+    # se esiste il nodo, prendi id e aggiungi interfaccia
+    # se non esiste il nodo, crealo
+
+    # nodes = []
+    # for i in range(count):
+    #     nodes.append(
+    #         {
+    #             "id": node_id,
+    #             "name": f"{prefix}{node_id}",
+    #             "cpu": template_obj.cpu,
+    #             "ram": template_obj.ram,
+    #             "nics": round_interface_count(count),
+    #             "template": template_obj.name,
+    #             "features": features,
+    #             "interfaces": [],
+    #         }
+    #     )
+    #     node_id += 1
+
+    return list(), list()
 
 
 def make_topology_hub_spoke(
@@ -283,11 +340,21 @@ def build_lld(lab_id):
             nodes, links = make_topology_full_mesh(**topology_params)
         elif topology == "hub-spoke":
             nodes, links = make_topology_hub_spoke(**topology_params)
+        # elif topology == "ring":
+        #     nodes, links = make_topology_ring(**topology_params)
+        # elif topology == "linear":
+        #     nodes, links = make_topology_linear(**topology_params)
+        elif topology == "custom":
+            nodes, links = make_topology_custom(nodes=lld["nodes"], **topology_params)
         else:
-            raise ValueError("Topology not supported")
+            raise ValueError(f"Topology {topology} not supported")
 
         # Builing group:
-        lld["nodes"] += nodes
+        if topology == "custom":
+            # Custom topology replace nodes
+            lld["nodes"] = nodes
+        else:
+            lld["nodes"] += nodes
         lld["links"] += links
         lld["groups"].append(
             {
@@ -296,6 +363,8 @@ def build_lld(lab_id):
                 "members": [node["name"] for node in nodes],
             }
         )
+
+        # Update global counters
         node_id += len(nodes)
         link_id += len(links)
 

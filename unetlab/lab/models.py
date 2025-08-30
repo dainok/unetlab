@@ -1,13 +1,429 @@
 """Define ORM models for Proxmox hosts."""
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import User, Group
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
-from node.models import Node
+from node.models import Node, NodeTemplate
 from ui.include.validators import (
     AlphanumericPhraseValidator,
 )
+
+#############################################################################
+# Lab HLD
+#############################################################################
+
+# class LabHLD:
+#     def __init__(self, hld: dict | None = None):
+#         self.hld = hld or {
+#             "groups": [],
+#             "interfaces": [],
+#         }
+
+
+#############################################################################
+# Lab LLD
+#############################################################################
+
+
+class LabLld:
+    groups: dict[int, dict] = {}
+    nodes: dict[int, dict] = {}
+    ifaces: dict[str, dict] = {}
+    links: dict[int, dict] = {}
+    node_name_to_id: dict[str, int] = {}
+
+    def __init__(self, data: dict | None = None):
+        if not data:
+            pass
+        elif "groups" in data and "interfaces" in data:
+            # TODO: Validate HLD
+            self.load_hld(data)
+        elif "groups" in data and "nodes" in data and "links" in data:
+            # TODO: validate LLD
+            self.load_lld(data)
+        else:
+            raise ValidationError(
+                "Data must contain either 'nodes'+'links' (LLD) or 'groups' (HLD)"
+            )
+
+        self._rebuild_maps()
+
+    def _rebuild_maps(self):
+        # Update node_name_to_id and interface_name_to_id
+        self.node_name_to_id = {
+            node["name"].lower(): node_id for node_id, node in self.nodes.items()
+        }
+
+    def _round_iface_count(self, count):
+        return int(count / 4) + (count % 4 > 0) * 4
+
+    def _get_template(self, template_prefix):
+        qs = NodeTemplate.objects.filter(name__contains=template_prefix).order_by(
+            "name"
+        )
+        # Prefer local template
+        local_qs = qs.filter(repository__name="local")
+        if local_qs:
+            return local_qs.last()
+        if qs:
+            return qs.last()
+        return None
+
+    def load_hld(self, hld):
+        for group_id, group_template in enumerate(hld.get("groups")):
+            connect_hubs = group_template.get("connect_hubs", False)
+            group_name = f"Group{group_id}"
+            hub_count = group_template.get("hubs", 1)
+            link_type = group_template.get("link_type", "l1")
+            links = [link.split(",") for link in group_template.get("links", list())]
+            node_count = group_template.get("count", 0)
+            node_features = group_template.get("features", list())
+            node_prefix = group_template.get("prefix", "")
+            node_template = self._get_template(group_template.get("template", ""))
+            topology = group_template.get("topology")
+
+            print("-" * 78)
+            print(group_name)
+            print("-" * 78)
+            print("LEN", len(self.nodes))
+
+            if topology == "full-mesh":
+                self._add_topology_full_mesh(
+                    count=node_count,
+                    features=node_features,
+                    group=group_name,
+                    link_type=link_type,
+                    prefix=node_prefix,
+                    template=node_template,
+                )
+            elif topology == "hub-spoke":
+                continue
+                self.add_topology_hub_spoke(
+                    connect_hubs=connect_hubs,
+                    count=node_count,
+                    features=node_features,
+                    group=group_name,
+                    hub=hub_count,
+                    link_type=link_type,
+                    prefix=node_prefix,
+                    template=node_template,
+                )
+            elif topology == "ring":
+                continue
+                self.add_topology_ring(
+                    count=node_count,
+                    features=node_features,
+                    group=group_name,
+                    link_type=link_type,
+                    prefix=node_prefix,
+                    template=node_template,
+                )
+            elif topology == "linear":
+                continue
+                self.add_topology_full_mesh(
+                    count=node_count,
+                    features=node_features,
+                    group=group_name,
+                    link_type=link_type,
+                    prefix=node_prefix,
+                    template=node_template,
+                )
+            elif topology == "custom":
+                continue
+                self.add_topology_full_mesh(
+                    features=node_features,
+                    group=group_name,
+                    link_type=link_type,
+                    links=links,
+                    prefix=node_prefix,
+                    template=node_template,
+                )
+
+    def add_node(
+        self,
+        cpu: int,
+        id: int,
+        name: str,
+        nics: int,
+        ram: int,
+        template: NodeTemplate,
+        features: list = list(),
+        group: str | None = None,
+    ):
+        self.nodes[id] = {
+            "cpu": cpu,
+            "features": features,
+            "id": id,
+            "name": name,
+            "nics": nics,
+            "ram": ram,
+            "template": template.name,
+        }
+        self._rebuild_maps()
+
+    def add_node_from_template(
+        self,
+        features: list,
+        group: str,
+        prefix: str,
+        template: NodeTemplate,
+        nics: int = 0,
+    ):
+
+        # Find first available node_id
+        node_id = 1
+        used_node_ids = self.nodes.keys()
+        while node_id in used_node_ids:
+            node_id += 1
+
+        nics = self._round_iface_count(nics)
+        if nics < template.nics:
+            nics = template.nics
+
+        self.add_node(
+            cpu=template.cpu,
+            features=features,
+            group=group,
+            id=node_id,
+            name=f"{prefix}{node_id}",
+            nics=nics,
+            ram=template.ram,
+            template=template,
+        )
+        for iface_id in range(0, nics):
+            self.add_interface(
+                id=iface_id,
+                name=f"Ethernet{iface_id}",
+                node_id=node_id,
+            )
+        return node_id
+
+    def add_interface(
+        self,
+        id: int,
+        name: str,
+        node_id: int,
+        desc: str = "",
+        features: list = list(),
+        link_id: int | None = None,
+    ):
+        iface_index = f"{node_id}:{id}"
+        self.ifaces[iface_index] = {
+            "id": id,
+            "name": name,
+            "description": desc,
+            "features": features,
+            "link_id": link_id,
+        }
+
+    def connect(
+        self,
+        left_iface_id: int,
+        left_node_id: int,
+        right_iface_id: int,
+        right_node_id: int,
+        desc: str = "",
+        kind: str = "l1",
+    ):
+        # Find first available link_id
+        link_id = 0
+        used_link_ids = self.links.keys()
+        while link_id in used_link_ids:
+            link_id += 1
+
+        # Add link
+        self.add_link(
+            id=link_id,
+            desc=desc,
+            kind=kind,
+        )
+
+        # Attach interfaces to link
+        left_iface_index = f"{left_node_id}:{left_iface_id}"
+        self.ifaces[left_iface_index]["link_id"] = link_id
+        right_iface_index = f"{right_node_id}:{right_iface_id}"
+        self.ifaces[right_iface_index]["link_id"] = link_id
+        return link_id
+
+    def add_link(
+        self,
+        desc: str,
+        id: int,
+        kind: str,
+    ):
+        self.links[id] = {
+            "description": desc,
+            "id": id,
+            "type": kind,
+        }
+
+    def _add_topology_full_mesh(
+        self,
+        count: int,
+        features: list,
+        group: str,
+        link_type: str,
+        prefix: str,
+        template: NodeTemplate,
+    ):
+        required_links = count - 1
+        if template.mgmt:
+            required_links += 1
+
+        # Nodes
+        group_node_ids = []
+        for i in range(count):
+            group_node_ids.append(
+                self.add_node_from_template(
+                    features=features,
+                    group=group,
+                    nics=required_links,
+                    prefix=prefix,
+                    template=template,
+                )
+            )
+
+        # Connect nodes in full-mesh
+        starting_iface = 1 if template.mgmt else 0
+        iface_counters = {node_id: starting_iface for node_id in group_node_ids}
+
+        for index, left_node_id in enumerate(group_node_ids):
+            for right_node_id in group_node_ids[index + 1 :]:
+                left_iface_id = iface_counters[left_node_id]
+                right_iface_id = iface_counters[right_node_id]
+                left_node_name = self.nodes[left_node_id]["name"]
+                right_node_name = self.nodes[right_node_id]["name"]
+                left_iface_name = self.ifaces[f"{left_node_id}:{left_iface_id}"]["name"]
+                right_iface_name = self.ifaces[f"{right_node_id}:{right_iface_id}"][
+                    "name"
+                ]
+                link_desc = f"Link {left_node_name}:{left_iface_name} - {right_node_name}:{right_iface_name}"
+
+                # Connect nodes
+                self.connect(
+                    left_iface_id=left_iface_id,
+                    left_node_id=left_node_id,
+                    desc=link_desc,
+                    right_iface_id=right_iface_id,
+                    right_node_id=right_node_id,
+                )
+
+                # Update inteface counters
+                iface_counters[left_node_id] += 1
+                iface_counters[right_node_id] += 1
+
+                # n1 = self.nodes[n1_id]
+                # n2 = self.nodes[n2_id]
+
+                # # interfacce disponibili (basate sul numero già assegnato)
+                # n1_if_id = len(n1["interfaces"])
+                # n2_if_id = len(n2["interfaces"])
+
+                # iface1 = {
+                #     "id": n1_if_id,
+                #     "link_id": None,
+                #     "name": f"Ethernet{starting_iface + n1_if_id}",
+                # }
+                # iface2 = {
+                #     "id": n2_if_id,
+                #     "link_id": None,
+                #     "name": f"Ethernet{starting_iface + n2_if_id}",
+                # }
+
+                # # crea il link e ottieni un nuovo link_id
+                # link_id = self.add_link(
+                #     node1_id=n1_id,
+                #     node1_if=iface1,
+                #     node2_id=n2_id,
+                #     node2_if=iface2,
+                #     link_type=link_type,
+                # )
+
+                # # aggiorna link_id nelle interfacce
+                # iface1["link_id"] = link_id
+                # iface2["link_id"] = link_id
+
+                # # aggiungi alle interfacce dei nodi
+                # n1["interfaces"].append(iface1)
+                # n2["interfaces"].append(iface2)
+
+    # def load_lld(data):
+    #     for node in data.get("nodes"):
+    #         self.add_node(node)
+    #     for link in data.get("links"):
+    #         self.add_link(link)
+    #     for group in data("groups"):
+    #         self.add_group(group)
+
+    # ---- NODE MANAGEMENT ----
+    # def add_node(self, node: dict):
+    #     # TODO: validate node
+    #     node_id = node["id"]
+    #     node_interfaces = node.pop("interfaces")
+    #     self._nodes[node_id] = node
+    #     self._node_name_to_key[node["name"].lower()] = node_id
+
+    #     node["interfaces"] = {
+    #         node_interface["name"].lower(): node_interface for node_interface in node_interfaces
+    #     }
+
+    # def update_node(self, node_name: str, updates: dict):
+    #     if node_id not in self.lld["nodes"]:
+    #         raise ValidationError(f"Node {node_id} does not exist")
+    #     self.lld["nodes"][node_id].update(updates)
+
+    # def delete_node(self, node_id: int):
+    #     if node_id not in self.lld["nodes"]:
+    #         raise ValidationError(f"Node {node_id} does not exist")
+
+    #     # rimuovi anche link associati
+    #     links_to_remove = [lid for lid, l in self.lld["links"].items()
+    #                        if any(nid == node_id for nid, _ in l["endpoints"])]
+    #     for lid in links_to_remove:
+    #         del self.lld["links"][lid]
+
+    #     del self.lld["nodes"][node_id]
+
+    # # ---- LINK MANAGEMENT ----
+    # def add_link(self, link: dict):
+    #     link_id = link.get("id")
+    #     if not link_id:
+    #         raise ValidationError("Link must have an 'id'")
+    #     if link_id in self.lld["links"]:
+    #         raise ValidationError(f"Link {link_id} already exists")
+
+    #     endpoints = link.get("endpoints", [])
+    #     if len(endpoints) != 2:
+    #         raise ValidationError("Link must have exactly two endpoints")
+
+    #     for nid, _ in endpoints:
+    #         if nid not in self.lld["nodes"]:
+    #             raise ValidationError(f"Node {nid} does not exist (link {link_id})")
+
+    #     self.lld["links"][link_id] = link
+
+    # def delete_link(self, link_id: int):
+    #     if link_id not in self.lld["links"]:
+    #         raise ValidationError(f"Link {link_id} does not exist")
+    #     del self.lld["links"][link_id]
+
+    # # ---- VALIDATION ----
+    # def validate(self):
+    #     # es: ogni link deve avere nodi validi
+    #     for lid, link in self.lld["links"].items():
+    #         if "endpoints" not in link:
+    #             raise ValidationError(f"Link {lid} missing endpoints")
+    #         for nid, _ in link["endpoints"]:
+    #             if nid not in self.lld["nodes"]:
+    #                 raise ValidationError(f"Link {lid} references missing node {nid}")
+
+    #     return True
+
+    # # ---- SERIALIZATION ----
+    # def to_dict(self):
+    #     return self.lld
 
 
 #############################################################################
@@ -30,13 +446,13 @@ class Lab(models.Model):
     )
     hld = models.JSONField(
         verbose_name=_("HLD"),
-        help_text=_("High Level Design"),
+        help_text=_("High Level Description"),
         default=dict,
         blank=True,
     )
     lld = models.JSONField(
         verbose_name=_("LLD"),
-        help_text=_("Low Level Design"),
+        help_text=_("Low Level Description"),
         default=dict,
         editable=False,
     )
