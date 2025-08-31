@@ -57,7 +57,7 @@ class LabLld:
         }
 
     def _round_iface_count(self, count):
-        return int(count / 4) + (count % 4 > 0) * 4
+        return (int(count / 4) + (count % 4 > 0)) * 4
 
     def _get_template(self, template_prefix):
         qs = NodeTemplate.objects.filter(name__contains=template_prefix).order_by(
@@ -87,11 +87,6 @@ class LabLld:
             node_template = self._get_template(group_template.get("template", ""))
             topology = group_template.get("topology")
 
-            print("-" * 78)
-            print(group_name)
-            print("-" * 78)
-            print("LEN", len(self.nodes))
-
             if topology == "full-mesh":
                 self._add_topology_full_mesh(
                     count=node_count,
@@ -102,20 +97,19 @@ class LabLld:
                     template=node_template,
                 )
             elif topology == "hub-spoke":
-                continue
-                self.add_topology_hub_spoke(
+                self._add_topology_hub_spoke(
                     connect_hubs=connect_hubs,
                     count=node_count,
                     features=node_features,
                     group=group_name,
-                    hub=hub_count,
+                    hubs=hub_count,
                     link_type=link_type,
                     prefix=node_prefix,
                     template=node_template,
                 )
             elif topology == "ring":
                 continue
-                self.add_topology_ring(
+                self._add_topology_ring(
                     count=node_count,
                     features=node_features,
                     group=group_name,
@@ -125,7 +119,7 @@ class LabLld:
                 )
             elif topology == "linear":
                 continue
-                self.add_topology_full_mesh(
+                self._add_topology_full_mesh(
                     count=node_count,
                     features=node_features,
                     group=group_name,
@@ -135,7 +129,7 @@ class LabLld:
                 )
             elif topology == "custom":
                 continue
-                self.add_topology_full_mesh(
+                self._add_topology_custom(
                     features=node_features,
                     group=group_name,
                     link_type=link_type,
@@ -338,6 +332,119 @@ class LabLld:
                 iface_counters[left_node_id] += 1
                 iface_counters[right_node_id] += 1
 
+    def _add_topology_hub_spoke(
+        self,
+        count: int,
+        features: list,
+        group: str,
+        link_type: str,
+        prefix: str,
+        template: NodeTemplate,
+        connect_hubs: bool = False,
+        hubs: int = 1,
+    ):
+        required_spoke_links = hubs
+        required_hub_links = count
+        if hubs > 1 and connect_hubs:
+            required_hub_links += hubs - 1
+        if template.mgmt:
+            required_spoke_links += 1
+            required_hub_links += 1
+
+        # Hubs
+        group_hub_ids = []
+        for i in range(hubs):
+            group_hub_ids.append(
+                self.add_node_from_template(
+                    features=features,
+                    group=group,
+                    nics=required_hub_links,
+                    prefix=prefix,
+                    template=template,
+                )
+            )
+
+        # Spokes
+        group_spoke_ids = []
+        for i in range(count):
+            group_spoke_ids.append(
+                self.add_node_from_template(
+                    features=features,
+                    group=group,
+                    nics=required_spoke_links,
+                    prefix=prefix,
+                    template=template,
+                )
+            )
+
+        # Connect spokes to hubs
+        starting_iface = 1 if template.mgmt else 0
+        iface_counters = {
+            node_id: starting_iface for node_id in group_spoke_ids + group_hub_ids
+        }
+
+        for spoke_id in group_spoke_ids:
+            for hub_id in group_hub_ids:
+                hub_iface_id = iface_counters[hub_id]
+                spoke_iface_id = iface_counters[spoke_id]
+                hub_name = self.nodes[hub_id]["name"]
+                spoke_name = self.nodes[spoke_id]["name"]
+                hub_iface_index = self._get_iface_index(
+                    node_id=hub_id, iface_id=hub_iface_id
+                )
+                hub_iface_name = self.ifaces[hub_iface_index]
+                spoke_iface_index = self._get_iface_index(
+                    node_id=spoke_id, iface_id=spoke_iface_id
+                )
+                spoke_iface_name = self.ifaces[spoke_iface_index]["name"]
+                link_desc = f"Link {hub_name}:{hub_iface_name} - {spoke_name}:{spoke_iface_name}"
+
+                # Connect nodes
+                self.connect(
+                    left_iface_id=hub_iface_id,
+                    left_node_id=hub_id,
+                    desc=link_desc,
+                    kind=link_type,
+                    right_iface_id=spoke_iface_id,
+                    right_node_id=spoke_id,
+                )
+
+                # Update inteface counters
+                iface_counters[hub_id] += 1
+                iface_counters[spoke_id] += 1
+
+        # Connect hubs
+        if hubs > 1 and connect_hubs:
+            for index, left_hub_id in enumerate(group_hub_ids):
+                for right_hub_id in group_hub_ids[index + 1 :]:
+                    left_iface_id = iface_counters[left_hub_id]
+                    right_iface_id = iface_counters[right_hub_id]
+                    left_hub_name = self.nodes[left_hub_id]["name"]
+                    right_hub_name = self.nodes[right_hub_id]["name"]
+                    left_iface_index = self._get_iface_index(
+                        node_id=left_hub_id, iface_id=left_iface_id
+                    )
+                    left_iface_name = self.ifaces[left_iface_index]
+                    right_iface_index = self._get_iface_index(
+                        node_id=right_hub_id, iface_id=right_iface_id
+                    )
+                    right_iface_name = self.ifaces[right_iface_index]["name"]
+                    link_desc = f"Link {left_hub_name}:{left_iface_name} - {right_hub_name}:{right_iface_name}"
+
+                    # Connect hubs
+                    self.connect(
+                        left_iface_id=left_iface_id,
+                        left_node_id=left_hub_id,
+                        desc=link_desc,
+                        kind=link_type,
+                        right_iface_id=right_iface_id,
+                        right_node_id=right_hub_id,
+                    )
+
+                    # Update inteface counters
+                    iface_counters[left_hub_id] += 1
+                    iface_counters[right_hub_id] += 1
+
     def get_lld(self):
         # Groups
         groups = []
@@ -368,8 +475,6 @@ class LabLld:
             "nodes": nodes,
             "links": links,
         }
-
-    #     for node_id, node in self.nodes.items():
 
     # def load_lld(data):
     #     for node in data.get("nodes"):
