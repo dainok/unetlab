@@ -10,17 +10,6 @@ from ui.include.validators import (
     AlphanumericPhraseValidator,
 )
 
-#############################################################################
-# Lab HLD
-#############################################################################
-
-# class LabHLD:
-#     def __init__(self, hld: dict | None = None):
-#         self.hld = hld or {
-#             "groups": [],
-#             "interfaces": [],
-#         }
-
 
 #############################################################################
 # Lab LLD
@@ -108,7 +97,6 @@ class LabLld:
                     template=node_template,
                 )
             elif topology == "ring":
-                continue
                 self._add_topology_ring(
                     count=node_count,
                     features=node_features,
@@ -118,8 +106,7 @@ class LabLld:
                     template=node_template,
                 )
             elif topology == "linear":
-                continue
-                self._add_topology_full_mesh(
+                self._add_topology_linear(
                     count=node_count,
                     features=node_features,
                     group=group_name,
@@ -444,6 +431,128 @@ class LabLld:
                     # Update inteface counters
                     iface_counters[left_hub_id] += 1
                     iface_counters[right_hub_id] += 1
+
+    def _add_topology_ring(
+        self,
+        count: int,
+        features: list,
+        group: str,
+        link_type: str,
+        prefix: str,
+        template: NodeTemplate,
+    ):
+        required_links = 2
+        if template.mgmt:
+            required_links += 1
+
+        # Nodes
+        group_node_ids = []
+        for i in range(count):
+            group_node_ids.append(
+                self.add_node_from_template(
+                    features=features,
+                    group=group,
+                    nics=required_links,
+                    prefix=prefix,
+                    template=template,
+                )
+            )
+
+        # Connect nodes in ring
+        starting_iface = 1 if template.mgmt else 0
+        iface_counters = {node_id: starting_iface for node_id in group_node_ids}
+
+        for i in range(count):
+            left_node_id = group_node_ids[i]
+            right_node_id = group_node_ids[(i + 1) % count]
+            left_iface_id = iface_counters[left_node_id]
+            right_iface_id = iface_counters[right_node_id]
+            left_node_name = self.nodes[left_node_id]["name"]
+            right_node_name = self.nodes[right_node_id]["name"]
+            left_iface_index = self._get_iface_index(
+                node_id=left_node_id, iface_id=left_iface_id
+            )
+            left_iface_name = self.ifaces[left_iface_index]
+            right_iface_index = self._get_iface_index(
+                node_id=right_node_id, iface_id=right_iface_id
+            )
+            right_iface_name = self.ifaces[right_iface_index]["name"]
+            link_desc = f"Link {left_node_name}:{left_iface_name} - {right_node_name}:{right_iface_name}"
+
+            # Connect nodes
+            self.connect(
+                left_iface_id=left_iface_id,
+                left_node_id=left_node_id,
+                desc=link_desc,
+                kind=link_type,
+                right_iface_id=right_iface_id,
+                right_node_id=right_node_id,
+            )
+
+            # Update inteface counters
+            iface_counters[left_node_id] += 1
+            iface_counters[right_node_id] += 1
+
+    def _add_topology_linear(
+        self,
+        count: int,
+        features: list,
+        group: str,
+        link_type: str,
+        prefix: str,
+        template: NodeTemplate,
+    ):
+        required_links = 2
+        if template.mgmt:
+            required_links += 1
+
+        # Nodes
+        group_node_ids = []
+        for i in range(count):
+            group_node_ids.append(
+                self.add_node_from_template(
+                    features=features,
+                    group=group,
+                    nics=required_links,
+                    prefix=prefix,
+                    template=template,
+                )
+            )
+
+        # Connect nodes in ring
+        starting_iface = 1 if template.mgmt else 0
+        iface_counters = {node_id: starting_iface for node_id in group_node_ids}
+
+        for i in range(count - 1):
+            left_node_id = group_node_ids[i]
+            right_node_id = group_node_ids[i + 1]
+            left_iface_id = iface_counters[left_node_id]
+            right_iface_id = iface_counters[right_node_id]
+            left_node_name = self.nodes[left_node_id]["name"]
+            right_node_name = self.nodes[right_node_id]["name"]
+            left_iface_index = self._get_iface_index(
+                node_id=left_node_id, iface_id=left_iface_id
+            )
+            left_iface_name = self.ifaces[left_iface_index]
+            right_iface_index = self._get_iface_index(
+                node_id=right_node_id, iface_id=right_iface_id
+            )
+            right_iface_name = self.ifaces[right_iface_index]["name"]
+            link_desc = f"Link {left_node_name}:{left_iface_name} - {right_node_name}:{right_iface_name}"
+
+            # Connect nodes
+            self.connect(
+                left_iface_id=left_iface_id,
+                left_node_id=left_node_id,
+                desc=link_desc,
+                kind=link_type,
+                right_iface_id=right_iface_id,
+                right_node_id=right_node_id,
+            )
+
+            # Update inteface counters
+            iface_counters[left_node_id] += 1
+            iface_counters[right_node_id] += 1
 
     def get_lld(self):
         # Groups
