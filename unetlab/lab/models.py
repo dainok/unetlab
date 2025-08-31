@@ -28,7 +28,7 @@ from ui.include.validators import (
 
 
 class LabLld:
-    groups: dict[int, dict] = {}
+    groups: dict[str, dict] = {}
     nodes: dict[int, dict] = {}
     ifaces: dict[str, dict] = {}
     links: dict[int, dict] = {}
@@ -70,6 +70,9 @@ class LabLld:
         if qs:
             return qs.last()
         return None
+
+    def _get_iface_index(self, node_id: int, iface_id: int):
+        return f"{node_id}:{iface_id}"
 
     def load_hld(self, hld):
         for group_id, group_template in enumerate(hld.get("groups")):
@@ -141,6 +144,17 @@ class LabLld:
                     template=node_template,
                 )
 
+    def add_group(self, group: str, members: list[int] = list()):
+        group_index = group.lower()
+        if group_index not in self.groups:
+            self.groups[group_index] = {
+                "name": group,
+                "members": list(),
+            }
+        self.groups[group_index]["members"] = list(
+            set(self.groups[group_index]["members"] + members)
+        )
+
     def add_node(
         self,
         cpu: int,
@@ -161,6 +175,7 @@ class LabLld:
             "ram": ram,
             "template": template.name,
         }
+        self.add_group(group=group, members=[id])
         self._rebuild_maps()
 
     def add_node_from_template(
@@ -209,7 +224,7 @@ class LabLld:
         features: list = list(),
         link_id: int | None = None,
     ):
-        iface_index = f"{node_id}:{id}"
+        iface_index = self._get_iface_index(node_id=node_id, iface_id=id)
         self.ifaces[iface_index] = {
             "id": id,
             "name": name,
@@ -241,9 +256,13 @@ class LabLld:
         )
 
         # Attach interfaces to link
-        left_iface_index = f"{left_node_id}:{left_iface_id}"
+        left_iface_index = self._get_iface_index(
+            node_id=left_node_id, iface_id=left_iface_id
+        )
         self.ifaces[left_iface_index]["link_id"] = link_id
-        right_iface_index = f"{right_node_id}:{right_iface_id}"
+        right_iface_index = self._get_iface_index(
+            node_id=right_node_id, iface_id=right_iface_id
+        )
         self.ifaces[right_iface_index]["link_id"] = link_id
         return link_id
 
@@ -295,10 +314,14 @@ class LabLld:
                 right_iface_id = iface_counters[right_node_id]
                 left_node_name = self.nodes[left_node_id]["name"]
                 right_node_name = self.nodes[right_node_id]["name"]
-                left_iface_name = self.ifaces[f"{left_node_id}:{left_iface_id}"]["name"]
-                right_iface_name = self.ifaces[f"{right_node_id}:{right_iface_id}"][
-                    "name"
-                ]
+                left_iface_index = self._get_iface_index(
+                    node_id=left_node_id, iface_id=left_iface_id
+                )
+                left_iface_name = self.ifaces[left_iface_index]
+                right_iface_index = self._get_iface_index(
+                    node_id=right_node_id, iface_id=right_iface_id
+                )
+                right_iface_name = self.ifaces[right_iface_index]["name"]
                 link_desc = f"Link {left_node_name}:{left_iface_name} - {right_node_name}:{right_iface_name}"
 
                 # Connect nodes
@@ -306,6 +329,7 @@ class LabLld:
                     left_iface_id=left_iface_id,
                     left_node_id=left_node_id,
                     desc=link_desc,
+                    kind=link_type,
                     right_iface_id=right_iface_id,
                     right_node_id=right_node_id,
                 )
@@ -314,40 +338,38 @@ class LabLld:
                 iface_counters[left_node_id] += 1
                 iface_counters[right_node_id] += 1
 
-                # n1 = self.nodes[n1_id]
-                # n2 = self.nodes[n2_id]
+    def get_lld(self):
+        # Groups
+        groups = []
+        for group in self.groups.values():
+            member_names = []
+            for member_id in group["members"]:
+                # Translate node_id to node_name
+                member_names.append(self.nodes[member_id]["name"])
+            group["members"] = member_names
+            groups.append(group)
 
-                # # interfacce disponibili (basate sul numero già assegnato)
-                # n1_if_id = len(n1["interfaces"])
-                # n2_if_id = len(n2["interfaces"])
+        # Nodes
+        nodes = []
+        for node in self.nodes.values():
+            # Add interfaces
+            node_id = node["id"]
+            node["interfaces"] = []
+            for iface_index, iface in self.ifaces.items():
+                if iface_index.startswith(f"{node_id}:"):
+                    node["interfaces"].append(iface)
+            nodes.append(node)
 
-                # iface1 = {
-                #     "id": n1_if_id,
-                #     "link_id": None,
-                #     "name": f"Ethernet{starting_iface + n1_if_id}",
-                # }
-                # iface2 = {
-                #     "id": n2_if_id,
-                #     "link_id": None,
-                #     "name": f"Ethernet{starting_iface + n2_if_id}",
-                # }
+        # Links
+        links = list(self.links.values())
 
-                # # crea il link e ottieni un nuovo link_id
-                # link_id = self.add_link(
-                #     node1_id=n1_id,
-                #     node1_if=iface1,
-                #     node2_id=n2_id,
-                #     node2_if=iface2,
-                #     link_type=link_type,
-                # )
+        return {
+            "groups": groups,
+            "nodes": nodes,
+            "links": links,
+        }
 
-                # # aggiorna link_id nelle interfacce
-                # iface1["link_id"] = link_id
-                # iface2["link_id"] = link_id
-
-                # # aggiungi alle interfacce dei nodi
-                # n1["interfaces"].append(iface1)
-                # n2["interfaces"].append(iface2)
+    #     for node_id, node in self.nodes.items():
 
     # def load_lld(data):
     #     for node in data.get("nodes"):
