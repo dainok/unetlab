@@ -116,7 +116,6 @@ class LabLld:
                     group=group_name,
                     link_type=link_type,
                     links=links,
-                    prefix=node_prefix,
                     template=node_template,
                 )
 
@@ -159,9 +158,10 @@ class LabLld:
         self,
         features: list,
         group: str,
-        prefix: str,
         template: NodeTemplate,
+        name: str | None = None,
         oob: bool = True,
+        prefix: str | None = None,
     ):
 
         # Find first available node_id
@@ -170,12 +170,14 @@ class LabLld:
         while node_id in used_node_ids:
             node_id += 1
 
+        if prefix:
+            name = f"{prefix}{node_id}"
         self.add_node(
             cpu=template.cpu,
             features=features,
             group=group,
             id=node_id,
-            name=f"{prefix}{node_id}",
+            name=name,
             ram=template.ram,
             template=template,
         )
@@ -399,26 +401,28 @@ class LabLld:
         features: list,
         group: str,
         link_type: str,
-        links: [],
-        prefix: str,
+        links: list[str],
         template: NodeTemplate,
     ):
         for link in links:
-            # Create node if not exists
-            # Connect nodes together
-            pass
-        # # Nodes
-        # group_node_ids = []
-        # for i in range(count):
-        #     group_node_ids.append(
-        #         self.add_node_from_template(
-        #             features=features,
-        #             group=group,
-        #             oob=template.oob,
-        #             prefix=prefix,
-        #             template=template,
-        #         )
-        #     )
+            link_node_ids = []
+            for node_name in link:
+                node_key = node_name.lower().strip()
+                node_name = node_name.strip()
+                if node_key in self.node_name_to_id:
+                    node_id = self.node_name_to_id[node_key]
+                else:
+                    node_id = self.add_node_from_template(
+                        features=features,
+                        group=group,
+                        oob=template.oob,
+                        name=node_name,
+                        template=template,
+                    )
+                link_node_ids.append(node_id)
+
+            self.connect(node_ids=link_node_ids, kind=link_type)
+            self.add_group(group=group, members=link_node_ids)
 
     def to_dict(self):
         # Groups
