@@ -171,7 +171,7 @@ class LabTopologyView(LabQueryMixin, ObjectDetailView):
                     cy_edges.append(
                         {
                             "data": {
-                                "id": f"link{link['id']}",
+                                # "id": f"link{link['id']}",
                                 "source": endpoints[0]["node"],
                                 "target": endpoints[1]["node"],
                                 "sourceLabel": endpoints[0]["ifName"],
@@ -179,6 +179,22 @@ class LabTopologyView(LabQueryMixin, ObjectDetailView):
                             }
                         }
                     )
+                elif len(endpoints) > 2:
+                    # Add network as node
+                    cy_nodes.append(
+                        {"data": {"id": f"Link{link['id']}", "label": f"N{link['id']}"}}
+                    )
+                    for endpoint in endpoints:
+                        cy_edges.append(
+                            {
+                                "data": {
+                                    # "id": f"link{link['id']}",
+                                    "source": endpoint["node"],
+                                    "target": f"Link{link['id']}",
+                                    "sourceLabel": endpoint["ifName"],
+                                }
+                            }
+                        )
             context["elements"] = cy_nodes + cy_edges
 
             # from pprint import pprint
