@@ -154,16 +154,25 @@ class LabTopologyView(LabQueryMixin, ObjectDetailView):
         # Creo un array per i link nella forma src-dst
         if lab.lld:
             cy_nodes = [
-                {"data": {"id": node["name"], "label": node["name"]}}
+                {
+                    "data": {
+                        "id": node["name"],
+                        "label": node["name"],
+                        "image_url": "/static/icons/router.svg",
+                    },
+                }
                 for node in lab.lld.get("nodes", [])
             ]
             cy_edges = []
 
             link_map = {}
             for node in lab.lld.get("nodes", []):
-                for intf in node["interfaces"]:
-                    link_map.setdefault(intf["link_id"], []).append(
-                        {"node": node["name"], "ifName": intf["name"]}
+                for iface in node["interfaces"]:
+                    link_map.setdefault(iface["link_id"], []).append(
+                        {
+                            "node": node["name"],
+                            "iface_name": iface["name"]
+                        }
                     )
             for link in lab.lld.get("links", []):
                 endpoints = link_map.get(link["id"], [])
@@ -174,8 +183,8 @@ class LabTopologyView(LabQueryMixin, ObjectDetailView):
                                 # "id": f"link{link['id']}",
                                 "source": endpoints[0]["node"],
                                 "target": endpoints[1]["node"],
-                                "sourceLabel": endpoints[0]["ifName"],
-                                "targetLabel": endpoints[1]["ifName"],
+                                "source_label": endpoints[0]["iface_name"],
+                                "target_label": endpoints[1]["iface_name"],
                             }
                         }
                     )
@@ -191,15 +200,11 @@ class LabTopologyView(LabQueryMixin, ObjectDetailView):
                                     # "id": f"link{link['id']}",
                                     "source": endpoint["node"],
                                     "target": f"Link{link['id']}",
-                                    "sourceLabel": endpoint["ifName"],
+                                    "source_label": endpoint["iface_name"],
                                 }
                             }
                         )
             context["elements"] = cy_nodes + cy_edges
-
-            # from pprint import pprint
-            # pprint(context["elements"])
-            # pprint(lab.lld)
         return context
 
 
