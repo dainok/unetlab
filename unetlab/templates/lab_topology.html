@@ -16,31 +16,86 @@
                 selector: 'node',
                 style: {
                     'label': 'data(label)',
-                    'text-valign': 'center',
+                    'color': '#444000',
+                    'text-valign': 'bottom',
                     'text-halign': 'center',
-                    'shape': 'round-rectangle',
-                    'background-color': '#88c'
+                    'background-color': '#88c',
+                    'background-image': 'data(img)',
+                    'font-size': 10,
+                    'font-family': 'Arial, Helvetica, sans-serif',
                 }
             },
             {
-                selector: 'edge',
+                selector: 'edge[sourceLabel], edge[targetLabel]',
                 style: {
-                    'width': 2,
-                    'line-color': '#555',
+                    // Connector
+                    'width': 1,
+                    'line-color': '#444000',
                     'target-arrow-shape': 'none',
                     'curve-style': 'bezier',
-                    'source-label': 'data(sourceLabel)',   /* Etichetta lato sorgente */
-                    'target-label': 'data(targetLabel)',   /* Etichetta lato destinazione */
-                    'source-text-offset': 20,
-                    'target-text-offset': 20,
-                    'font-size': 12,
+                    // Source/Target labels
+                    'font-size': 8,
+                    'font-family': 'Courier New, monospace',
                     'text-background-color': '#fff',
                     'text-background-opacity': 0.7,
-                    'text-background-shape': 'round-rectangle'
+                    'text-background-shape': 'round-rectangle',
+                    // Source/Target label background
+                    'text-background-color': '#ffffff',
+                    'text-background-opacity': 0.7,
+                    'text-background-shape': 'roundrectangle',
+                    'text-background-padding': 2,
+                    'text-border-color': '#444000',
+                    'text-border-width': 1,
+                    'text-border-opacity': 1,
+                    'text-border-style': 'solid',
+                    // Source label
+                    'source-label': 'data(sourceLabel)',
+                    //'source-text-offset': 10,
+                }
+            },
+            {
+                selector: 'edge[targetLabel]',
+                style: {
+                    // Connector
+                    'width': 1,
+                    'line-color': '#444000',
+                    'target-arrow-shape': 'none',
+                    'curve-style': 'bezier',
+                    // Source/Target labels
+                    'font-size': 8,
+                    'font-family': 'Courier New, monospace',
+                    'text-background-color': '#fff',
+                    'text-background-opacity': 0.7,
+                    'text-background-shape': 'round-rectangle',
+                    // Source/Target label background
+                    'text-background-color': '#ffffff',
+                    'text-background-opacity': 0.7,
+                    'text-background-shape': 'roundrectangle',
+                    'text-background-padding': 2,
+                    'text-border-color': '#444000',
+                    'text-border-width': 1,
+                    'text-border-opacity': 1,
+                    'text-border-style': 'solid',
+                    // Source label
+                    'source-label': 'data(sourceLabel)',
+                    //'source-text-offset': 10,
+                    // Target label
+                    'target-label': 'data(targetLabel)',
+                    //'target-text-offset': 10,
                 }
             }
         ],
         layout: { name: 'cose' } // try 'cose' grid, circle, breadthfirst
+    });
+    cy.on('tap', 'node', function(evt){
+        const node = evt.target;
+        console.log('Hai cliccato sul nodo:', node.id());
+        // alert('Hai cliccato sul nodo: ' + node.data('label'));
+    });
+    cy.on('tap', 'edge', function(evt){
+        const edge = evt.target;
+        console.log('Hai cliccato sull\'edge:', edge.id());
+        // alert('Hai cliccato sull\'edge: ' + edge.data('source') + ' → ' + edge.data('target'));
     });
 </script>
 {% endblock page %}
