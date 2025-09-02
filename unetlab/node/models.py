@@ -74,10 +74,10 @@ class NodeTemplate(models.Model):
         verbose_name=_("NIC"),
         help_text=_("Template default network interfaces."),
     )
-    mgmt = models.BooleanField(
+    oob = models.BooleanField(
         default=True,
-        verbose_name=_("Management interface"),
-        help_text=_("True if first interface is for management."),
+        verbose_name=_("OOB Management interface"),
+        help_text=_("True if first interface is used for OOB management."),
     )
     disk_checksum = models.CharField(
         max_length=255,
