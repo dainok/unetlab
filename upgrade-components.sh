@@ -10,4 +10,5 @@ TABLER_CDN_URL="https://cdn.jsdelivr.net/npm/@tabler/core@${TABLER_VERSION}/dist
 
 wget -q -O- "${CYTOSCAPE_CDN_URL}/cytoscape.min.js" > unetlab/static/cytoscape/js/cytoscape.min.js
 wget -q -O- "${TABLER_CDN_URL}/js/tabler.min.js" > unetlab/static/tabler/js/tabler.min.js
+wget -q -O- "${TABLER_CDN_URL}/js/tabler.min.js.map" > unetlab/static/tabler/js/tabler.min.js.map
 wget -q -O- "${TABLER_CDN_URL}/css/tabler.min.css" > unetlab/static/tabler/css/tabler.min.css

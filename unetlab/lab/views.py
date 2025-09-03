@@ -190,9 +190,13 @@ class LabTopologyView(LabQueryMixin, ObjectDetailView):
                     )
                 elif len(endpoints) > 2:
                     # Add network as node
-                    cy_nodes.append(
-                        {"data": {"id": f"Link{link['id']}", "label": f"N{link['id']}"}}
-                    )
+                    cy_nodes.append({
+                        "data": {
+                            "id": f"Link{link['id']}",
+                            "label": f"N{link['id']}",
+                            "image_url": "/static/icons/l2-switch.svg",
+                        },
+                    })
                     for endpoint in endpoints:
                         cy_edges.append(
                             {
