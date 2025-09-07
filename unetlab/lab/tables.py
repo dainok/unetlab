@@ -26,6 +26,26 @@ class LabTable(ObjectTable):
         ]
         sequence = ["name", "..."]
         order_by = ["name"]
+        attrs = {
+            "row_actions": [
+                {
+                    "button": "Delete",
+                    "view": "lab_delete",
+                },
+                {
+                    "button": "Edit",
+                    "view": "lab_update",
+                },
+                {
+                    "button": "Start",
+                    "js": "labinstance_detail",
+                },
+                {
+                    "button": "View",
+                    "view": "lab_detail",
+                },
+            ],
+        }
 
 
 #############################################################################

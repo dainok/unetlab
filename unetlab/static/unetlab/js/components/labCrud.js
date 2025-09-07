@@ -1,27 +1,33 @@
 import { api } from "../utils.js";
 
-export default function labCrud() {
+export function labCrud() {
   return {
-    form: {
-      title: "Nuovo Libro",
-      author_id: 1
+    async create() {
+      const pk = this.$el.closest('[data-pk]').dataset.pk;
+      console.log("✅ Creo lab con pk =", pk);
     },
-
-    async submit(lab_id) {
-      try {
-        // POST usando il tuo api helper
-        const data = await api.post("/books", this.form);
-
-        console.log("POST riuscito", data);
-
-        // redirect alla nuova pagina
-        window.location.href = `/books/${data.id}`;
-
-      } catch (error) {
-        console.error("Errore POST:", error);
-        alert("Errore durante la creazione del libro");
+    async read() {
+      const pk = this.$el.closest('[data-pk]').dataset.pk;
+      console.log("🗑️ Leggo lab con pk =", pk);
+    },
+    async update() {
+      const pk = this.$el.closest('[data-pk]').dataset.pk;
+      console.log("✅ Aggiorno lab con pk =", pk);
+    },
+    async remove() {
+      const pk = this.$el.closest('[data-pk]').dataset.pk;
+      console.log("🗑️ Cancello lab con pk =", pk);
+    },
+    async start() {
+      const pk = this.$el.closest('[data-pk]').dataset.pk;
+      const payload = {
+        lab__pk: pk,
       }
-    }
-  }
+      await api.post("/instance/create/", payload);
+    },
+    async build() {
+      const pk = this.$el.closest('[data-pk]').dataset.pk;
+      console.log("🗑️ Build lab con pk =", pk);
+    },
+  };
 }
-window.labCrud = labCrud;

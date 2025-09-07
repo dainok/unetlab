@@ -142,6 +142,7 @@ class ObjectTable(tables.Table):
             self.attrs["description"] = default_description
         if "search" not in self.attrs:
             self.attrs["search"] = True
+        self.attrs["model"] = model_name
 
         # Set default row actions if not provided
         if "row_actions" not in self.attrs:

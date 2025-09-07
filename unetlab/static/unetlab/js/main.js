@@ -1,17 +1,13 @@
-// import Alpine from "alpinejs";
-import "./stores/wsStore.js";   // store WS
-// import bookCrud from "./components/bookCrud.js";
-import labCrud from "./components/labCrud.js";
+import { labCrud } from "./components/labCrud.js";
+import { registerWsStore } from "./stores/wsStore.js";
 
-// window.Alpine = Alpine;
+// Register websocket store
+registerWsStore();
 
-// registra componenti
-// Alpine.data("bookCrud", bookCrud);
-// Alpine.data("labCrud", labCrud);
-
-// Alpine.start();
-
-
+// Wait for Alpine and register components
+document.addEventListener("alpine:init", () => {
+  Alpine.data("labCrud", labCrud);
+});
 
 
 // project/

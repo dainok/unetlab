@@ -2,7 +2,7 @@
 {% block title %}UNetLab | {{ object.name }} > Detail{% endblock title %}
 {% block page_title %}{{ object.name }} > Detail{% endblock page_title %}
 {% block page_body %}
-<div class="col-lg-12">
+<div class="col-lg-12" x-data="labCrud()" data-pk="{{ pk }}">
     <div class="card card-lg">
         <div class="card-body markdown">
             <div class="row align-items-center">
@@ -11,7 +11,7 @@
                     <a href="{% url model_name|add:'_delete' pk %}" class="btn">Delete</a>
                 </div>
                 <div class="col-auto">
-                    <button type="submit" class="btn" onclick="LabRebuildView({{ pk }})">
+                    <button type="submit" class="btn" @click="build()">
                         Rebuild
                     </button>
                 </div>
@@ -19,7 +19,7 @@
                     <a href="{% url model_name|add:'_update' pk %}" class="btn">Edit</a>
                 </div>
                 <div class="col-auto">
-                    <button type="submit" class="btn btn-primary" onclick="LabStartView({{ pk }})">
+                    <button class="btn btn-primary" @click="start()">
                         Start
                     </button>
                 </div>

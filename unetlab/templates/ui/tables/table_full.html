@@ -68,7 +68,7 @@
         </div>
         <div id="advanced-table">
             <div class="table-responsive">
-                <table class="table table-vcenter table-selectable">
+                <table class="table table-vcenter table-selectable"{% if table.attrs.model %} todox-data="{{ table.attrs.model }}Crud()"{% endif %}>
                     <thead>
                         <tr>
                             {% if "select" not in table.exclude %}
@@ -93,7 +93,7 @@
                     </thead>
                     <tbody class="table-tbody">
                         {% for row in table.page.object_list|default:table.rows %}
-                        <tr>
+                        <tr data-pk="{{ row.record.pk }}">
                             {% if "select" not in table.exclude %}
                             <td class="{{ table.attrs.td }}">
                                 <input class="form-check-input m-0 align-middle table-selectable-check" type="checkbox"

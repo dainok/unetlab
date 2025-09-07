@@ -169,10 +169,7 @@ class LabTopologyView(LabQueryMixin, ObjectDetailView):
             for node in lab.lld.get("nodes", []):
                 for iface in node["interfaces"]:
                     link_map.setdefault(iface["link_id"], []).append(
-                        {
-                            "node": node["name"],
-                            "iface_name": iface["name"]
-                        }
+                        {"node": node["name"], "iface_name": iface["name"]}
                     )
             for link in lab.lld.get("links", []):
                 endpoints = link_map.get(link["id"], [])
@@ -190,13 +187,15 @@ class LabTopologyView(LabQueryMixin, ObjectDetailView):
                     )
                 elif len(endpoints) > 2:
                     # Add network as node
-                    cy_nodes.append({
-                        "data": {
-                            "id": f"Link{link['id']}",
-                            "label": f"N{link['id']}",
-                            "image_url": "/static/icons/l2-switch.svg",
-                        },
-                    })
+                    cy_nodes.append(
+                        {
+                            "data": {
+                                "id": f"Link{link['id']}",
+                                "label": f"N{link['id']}",
+                                "image_url": "/static/icons/l2-switch.svg",
+                            },
+                        }
+                    )
                     for endpoint in endpoints:
                         cy_edges.append(
                             {
