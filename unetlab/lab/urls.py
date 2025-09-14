@@ -7,7 +7,7 @@ from lab.views import (
     LabInstanceAPIViewSet,
     LabInstanceBulkDeleteView,
     LabInstanceChangeView,
-    # LabInstanceCreateView,
+    LabInstanceCreateView,
     LabInstanceDeleteView,
     LabInstanceDetailView,
     LabInstanceListView,
@@ -46,7 +46,7 @@ urlpatterns = [
     # Instance
     #########################################################################
     path("instance/", LabInstanceListView.as_view(), name="labinstance_list"),
-    # path("instance/create", LabCreateView.as_view(), name="labinstance_create"),
+    path("instance/create", LabInstanceCreateView.as_view(), name="labinstance_create"),
     path(
         "instance/delete",
         LabInstanceBulkDeleteView.as_view(),

@@ -62,15 +62,15 @@ class LabInstanceTable(ObjectTable):
         exclude = [
             # "select",
             # "actions",
-            "id",
-            "nodes",
-            "hld",
-            "lld",
+            # "id",
+            # "nodes",
+            # "hld",
+            # "lld",
             # "created_at",
-            "updated_at",
+            # "updated_at",
         ]
-        sequence = ["lab", "..."]
-        order_by = ["lab"]
-        attrs = {
-            "table_actions": [],
-        }
+        # sequence = ["lab", "..."]
+        # order_by = ["lab"]
+        # attrs = {
+        #     "table_actions": [],
+        # }

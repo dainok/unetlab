@@ -2,6 +2,9 @@
 
 import yaml
 from django.core.exceptions import PermissionDenied
+from rest_framework import status
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from lab.models import Lab, LabInstance
 from lab.serializers import LabSerializer, LabInstanceSerializer
 from lab.filters import LabFilter, LabInstanceFilter
@@ -85,6 +88,13 @@ class LabAPIViewSet(LabQueryMixin, APICRUDViewSet):
         # Set user
         serializer.save(user=self.request.user)
 
+    # @action(detail=False, methods=["post"])
+    # def update_node_position(self, request, pk=None, node_id=None, position=None):
+    #     # do_rescan(username=request.user.username)
+    #     return Response({}, status=status.HTTP_200_OK)
+    # # update cpu, name, nics, ram, template, positions
+    # # update interface name, description, link
+
 
 class LabBulkDeleteView(LabQueryMixin, ObjectBulkDeleteView):
     """HTML view for deleting multiple `User` objects at once."""
@@ -144,7 +154,7 @@ class LabListView(LabQueryMixin, ObjectListView):
 
 
 class LabTopologyView(LabQueryMixin, ObjectDetailView):
-    model = LabInstance
+    model = Lab
     template_name = "lab_topology.html"
 
     def get_context_data(self, **kwargs):
@@ -229,7 +239,7 @@ class LabInstanceQueryMixin:
         - Staff users can see users who share at least one group
         - Non-superusers can only access their own `User` object.
         """
-        qs = Lab.objects.all()
+        qs = LabInstance.objects.all()
         user = self.request.user
         if user.is_superuser:
             # Admin users can see all `User` objects
@@ -267,11 +277,17 @@ class LabInstanceQueryMixin:
         raise PermissionDenied(messages.PERMISSION_DENIED)
 
 
-class LabInstanceAPIViewSet(LabQueryMixin, APICRUDViewSet):
+class LabInstanceAPIViewSet(LabInstanceQueryMixin, APICRUDViewSet):
     """REST API endpoints for Template model."""
 
     serializer_class = LabInstanceSerializer
     filterset_class = LabInstanceFilter
+
+    def perform_create(self, serializer):
+        # Set user and lab ID
+        lab_id = self.request.data.get("lab_id")
+        lab_obj = Lab.objects.get(id=lab_id)
+        serializer.save(user=self.request.user, lab=lab_obj)
 
 
 class LabInstanceBulkDeleteView(LabInstanceQueryMixin, ObjectBulkDeleteView):
@@ -287,6 +303,13 @@ class LabInstanceChangeView(LabInstanceQueryMixin, ObjectChangeView):
     form_class = LabInstanceForm
 
 
+class LabInstanceCreateView(LabQueryMixin, ObjectCreateView):
+    """HTML view for creating a new `User`."""
+
+    model = LabInstance
+    form_class = LabInstanceForm
+
+
 class LabInstanceDeleteView(LabInstanceQueryMixin, ObjectDeleteView):
     """HTML view for deleting a single `User`."""
 
@@ -296,7 +319,7 @@ class LabInstanceDeleteView(LabInstanceQueryMixin, ObjectDeleteView):
 class LabInstanceDetailView(LabInstanceQueryMixin, ObjectDetailView):
     model = LabInstance
     exclude = ["id"]
-    sequence = ["name", "created_at", "description"]
+    sequence = ["name", "created_at"]
 
 
 class LabInstanceListView(LabInstanceQueryMixin, ObjectListView):

@@ -5,7 +5,6 @@ class CustomJSONRenderer(JSONRenderer):
     def render(self, data, accepted_media_type=None, renderer_context=None):
         response = renderer_context.get("response", None)
         request = renderer_context.get("request", None)
-        command = request.resolver_match.view_name
         status_code = response.status_code
         status_type = "success" if status_code < 400 else "error"
         # Override codes
@@ -19,8 +18,7 @@ class CustomJSONRenderer(JSONRenderer):
                 "message": response.status_text,
                 "url": request.get_full_path(),
             },
-            "type": "reponse",
-            "command": command,
+            "type": "response",
         }
         if data:
             wrapped["data"] = data

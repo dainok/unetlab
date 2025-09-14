@@ -3,13 +3,14 @@
 import hashlib
 from django.core.files.storage import default_storage
 from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from node.filters import NodeTemplateFilter
-from node.models import NodeTemplate
-from node.serializers import NodeTemplateSerializer, UploadDiskSerializer
-from node.tables import NodeTemplateTable
-from node.forms import NodeTemplateForm
+from node.filters import NodeFilter, NodeTemplateFilter
+from node.models import Node, NodeTemplate
+from node.serializers import NodeSerializer, NodeTemplateSerializer, UploadDiskSerializer
+from node.tables import NodeTable, NodeTemplateTable
+from node.forms import NodeForm, NodeTemplateForm
 from ui.include.permissions import IsAdmin, IsAdminOrStaff
 from ui.include.views import (
     APICRUDViewSet,
@@ -20,6 +21,77 @@ from ui.include.views import (
     ObjectDetailView,
     ObjectListView,
 )
+
+
+#############################################################################
+# Nodes
+#############################################################################
+
+
+class NodeQueryMixin:
+    """Mixin to encapsulate common Template queryset and permissions logic.
+
+    Used by both UI and API views.
+    """
+
+
+class NodeAPIViewSet(NodeQueryMixin, APICRUDViewSet):
+    """REST API endpoints for Template model."""
+
+    serializer_class = NodeSerializer
+    filterset_class = NodeFilter
+
+    @action(detail=False, methods=["post"])
+    def stop(self, request):
+        # do_rescan(username=request.user.username)
+        return Response({}, status=status.HTTP_202_ACCEPTED)
+    
+    @action(detail=False, methods=["post"])
+    def start(self, request):
+        # do_rescan(username=request.user.username)
+        return Response({}, status=status.HTTP_202_ACCEPTED)
+    
+    @action(detail=False, methods=["post"])
+    def wipe(self, request):
+        # do_rescan(username=request.user.username)
+        return Response({}, status=status.HTTP_202_ACCEPTED)
+    
+
+class NodeBulkDeleteView(ObjectBulkDeleteView):
+    """HTML view for deleting multiple `Group` objects at once."""
+
+    model = Node
+    permission_classes = [IsAdmin]
+
+
+class NodeChangeView(ObjectChangeView):
+    model = Node
+    form_class = NodeForm
+    permission_classes = [IsAdmin]
+
+
+class NodeCreateView(ObjectCreateView):
+    model = Node
+    form_class = NodeForm
+
+
+class NodeDeleteView(ObjectDeleteView):
+    """HTML view for deleting a single `Group`."""
+
+    model = Node
+    permission_classes = [IsAdmin]
+
+
+class NodeDetailView(ObjectDetailView):
+    model = Node
+    exclude = ["id"]
+    sequence = ["name", "created_at", "description"]
+
+
+class NodeListView(ObjectListView):
+    model = Node
+    table_class = NodeTable
+    filterset_class = NodeFilter
 
 
 #############################################################################
@@ -40,6 +112,11 @@ class NodeTemplateAPIViewSet(NodeTemplateQueryMixin, APICRUDViewSet):
     serializer_class = NodeTemplateSerializer
     filterset_class = NodeTemplateFilter
 
+    @action(detail=False, methods=["post"])
+    def build(self, request):
+        # do_rescan(username=request.user.username)
+        return Response({}, status=status.HTTP_202_ACCEPTED)
+     
 
 class NodeTemplateBulkDeleteView(ObjectBulkDeleteView):
     """HTML view for deleting multiple `Group` objects at once."""

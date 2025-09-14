@@ -5,8 +5,26 @@ to enable users to filter Template and Log records by relevant fields.
 """
 
 import django_filters
-from node.models import NodeTemplate
+from node.models import Node, NodeTemplate
 from ui.include.filters import SearchFilterSet
+
+
+class NodeFilter(SearchFilterSet):
+    """FilterSet for filtering Template instances by username, status, and creation date.
+
+    This filter is used primarily in list views and APIs to narrow down
+    Template records based on selected criteria.
+
+    Filters:
+        - username: Dropdown choice of Template owners dynamically populated
+        - status: Template status, using TemplateStatusChoices enum
+        - created_at__gte: Filter Templates created on or after a given date
+        - created_at__lte: Filter Templates created on or before a given date
+    """
+
+    class Meta:
+        model = Node
+        fields = ["name"]
 
 
 class NodeTemplateFilter(SearchFilterSet):

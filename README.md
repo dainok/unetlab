@@ -86,7 +86,6 @@ The APIs are built using Django REST Framework, with the output format customize
         "url": "/api/log", // The requested URL
     },
     "type": "response", // For API requests, this is always "response"
-    "command": "log-list", // The reverse view name used by the API
     "data": [], // The server response data, if present
     "traceback": "", // Present only in case of errors (with debug enabled)
 }

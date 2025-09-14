@@ -39,3 +39,26 @@ class NodeTemplateTable(ObjectTable):
                 }
             ],
         }
+
+
+class NodeTable(ObjectTable):
+    class Meta:
+        model = NodeTemplate
+        exclude = [
+        ]
+        # sequence = ["vendor", "os", "version", "extra", "..."]
+        # order_by = ["vendor", "os", "version", "extra"]
+        # attrs = {
+        #     "table_vip_actions": [
+        #         {
+        #             "button": "Rescan",
+        #             "js": "RescanView('repository')",
+        #         },
+        #     ],
+        #     "row_actions": [
+        #         {
+        #             "button": "View",
+        #             "view": "nodetemplate_detail",
+        #         }
+        #     ],
+        # }

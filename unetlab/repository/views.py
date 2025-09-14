@@ -40,7 +40,7 @@ class RepositoryAPIViewSet(RepositoryQueryMixin, APICRUDViewSet):
     def rescan(self, request):
         do_rescan(username=request.user.username)
         return Response({}, status=status.HTTP_202_ACCEPTED)
-
+    
 
 class RepositoryBulkDeleteView(RepositoryQueryMixin, ObjectBulkDeleteView):
     """HTML view for deleting multiple `User` objects at once."""
