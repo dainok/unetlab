@@ -1,75 +1,74 @@
-hld:
-  groups:
-    - template: local-vyos-vyos
-      prefix: R
-      count: 4
-      topology: full-mesh
-      link_type: l1
-      features:
-        - loopback:name=Loopback0
-    - template: local-vyos-vyos
-      prefix: R
-      count: 4
-      topology: full-mesh
-      link_type: l1
-      features:
-        - loopback:name=Loopback0
-    - template: local-vyos-vyos
-      prefix: R
-      count: 8
-      topology: hub-spoke
-      hubs: 3
-      connect_hubs: true
-      link_type: l1
-      features:
-        - loopback:name=Loopback0
-    - template: local-vyos-vyos
-      prefix: R
-      count: 6
-      topology: ring
-      link_type: l1
-      features:
-        - loopback:name=Loopback0
-    - template: local-vyos-vyos
-      prefix: R
-      count: 4
-      topology: linear
-      link_type: l1
-      features:
-        - loopback:name=Loopback0
-    - template: local-vyos-vyos
-      prefix: R
-      topology: custom
-      link_type: l1
-      links:
-        - R30, R31, R32, R33
-        - R30, R31
-        - R32, R33
-        - R32, R11
-        - R33, R10
-    - template: local-vyos-vyos
-      prefix: R
-      topology: custom
-      link_type: l2
-      links:
-        - R1, R12
-        - R2, R13
-        - R5, R14
-        - R6, R15
-        - R23, R16
-        - R20, R17
-        - R26, R18
-        - R29, R19
-      features:
-        - loopback:name=Loopback0
-  interfaces:
-    - match: Loopback0
-      address: 192.168.0.1/16
-      mask: 32
-      features:
-        - ospf:area=0
-    - match: Ethernet
-      address: 10.0.0.0/8
-      mask: auto
-      features:
-        - ospf:area=0
+groups:
+  - template: local-vyos-vyos
+    prefix: R
+    count: 4
+    topology: full-mesh
+    link_type: l1
+    features:
+      - loopback:name=Loopback0
+  - template: local-vyos-vyos
+    prefix: R
+    count: 4
+    topology: full-mesh
+    link_type: l1
+    features:
+      - loopback:name=Loopback0
+  - template: local-vyos-vyos
+    prefix: R
+    count: 8
+    topology: hub-spoke
+    hubs: 3
+    connect_hubs: true
+    link_type: l1
+    features:
+      - loopback:name=Loopback0
+  - template: local-vyos-vyos
+    prefix: R
+    count: 6
+    topology: ring
+    link_type: l1
+    features:
+      - loopback:name=Loopback0
+  - template: local-vyos-vyos
+    prefix: R
+    count: 4
+    topology: linear
+    link_type: l1
+    features:
+      - loopback:name=Loopback0
+  - template: local-vyos-vyos
+    prefix: R
+    topology: custom
+    link_type: l1
+    links:
+      - R30, R31, R32, R33
+      - R30, R31
+      - R32, R33
+      - R32, R11
+      - R33, R10
+  - template: local-vyos-vyos
+    prefix: R
+    topology: custom
+    link_type: l2
+    links:
+      - R1, R12
+      - R2, R13
+      - R5, R14
+      - R6, R15
+      - R23, R16
+      - R20, R17
+      - R26, R18
+      - R29, R19
+    features:
+      - loopback:name=Loopback0
+interfaces:
+  - match: Loopback0
+    address: 192.168.0.1/16
+    mask: 32
+    features:
+      - ospf:area=0
+  - match: Ethernet
+    address: 10.0.0.0/8
+    mask: auto
+    features:
+      - ospf:area=0

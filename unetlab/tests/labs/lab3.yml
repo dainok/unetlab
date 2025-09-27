@@ -1,5 +1,5 @@
 hll:
-  nodes:
+  groups:
     - template: vyos-vyos
       prefix: R
       count: 4

@@ -1,0 +1,134 @@
+{% extends "ui/base.html" %}
+{% block title %}UNetLab | {{ object.name }} > Detail{% endblock title %}
+{% block page_title %}{{ object.name }} > Detail{% endblock page_title %}
+{% block page_body %}
+<div class="col-lg-12" x-data="labCrud()" data-pk="{{ pk }}">
+    <div class="card card-lg">
+        <div class="card-body markdown">
+            <div class="row align-items-center">
+                <div class="col"></div>
+                <div class="col-auto">
+                    <a href="{% url model_name|add:'_delete' pk %}" class="btn">Delete</a>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn" @click="build()">
+                        Rebuild
+                    </button>
+                </div>
+                <div class="col-auto">
+                    <a href="{% url model_name|add:'_update' pk %}" class="btn">Edit</a>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-primary" @click="start()">
+                        Start
+                    </button>
+                </div>
+            </div>
+
+            <h1>Lab {{ object.lab.name }}-{{ object.rid }}</h1>
+            <ul>
+                <li>User: {{ object.user }}</li>
+                <li>Lab Shared group: {{ object.lab.shared_group }}</li>
+                <li>Instance Shared group: {{ object.shared_group }}</li>
+                <li>Created at: {{ object.created_at }}</li>
+                <li>Updated at: {{ object.updated_at }}</li>
+            </ul>
+
+            <h2>High Level Design:</h2>
+            <pre><code class="language-scss">{{ hld_yaml }}</code></pre>
+
+            <h2>Groups</h2>
+            <div class="table-responsive">
+                <table class="table table-vcenter table-selectable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Members</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-tbody">
+                        {% for row in object.node_groups %}
+                        <tr>
+                            <td>{{ row.name }}</td>
+                            <td>
+                                {% for member in row.members %}
+                                    {{ member }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>Nodes</h2>
+            <div class="table-responsive">
+                <table class="table table-vcenter table-selectable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Template</th>
+                            <th>Features</th>
+                            <th>CPU</th>
+                            <th>RAM</th>
+                            <th>NICs</th>
+                            <th>Interfaces</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-tbody">
+                        {% for row in object.nodes %}
+                        <tr>
+                            <td>{{ row.id }}</td>
+                            <td>{{ row.name }}</td>
+                            <td>{{ row.template }}</td>
+                            <td>
+                                {% for feature in row.features %}
+                                    {{ feature }}
+                                {% endfor %}
+                            </td>
+                            <td>{{ row.cpu }}</td>
+                            <td>{{ row.ram }}</td>
+                            <td>{{ row.nics }}</td>
+                            <td>
+                                <ul>
+                                {% for interface in row.interfaces %}
+                                    <li>{{ interface.name }} ({{ interface.id }}) -> network {{ interface.link_id }}</li>
+                                {% endfor %}
+                                </ul>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>Networks</h2>
+            <div class="table-responsive">
+                <table class="table table-vcenter table-selectable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Description</th>
+                            <th>Type</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-tbody">
+                        {% for row in object.lld.links %}
+                        <tr>
+                            <td>{{ row.id }}</td>
+                            <td>{{ row.name }}</td>
+                            <td>{{ row.type }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>Low Level Design:</h2>
+            <pre><code class="language-scss">{{ lld_yaml }}</code></pre>
+
+        </div>
+    </div>
+</div>
+{% endblock page_body %}
