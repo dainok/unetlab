@@ -36,7 +36,7 @@ class RepositoryAPIViewSet(RepositoryQueryMixin, APICRUDViewSet):
     serializer_class = RepositorySerializer
     filterset_class = RepositoryFilter
 
-    @action(detail=False, methods=["post"], permission_classes=IsAdminOrStaff)
+    @action(detail=False, methods=["post"], permission_classes=[IsAdminOrStaff])
     def rescan(self, request):
         do_rescan(username=request.user.username)
         return Response({}, status=status.HTTP_202_ACCEPTED)

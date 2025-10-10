@@ -58,8 +58,9 @@ class NodeTemplate(models.Model):
         max_length=255,
         default="",
         verbose_name=_("Extra"),
+        blank=True,
         help_text=_("Template label."),
-        validators=[AlphanumericValidator],
+        # validators=[AlphanumericValidator],
     )
     cpu = models.IntegerField(
         default=1,
@@ -155,12 +156,21 @@ class Network(models.Model):
     """
     Model for Network.
     """
+    rid = models.IntegerField()
     instance = models.ForeignKey(
         LabInstance,
         on_delete=models.CASCADE,
         related_name="node_networks",
         editable=False,
     )
+    running_description = models.CharField(
+        max_length=255,
+        editable=False,
+        verbose_name=_("Name"),
+        # validators=[AlphanumericValidator],
+        help_text=_("Network name."),
+    )
+    # running_type=link["type"]
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="node_networks", editable=False)
 
     class Meta:
@@ -168,6 +178,7 @@ class Network(models.Model):
 
         db_table = "networks"
         # ordering = ["name"]
+        unique_together = [["user", "rid", "instance"]]
         verbose_name = _("Network")
         verbose_name_plural = _("Networks")
 
@@ -180,47 +191,19 @@ class Network(models.Model):
         return reverse("network-detail-view", args=[str(self.pk)])
 
 
-class NodeInterface(models.Model):
-    """
-    Model for Interface.
-    """
-    instance = models.ForeignKey(
-        LabInstance,
-        on_delete=models.CASCADE,
-        related_name="node_interfaces",
-        editable=False,
-    )
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="node_interfaces", editable=False)
-
-    class Meta:
-        """Database metadata."""
-
-        db_table = "interfaces"
-        ordering = ["id"]
-        verbose_name = _("Interface")
-        verbose_name_plural = _("Interfaces")
-
-    # def __str__(self):
-    #     """Return a human readable name when the object is printed."""
-    #     return self.id
-
-    def get_absolute_url(self):
-        """Return the absolute url."""
-        return reverse("interface-detail-view", args=[str(self.pk)])
-
-
 class Node(models.Model):
     """
     Model for Node.
     """
 
+    rid = models.IntegerField()
     instance = models.ForeignKey(
         LabInstance,
         on_delete=models.CASCADE,
         related_name="nodes",
         editable=False,
     )
-    name = models.CharField(
+    running_name = models.CharField(
         max_length=255,
         editable=False,
         verbose_name=_("Name"),
@@ -273,14 +256,60 @@ class Node(models.Model):
         """Database metadata."""
 
         db_table = "nodes"
-        ordering = ["name"]
+        ordering = ["running_name"]
+        unique_together = [["user", "rid", "instance"],]
         verbose_name = _("Node")
         verbose_name_plural = _("Nodes")
 
     def __str__(self):
         """Return a human readable name when the object is printed."""
-        return self.name
+        return self.running_name
 
     def get_absolute_url(self):
         """Return the absolute url."""
         return reverse("node-detail-view", args=[str(self.pk)])
+
+
+class NodeInterface(models.Model):
+    """
+    Model for Interface.
+    """
+    rid = models.IntegerField()
+    node = models.ForeignKey(
+        Node,
+        on_delete=models.CASCADE,
+        related_name="node_interfaces",
+        editable=False,
+    )
+    running_description = models.CharField(
+        max_length=255,
+        verbose_name=_("Description"),
+        # validators=[AlphanumericValidator],
+        help_text=_("Interface description."),
+        blank=True,
+        null=True,
+    )
+    link = models.ForeignKey(
+        Network,
+        on_delete=models.SET_NULL,
+        related_name="node_interfaces",
+        blank=True,
+        null=True,
+    )
+
+    class Meta:
+        """Database metadata."""
+
+        db_table = "interfaces"
+        ordering = ["id"]
+        unique_together = [["node", "rid"]]
+        verbose_name = _("Interface")
+        verbose_name_plural = _("Interfaces")
+
+    # def __str__(self):
+    #     """Return a human readable name when the object is printed."""
+    #     return self.id
+
+    def get_absolute_url(self):
+        """Return the absolute url."""
+        return reverse("interface-detail-view", args=[str(self.pk)])

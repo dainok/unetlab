@@ -8,7 +8,7 @@ import redis
 from celery import shared_task
 from django.conf import settings
 
-from ui import messages
+from ui.include import messages
 from job.models import Job, JobStatusChoices
 from job.utils import log
 

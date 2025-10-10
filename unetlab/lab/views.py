@@ -6,10 +6,12 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from lab.models import Lab, LabInstance
+from lab.utils import LabLld
 from lab.serializers import LabSerializer, LabInstanceSerializer
 from lab.filters import LabFilter, LabInstanceFilter
 from lab.forms import LabForm, LabInstanceForm
 from lab.tables import LabTable, LabInstanceTable
+from node.models import NodeTemplate, Node, NodeInterface, NodeGroup, Network
 from ui.include import messages
 from ui.include.views import (
     APICRUDViewSet,
@@ -287,7 +289,57 @@ class LabInstanceAPIViewSet(LabInstanceQueryMixin, APICRUDViewSet):
         # Set user and lab ID
         lab_id = self.request.data.get("lab_id")
         lab_obj = Lab.objects.get(id=lab_id)
-        serializer.save(user=self.request.user, lab=lab_obj)
+        lab_instance_obj = serializer.save(user=self.request.user, lab=lab_obj)
+
+        if not lab_obj.lld:
+            # Create LLD from HLD
+            lld = LabLld()
+            lld.load_hld(lab_obj.hld)
+            lab_obj.lld = lld.to_dict()
+            lab_obj.save()
+            print(lld.to_dict())
+            print("HERE")
+        print("EXISTS")
+        print(lab_obj.lld)
+        for link in lab_obj.lld["links"]:
+            Network.objects.create(
+                rid=link["id"],
+                instance=lab_instance_obj,
+                user=self.request.user,
+                running_description=link["description"],
+                # running_type=link["type"],
+            )
+
+        for node in lab_obj.lld["nodes"]:
+            template = NodeTemplate.objects.get(name=node["template"])
+            Node.objects.create(
+                rid=node["id"],
+                instance=lab_instance_obj,
+                running_cpu=node["cpu"],
+                running_name=node["name"],
+                running_ram=node["ram"],
+                running_nics=node["nics"],
+                template=template,
+                user=self.request.user,
+            )
+            for iface in node["interfaces"]:
+                network_obj = Network.objects.get(user=self.request.user, instance=lab_instance_obj, rid=iface["link_id"])
+                NodeInterface.objects.create(
+                    rid=iface["id"],
+                    running_name=iface["name"],
+                    running_description=iface["description"],
+                    link=network_obj,
+                )
+
+        # NodeGroup
+        # print(lab_obj.lld["groups"])
+        # [{'name': 'Group0', 'members': ['R1', 'R2', 'R3', 'R4']}, {'name': 'Group1', 'members': ['R8', 'R5', 'R6', 'R7']}, {'name': 'Group2', 'members': ['R9', 'R10', 'R11', 'R12', 'R13', 'R14', 'R15', 'R16', 'R17', 'R18', 'R19']}, {'name': 'Group3', 'members': ['R20', 'R21', 'R22', 'R23', 'R24', 'R25']}, {'name': 'Group4', 'members': ['R26', 'R27', 'R28', 'R29']}, {'name': 'Group5', 'members': ['R32', 'R33', 'R10', 'R11', 'R30', 'R31']}, {'name': 'Group6', 'members': ['R1', 'R2', 'R5', 'R6', 'R12', 'R13', 'R14', 'R15', 'R16', 'R17', 'R18', 'R19', 'R20', 'R23', 'R26', 'R29']}]
+        # print(lab_obj.lld["links"])
+        # [{'description': 'Link R1:Ethernet1 R2:Ethernet1', 'id': 0, 'type': 'l1'}, {'description': 'Link R1:Ethernet2 R3:Ethernet1', 'id': 1, 'type': 'l1'}, {'description': 'Link R1:Ethernet3 R4:Ethernet1', 'id': 2, 'type': 'l1'}, {'description': 'Link R2:Ethernet2 R3:Ethernet2', 'id': 3, 'type': 'l1'}, {'description': 'Link R2:Ethernet3 R4:Ethernet2', 'id': 4, 'type': 'l1'}, {'description': 'Link R3:Ethernet3 R4:Ethernet3', 'id': 5, 'type': 'l1'}, {'description': 'Link R5:Ethernet1 R6:Ethernet1', 'id': 6, 'type': 'l1'}, {'description': 'Link R5:Ethernet2 R7:Ethernet1', 'id': 7, 'type': 'l1'}, {'description': 'Link R5:Ethernet3 R8:Ethernet1', 'id': 8, 'type': 'l1'}, {'description': 'Link R6:Ethernet2 R7:Ethernet2', 'id': 9, 'type': 'l1'}, {'description': 'Link R6:Ethernet3 R8:Ethernet2', 'id': 10, 'type': 'l1'}, {'description': 'Link R7:Ethernet3 R8:Ethernet3', 'id': 11, 'type': 'l1'}, {'description': 'Link R9:Ethernet1 R12:Ethernet1', 'id': 12, 'type': 'l1'}, {'description': 'Link R10:Ethernet1 R12:Ethernet2', 'id': 13, 'type': 'l1'}, {'description': 'Link R11:Ethernet1 R12:Ethernet3', 'id': 14, 'type': 'l1'}, {'description': 'Link R9:Ethernet2 R13:Ethernet1', 'id': 15, 'type': 'l1'}, {'description': 'Link R10:Ethernet2 R13:Ethernet2', 'id': 16, 'type': 'l1'}, {'description': 'Link R11:Eth
+        # {'cpu': 1, 'features': [], 'id': 32, 'name': 'R32', 'nics': 4, 'ram': 2, 'template': 'template-local-vyos-vyos-2025.07.28-0022-unl',
+        # 'interfaces': [{'id': 0, 'name': 'Ethernet0', 'description': 'OOB Management', 'features': [], 'link_id': None}, {'id': 1, 'name': 'Ethernet1', 'description': '', 'features': [], 'link_id': 48}, {'id': 2, 'name': 'Ethernet2', 'description': '', 'features': [], 'link_id': 50}, {'id': 3, 'name': 'Ethernet3', 'description': '', 'features': [], 'link_id': 51}]}
+
+        print("BUILDING NODES AND  NETWORKS")
 
 
 class LabInstanceBulkDeleteView(LabInstanceQueryMixin, ObjectBulkDeleteView):
@@ -318,8 +370,7 @@ class LabInstanceDeleteView(LabInstanceQueryMixin, ObjectDeleteView):
 
 class LabInstanceDetailView(LabInstanceQueryMixin, ObjectDetailView):
     model = LabInstance
-    exclude = ["id"]
-    sequence = ["name", "created_at"]
+    template_name = "instance_detail.html"
 
 
 class LabInstanceListView(LabInstanceQueryMixin, ObjectListView):

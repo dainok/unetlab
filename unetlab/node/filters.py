@@ -24,7 +24,7 @@ class NodeFilter(SearchFilterSet):
 
     class Meta:
         model = Node
-        fields = ["name"]
+        fields = ["running_name"]
 
 
 class NodeTemplateFilter(SearchFilterSet):

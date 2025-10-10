@@ -9,10 +9,7 @@ import socket
 
 # from proxmoxer import ProxmoxAPI
 
-import django_rq
-
-from unetlab import dictionaries
-from unetlab import models
+from job import models
 
 
 def save_log(log):
@@ -22,26 +19,26 @@ def save_log(log):
     models.Log.objects.create(**log)
 
 
-def delete(host=None, node_id=None):
-    """Delete a stopped node."""
-    print("DELETE")
-    source = socket.gethostname().lower()
-    type = dictionaries.LogTypeChoices.HOST.value
-    user = None
+# def delete(host=None, node_id=None):
+#     """Delete a stopped node."""
+#     print("DELETE")
+#     source = socket.gethostname().lower()
+#     type = dictionaries.LogTypeChoices.HOST.value
+#     user = None
 
-    severity = dictionaries.LogSeverityChoices.NOTICE.value
-    message = "Ciao"
+#     severity = dictionaries.LogSeverityChoices.NOTICE.value
+#     message = "Ciao"
 
-    log = {
-        "source": source,
-        "type": type,
-        "user": user,
-        "severity": severity,
-        "message": message,
-    }
+#     log = {
+#         "source": source,
+#         "type": type,
+#         "user": user,
+#         "severity": severity,
+#         "message": message,
+#     }
 
-    queue = django_rq.get_queue("logs")
-    queue.enqueue(save_log, log)
+#     queue = django_rq.get_queue("logs")
+#     queue.enqueue(save_log, log)
 
 
 def provision(
