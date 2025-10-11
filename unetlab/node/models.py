@@ -60,7 +60,7 @@ class NodeTemplate(models.Model):
         verbose_name=_("Extra"),
         blank=True,
         help_text=_("Template label."),
-        # validators=[AlphanumericValidator],
+        validators=[AlphanumericValidator],
     )
     cpu = models.IntegerField(
         default=1,

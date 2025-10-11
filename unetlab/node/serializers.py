@@ -28,5 +28,5 @@ class NodeTemplateSerializer(serializers.ModelSerializer):
         ]  # Make some fields read-only
 
 
-class UploadDiskSerializer(serializers.Serializer):
+class DiskTemplateSerializer(serializers.Serializer):
     file = serializers.FileField()

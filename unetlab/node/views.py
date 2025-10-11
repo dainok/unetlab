@@ -2,13 +2,13 @@
 
 import hashlib
 from django.core.files.storage import default_storage
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from node.filters import NodeFilter, NodeTemplateFilter
 from node.models import Node, NodeTemplate
-from node.serializers import NodeSerializer, NodeTemplateSerializer, UploadDiskSerializer
+from node.serializers import NodeSerializer, NodeTemplateSerializer, DiskTemplateSerializer
 from node.tables import NodeTable, NodeTemplateTable
 from node.forms import NodeForm, NodeTemplateForm
 from ui.include.permissions import IsAdmin, IsAdminOrStaff
@@ -159,20 +159,19 @@ class NodeTemplateListView(ObjectListView):
 # Disks
 #############################################################################
 
-
-class DiskTemplateCreateAPIView(APIView):
+class DiskTemplateAPIViewSet(viewsets.GenericViewSet):
     """Add disk."""
 
     permission_classes = [IsAdminOrStaff]
 
-    def post(self, request, pk):
-        template = NodeTemplate.objects.filter(pk=pk).first()
+    def create(self, request, template_pk):
+        template = NodeTemplate.objects.filter(pk=template_pk).first()
         # TODO
         # if not template:
         #     return Response({"detail": "Template non trovato"}, status=status.HTTP_404_NOT_FOUND)
         # return Response({"status": "rescan triggered"})
 
-        serializer = UploadDiskSerializer(data=request.data)
+        serializer = DiskTemplateSerializer(data=request.data)
         # TODO
         serializer.is_valid()
         # if not serializer.is_valid():
@@ -202,3 +201,13 @@ class DiskTemplateCreateAPIView(APIView):
         template.save()
 
         return Response({"disk": disk}, status=status.HTTP_201_CREATED)
+
+    def destroy(self, request, template_pk=None, checksum=None):
+        """
+        Elimina un disco specifico associato al template.
+        pk = ID del disco
+        """
+        template = get_object_or_404(NodeTemplate, pk=template_pk)
+        disk = get_object_or_404(template.disks, pk=pk)  # assuming related_name='disks'
+        disk.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
