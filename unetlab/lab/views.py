@@ -7,7 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from lab.models import Lab, LabInstance
 from lab.utils import LabLld
-from lab.serializers import LabSerializer, LabInstanceSerializer
+from lab.serializers import LabSerializer, LabInstanceDetailSerializer, LabInstanceListSerializer
 from lab.filters import LabFilter, LabInstanceFilter
 from lab.forms import LabForm, LabInstanceForm
 from lab.tables import LabTable, LabInstanceTable
@@ -233,7 +233,15 @@ class LabInstanceQueryMixin:
 
     Used by both UI and API views.
     """
+    serializer_detail_class = LabInstanceDetailSerializer
+    serializer_list_class = LabInstanceListSerializer
 
+    # def get_serializer_class(self):
+    #     """Usa un serializer diverso per list e detail."""
+    #     if self.action == "list":
+    #         return LabInstanceListSerializer
+    #     return LabInstanceDetailSerializer
+    
     def get_queryset(self):
         """Return the queryset of `User` objects accessible to the current user.
 
@@ -263,7 +271,11 @@ class LabInstanceQueryMixin:
         Raises:
             PermissionDenied: If the user does not have access.
         """
+        # obj = self.get_queryset().filter(pk=self.kwargs["pk"]).prefetch_related("node_groups", "nodes", "node_networks").get()
         obj = super().get_object()
+        print("AAA")
+        print(obj)
+        print(obj.nodes.all())
         user = self.request.user
         if user.is_superuser:
             # Admin users can see all `User` objects
@@ -282,8 +294,14 @@ class LabInstanceQueryMixin:
 class LabInstanceAPIViewSet(LabInstanceQueryMixin, APICRUDViewSet):
     """REST API endpoints for Template model."""
 
-    serializer_class = LabInstanceSerializer
+    # serializer_class = LabInstanceSerializer
     filterset_class = LabInstanceFilter
+
+    # def get_serializer_class(self):
+    #     """Usa un serializer diverso per list e detail."""
+    #     if self.action == "list":
+    #         return LabInstanceListSerializer
+    #     return LabInstanceDetailSerializer
 
     def perform_create(self, serializer):
         # Set user and lab ID
@@ -297,9 +315,7 @@ class LabInstanceAPIViewSet(LabInstanceQueryMixin, APICRUDViewSet):
             lld.load_hld(lab_obj.hld)
             lab_obj.lld = lld.to_dict()
             lab_obj.save()
-            print(lld.to_dict())
-            print("HERE")
-        print("EXISTS")
+        print("HERE")
         print(lab_obj.lld)
         for link in lab_obj.lld["links"]:
             Network.objects.create(
@@ -322,14 +338,14 @@ class LabInstanceAPIViewSet(LabInstanceQueryMixin, APICRUDViewSet):
                 template=template,
                 user=self.request.user,
             )
-            for iface in node["interfaces"]:
-                network_obj = Network.objects.get(user=self.request.user, instance=lab_instance_obj, rid=iface["link_id"])
-                NodeInterface.objects.create(
-                    rid=iface["id"],
-                    running_name=iface["name"],
-                    running_description=iface["description"],
-                    link=network_obj,
-                )
+            # for iface in node["interfaces"]:
+            #     network_obj = Network.objects.get(user=self.request.user, instance=lab_instance_obj, rid=iface["link_id"])
+            #     NodeInterface.objects.create(
+            #         rid=iface["id"],
+            #         running_name=iface["name"],
+            #         running_description=iface["description"],
+            #         link=network_obj,
+            #     )
 
         # NodeGroup
         # print(lab_obj.lld["groups"])
@@ -348,11 +364,11 @@ class LabInstanceBulkDeleteView(LabInstanceQueryMixin, ObjectBulkDeleteView):
     model = LabInstance
 
 
-class LabInstanceChangeView(LabInstanceQueryMixin, ObjectChangeView):
-    """HTML view for updating an existing `User`."""
+# class LabInstanceChangeView(LabInstanceQueryMixin, ObjectChangeView):
+#     """HTML view for updating an existing `User`."""
 
-    model = LabInstance
-    form_class = LabInstanceForm
+#     model = LabInstance
+#     form_class = LabInstanceForm
 
 
 class LabInstanceCreateView(LabQueryMixin, ObjectCreateView):
@@ -372,6 +388,13 @@ class LabInstanceDetailView(LabInstanceQueryMixin, ObjectDetailView):
     model = LabInstance
     template_name = "instance_detail.html"
 
+    # def get_context_data(self, **kwargs):
+    #     ctx = super().get_context_data(**kwargs)
+    #     # aggiunge una versione semplice per debug
+    #     ctx["nodes_debug"] = list(self.object.nodes.values("id", "running_name"))
+    #     print(ctx)
+    #     print(type(ctx["object"]))
+    #     return ctx
 
 class LabInstanceListView(LabInstanceQueryMixin, ObjectListView):
     model = LabInstance

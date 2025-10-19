@@ -51,7 +51,7 @@ INSTALLED_APPS = [
     "lab",
     "node",
     "proxmox",
-    "repository",
+    # "repository",
     "ui",
     # Optional: OpenAPI docs
     # "drf_spectacular",

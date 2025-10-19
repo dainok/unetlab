@@ -4,18 +4,6 @@ from rest_framework import serializers
 from node.models import Node, NodeTemplate
 
 
-class NodeSerializer(serializers.ModelSerializer):
-    """Serializer for Node model."""
-
-    class Meta:
-        model = Node
-        fields = "__all__"
-        read_only_fields = [
-            "created_at",
-            "updated_at",
-        ]  # Make some fields read-only
-
-
 class NodeTemplateSerializer(serializers.ModelSerializer):
     """Serializer for Template model."""
 
@@ -30,3 +18,17 @@ class NodeTemplateSerializer(serializers.ModelSerializer):
 
 class DiskTemplateSerializer(serializers.Serializer):
     file = serializers.FileField()
+
+
+class NodeSerializer(serializers.ModelSerializer):
+    """Serializer for Node model."""
+    disks = DiskTemplateSerializer(read_only=True)
+    template = NodeTemplateSerializer(read_only=True)
+
+    class Meta:
+        model = Node
+        fields = "__all__"
+        read_only_fields = [
+            "created_at",
+            "updated_at",
+        ]  # Make some fields read-only

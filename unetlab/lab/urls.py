@@ -6,7 +6,7 @@ from rest_framework.routers import DefaultRouter
 from lab.views import (
     LabInstanceAPIViewSet,
     LabInstanceBulkDeleteView,
-    LabInstanceChangeView,
+    # LabInstanceChangeView,
     LabInstanceCreateView,
     LabInstanceDeleteView,
     LabInstanceDetailView,
@@ -57,11 +57,11 @@ urlpatterns = [
         LabInstanceDeleteView.as_view(),
         name="labinstance_delete",
     ),
-    path(
-        "instance/<int:pk>/update",
-        LabInstanceChangeView.as_view(),
-        name="labinstance_update",
-    ),
+    # path(
+    #     "instance/<int:pk>/update",
+    #     LabInstanceChangeView.as_view(),
+    #     name="labinstance_update",
+    # ),
     path(
         "instance/<int:pk>/", LabInstanceDetailView.as_view(), name="labinstance_detail"
     ),

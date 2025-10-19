@@ -16,9 +16,6 @@
                     </button>
                 </div>
                 <div class="col-auto">
-                    <a href="{% url model_name|add:'_update' pk %}" class="btn">Edit</a>
-                </div>
-                <div class="col-auto">
                     <button class="btn btn-primary" @click="start()">
                         Start
                     </button>
@@ -59,6 +56,10 @@
             </div>
 
             <h2>Nodes</h2>
+            AAA {{ object }}<br>
+            BBB {{ obj }}<br>
+            CCC {{ object.nodes }}<br>
+            DDD {{ nodes_debug }}<br>
             <div class="table-responsive">
                 <table class="table table-vcenter table-selectable">
                     <thead>
@@ -121,9 +122,6 @@
                     </tbody>
                 </table>
             </div>
-
-            <h2>Low Level Design:</h2>
-            <pre><code class="language-scss">{{ lld_yaml }}</code></pre>
 
         </div>
     </div>

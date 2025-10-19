@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
 from lab.models import LabInstance
-from repository.models import Repository
 from ui.include.validators import (
     AlphanumericValidator,
     VersionValidator,
@@ -21,14 +20,6 @@ class NodeTemplate(models.Model):
     The details of Repository are retrieved and cached.
     """
 
-    repository = models.ForeignKey(
-        Repository,
-        on_delete=models.CASCADE,
-        related_name="templates",
-        verbose_name=_("Repository"),
-        help_text=_("Repository associated with this template."),
-        editable=False,
-    )
     name = models.CharField(
         max_length=255,
         editable=False,
@@ -113,6 +104,7 @@ class NodeTemplate(models.Model):
         ordering = ["vendor", "os", "version", "extra"]
         verbose_name = _("Template")
         verbose_name_plural = _("Templates")
+        unique_together = ["vendor", "os", "version", "extra"]
 
     def __str__(self):
         """Return a human readable name when the object is printed."""

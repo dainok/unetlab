@@ -29,7 +29,7 @@ urlpatterns = [
     path("", include("lab.urls")),
     path("", include("node.urls")),
     path("", include("proxmox.urls")),
-    path("", include("repository.urls")),
+    # path("", include("repository.urls")),
     path("", include("ui.urls")),
     # path("", include("ui.urls")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -1,6 +1,7 @@
 """Template tags for dynamic template behavior in Django."""
 
 from django import template
+from django.urls import reverse, NoReverseMatch
 
 register = template.Library()
 
@@ -23,3 +24,16 @@ def is_active(context, *view_names):
     if current_view in view_names:
         return " active"
     return ""
+
+# @register.simple_tag
+# def exist_view(view_name, *args, **kwargs):
+#     """
+#     Ritorna True se il nome di view esiste (cioè se reverse() funziona),
+#     altrimenti False.
+#     """
+#     try:
+#         reverse(view_name, args=args, kwargs=kwargs)
+#         return True
+#     except NoReverseMatch:
+#         return False
+    
