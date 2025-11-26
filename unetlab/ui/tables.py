@@ -1,8 +1,4 @@
-"""Table definitions for User, Group, and Token models.
-
-These tables are used in the corresponding list views to render
-HTML tables with django-tables2.
-"""
+"""Table definitions for UI app."""
 
 from django.contrib.auth.models import Group, User
 from rest_framework.authtoken.models import Token
@@ -47,6 +43,45 @@ class GroupTable(ObjectTable):
     def render_users(self, record):
         """Render a comma-separated list of users in the group."""
         return ", ".join(user.username for user in record.user_set.all())
+
+
+#############################################################################
+# User
+#############################################################################
+
+
+class UserTable(ObjectTable):
+    """Table definition for the `User` model.
+
+    Used in the `user_list` view.
+    """
+
+    is_active = GreenRedBooleanColumn()
+    is_staff = GreenRedReverseBooleanColumn(verbose_name="Staff")
+    is_superuser = GreenRedReverseBooleanColumn(verbose_name="Admin")
+    username = tables.LinkColumn(
+        "user_detail",
+        args=[tables.A("pk")],
+    )
+    date_joined = tables.DateColumn(orderable=True, format="Y-m-d")
+    last_login = tables.DateColumn(orderable=True, format="Y-m-d H:i")
+
+    class Meta:
+        """Meta options."""
+
+        model = User
+        exclude = ["id", "password", "date_joined", "last_login"]
+        sequence = [
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "is_active",
+            "is_superuser",
+            "is_staff",
+            "...",
+        ]
+        order_by = "username"
 
 
 #############################################################################
@@ -97,47 +132,3 @@ class TokenTable(ObjectTable):
                 },
             ],
         }
-
-
-#############################################################################
-# User
-#############################################################################
-
-
-class UserTable(ObjectTable):
-    """Table definition for the `User` model.
-
-    Used in the `user_list` view.
-    """
-
-    is_active = GreenRedBooleanColumn()
-    is_staff = GreenRedReverseBooleanColumn(verbose_name="Admin")
-    is_superuser = GreenRedReverseBooleanColumn(verbose_name="Staff")
-    username = tables.LinkColumn(
-        "user_detail",
-        args=[tables.A("pk")],
-    )
-    date_joined = tables.DateColumn(orderable=True, format="Y-m-d")
-    last_login = tables.DateColumn(orderable=True, format="Y-m-d H:i")
-
-    class Meta:
-        """Meta options for the `UserTable`.
-
-        - Defines the underlying model.
-        - Excludes sensitive or unused fields.
-        - Sets column sequence and default ordering.
-        """
-
-        model = User
-        exclude = ["id", "password", "date_joined", "last_login"]
-        sequence = [
-            "username",
-            "first_name",
-            "last_name",
-            "email",
-            "is_active",
-            "is_superuser",
-            "is_staff",
-            "...",
-        ]
-        order_by = "username"

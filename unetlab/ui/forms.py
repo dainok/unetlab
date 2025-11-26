@@ -1,12 +1,8 @@
-"""
-Forms for managing Django Group, User, and Token models.
-
-This module provides reusable forms for CRUD operations on
-auth-related models.
-"""
+"""Forms definitions for UI app."""
 
 from django import forms
 from django.contrib.auth.models import Group, User
+from rest_framework.authtoken.models import Token
 from ui.include import messages
 from ui.include.forms import ObjectModelForm
 
@@ -135,16 +131,24 @@ class UserForm(ObjectModelForm):
         """
         Initialize the form and pre-fill the 'groups' field for existing users.
         """
+        # self.user = kwargs.pop("request_user", None)
+        # self.request = kwargs.pop("request", None)
         super().__init__(*args, **kwargs)
         # Pre-populate groups if user exists
         if self.instance.pk:
             self.fields["groups"].initial = self.instance.groups.all()
+        if self.user and not self.user.is_superuser:
+            # Disable field for non admins
+            self.fields["groups"].disabled = True
+            self.fields["is_staff"].disabled = True
+            self.fields["is_superuser"].disabled = True
 
     def clean(self):
         """
         Check that password1 and password2 match.
         """
         cleaned_data = super().clean()
+        # user = getattr(self, "current_user", None)
         password1 = cleaned_data.get("password1")
         password2 = cleaned_data.get("password2")
 
@@ -164,13 +168,43 @@ class UserForm(ObjectModelForm):
         Returns:
             User: The saved user instance.
         """
-        user = super().save(commit=False)
+        obj = super().save(commit=False)
 
         password1 = self.cleaned_data.get("password1")
         if password1:  # only if set/modified
-            user.set_password(password1)
+            obj.set_password(password1)
+
+        if self.user and not self.user.is_superuser and obj.pk:
+            # Disable field for non admins
+            current_obj = User.objects.get(id=obj.id)
+            obj.is_superuser = current_obj.is_superuser
+            obj.is_staff = current_obj.is_staff
 
         if commit:
-            user.save()
-            user.groups.set(self.cleaned_data["groups"])
-        return user
+            obj.save()
+            # Set groups only for admins
+            if self.user.is_superuser:
+                obj.groups.set(Group.objects.filter(id__in=self.cleaned_data["groups"]))
+
+
+        return obj
+
+
+
+#############################################################################
+# Token
+#############################################################################
+
+
+class TokenForm(ObjectModelForm):
+    """
+    Form for the Django Token model.
+    """
+
+    class Meta:
+        """
+        Meta class for TokenForm.
+        """
+
+        model = Token
+        fields = []

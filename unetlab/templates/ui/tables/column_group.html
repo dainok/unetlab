@@ -1,0 +1,3 @@
+{% for group in record.groups.all %}
+    <a href="{% url 'group_detail' group.pk %}">{{ group.name }}</a>{% if not forloop.last %}, {% endif %}
+{% endfor %}

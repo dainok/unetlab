@@ -5,13 +5,12 @@
 
 <head>
     <link rel="author" href="https://www.adainese.it" />
-    <link rel="icon" href="{% static 'unetlab/favicon.ico' %}" type="image/x-icon" sizes="16x16" />
-    <title>{% block title %}Unified Networking Lab{% endblock title %}</title>
+    <link rel="icon" href="{% static 'ui/favicon.ico' %}" type="image/x-icon" sizes="16x16" />
+    <title>{% block title %}eg0n{% endblock title %}</title>
     <meta charSet="utf-8" />
-    <meta name="author" content="Andrea Dainese" />
-    <meta name="description"
-        content="UNetLab is a modular and extensible orchestration platform tailored for virtual network environments. It provides centralized control over distributed compute resources, enabling automated provisioning, scheduling, and lifecycle management of virtual nodes and jobs. Designed for testing and production, UNetLab ensures a scalable and secure foundation for building reproducible network labs and automation pipelines.">
-    <meta name="keywords" content="virtualization, orchestration, network, automation, unetlab">
+    <meta name="author" content="Andrea Dainese, Rocco Sicilia" />
+    <meta name="description" content="eg0n.">
+    <meta name="keywords" content="eg0n, misp, cti">
     <meta name="Content-Security-Policy"
         content="default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self';base-uri 'self';form-action 'self'" />
     <meta name="robots" content="noindex, nofollow">
@@ -19,7 +18,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
     <!-- CSS files -->
     <link href="{% static 'tabler/css/tabler.min.css' %}" rel="stylesheet" />
-    <link href="{% static 'unetlab/css/unetlab.css' %}" rel="stylesheet" />
+    <link href="{% static 'ui/css/main.css' %}" rel="stylesheet" />
 </head>
 
 <body class="{% block bodyclass %}{% endblock bodyclass %}">
@@ -71,7 +70,6 @@
     </div>
     <!-- JavaScript files -->
     <script src="{% static 'tabler/js/tabler.min.js' %}" defer></script>
-    <script src="{% static 'unetlab/js/main.js' %}" type="module"></script>
     <script src="{% static 'alpinejs/js/alpinejs.min.js' %}" defer></script>
     <script>
         /**

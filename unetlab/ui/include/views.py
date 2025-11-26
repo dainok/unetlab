@@ -7,17 +7,21 @@ django-tables2, and django-filters.
 """
 
 from django.conf import settings
+from django.core.exceptions import PermissionDenied, FieldDoesNotExist
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
+from django.urls import reverse, reverse_lazy
 from django.views.generic import DeleteView, TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView
-from django.urls import reverse, reverse_lazy
 from django_filters.views import FilterView
 from django_tables2 import SingleTableView
 from django_tables2.columns import Column
+from django_tables2 import RequestConfig
+import django_tables2 as tables
 from rest_framework.mixins import DestroyModelMixin, ListModelMixin, RetrieveModelMixin
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
-from unetlab.views import CommonMixin
+from ui.include.permissions import ObjectPermission
 
 
 class APICRUDViewSet(ModelViewSet):
@@ -30,6 +34,7 @@ class APICRUDViewSet(ModelViewSet):
     filterset_class = None
     serializer_class = None
     queryset = None
+    permission_classes = [ObjectPermission]  # Required for API
 
 
 class APIRDViewSet(
@@ -44,6 +49,7 @@ class APIRDViewSet(
     filterset_class = None
     serializer_class = None
     queryset = None
+    permission_classes = [ObjectPermission]  # Required for API
 
 
 class APIRViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
@@ -56,9 +62,112 @@ class APIRViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
     filterset_class = None
     serializer_class = None
     queryset = None
+    permission_classes = [ObjectPermission]  # Required for API
 
 
-class ObjectBulkDeleteView(CommonMixin, TemplateView):
+class TemplateMixin:
+    # Solo per TemplateView   
+    policy_class = None  # da impostare nelle subclass o nei mixin specifici
+
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Esegue il controllo dei permessi prima di processare la view.
+        """
+        policy = self.policy_class()
+        result = policy.can(request.user, request.method)
+        if result is True:
+            return super().dispatch(request, *args, **kwargs)
+        elif result is False:
+            raise PermissionDenied("Non hai i permessi per eseguire questa azione.")  # 403
+        elif result is None:
+            if settings.LOGIN_URL:
+                return HttpResponseRedirect(settings.LOGIN_URL)
+            return HttpResponse("Non autenticato", status=401)  # 401
+        else:
+            # fallback di sicurezza
+            return HttpResponse("Errore permessi TemplateView", status=403)
+
+
+
+class ObjectMixin:
+    """
+    Mixin generico per applicare una policy di permessi (es. UserPermissionPolicy)
+    a qualsiasi ModelView Django (Create/Update/Delete/List/Detail).
+
+    Solo per CBV.
+    """
+
+    policy_class = None  # da impostare nelle subclass o nei mixin specifici
+
+
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Esegue il controllo dei permessi prima di processare la view.
+        """
+        result = self.has_permission()
+        if result is True:
+            return super().dispatch(request, *args, **kwargs)
+        elif result is False:
+            raise PermissionDenied("Non hai i permessi per eseguire questa azione.")  # 403
+        elif result is None:
+            if settings.LOGIN_URL:
+                return HttpResponseRedirect(settings.LOGIN_URL)
+            return HttpResponse("Non autenticato", status=401)  # 401
+        else:
+            # fallback di sicurezza
+            return HttpResponse("Errore permessi ObjectMixin", status=403)
+
+
+            
+    def has_permission(self):
+        """
+        Verifica i permessi a livello di view, includendo la normalizzazione del metodo.
+        """
+        if not self.policy_class:
+            return True  # Nessuna policy definita → accesso consentito
+
+
+        policy = self.policy_class()
+        user = self.request.user
+        
+        # 🔹 Normalizzazione del metodo (inline)
+        method = self.request.method.upper()
+
+        # Normalizza i form POST delle view HTML in "DELETE" o "PUT"
+        if method == "POST":
+            if isinstance(self, ObjectDeleteView) or isinstance(self, ObjectBulkDeleteView):
+                method = "DELETE"
+            if isinstance(self, ObjectChangeView):
+                method = "PUT"
+            if isinstance(self, ObjectCreateView):
+                method = "POST"
+
+        data = getattr(self.request, "data", None)
+        if isinstance(data, list):
+            # bulk operation
+            for item in data:
+                obj = self._resolve_object(item)
+                if not policy.can(user, method, obj):
+                    raise PermissionDenied(
+                        f"Non hai i permessi per modificare l'oggetto {obj}."
+                    )
+            return True
+
+        # Single object
+        target = None
+        if hasattr(self, "get_object") and callable(getattr(self, "get_object")):
+            try:
+                target = self.get_object()
+            except Exception:
+                target = None
+
+        return policy.can(user, method, target)
+
+
+
+    
+
+class ObjectBulkDeleteView(ObjectMixin, TemplateView):
     """Generic view to delete multiple objects selected via checkboxes.
 
     Subclasses should define `model`.
@@ -104,7 +213,7 @@ class ObjectBulkDeleteView(CommonMixin, TemplateView):
         )
 
 
-class ObjectChangeView(CommonMixin, UpdateView):
+class ObjectChangeView(ObjectMixin, UpdateView):
     """Generic update view for any model object.
 
     Subclasses should define `model` and `form_class`.
@@ -128,7 +237,7 @@ class ObjectChangeView(CommonMixin, UpdateView):
         return kwargs
 
 
-class ObjectCreateView(CommonMixin, CreateView):
+class ObjectCreateView(ObjectMixin, CreateView):
     """Generic create view for any model object.
 
     Subclasses should define `model` and optionally `form_class`.
@@ -151,7 +260,7 @@ class ObjectCreateView(CommonMixin, CreateView):
         return kwargs
 
 
-class ObjectDeleteView(CommonMixin, DeleteView):
+class ObjectDeleteView(ObjectMixin, DeleteView):
     """Generic delete view with confirmation for a single object.
 
     Subclasses should define `model`.
@@ -159,6 +268,7 @@ class ObjectDeleteView(CommonMixin, DeleteView):
     """
 
     model = None
+    form_class = None
     template_name = "ui/object_confirm_delete.html"
 
     def get_success_url(self):
@@ -166,8 +276,18 @@ class ObjectDeleteView(CommonMixin, DeleteView):
         model_name = self.model._meta.model_name
         return reverse_lazy(f"{model_name}_list")
 
+    def post(self, request, *args, **kwargs):
+        """
+        Forza la chiamata diretta a delete(), ignorando eventuali mixin
+        che ereditano da FormMixin e provano a usare un form.
+        """
+        self.object = self.get_object()
+        return self.delete(request, *args, **kwargs)
+    
 
-class ObjectDetailView(CommonMixin, DetailView):
+
+
+class ObjectDetailView(ObjectMixin, DetailView):
     """Generic detail view for any model object.
 
     Provides field data as a dictionary, supports column ordering,
@@ -177,7 +297,7 @@ class ObjectDetailView(CommonMixin, DetailView):
     model = None
     exclude = []
     sequence = []
-    attrs = {"title": "", "description": ""}
+    attrs = {}
     template_name = "ui/object_detail.html"
     list_view = None
 
@@ -193,36 +313,94 @@ class ObjectDetailView(CommonMixin, DetailView):
         """Prepare context data for template rendering."""
         context = super().get_context_data(**kwargs)
         obj = self.object
-        fields = obj._meta.fields
+        # fields = obj._meta.fields
+        policy = self.policy_class()
+        user = self.request.user
+        serializer = self.serializer_class(obj)
+        data = serializer.data
 
-        data = {}
+        class SingleObjectTable(tables.Table):
+            class Meta:
+                model = self.model
+                template_name = "django_tables2/bootstrap.html"
+                # Se vuoi, puoi escludere campi dinamicamente
+                exclude = self.exclude
+                sequence = self.sequence
+                attrs = self.attrs
 
-        for field in fields:
-            field_name = field.name
-            if field_name in self.exclude:
-                continue
-            value = getattr(obj, field_name)
-            data[field_name] = value
+        for custom_field in self.get_column_fields().keys():
+            # custom_fields[custom_field] = getattr(self, custom_field)
+            SingleObjectTable.base_columns[custom_field] = getattr(self, custom_field)
+        table = SingleObjectTable([obj])
+        RequestConfig(self.request).configure(table)
+        # context["table"] = list(table.rows)[0]
 
-        # Sort by `sequence`, if present
-        if self.sequence:
-            ordered_data = {k: data[k] for k in self.sequence if k in data}
-            for k in data:
-                if k not in ordered_data:
-                    ordered_data[k] = data[k]
-            data = ordered_data
 
-        context["object"] = data
+        # for field_name in self.exclude:
+        #     # Removing excluded fields
+        #     if field_name in data:
+        #         del data[field_name]
+
+        # # Sort by `sequence`, if present
+        # if self.sequence:
+        #     ordered_data = {k: data[k] for k in self.sequence if k in data}
+        #     for k in data:
+        #         if k not in ordered_data:
+        #             ordered_data[k] = data[k]
+        #     data = ordered_data
+
+        context["object"] = list(table.rows)[0]
         context["attrs"] = {
-            "title": self.attrs.get("title", ""),
+            "title": self.attrs.get("title", str(obj)),
             "description": self.attrs.get("description", ""),
+            "name": str(obj),
+            # "fields": {},
         }
+        # for field_name, value in data.items():
+        #     try:
+        #         field = obj._meta.get_field(field_name)
+        #         context["attrs"]["fields"][field.name] = {
+        #             "verbose_name": field.verbose_name,
+        #             "help_text": field.help_text,
+        #         }
+        #     except FieldDoesNotExist:
+        #         field = None
+            
+        #     custom_field = getattr(self, field_name, None)
+        #     if custom_field:
+        #         if custom_field.verbose_name:
+        #             context["attrs"]["fields"][field.name]["verbose_name"] = custom_field.verbose_name
+        #         if custom_field.template_name:
+        #             context["attrs"]["fields"][field.name]["template_name"] = custom_field.template_name
+
+            # else:
+            # print(help(obj._meta.get_field))
+
+
+        # for field in obj._meta.get_fields():
+        #     if field.concrete and not field.many_to_many and not field.auto_created:
+        #         context["attrs"]["fields"][field.name] = {
+        #             "verbose_name": field.verbose_name,
+        #             "help_text": field.help_text,
+        #         }
+        #         custom_field = getattr(self, field.name, None)
+        #         if custom_field:
+        #             context["attrs"]["fields"][field.name]["template_name"] = custom_field.template_name
+        #             if custom_field.verbose_name:
+        #                 # Override verbose name
+        #                 context["attrs"]["fields"][field.name]["verbose_name"] = custom_field.verbose_name
         context["model_name"] = self.model._meta.model_name
+        context["permissions"] = {
+            "can_create": policy.can(user, "POST"),
+            "can_read": True,
+            "can_update": policy.can(user, "PATCH", obj),
+            "can_delete": policy.can(user, "DELETE", obj),
+        }
         context["pk"] = obj.pk
         return context
 
 
-class ObjectListView(CommonMixin, SingleTableView, FilterView):
+class ObjectListView(ObjectMixin, SingleTableView, FilterView):
     """Base list view using django-tables2 and django-filters.
 
     Supports pagination customization via 'per_page' query param.
@@ -236,13 +414,30 @@ class ObjectListView(CommonMixin, SingleTableView, FilterView):
     paginate_by = settings.DJANGO_TABLES2_PAGE_SIZE
     template_name = "ui/object_list.html"
 
-    def get_table(self, **kwargs):
-        """Return the table instance. Placeholder for custom pagination logic."""
-        # PAGINATE NOT WORKING TODO
-        table = super().get_table(**kwargs)
-        print("paginate_by in view:", self.get_paginate_by(table.data))
-        return table
+    # def render_to_response(self, context, **response_kwargs):
+    #     queryset = context['object_list']
 
+    #     # Paginazione
+    #     page = int(self.request.GET.get("page", 1))
+    #     per_page = int(self.request.GET.get("per_page", 10))
+    #     paginator = Paginator(queryset, per_page)
+    #     page_obj = paginator.get_page(page)
+
+    #     # Serializzazione
+    #     serializer = UserSerializer(page_obj, many=True)
+    #     data = {
+    #         "results": serializer.data,
+    #         "count": paginator.count,
+    #         "num_pages": paginator.num_pages,
+    #     }
+
+    #     # Ritorna JSON se richiesto
+    #     # if self.request.headers.get("Accept") == "application/json":
+    #     #     return JsonResponse(data, safe=False)
+
+    #     # Altrimenti fallback al template HTML
+    #     return super().render_to_response(context, **response_kwargs)
+    
     def get_table_data(self):
         """Return the queryset filtered by the FilterSet if present."""
         queryset = super().get_table_data()
@@ -252,30 +447,19 @@ class ObjectListView(CommonMixin, SingleTableView, FilterView):
             return filterset.qs
         return queryset
 
-    def get_paginate_by(self, queryset):
-        """Allow client to customize pagination via 'per_page' query param.
-
-        Enforces a maximum of DJANGO_TABLES2_MAX_PAGE_SIZE per page; defaults to
-        DJANGO_TABLES2_PAGE_SIZE if invalid or missing.
-        """
-        # PAGINATE NOT WORKING TODO
-        try:
-            per_page = int(self.request.GET.get("per_page", 0))
-            print(per_page)
-            if per_page <= 0:
-                return settings.DJANGO_TABLES2_PAGE_SIZE
-            print("FIX")
-            print(min(per_page, settings.DJANGO_TABLES2_MAX_PAGE_SIZE))
-            return min(per_page, settings.DJANGO_TABLES2_MAX_PAGE_SIZE)
-        except (TypeError, ValueError):
-            # return super().get_paginate_by(queryset)
-            return settings.DJANGO_TABLES2_PAGE_SIZE
-
     def get_context_data(self, **kwargs):
         """Add model name to context for template rendering."""
+        policy = self.policy_class()
+        user = self.request.user
         context = super().get_context_data(**kwargs)
         # Add model_name to create URLs via views
         context["model_name"] = self.model._meta.model_name
+        context["permissions"] = {
+            "can_create": policy.can(user, "POST"),
+            "can_read": True,
+            "can_update": True,
+            "can_delete": True,
+        }
         # Add filters
         filterset = self.get_filterset(self.get_filterset_class())
         if filterset:

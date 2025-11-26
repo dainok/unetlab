@@ -1,21 +1,24 @@
-"""Views for managing Groups.
+"""Views for UI app."""
 
-This module provides both HTML UI views and REST API endpoints
-for the `Group` model, including creation, modification,
-retrieval, and deletion.
-"""
-
-from django.core.exceptions import PermissionDenied
+from constance import config
 from django.contrib import messages as django_msgs
 from django.contrib.auth.models import Group, User
-from django.views.generic import TemplateView
+from django.db.models import Q
 from django.shortcuts import redirect, render
-from constance import config
+from django.views.generic import TemplateView
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
-from unetlab.views import CommonMixin
+import django_tables2 as tables
+from ui.filters import GroupFilter, TokenFilter, UserFilter
+from ui.forms import GroupForm, UserForm, TokenForm
 from ui.include import messages
-from ui.include.permissions import IsAdmin
+from ui.include.permissions import ObjectPermission
+from ui.include.tables import (
+    GreenBooleanColumn,
+    GroupColumn,
+    GreenRedReverseBooleanColumn,
+    GreenRedBooleanColumn,
+)
 from ui.include.views import (
     APICRUDViewSet,
     ObjectBulkDeleteView,
@@ -24,9 +27,15 @@ from ui.include.views import (
     ObjectDeleteView,
     ObjectDetailView,
     ObjectListView,
+    TemplateMixin,
 )
-from ui.filters import GroupFilter, TokenFilter, UserFilter
-from ui.forms import GroupForm, UserForm
+from ui.permissions import (
+    ConstancePermissionPolicy,
+    GroupPermissionPolicy,
+    HomePermissionPolicy,
+    TokenPermissionPolicy,
+    UserPermissionPolicy,
+)
 from ui.serializers import GroupSerializer, UserSerializer
 from ui.tables import GroupTable, TokenTable, UserTable
 
@@ -36,7 +45,7 @@ from ui.tables import GroupTable, TokenTable, UserTable
 #############################################################################
 
 
-class ConstanceListView(CommonMixin, TemplateView):
+class ConstanceListView(TemplateMixin, TemplateView):
     """
     View to display Constance settings as a list.
 
@@ -45,7 +54,7 @@ class ConstanceListView(CommonMixin, TemplateView):
         TemplateView
     """
 
-    permission_classes = [IsAdmin]
+    policy_class = ConstancePermissionPolicy
     template_name = "ui/settings_list.html"
 
     def get_variables(self):
@@ -69,7 +78,7 @@ class ConstanceListView(CommonMixin, TemplateView):
         return context
 
 
-class ConstanceUpdateView(CommonMixin, TemplateView):
+class ConstanceUpdateView(TemplateMixin, TemplateView):
     """
     View to display and update Constance settings via a form.
 
@@ -78,8 +87,8 @@ class ConstanceUpdateView(CommonMixin, TemplateView):
         TemplateView
     """
 
+    policy_class = ConstancePermissionPolicy
     template_name = "ui/settings_form.html"
-    permission_classes = [IsAdmin]
 
     def get_variables(self):
         """
@@ -143,10 +152,18 @@ class ConstanceUpdateView(CommonMixin, TemplateView):
 
 
 class GroupQueryMixin:
-    """Mixin encapsulating common queryset and permission logic for `Group`.
+    """Mixin encapsulating common queryset and permission logic for Group objects.
 
     Used by both HTML views and API views.
     """
+
+    filterset_class = GroupFilter
+    form_class = GroupForm
+    model = Group
+    # permission_classes = [GroupPermission]  # Required for API
+    policy_class = GroupPermissionPolicy
+    serializer_class = GroupSerializer
+    table_class = GroupTable
 
     def get_queryset(self):
         """Return the queryset of `Group` objects accessible to the current user.
@@ -154,186 +171,164 @@ class GroupQueryMixin:
         - Superusers can access all `Group` objects.
         - Non-superusers can only access `Group` objects they belong to.
         """
-        qs = Group.objects.all()
         user = self.request.user
         if user.is_superuser:
             # Admin users can see all `Group` objects
-            return qs
+            # order_by is required to aboid UnorderedObjectListWarning warning
+            return Group.objects.all().order_by("name")
         # Non-admin users can only see the `Group` objects they belong to
-        return qs.filter(user=user)
-
-    def get_object(self):
-        """Return a `Group` object only if the user has permission.
-
-        - Superusers can access any `Group`.
-        - Non-superusers can only access `Group` objects they belong to.
-
-        Raises:
-            PermissionDenied: If the user does not have access.
-        """
-        obj = super().get_object()
-        user = self.request.user
-        if user.is_superuser:
-            # Admin users can see all `Group` objects
-            return obj
-        if user in obj.user_set.all():
-            # Non-admin users can only see the `Group` objects they belong to
-            return obj
-        raise PermissionDenied(messages.PERMISSION_DENIED)
+        # order_by is required to aboid UnorderedObjectListWarning warning
+        return user.groups.all().order_by("name")
 
 
 class GroupAPIViewSet(GroupQueryMixin, APICRUDViewSet):
     """REST API ViewSet for the `Group` model."""
 
-    serializer_class = GroupSerializer
-    filterset_class = GroupFilter
+    pass
 
 
-class GroupBulkDeleteView(ObjectBulkDeleteView):
+class GroupBulkDeleteView(GroupQueryMixin, ObjectBulkDeleteView):
     """HTML view for deleting multiple `Group` objects at once."""
 
-    model = Group
-    permission_classes = [IsAdmin]
+    pass
 
 
-class GroupChangeView(ObjectChangeView):
+class GroupChangeView(GroupQueryMixin, ObjectChangeView):
     """HTML view for updating an existing `Group`."""
 
-    model = Group
-    form_class = GroupForm
-    permission_classes = [IsAdmin]
+    pass
 
 
-class GroupCreateView(ObjectCreateView):
+class GroupCreateView(GroupQueryMixin, ObjectCreateView):
     """HTML view for creating a new `Group`."""
 
-    model = Group
-    form_class = GroupForm
-    permission_classes = [IsAdmin]
+    pass
 
 
-class GroupDeleteView(ObjectDeleteView):
+class GroupDeleteView(GroupQueryMixin, ObjectDeleteView):
     """HTML view for deleting a single `Group`."""
 
-    model = Group
-    permission_classes = [IsAdmin]
+    pass
 
 
 class GroupDetailView(GroupQueryMixin, ObjectDetailView):
     """HTML view for displaying the details of a `Group`."""
 
-    model = Group
     exclude = ["id"]
 
 
 class GroupListView(GroupQueryMixin, ObjectListView):
     """HTML view for displaying a table of `Group` objects."""
 
-    filterset_class = GroupFilter
-    model = Group
-    table_class = GroupTable
+    pass
 
 
 #############################################################################
 # User
 #############################################################################
 
+"""
+CBV:
+as_view()
+→ dispatch()
+   → LoginRequiredMixin
+   → UserPassesTestMixin → test_func()
+→ get()
+   → get_object() (di solito non riceve un queryset specifico)
+      → get_queryset() (se personalizzo get_queryset, influenzo get_object)
+   → get_context_data()
+→ render_to_response()
+
+TemplateView:
+as_view()
+→ dispatch()
+   → (LoginRequiredMixin / UserPassesTestMixin controllano permessi)
+→ get()
+   → get_context_data()
+→ render_to_response()
+
+DRF (REST API):
+as_view()
+→ dispatch()
+   → perform_authentication(request)
+   → check_permissions(request)
+   → get() / post() / put() / delete()
+      → get_object() (solo per Detail)
+        → get_queryset()
+        → check_object_permissions(request, obj)
+            has_object_permission su ogni class
+      → serializer (serializzazione)
+→ Response()
+"""
+
 
 class UserQueryMixin:
-    """Mixin encapsulating common queryset and permission logic for `User`.
+    """Mixin encapsulating common queryset and permission logic for User objects.
 
     Used by both HTML views and API views.
     """
 
+    filterset_class = UserFilter
+    form_class = UserForm
+    model = User
+    # permission_classes = [UserPermission]  # Required for API
+    policy_class = UserPermissionPolicy
+    serializer_class = UserSerializer
+    table_class = UserTable
+
     def get_queryset(self):
-        """Return the queryset of `User` objects accessible to the current user.
-
-        - Superusers can access all `User` objects.
-        - Staff users can see users who share at least one group
-        - Non-superusers can only access their own `User` object.
-        """
-        qs = User.objects.all()
+        """Limit visible users depending on the requester's role."""
+        # order_by is required to aboid UnorderedObjectListWarning warning
+        qs = User.objects.all().order_by("username")
         user = self.request.user
         if user.is_superuser:
-            # Admin users can see all `User` objects
+            # Admin users can see all User objects
             return qs
-        if user.is_staff:
-            # Staff users can see users who share at least one group
-            groups = user.groups.all()
-            return qs.filter(groups__in=groups).distinct()
-        # Non-admin users can only see their own user
-        return qs.filter(username=user.username)
-
-    def get_object(self):
-        """Return a `User` object only if the user has permission.
-
-        - Superusers can access any `User`.
-        - Staff users can see users who share at least one group.
-        - Non-superusers can only access their own `User` object.
-
-        Raises:
-            PermissionDenied: If the user does not have access.
-        """
-        obj = super().get_object()
-        user = self.request.user
-        if user.is_superuser:
-            # Admin users can see all `User` objects
-            return obj
-        if user.is_staff:
-            if obj.is_superuser:
-                raise PermissionDenied(messages.PERMISSION_ADMIN)
-            # Staff users can see users who share at least one group
-            if user.groups.filter(
-                pk__in=obj.groups.values_list("pk", flat=True)
-            ).exists():
-                return obj
-        if user == obj:
-            # Non-admin users can only see the `Group` objects they belong to
-            return obj
-        raise PermissionDenied(messages.PERMISSION_DENIED)
+        # Staff and standard users can see users who share at least one group
+        groups = user.groups.all()
+        return qs.filter(Q(groups__in=groups) | Q(id=user.id)).distinct()
 
 
 class UserAPIViewSet(UserQueryMixin, APICRUDViewSet):
-    """REST API ViewSet for the `User` model."""
+    """REST API ViewSet for the User model."""
 
-    serializer_class = UserSerializer
-    filterset_class = UserFilter
-
-
-class UserBulkDeleteView(ObjectBulkDeleteView):
-    """HTML view for deleting multiple `User` objects at once."""
-
-    model = User
-    permission_classes = [IsAdmin]
+    pass
 
 
-class UserChangeView(ObjectChangeView):
-    """HTML view for updating an existing `User`."""
+class UserBulkDeleteView(UserQueryMixin, ObjectBulkDeleteView):
+    """HTML view for deleting multiple User objects at once."""
 
-    model = User
-    form_class = UserForm
-    permission_classes = [IsAdmin]
+    pass
 
 
-class UserCreateView(ObjectCreateView):
-    """HTML view for creating a new `User`."""
+class UserChangeView(UserQueryMixin, ObjectChangeView):
+    """HTML view for updating an existing User."""
 
-    model = User
-    form_class = UserForm
-    permission_classes = [IsAdmin]
+    pass
 
 
-class UserDeleteView(ObjectDeleteView):
-    """HTML view for deleting a single `User`."""
+class UserCreateView(UserQueryMixin, ObjectCreateView):
+    """HTML view for creating a new User."""
 
-    model = User
-    permission_classes = [IsAdmin]
+    pass
+
+
+class UserDeleteView(UserQueryMixin, ObjectDeleteView):
+    """HTML view for deleting a single User."""
+
+    pass
 
 
 class UserDetailView(UserQueryMixin, ObjectDetailView):
-    """HTML view for displaying the details of a `User`."""
+    """HTML view for displaying the details of a User."""
+    # groups_display = "Groups"
+    is_active = GreenRedBooleanColumn()
+    is_staff = GreenRedReverseBooleanColumn(verbose_name="Staff")
+    is_superuser = GreenRedReverseBooleanColumn(verbose_name="Admin")
+    date_joined = tables.DateColumn(orderable=True, format="Y-m-d")
+    last_login = tables.DateColumn(orderable=True, format="Y-m-d H:i")
+    groups = GroupColumn()
 
-    model = User
     exclude = ["id", "password"]
     sequence = [
         "username",
@@ -343,15 +338,17 @@ class UserDetailView(UserQueryMixin, ObjectDetailView):
         "is_active",
         "is_superuser",
         "is_staff",
+        # "groups_display",
+        "groups",
+        "date_joined",
+        "last_login",
     ]
 
 
 class UserListView(UserQueryMixin, ObjectListView):
-    """HTML view for displaying a table of `User` objects."""
+    """HTML view for displaying a table of User objects."""
 
-    filterset_class = UserFilter
-    model = User
-    table_class = UserTable
+    pass
 
 
 #############################################################################
@@ -360,85 +357,69 @@ class UserListView(UserQueryMixin, ObjectListView):
 
 
 class TokenQueryMixin:
-    """Mixin encapsulating common queryset and permission logic for `Token`.
+    """Mixin encapsulating common queryset and permission logic for Token objects.
 
     Used by both HTML views and API views.
     """
 
-    def get_queryset(self):
-        """Return the queryset of `User` objects accessible to the current user.
+    filterset_class = TokenFilter
+    form_class = TokenForm
+    model = Token
+    # permission_classes = [TokenPermission]  # Required for API
+    policy_class = TokenPermissionPolicy
+    serializer_class = None
+    table_class = TokenTable
 
-        - Superusers can access all `User` objects.
-        - Staff users can see users who share at least one group
-        - Non-superusers can only access their own `User` object.
-        """
-        qs = Token.objects.all()
+    def get_queryset(self):
+        """Limit visible users depending on the requester's role."""
+        # order_by is required to aboid UnorderedObjectListWarning warning
+        qs = Token.objects.all().order_by("user__username")
         user = self.request.user
         if user.is_superuser:
-            # Admin users can see all `User` objects
+            # Admin users can see all Token objects
             return qs
-        if user.is_staff:
-            # Staff users can see users who share at least one group
-            groups = user.groups.all()
-            return qs.filter(user__groups__in=groups, is_superuser=False).distinct()
-        # Non-admin users can only see their own user
+        # Staff and standard users can only see their own Token
         return qs.filter(user__username=user.username)
 
-    def get_object(self):
-        """Return a `User` object only if the user has permission.
 
-        - Superusers can access any `User`.
-        - Staff users can see users who share at least one group.
-        - Non-superusers can only access their own `User` object.
+class TokenBulkDeleteView(TokenQueryMixin, ObjectBulkDeleteView):
+    """HTML view for deleting multiple Token objects at once."""
 
-        Raises:
-            PermissionDenied: If the user does not have access.
-        """
-        obj = super().get_object()
-        user = self.request.user
-        if user.is_superuser:
-            # Admin users can see all `User` objects
-            return obj
-        if user.is_staff:
-            if obj.is_superuser:
-                raise PermissionDenied(messages.PERMISSION_ADMIN)
-            # Staff users can see users who share at least one group
-            if user.groups.filter(
-                pk__in=obj.groups.values_list("pk", flat=True)
-            ).exists():
-                return obj
-        if user == obj:
-            # Non-admin users can only see the `Group` objects they belong to
-            return obj
-        raise PermissionDenied(messages.PERMISSION_DENIED)
+    pass
 
 
-class TokenBulkDeleteView(ObjectBulkDeleteView):
-    """HTML view for deleting multiple `Token` objects at once."""
-
-    model = Token
-    permission_classes = [IsAdmin]
-
-
-class TokenCreateView(ObtainAuthToken):
-    """
-    API per permettere a ciascun utente di generare il proprio token.
-    """
+class TokenCreateView(TokenQueryMixin, ObtainAuthToken):
+    """HTML view for creating a new Token."""
+    permission_classes = [ObjectPermission]
 
     def post(self, request, *args, **kwargs):
         Token.objects.get_or_create(user=request.user)
         return redirect("token_list")
 
 
-class TokenDeleteView(ObjectDeleteView):
-    """HTML view for deleting a single `Token`."""
+class TokenDeleteView(TokenQueryMixin, ObjectDeleteView):
+    """HTML view for deleting a single Token."""
 
-    model = Token
+    pass
 
 
 class TokenListView(TokenQueryMixin, ObjectListView):
-    """HTML view for displaying a table of `Token` objects."""
+    """HTML view for displaying a table of Token objects."""
 
-    filterset_class = TokenFilter
-    model = Token
-    table_class = TokenTable
+    pass
+
+
+#############################################################################
+# Home
+#############################################################################
+
+
+class HomeView(TemplateMixin, TemplateView):
+    """
+    Render the home page for authenticated users.
+
+    The template is loaded from: templates/ui
+    """
+
+    policy_class = HomePermissionPolicy
+    template_name = "ui/home.html"

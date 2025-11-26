@@ -9,6 +9,14 @@ import django_tables2 as tables
 from ui.include import messages
 
 
+class GroupColumn(tables.TemplateColumn):
+    orderable=False
+    def __init__(self, *args, **kwargs):
+        """Initialize the column and apply the default template."""
+        kwargs.setdefault("template_name", "ui/tables/column_group.html")
+        super().__init__(*args, **kwargs)
+
+
 class BooleanColumn(tables.TemplateColumn):
     """Represents a boolean value in a table with ☑️ (True) and ❌ (False).
 

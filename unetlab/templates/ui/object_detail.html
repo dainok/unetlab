@@ -1,6 +1,7 @@
 {% extends "ui/base.html" %}
-{% block title %}UNetLab | {{ object.name }} > Detail{% endblock title %}
-{% block page_title %}{{ object.name }} > Detail{% endblock page_title %}
+{% load ui_tags %}
+{% block title %}UNetLab | {{ model_name|title }} > Detail{% endblock title %}
+{% block page_title %}{{ model_name|title }} > Detail{% endblock page_title %}
 {% block page_body %}
 <div class="col-lg-12">
     <div class="card">
@@ -15,30 +16,34 @@
                 </div>
             </div>
             {% endif %}
-
             <div class="card-body">
-                <div class="datagrid">
-                    {% for field, value in object.items %}
-                    <div class="datagrid-item">
-                        <div class="datagrid-title">{{ field|capfirst }}</div>
-                        <div class="datagrid-content">{{ value|safe }}</div>
+                {% for column, cell in object.items %}
+                <div class="mb-3 row">
+                    <label class="col-3 col-form-label text-uppercase">
+                        {{ column }}
+                    </label>
+                    <div class="col">
+                        {{ cell }}
                     </div>
-                    {% endfor %}
                 </div>
+                {% endfor %}
             </div>
-
             <div class="card-footer">
                 <div class="text-end">
-                    {% url model_name|add:'_delete' pk as delete_url %}
-                    {% if delete_url %}
-                    <a href="{% url model_name|add:'_delete' pk %}" class="btn">Delete</a>
+                    {% if permissions.can_delete %}
+                        {% url model_name|add:'_delete' pk as delete_url %}
+                        {% if delete_url %}
+                        <a href="{% url model_name|add:'_delete' pk %}" class="btn">Delete</a>
+                        {% endif %}
                     {% endif %}
                     {% if request.GET.back %}
                     <a href="{% url request.GET.back %}" class="btn">Back</a>
                     {% endif %}
-                    {% url model_name|add:'_delete' pk as edit_url %}
-                    {% if edit_url %}
-                    <a href="{% url model_name|add:'_update' pk %}" class="btn btn-primary ms-auto">Edit</a>
+                    {% if permissions.can_update %}
+                        {% url model_name|add:'_delete' pk as edit_url %}
+                        {% if edit_url %}
+                        <a href="{% url model_name|add:'_update' pk %}" class="btn btn-primary ms-auto">Edit</a>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>

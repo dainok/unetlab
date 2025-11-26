@@ -40,19 +40,48 @@
             </a>
         </li>
         {% endif %}
-        {# Pages #}
-        {% for i in table.paginator.page_range %}
-        {% if i == table.page.number %}
-        {# Current page #}
-        <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+
+        {# Sliding pages #}
+        {% with total_pages=table.paginator.num_pages current=table.page.number %}
+        {% if total_pages > 10 %}
+            {% if current > 6 %}
+                <li class="page-item"><a class="page-link" href="{% querystring page=1 %}">1</a></li>
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+            {% endif %}
+
+            {% with start=current|add:"-4" end=current|add:"5" %}
+                {% for i in table.paginator.page_range %}
+                    {% if i >= start and i <= end %}
+                        {% if i == current %}
+                            <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="{% querystring page=i %}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            {% endwith %}
+
+            {% with limit=total_pages|add:"-5" %}
+                {% if current < limit %}
+                    <li class="page-item disabled"><span class="page-link">…</span></li>
+                    <li class="page-item"><a class="page-link" href="{% querystring page=total_pages %}">{{ total_pages }}</a></li>
+                {% endif %}
+            {% endwith %}
         {% else %}
-        <li class="page-item"><a class="page-link" href="{% querystring page=i %}">{{ i }}</a></li>
+            {% for i in table.paginator.page_range %}
+                {% if i == current %}
+                    <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                {% else %}
+                    <li class="page-item"><a class="page-link" href="{% querystring page=i %}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
         {% endif %}
-        {% endfor %}
+        {% endwith %}
+
         {# Next page #}
         {% if table.page.has_next %}
         <li class="page-item">
-            <a class="page-link" href="?page={% querystring page=table.page.next_page_number %}" aria-label="Next">
+            <a class="page-link" href="{% querystring page=table.page.next_page_number %}" aria-label="Next">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                     class="icon icon-1">

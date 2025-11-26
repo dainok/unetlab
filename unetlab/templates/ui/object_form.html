@@ -28,7 +28,7 @@
                     {% endif %}
                     {% for field in form %}
                     <div class="mb-3 row">
-                        <label for="{{ field.id_for_label }}" class="col-3 col-form-label{% if field.field.required %} required{% endif %}">
+                        <label for="{{ field.id_for_label }}" class="col-3 col-form-label text-uppercase{% if field.field.required %} required{% endif %}">
                             {{ field.label }}
                         </label>
                         <div class="col">

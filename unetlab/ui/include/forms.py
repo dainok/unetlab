@@ -47,5 +47,6 @@ class ObjectModelForm(FormMixin, forms.ModelForm):
         Initialize the model form and ensure Bootstrap classes are applied
         via FormMixin.
         """
-        self.user = kwargs.pop("user", None)  # Extract and save user
+        self.user = kwargs.pop("user", None)
+        self.request = kwargs.pop("request", None)
         super().__init__(*args, **kwargs)
