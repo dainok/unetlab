@@ -1,34 +1,28 @@
-hll:
-  groups:
-    - template: vyos-vyos
-      prefix: R
-      count: 4
-      features:
-        - loopback
-        - ospf:area=0
-  topologies:
-    - type: full-mesh
-      match:
-        - Site1R
-    - type: full-mesh
-      match:
-        - Site2R
-    - type: defined
-      links:
-        - Site1R1, Site2R1
-        - Site1R2, Site2R2
-  ipv4_addresses:
-    - match: Site1*:Loopback
-      address: 192.168.1.1/24
-    - match: Site2*:Loopback
-      address: 192.168.2.1/24
-    - match: Site1*:Ethernet
-      address: 10.1.0.0/16
-    - match: Site2*:Ethernet
-      address: 10.1.0.0/16
-      mask: auto
-lll:
-metadata:
-  author: Andrea Dainese
-  name: Test Lab 3
-  description: Third test lab
+groups:
+  - template: vyos-vyos
+    prefix: R
+    count: 4
+    features:
+      - loopback
+      - ospf:area=0
+topologies:
+  - type: full-mesh
+    match:
+      - Site1R
+  - type: full-mesh
+    match:
+      - Site2R
+  - type: defined
+    links:
+      - Site1R1, Site2R1
+      - Site1R2, Site2R2
+ipv4_addresses:
+  - match: Site1*:Loopback
+    address: 192.168.1.1/24
+  - match: Site2*:Loopback
+    address: 192.168.2.1/24
+  - match: Site1*:Ethernet
+    address: 10.1.0.0/16
+  - match: Site2*:Ethernet
+    address: 10.1.0.0/16
+    mask: auto
