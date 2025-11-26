@@ -142,13 +142,6 @@ USE_L10N = True
 USE_TZ = True
 
 # ==============================================================================
-# STATIC FILES
-# ==============================================================================
-
-STATIC_URL = "/static/"
-STATICFILES_DIRS = [BASE_DIR / "static"]
-
-# ==============================================================================
 # DEFAULT PRIMARY KEY FIELD TYPE
 # ==============================================================================
 
@@ -169,28 +162,6 @@ CHANNEL_LAYERS = {
 }
 
 # ==============================================================================
-# DJANGO REST FRAMEWORK (DRF)
-# ==============================================================================
-
-REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",
-    ],
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.TokenAuthentication",
-        "rest_framework.authentication.SessionAuthentication",
-    ],
-    "DEFAULT_PAGINATION_CLASS": "ui.include.pagination.CustomPagination",
-    "DEFAULT_RENDERER_CLASSES": [
-        "unetlab.renderers.CustomJSONRenderer",
-    ],
-    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
-    "EXCEPTION_HANDLER": "unetlab.exception_handler.custom_exception_handler",
-    "PAGE_SIZE": 10,
-    "MAX_PAGE_SIZE": 100,
-}
-
-# ==============================================================================
 # CELERY CONFIGURATION
 # ==============================================================================
 
@@ -208,25 +179,50 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
-# ==============================================================================
-# LOGIN / LOGOUT REDIRECTS
-# ==============================================================================
-
-LOGIN_REDIRECT_URL = "home"
-LOGOUT_REDIRECT_URL = "login"
-
 # Public URLs excluded from login-required middleware
-PUBLIC_URLS = [
-    "login",
-    "logout",
-]
+# PUBLIC_URLS = [
+#     "login",
+#     "logout",
+# ]
 
 # ==============================================================================
-# DJANGO-CONSTANCE (Dynamic settings)
+# HOST IDENTIFIER
+# ==============================================================================
+
+SOURCE = socket.gethostname().upper()
+
+# ==============================================================================
+# FILE UPLOAD
+# ==============================================================================
+
+FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440
+DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600
+MEDIA_ROOT = BASE_DIR / ".." / "uploads"
+MEDIA_URL = "/files/"
+
+
+
+
+
+# ==============================================================================
+# UI: LOGIN / LOGOUT REDIRECTS
+# ==============================================================================
+
+LOGIN_REDIRECT_URL = "home" # "/accounts/login/"
+LOGOUT_REDIRECT_URL = "login" # "/accounts/logout/"
+
+# ==============================================================================
+# UI: STATIC FILES
+# ==============================================================================
+
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [BASE_DIR / "static"]
+
+# ==============================================================================
+# UI: DJANGO CONSTANCE (Dynamic settings)
 # ==============================================================================
 
 CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
-
 CONSTANCE_CONFIG = {
     "PROXMOX_PRIMARY_ADDRESS": (
         "",
@@ -255,24 +251,31 @@ CONSTANCE_CONFIG = {
 }
 
 # ==============================================================================
-# HOST IDENTIFIER
+# UI: DJANGO REST FRAMEWORK (DRF)
 # ==============================================================================
 
-SOURCE = socket.gethostname().upper()
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+    "DEFAULT_PAGINATION_CLASS": "ui.include.pagination.CustomPagination",
+    # "DEFAULT_RENDERER_CLASSES": [
+    #     "unetlab.renderers.CustomJSONRenderer",
+    # ],
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
+    # "EXCEPTION_HANDLER": "unetlab.exception_handler.custom_exception_handler",
+    "PAGE_SIZE": 10,
+    "MAX_PAGE_SIZE": 100,
+}
 
 # ==============================================================================
-# TABLES2 SETTINGS
+# UI: DJANGO TABLES2 SETTINGS
 # ==============================================================================
 
 DJANGO_TABLES2_PAGE_SIZE = REST_FRAMEWORK["PAGE_SIZE"]
 DJANGO_TABLES2_MAX_PAGE_SIZE = REST_FRAMEWORK["MAX_PAGE_SIZE"]
 DJANGO_TABLES2_TEMPLATE = "ui/tables/table_full.html"
-
-# ==============================================================================
-# FILE UPLOAD
-# ==============================================================================
-
-FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440
-DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600
-MEDIA_ROOT = BASE_DIR / ".." / "uploads"
-MEDIA_URL = "/files/"

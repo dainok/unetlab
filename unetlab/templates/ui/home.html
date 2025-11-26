@@ -1,6 +1,6 @@
 {% extends "ui/base.html" %}
 {% load django_tables2 %}
-{% block title %}eg0n | Home{% endblock title %}
+{% block title %}UNetLab | Home{% endblock title %}
 {% block body %}
 <div class="page-header d-print-none" aria-label="Page header">
     <div class="container-xl">
@@ -18,8 +18,10 @@
     <div class="container-xl">
         <div class="row row-deck row-cards">
             <div class="col-sm-12 col-lg-12">
+                {% render_table host_table %}
             </div>
             <div class="col-sm-12 col-lg-12">
+                {% render_table log_table %}
             </div>
         </div>
     </div>
