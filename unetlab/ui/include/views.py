@@ -7,7 +7,7 @@ django-tables2, and django-filters.
 """
 
 from django.conf import settings
-from django.core.exceptions import PermissionDenied, FieldDoesNotExist
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
@@ -66,7 +66,7 @@ class APIRViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
 
 
 class TemplateMixin:
-    # Solo per TemplateView   
+    # Solo per TemplateView
     policy_class = None  # da impostare nelle subclass o nei mixin specifici
 
     def dispatch(self, request, *args, **kwargs):
@@ -78,7 +78,9 @@ class TemplateMixin:
         if result is True:
             return super().dispatch(request, *args, **kwargs)
         elif result is False:
-            raise PermissionDenied("Non hai i permessi per eseguire questa azione.")  # 403
+            raise PermissionDenied(
+                "Non hai i permessi per eseguire questa azione."
+            )  # 403
         elif result is None:
             if settings.LOGIN_URL:
                 return HttpResponseRedirect(settings.LOGIN_URL)
@@ -86,7 +88,6 @@ class TemplateMixin:
         else:
             # fallback di sicurezza
             return HttpResponse("Errore permessi TemplateView", status=403)
-
 
 
 class ObjectMixin:
@@ -99,7 +100,6 @@ class ObjectMixin:
 
     policy_class = None  # da impostare nelle subclass o nei mixin specifici
 
-
     def dispatch(self, request, *args, **kwargs):
         """
         Esegue il controllo dei permessi prima di processare la view.
@@ -108,7 +108,9 @@ class ObjectMixin:
         if result is True:
             return super().dispatch(request, *args, **kwargs)
         elif result is False:
-            raise PermissionDenied("Non hai i permessi per eseguire questa azione.")  # 403
+            raise PermissionDenied(
+                "Non hai i permessi per eseguire questa azione."
+            )  # 403
         elif result is None:
             if settings.LOGIN_URL:
                 return HttpResponseRedirect(settings.LOGIN_URL)
@@ -117,8 +119,6 @@ class ObjectMixin:
             # fallback di sicurezza
             return HttpResponse("Errore permessi ObjectMixin", status=403)
 
-
-            
     def has_permission(self):
         """
         Verifica i permessi a livello di view, includendo la normalizzazione del metodo.
@@ -126,16 +126,17 @@ class ObjectMixin:
         if not self.policy_class:
             return True  # Nessuna policy definita → accesso consentito
 
-
         policy = self.policy_class()
         user = self.request.user
-        
+
         # 🔹 Normalizzazione del metodo (inline)
         method = self.request.method.upper()
 
         # Normalizza i form POST delle view HTML in "DELETE" o "PUT"
         if method == "POST":
-            if isinstance(self, ObjectDeleteView) or isinstance(self, ObjectBulkDeleteView):
+            if isinstance(self, ObjectDeleteView) or isinstance(
+                self, ObjectBulkDeleteView
+            ):
                 method = "DELETE"
             if isinstance(self, ObjectChangeView):
                 method = "PUT"
@@ -163,9 +164,6 @@ class ObjectMixin:
 
         return policy.can(user, method, target)
 
-
-
-    
 
 class ObjectBulkDeleteView(ObjectMixin, TemplateView):
     """Generic view to delete multiple objects selected via checkboxes.
@@ -283,8 +281,6 @@ class ObjectDeleteView(ObjectMixin, DeleteView):
         """
         self.object = self.get_object()
         return self.delete(request, *args, **kwargs)
-    
-
 
 
 class ObjectDetailView(ObjectMixin, DetailView):
@@ -316,8 +312,6 @@ class ObjectDetailView(ObjectMixin, DetailView):
         # fields = obj._meta.fields
         policy = self.policy_class()
         user = self.request.user
-        serializer = self.serializer_class(obj)
-        data = serializer.data
 
         class SingleObjectTable(tables.Table):
             class Meta:
@@ -334,7 +328,6 @@ class ObjectDetailView(ObjectMixin, DetailView):
         table = SingleObjectTable([obj])
         RequestConfig(self.request).configure(table)
         # context["table"] = list(table.rows)[0]
-
 
         # for field_name in self.exclude:
         #     # Removing excluded fields
@@ -365,7 +358,7 @@ class ObjectDetailView(ObjectMixin, DetailView):
         #         }
         #     except FieldDoesNotExist:
         #         field = None
-            
+
         #     custom_field = getattr(self, field_name, None)
         #     if custom_field:
         #         if custom_field.verbose_name:
@@ -373,9 +366,8 @@ class ObjectDetailView(ObjectMixin, DetailView):
         #         if custom_field.template_name:
         #             context["attrs"]["fields"][field.name]["template_name"] = custom_field.template_name
 
-            # else:
-            # print(help(obj._meta.get_field))
-
+        # else:
+        # print(help(obj._meta.get_field))
 
         # for field in obj._meta.get_fields():
         #     if field.concrete and not field.many_to_many and not field.auto_created:
@@ -437,7 +429,7 @@ class ObjectListView(ObjectMixin, SingleTableView, FilterView):
 
     #     # Altrimenti fallback al template HTML
     #     return super().render_to_response(context, **response_kwargs)
-    
+
     def get_table_data(self):
         """Return the queryset filtered by the FilterSet if present."""
         queryset = super().get_table_data()

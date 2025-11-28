@@ -1,8 +1,5 @@
 """Permissions for UI app."""
 
-from rest_framework.permissions import BasePermission
-
-
 #############################################################################
 # Constance
 #############################################################################
@@ -25,7 +22,7 @@ class ConstancePermissionPolicy:
         if user.is_superuser:
             return True
         return False
-    
+
 
 #############################################################################
 # Group

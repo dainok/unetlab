@@ -16,7 +16,7 @@ def test_ui_authentication_api_password(api_client, user_set_group1, role):
     api_client.credentials(HTTP_AUTHORIZATION=f"Basic {token}")
     url = reverse("user-list")
     response = api_client.get(url)
-    assert response.status_code == 401, f"Expected 401 for password authentication"
+    assert response.status_code == 401, "Expected 401 for password authentication"
 
 
 @pytest.mark.django_db

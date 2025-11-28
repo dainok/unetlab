@@ -15,7 +15,9 @@ def test_ui_constance_read_list_html(client, user_set_group1, role):
     if user.is_superuser:
         assert response.status_code == 200, f"Failed for user {user.username}"
     else:
-        assert response.status_code == 403, f"User {user.username} must not see Constance settings"
+        assert (
+            response.status_code == 403
+        ), f"User {user.username} must not see Constance settings"
 
 
 @pytest.mark.django_db

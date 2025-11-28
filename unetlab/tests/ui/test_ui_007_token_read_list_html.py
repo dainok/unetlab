@@ -15,7 +15,7 @@ def test_ui_authentication_token_read_list_html_user(client, user_set_group1, ro
     client.force_login(user)
     url = reverse("token_list")
     response = client.get(url)
-    assert response.status_code == 200 , f"Failed for user {user.username} ({role})"
+    assert response.status_code == 200, f"Failed for user {user.username} ({role})"
     if role == "admin":
         for token in Token.objects.all():
             assert (

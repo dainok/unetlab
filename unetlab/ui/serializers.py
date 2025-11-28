@@ -22,8 +22,10 @@ class GroupSerializer(ObjectSerializer):
 # User
 #############################################################################
 
+
 class UserSerializer(ObjectSerializer):
     """Serializer for the `User` model."""
+
     groups = serializers.PrimaryKeyRelatedField(
         many=True,
         queryset=Group.objects.all(),
@@ -55,10 +57,12 @@ class UserSerializer(ObjectSerializer):
             "last_login",
         )
 
-
     def get_groups_display(self, obj):
         """Ritorna i nomi dei gruppi dell'utente in formato leggibile."""
-        return [{"id": group.id, "name": group.name} for group in obj.groups.all().order_by("name")]
+        return [
+            {"id": group.id, "name": group.name}
+            for group in obj.groups.all().order_by("name")
+        ]
 
     def update(self, instance, validated_data):
         """
@@ -93,7 +97,6 @@ class UserSerializer(ObjectSerializer):
 
         instance.save()
         return instance
-
 
     def get_fields(self):
         fields = super().get_fields()

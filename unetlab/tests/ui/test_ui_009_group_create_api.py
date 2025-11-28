@@ -21,16 +21,16 @@ def test_ui_group_create_api_user(api_client, user_set_group1, role):
         assert response.status_code == 201, f"Failed for user {user.username}"
         assert (
             response.data["name"] == payload["name"]
-        ), f"Group not in the returning payload"
+        ), "Group not in the returning payload"
         assert (
             len(Group.objects.filter(name=payload["name"])) == 1
-        ), f"Group has not been created"
+        ), "Group has not been created"
     else:
         # Non admin users cannot create new groups.
         assert response.status_code == 403, f"Expected 401 for {user.username}"
         assert (
             len(Group.objects.filter(name=payload["name"])) == 0
-        ), f"Group has been created"
+        ), "Group has been created"
 
 
 @pytest.mark.django_db
@@ -42,4 +42,4 @@ def test_ui_group_create_api_guest(api_client):
     assert response.status_code == 401, "Expected 401 for guest user"
     assert (
         len(Group.objects.filter(name=payload["name"])) == 0
-    ), f"Group has been created"
+    ), "Group has been created"

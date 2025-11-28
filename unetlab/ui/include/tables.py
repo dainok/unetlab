@@ -10,7 +10,8 @@ from ui.include import messages
 
 
 class GroupColumn(tables.TemplateColumn):
-    orderable=False
+    orderable = False
+
     def __init__(self, *args, **kwargs):
         """Initialize the column and apply the default template."""
         kwargs.setdefault("template_name", "ui/tables/column_group.html")

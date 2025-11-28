@@ -67,7 +67,7 @@ def test_generic_user_views(client, django_user_model, test_case, username, role
 
     client.force_login(user)
     url = reverse(test_case["url_name"], kwargs={"pk": 1} if "delete" in test_case["url_name"] else {})
-    
+
     for method in test_case["methods"]:
         response = getattr(client, method)(url)
         if username in test_case["allowed"]:

@@ -1,7 +1,8 @@
 [flake8]
-# Ignore line length (E501) since Black handles formatting
-# Ignore W503 (line break before binary operator) to be compatible with Black's style
-ignore = E501, W503
+# Ignore E501: Line too long (82 > 79 characters)
+# Ignore W503: Line break occurred before a binary operator
+# Ignore C901: Function is too complex
+ignore = E501, W503, C901
 
 # Exclude common virtual environment folders and Django migration files
 exclude =

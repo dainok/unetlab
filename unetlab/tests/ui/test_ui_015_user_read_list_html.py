@@ -64,4 +64,4 @@ def test_ui_user_read_list_html_guest(client):
     response = client.get(url)
     assert (
         response.status_code == 302
-    ), f"Expected 302 (redirect to login page) for guest user"
+    ), "Expected 302 (redirect to login page) for guest user"

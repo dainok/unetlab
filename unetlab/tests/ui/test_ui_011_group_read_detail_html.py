@@ -35,7 +35,6 @@ def test_ui_group_read_detail_html_user(
     """Test HTML (UI) group detail view by staffs and users."""
     for user in User.objects.filter(is_superuser=False):
         client.force_login(user)
-        all_users = User.objects.all()
         # Testing user groups
         user_group_ids = user.groups.all()
         for g in user_group_ids:

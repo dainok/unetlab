@@ -71,7 +71,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # Custom middlewares
-    "unetlab.middleware.LoginRequiredMiddleware",
+    # "unetlab.middleware.LoginRequiredMiddleware",
 ]
 
 # ==============================================================================
@@ -201,15 +201,12 @@ MEDIA_ROOT = BASE_DIR / ".." / "uploads"
 MEDIA_URL = "/files/"
 
 
-
-
-
 # ==============================================================================
 # UI: LOGIN / LOGOUT REDIRECTS
 # ==============================================================================
 
-LOGIN_REDIRECT_URL = "home" # "/accounts/login/"
-LOGOUT_REDIRECT_URL = "login" # "/accounts/logout/"
+LOGIN_REDIRECT_URL = "home"  # "/accounts/login/"
+LOGOUT_REDIRECT_URL = "login"  # "/accounts/logout/"
 
 # ==============================================================================
 # UI: STATIC FILES

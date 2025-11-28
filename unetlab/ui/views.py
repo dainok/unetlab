@@ -14,7 +14,6 @@ from ui.forms import GroupForm, UserForm, TokenForm
 from ui.include import messages
 from ui.include.permissions import ObjectPermission
 from ui.include.tables import (
-    GreenBooleanColumn,
     GroupColumn,
     GreenRedReverseBooleanColumn,
     GreenRedBooleanColumn,
@@ -321,6 +320,7 @@ class UserDeleteView(UserQueryMixin, ObjectDeleteView):
 
 class UserDetailView(UserQueryMixin, ObjectDetailView):
     """HTML view for displaying the details of a User."""
+
     # groups_display = "Groups"
     is_active = GreenRedBooleanColumn()
     is_staff = GreenRedReverseBooleanColumn(verbose_name="Staff")
@@ -390,6 +390,7 @@ class TokenBulkDeleteView(TokenQueryMixin, ObjectBulkDeleteView):
 
 class TokenCreateView(TokenQueryMixin, ObtainAuthToken):
     """HTML view for creating a new Token."""
+
     permission_classes = [ObjectPermission]
 
     def post(self, request, *args, **kwargs):

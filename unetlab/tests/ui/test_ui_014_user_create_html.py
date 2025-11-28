@@ -21,13 +21,13 @@ def test_ui_user_create_html_user(client, user_set_group1, role):
         ), f"Expected 302 (redirect to list page) for user {user.username} ({role})"
         assert (
             len(User.objects.filter(username=payload["username"])) == 1
-        ), f"User has not been created"
+        ), "User has not been created"
     else:
         # Non admin users cannot create new users.
         assert response.status_code == 403, f"Expected 401 for {user.username}"
         assert (
             len(User.objects.filter(username=payload["username"])) == 0
-        ), f"User has been created"
+        ), "User has been created"
 
 
 @pytest.mark.django_db
@@ -38,7 +38,7 @@ def test_ui_user_create_html_guest(client):
     response = client.post(url, payload, format="json")
     assert (
         response.status_code == 302
-    ), f"Expected 302 (redirect to login page) for guest user"
+    ), "Expected 302 (redirect to login page) for guest user"
     assert (
         len(User.objects.filter(username=payload["username"])) == 0
-    ), f"User has been created"
+    ), "User has been created"

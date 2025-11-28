@@ -186,9 +186,7 @@ class UserForm(ObjectModelForm):
             if self.user.is_superuser:
                 obj.groups.set(Group.objects.filter(id__in=self.cleaned_data["groups"]))
 
-
         return obj
-
 
 
 #############################################################################

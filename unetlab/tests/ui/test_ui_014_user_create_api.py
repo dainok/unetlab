@@ -21,16 +21,16 @@ def test_ui_user_create_api_user(api_client, user_set_group1, role):
         assert response.status_code == 201, f"Failed for user {user.username}"
         assert (
             response.data["username"] == payload["username"]
-        ), f"Username not in the returning payload"
+        ), "Username not in the returning payload"
         assert (
             len(User.objects.filter(username=payload["username"])) == 1
-        ), f"User has not been created"
+        ), "User has not been created"
     else:
         # Non admin users cannot create new users.
         assert response.status_code == 403, f"Expected 401 for {user.username}"
         assert (
             len(User.objects.filter(username=payload["username"])) == 0
-        ), f"User has been created"
+        ), "User has been created"
 
 
 @pytest.mark.django_db
@@ -42,4 +42,4 @@ def test_ui_user_create_api_guest(api_client):
     assert response.status_code == 401, "Expected 401 for guest user"
     assert (
         len(User.objects.filter(username=payload["username"])) == 0
-    ), f"User has been created"
+    ), "User has been created"

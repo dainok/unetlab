@@ -25,14 +25,14 @@ def test_ui_profile_delete_html_admin(client, user_set_group1, user_set_ungroupe
             response.status_code == 403
         ), f"Expected 403 for user {user.username} ({role})"
         # Verify the profile still exists
-        assert len(User.objects.filter(username=user.username)) == 1, f"Expected 200 for user {user.username} ({role})"
+        assert (
+            len(User.objects.filter(username=user.username)) == 1
+        ), f"Expected 200 for user {user.username} ({role})"
 
 
 @pytest.mark.django_db
 @pytest.mark.parametrize("role", ["staff", "user"])
-def test_ui_profile_delete_html_user(
-    client, user_set_group1, user_set_ungrouped, role
-):
+def test_ui_profile_delete_html_user(client, user_set_group1, user_set_ungrouped, role):
     """Test HTML (UI) non-admin profile deletion."""
     for user_set_group in [user_set_group1, user_set_ungrouped]:
         user = user_set_group[role]
@@ -50,4 +50,6 @@ def test_ui_profile_delete_html_user(
             response.status_code == 302
         ), f"Expected 302 (redirect to login page) for user {user.username} ({role})"
         # Verify the profile has been deleted
-        assert len(User.objects.filter(username=user.username)) == 0, f"Expected 200 for user {user.username} ({role})"
+        assert (
+            len(User.objects.filter(username=user.username)) == 0
+        ), f"Expected 200 for user {user.username} ({role})"

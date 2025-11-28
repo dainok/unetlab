@@ -33,7 +33,6 @@ class IsAdmin(BasePermission):
         return request.user and request.user.is_superuser
 
 
-
 class ObjectPermission(BasePermission):
     """DRF permission class using the shared policy_class policy."""
 
@@ -52,4 +51,3 @@ class ObjectPermission(BasePermission):
         user = request.user
         method = request.method
         return policy.can(user, method, obj)
-    
