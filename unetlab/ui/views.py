@@ -4,7 +4,11 @@ from constance import config
 from django.contrib import messages as django_msgs
 from django.contrib.auth.models import Group, User
 from django.db.models import Q, query
-from django.http import HttpResponse, HttpResponsePermanentRedirect, HttpResponseRedirect
+from django.http import (
+    HttpResponse,
+    HttpResponsePermanentRedirect,
+    HttpResponseRedirect,
+)
 from django.shortcuts import redirect, render
 from django.views.generic import TemplateView
 from rest_framework.authtoken.models import Token
@@ -80,7 +84,9 @@ class ConstanceUpdateView(TemplateMixin, TemplateView):
         context["variables"] = self.get_variables()
         return render(request, self.template_name, context)
 
-    def post(self, request, *args, **kwargs) -> HttpResponsePermanentRedirect|HttpResponseRedirect:
+    def post(
+        self, request, *args, **kwargs
+    ) -> HttpResponsePermanentRedirect | HttpResponseRedirect:
         """Handle POST request to update Constance settings."""
         for key in dir(config):
             if key in request.POST:
@@ -298,7 +304,9 @@ class TokenCreateView(TokenQueryMixin, ObtainAuthToken):
 
     permission_classes = [ObjectPermission]
 
-    def post(self, request, *args, **kwargs) -> HttpResponsePermanentRedirect|HttpResponseRedirect:
+    def post(
+        self, request, *args, **kwargs
+    ) -> HttpResponsePermanentRedirect | HttpResponseRedirect:
         """Create one Token per User."""
         Token.objects.get_or_create(user=request.user)
         return redirect("token_list")

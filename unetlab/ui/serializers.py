@@ -15,6 +15,7 @@ class GroupSerializer(ObjectSerializer):
 
     class Meta:
         """Meta options."""
+
         fields = ("id", "name")
         model = Group
 
@@ -25,7 +26,7 @@ class GroupSerializer(ObjectSerializer):
 
 
 class UserSerializer(ObjectSerializer):
-    """Serializer for the `User` model."""
+    """Serializer for the User model."""
 
     groups = serializers.PrimaryKeyRelatedField(
         many=True,
@@ -37,6 +38,7 @@ class UserSerializer(ObjectSerializer):
 
     class Meta:
         """Meta options."""
+
         model = User
         fields = (
             "date_joined",
@@ -59,48 +61,34 @@ class UserSerializer(ObjectSerializer):
             "last_login",
         )
 
-    def get_groups_display(self, obj):
-        """Ritorna i nomi dei gruppi dell'utente in formato leggibile."""
+    def get_groups_display(self, obj) -> list:
+        """Return Group names in readable format."""
         return [
             {"id": group.id, "name": group.name}
             for group in obj.groups.all().order_by("name")
         ]
 
-    def update(self, instance, validated_data):
-        """
-        Update the user instance.
-
-        Args:
-            instance (User): The existing user instance to update.
-            validated_data (dict): Validated fields from the request.
-
-        Returns:
-            User: The updated user instance.
-
-        Behavior:
-            - Updates all standard fields from `validated_data`.
-            - If a `password` key is provided, it is set via
-              `set_password()` to ensure hashing.
-            - Saves the instance before returning.
-        """
-        password = validated_data.pop("password", None)
+    def update(self, instance, validated_data) -> User:
+        """Update the User objects managing password and Groups."""
         groups = validated_data.pop("groups", None)
+        password = validated_data.pop("password", None)
 
         for attr, value in validated_data.items():
-            # Aggiorna i campi normali
+            # Update standard fields
             setattr(instance, attr, value)
 
-        # Aggiorna i gruppi (sovrascrive)
+        # Update (overwrite) Groups
         if groups is not None:
             instance.groups.set(groups)
 
-        if password:  # if filled in
+        if password:
+            # Update password if set
             instance.set_password(password)
 
         instance.save()
         return instance
 
-    def get_fields(self):
+    def get_fields(self) -> dict:
         fields = super().get_fields()
         request = self.context.get("request", None)
         if request and request.user and not request.user.is_superuser:

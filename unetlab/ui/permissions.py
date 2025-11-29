@@ -1,4 +1,11 @@
-"""Permissions for UI app."""
+"""
+Permissions for UI app.
+
+Return values of the can method:
+- None -> authentication is required.
+- True -> action is permitted.
+- False -> action is denied.
+"""
 
 #############################################################################
 # Constance
@@ -6,21 +13,21 @@
 
 
 class ConstancePermissionPolicy:
-    """
-    Policy per TemplateView.
-    """
+    """Access policy for the Constance model."""
 
     def can(self, user, method):
-        """
-        Restituisce:
-        - True: ha permesso → mostra la view
-        - False: utente autenticato ma senza permesso → 403
-        - None: utente anonimo → 401 / redirect
-        """
+        """Defines what the requesting user can do based on role and HTTP method."""
+
+        # === GUEST RULES ===
         if not user.is_authenticated:
+            # Guest access is denied
             return None
+
+        # === ADMIN RULES ===
         if user.is_superuser:
             return True
+
+        # === STAFF/USER RULES ===
         return False
 
 
@@ -30,34 +37,34 @@ class ConstancePermissionPolicy:
 
 
 class GroupPermissionPolicy:
-    """UI and DRF (API) permisson policy for Group objects."""
+    """Access policy for the Group model."""
 
     def can(self, user, method, target=None):
-        """Defines what the requesting user can do based on their role and HTTP method."""
+        """Defines what the requesting user can do based on target, role and HTTP method."""
 
         # === GUEST RULES ===
         if not user.is_authenticated:
-            # Guest users are not allowed to do anything
+            # Guest access is denied
             return None
 
         # === COMMON RULES ===
         if not target and method in (
-            "GET",
-            "OPTIONS",
-            "HEAD",
-            "PUT",
-            "PATCH",
             "DELETE",
+            "GET",
+            "HEAD",
+            "OPTIONS",
+            "PATCH",
+            "PUT",
         ):
-            # Without target object, return True with safe methods
+            # Safe methods are granted to anyone
             return True
 
         # === ADMIN RULES ===
         if user.is_superuser:
-            # Admin can do everything
             return True
 
-        # === STAFF RULES ===
+        # === STAFF/USER RULES ===
+        # With target and GET -> Permission granted
         return method in ("GET")
 
 
@@ -67,26 +74,26 @@ class GroupPermissionPolicy:
 
 
 class UserPermissionPolicy:
-    """UI and DRF (API) permisson policy for User objects."""
+    """Access policy for the User model."""
 
     def can(self, user, method, target=None):
-        """Defines what the requesting user can do based on their role and HTTP method."""
+        """Defines what the requesting user can do based on target, role and HTTP method."""
 
         # === GUEST RULES ===
         if not user.is_authenticated:
-            # Guest users are not allowed to do anything
+            # Guest access is denied
             return None
 
         # === COMMON RULES ===
         if not target and method in (
-            "GET",
-            "OPTIONS",
-            "HEAD",
-            "PUT",
-            "PATCH",
             "DELETE",
+            "GET",
+            "HEAD",
+            "OPTIONS",
+            "PATCH",
+            "PUT",
         ):
-            # Without target object, return True with safe methods
+            # Safe methods are granted to anyone
             return True
 
         # === ADMIN RULES ===
@@ -129,20 +136,35 @@ class TokenPermissionPolicy:
     """UI and DRF (API) permisson policy for Token objects."""
 
     def can(self, user, method, target=None):
-        """Defines what the requesting user can do based on their role and HTTP method."""
+        """Defines what the requesting user can do based on target, role and HTTP method."""
 
         # === GUEST RULES ===
         if not user.is_authenticated:
-            # Guest users are not allowed to do anything
+            # Guest access is denied
             return None
 
         # === COMMON RULES ===
         if target and target.user.id == user.id:
             # Anyone can do anything on owned Tokens
             return True
+        if not target and method in (
+            "DELETE",
+            "GET",
+            "HEAD",
+            "OPTIONS",
+            "PATCH",
+            "POST",
+            "PUT",
+        ):
+            # Safe methods are granted to anyone
+            return True
 
-        # Without target object, any method is safe
-        return True
+        # === ADMIN RULES ===
+        if user.is_superuser and method in ("DELETE", "GET"):
+            # Admin can always read and delete
+            return True
+
+        return False
 
 
 #############################################################################
@@ -151,17 +173,15 @@ class TokenPermissionPolicy:
 
 
 class HomePermissionPolicy:
-    """
-    Policy per TemplateView.
-    """
+    """UI permisson policy for Home."""
 
     def can(self, user, method):
-        """
-        Restituisce:
-        - True: ha permesso → mostra la view
-        - False: utente autenticato ma senza permesso → 403
-        - None: utente anonimo → 401 / redirect
-        """
+        """Defines what the requesting user can do based on target, role and HTTP method."""
+
+        # === GUEST RULES ===
         if not user.is_authenticated:
+            # Guest access is denied
             return None
+
+        # === COMMON RULES ===
         return True
