@@ -7,8 +7,9 @@ from django.urls import path, include
 from django.views.generic import RedirectView
 from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework.routers import DefaultRouter
-from ui.views import ConstanceListView, ConstanceUpdateView
 from ui.views import (
+    ConstanceListView,
+    ConstanceUpdateView,
     GroupAPIViewSet,
     GroupBulkDeleteView,
     GroupChangeView,

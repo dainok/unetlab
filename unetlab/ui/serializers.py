@@ -11,11 +11,12 @@ from ui.include.serializers import ObjectSerializer
 
 
 class GroupSerializer(ObjectSerializer):
-    """Serializer for the `Group` model."""
+    """Serializer for the Group model."""
 
     class Meta:
-        model = Group
+        """Meta options."""
         fields = ("id", "name")
+        model = Group
 
 
 #############################################################################
@@ -35,6 +36,7 @@ class UserSerializer(ObjectSerializer):
     groups_display = serializers.SerializerMethodField()
 
     class Meta:
+        """Meta options."""
         model = User
         fields = (
             "date_joined",

@@ -17,10 +17,7 @@ from ui.include.tables import (
 
 
 class GroupTable(ObjectTable):
-    """Table definition for the `Group` model.
-
-    Used in the `group_list` view.
-    """
+    """Table definition for the Group model."""
 
     name = tables.LinkColumn(
         "group_detail",
@@ -29,15 +26,10 @@ class GroupTable(ObjectTable):
     users = tables.Column(empty_values=())
 
     class Meta:
-        """Meta options for the `GroupTable`.
+        """Meta options."""
 
-        - Defines the underlying model.
-        - Excludes unused fields.
-        - Sets default ordering.
-        """
-
+        exclude = ("id",)
         model = Group
-        exclude = ["id"]
         order_by = "group"
 
     def render_users(self, record):
@@ -51,27 +43,21 @@ class GroupTable(ObjectTable):
 
 
 class UserTable(ObjectTable):
-    """Table definition for the `User` model.
+    """Table definition for the User model."""
 
-    Used in the `user_list` view.
-    """
-
+    date_joined = tables.DateColumn(orderable=True, format="Y-m-d")
     is_active = GreenRedBooleanColumn()
     is_staff = GreenRedReverseBooleanColumn(verbose_name="Staff")
     is_superuser = GreenRedReverseBooleanColumn(verbose_name="Admin")
-    username = tables.LinkColumn(
-        "user_detail",
-        args=[tables.A("pk")],
-    )
-    date_joined = tables.DateColumn(orderable=True, format="Y-m-d")
     last_login = tables.DateColumn(orderable=True, format="Y-m-d H:i")
+    username = tables.LinkColumn("user_detail", args=[tables.A("pk")])
 
     class Meta:
         """Meta options."""
 
         model = User
-        exclude = ["id", "password", "date_joined", "last_login"]
-        sequence = [
+        exclude = ("id", "password", "date_joined", "last_login")
+        sequence = (
             "username",
             "first_name",
             "last_name",
@@ -79,8 +65,7 @@ class UserTable(ObjectTable):
             "is_active",
             "is_superuser",
             "is_staff",
-            "...",
-        ]
+        )
         order_by = "username"
 
 
@@ -90,29 +75,19 @@ class UserTable(ObjectTable):
 
 
 class TokenTable(ObjectTable):
-    """Table definition for the `Token` model.
-
-    Used in the `token_list` view.
-    """
+    """Table definition for the Token model."""
 
     created = tables.DateColumn(orderable=True, format="Y-m-d")
 
     class Meta:
-        """Meta options for the `TokenTable`.
-
-        - Defines the underlying model.
-        - Excludes unused fields.
-        - Sets additional table attributes.
-        """
+        """Meta options."""
 
         model = Token
-        exclude = []
-        sequence = [
+        sequence = (
             "user",
             "key",
             "created",
-            "...",
-        ]
+        )
         attrs = {
             "search": False,
             "table_actions": [
