@@ -2,6 +2,7 @@
 
 from django import forms
 from django.contrib.auth.models import Group, User
+from django.utils.translation import gettext_lazy as _
 from rest_framework.authtoken.models import Token
 from ui.include import messages
 from ui.include.forms import ObjectModelForm
@@ -13,54 +14,27 @@ from ui.include.forms import ObjectModelForm
 
 
 class GroupForm(ObjectModelForm):
-    """
-    Form for the Django Group model.
-
-    Provides a Many-to-Many field to assign users to the group.
-
-    Attributes:
-        users (ModelMultipleChoiceField): Select multiple users for the group.
-
-    Methods:
-        __init__(*args, **kwargs): Pre-populates 'users' for existing groups.
-        save(commit=True): Saves the group and updates the associated users.
-    """
+    """Form for the Django Group model."""
 
     users = forms.ModelMultipleChoiceField(
         queryset=User.objects.all(), required=False, widget=forms.SelectMultiple
     )
 
     class Meta:
-        """
-        Meta class for GroupForm.
+        """Meta options."""
 
-        Attributes:
-            model (Group): The Django Group model this form operates on.
-            fields (list[str]): Fields included in the form ('name', 'users').
-        """
-
-        model = Group
         fields = ["name", "users"]
+        model = Group
 
     def __init__(self, *args, **kwargs):
-        """
-        Initialize the form and pre-fill the 'users' field for existing group instances.
-        """
+        """Initialize the form and pre-fill the users field for existing group instances."""
         super().__init__(*args, **kwargs)
         # Pre-populate the users field with those already in the group
         if self.instance.pk:
             self.fields["users"].initial = self.instance.user_set.all()
 
     def save(self, commit=True):
-        """
-        Save the group instance and update the associated users.
-
-        Args:
-            commit (bool): Whether to commit the changes to the database.
-
-        Returns:
-            Group: The saved group instance.
-        """
+        """Save the group instance and update the associated users."""
         group = super().save(commit=False)
         if commit:
             group.save()
@@ -74,46 +48,26 @@ class GroupForm(ObjectModelForm):
 
 
 class UserForm(ObjectModelForm):
-    """
-    Form for the Django User model.
-
-    Provides a Many-to-Many field to assign groups to the user.
-
-    Attributes:
-        groups (ModelMultipleChoiceField): Select multiple groups for the user.
-
-    Methods:
-        __init__(*args, **kwargs): Pre-populates 'groups' for existing user instances.
-        save(commit=True): Saves the user and updates the associated groups.
-    """
+    """Form for the Django User model."""
 
     groups = forms.ModelMultipleChoiceField(
         queryset=Group.objects.all(), required=False, widget=forms.SelectMultiple
     )
     password1 = forms.CharField(
-        label="Password",
+        label=_("Password"),
         widget=forms.PasswordInput,
         required=False,
         help_text=messages.PASSWORD1_HELP,
     )
-
     password2 = forms.CharField(
-        label="Conferma Password",
+        label=_("Confirm password"),
         widget=forms.PasswordInput,
         required=False,
         help_text=messages.PASSWORD2_HELP,
     )
 
     class Meta:
-        """
-        Meta class for UserForm.
-
-        Attributes:
-            model (User): The Django User model this form operates on.
-            fields (list[str]): Fields included in the form:
-                'username', 'first_name', 'last_name', 'email', 'is_active',
-                'is_superuser', 'is_staff', 'groups'.
-        """
+        """Meta options."""
 
         model = User
         fields = [
@@ -128,11 +82,7 @@ class UserForm(ObjectModelForm):
         ]
 
     def __init__(self, *args, **kwargs):
-        """
-        Initialize the form and pre-fill the 'groups' field for existing users.
-        """
-        # self.user = kwargs.pop("request_user", None)
-        # self.request = kwargs.pop("request", None)
+        """Initialize the form and pre-fill the groups field for existing users."""
         super().__init__(*args, **kwargs)
         # Pre-populate groups if user exists
         if self.instance.pk:
@@ -148,30 +98,23 @@ class UserForm(ObjectModelForm):
         Check that password1 and password2 match.
         """
         cleaned_data = super().clean()
-        # user = getattr(self, "current_user", None)
         password1 = cleaned_data.get("password1")
         password2 = cleaned_data.get("password2")
 
-        if password1 or password2:  # if one of the two is filled in
+        if password1 or password2:
+            # if one of the two is filled in
             if password1 != password2:
                 raise forms.ValidationError(messages.PASSWORD_ERROR)
 
         return cleaned_data
 
     def save(self, commit=True):
-        """
-        Save the user instance and update the associated groups.
-
-        Args:
-            commit (bool): Whether to commit the changes to the database.
-
-        Returns:
-            User: The saved user instance.
-        """
+        """Save the user instance and update the associated groups."""
         obj = super().save(commit=False)
 
         password1 = self.cleaned_data.get("password1")
-        if password1:  # only if set/modified
+        if password1:
+            # Update password only if set/modified
             obj.set_password(password1)
 
         if self.user and not self.user.is_superuser and obj.pk:
@@ -182,8 +125,8 @@ class UserForm(ObjectModelForm):
 
         if commit:
             obj.save()
-            # Set groups only for admins
             if self.user.is_superuser:
+                # Set groups only if admin
                 obj.groups.set(Group.objects.filter(id__in=self.cleaned_data["groups"]))
 
         return obj
@@ -200,9 +143,7 @@ class TokenForm(ObjectModelForm):
     """
 
     class Meta:
-        """
-        Meta class for TokenForm.
-        """
+        """Meta options."""
 
-        model = Token
         fields = []
+        model = Token

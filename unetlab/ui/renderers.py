@@ -4,7 +4,7 @@ from rest_framework.renderers import JSONRenderer
 
 
 class CustomJSONRenderer(JSONRenderer):
-    """Define the standard DRF format."""
+    """Return DRF data in a standard JSON format."""
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
         """Render DRF output."""

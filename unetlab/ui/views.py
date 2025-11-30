@@ -10,13 +10,13 @@ from django.http import (
     HttpResponseRedirect,
 )
 from django.shortcuts import redirect, render
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 import django_tables2 as tables
 from ui.filters import GroupFilter, TokenFilter, UserFilter
 from ui.forms import GroupForm, TokenForm, UserForm
-from ui.include import messages
 from ui.include.permissions import ObjectPermission
 from ui.include.tables import (
     GreenRedBooleanColumn,
@@ -100,11 +100,11 @@ class ConstanceUpdateView(TemplateMixin, TemplateView):
                         value = int(value)
                     except ValueError:
                         django_msgs.error(
-                            request, f"{messages.MSG_VALUE_ERROR} ({key})."
+                            request, _("Value error (%(key)s) .") % {"key": key}
                         )
                         continue
                 config._backend.set(key, value)
-        django_msgs.success(request, messages.MSG_CONFIG_UPDATED)
+        django_msgs.success(request, _("Configuration updated."))
         return redirect("settings_list")
 
 

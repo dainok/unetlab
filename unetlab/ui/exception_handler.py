@@ -1,3 +1,5 @@
+"""Exception handler for UI app."""
+
 import sys
 import traceback
 from http import HTTPStatus
@@ -6,6 +8,7 @@ from django.conf import settings
 
 
 def CustomExceptionHandler(exc, context):
+    """Return exception in JSON format."""
     status = HTTPStatus.INTERNAL_SERVER_ERROR
     response = exception_handler(exc, context)
     request = context.get("request", None)

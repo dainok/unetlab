@@ -70,8 +70,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    # Custom middlewares
-    # "unetlab.middleware.LoginRequiredMiddleware",
+    "django.middleware.locale.LocaleMiddleware",  # I18N
 ]
 
 # ==============================================================================
@@ -135,11 +134,15 @@ AUTH_PASSWORD_VALIDATORS = [
 # INTERNATIONALIZATION
 # ==============================================================================
 
+# Add django.middleware.locale.LocaleMiddleware to MIDDLEWARE
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+LOCALE_PATHS = [
+    BASE_DIR / "i18n",
+]
 
 # ==============================================================================
 # DEFAULT PRIMARY KEY FIELD TYPE
@@ -200,7 +203,6 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600
 MEDIA_ROOT = BASE_DIR / ".." / "uploads"
 MEDIA_URL = "/files/"
 
-
 # ==============================================================================
 # UI: LOGIN / LOGOUT REDIRECTS
 # ==============================================================================
@@ -225,21 +227,21 @@ CONSTANCE_CONFIG = {
         "",
         "The address of the primary Proxmox host.",
     ),
+    "PROXMOX_VERIFY_SSL": (
+        True,
+        "Whether to verify the SSL certificate for Proxmox.",
+    ),
     "PROXMOX_USERNAME": (
         "root@pam",
         "The username used to log in to the Proxmox host.",
-    ),
-    "PROXMOX_TOKEN_ID": (
-        "unetlab",
-        "The Token ID associated with the Proxmox user.",
     ),
     "PROXMOX_SECRET": (
         "",
         "The secret used to authenticate to the Proxmox host.",
     ),
-    "PROXMOX_VERIFY_SSL": (
-        True,
-        "Whether to verify the SSL certificate for Proxmox.",
+    "PROXMOX_TOKEN_ID": (
+        "unetlab",
+        "The Token ID associated with the Proxmox user.",
     ),
     "TEMPLATE_DIR": (
         f"{BASE_DIR.parent}/templates/local.json",
@@ -259,20 +261,18 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.TokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ],
-    "DEFAULT_PAGINATION_CLASS": "ui.include.pagination.CustomPagination",
-    # "DEFAULT_RENDERER_CLASSES": [
-    #     "unetlab.renderers.CustomJSONRenderer",
-    # ],
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
-    # "EXCEPTION_HANDLER": "unetlab.exception_handler.custom_exception_handler",
-    "PAGE_SIZE": 10,
+    "DEFAULT_PAGINATION_CLASS": "ui.include.pagination.CustomPagination",
+    "DEFAULT_RENDERER_CLASSES": ["ui.renderers.CustomJSONRenderer"],
+    "EXCEPTION_HANDLER": "ui.exception_handler.CustomExceptionHandler",
     "MAX_PAGE_SIZE": 100,
+    "PAGE_SIZE": 10,
 }
 
 # ==============================================================================
 # UI: DJANGO TABLES2 SETTINGS
 # ==============================================================================
 
-DJANGO_TABLES2_PAGE_SIZE = REST_FRAMEWORK["PAGE_SIZE"]
 DJANGO_TABLES2_MAX_PAGE_SIZE = REST_FRAMEWORK["MAX_PAGE_SIZE"]
+DJANGO_TABLES2_PAGE_SIZE = REST_FRAMEWORK["PAGE_SIZE"]
 DJANGO_TABLES2_TEMPLATE = "ui/tables/table_full.html"

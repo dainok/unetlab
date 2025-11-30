@@ -1,9 +1,9 @@
 """Table definitions for UI app."""
 
 from django.contrib.auth.models import Group, User
+from django.utils.translation import gettext_lazy as _
 from rest_framework.authtoken.models import Token
 import django_tables2 as tables
-from ui.include import messages
 from ui.include.tables import (
     GreenRedBooleanColumn,
     GreenRedReverseBooleanColumn,
@@ -47,8 +47,8 @@ class UserTable(ObjectTable):
 
     date_joined = tables.DateColumn(orderable=True, format="Y-m-d")
     is_active = GreenRedBooleanColumn()
-    is_staff = GreenRedReverseBooleanColumn(verbose_name="Staff")
-    is_superuser = GreenRedReverseBooleanColumn(verbose_name="Admin")
+    is_staff = GreenRedReverseBooleanColumn(verbose_name=_("Staff"))
+    is_superuser = GreenRedReverseBooleanColumn(verbose_name=_("Admin"))
     last_login = tables.DateColumn(orderable=True, format="Y-m-d H:i")
     username = tables.LinkColumn("user_detail", args=[tables.A("pk")])
 
@@ -92,17 +92,17 @@ class TokenTable(ObjectTable):
             "search": False,
             "table_actions": [
                 {
-                    "button": messages.ADD,
+                    "button": _("Add"),
                     "js": "TokenCreateView()",
                 },
                 {
-                    "button": messages.DELETE,
+                    "button": _("Delete"),
                     "js": "ObjectBulkDeleteView('token')",
                 },
             ],
             "row_actions": [
                 {
-                    "button": messages.DELETE,
+                    "button": _("Delete"),
                     "view": "token_delete",
                 },
             ],
