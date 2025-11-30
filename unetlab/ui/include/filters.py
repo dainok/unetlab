@@ -1,8 +1,4 @@
-"""Generic reusable search filter for Django models.
-
-This filter extends `django_filters.FilterSet` and allows subclasses
-to define a list of searchable fields via `search_fields`.
-"""
+"""Generic reusable search filter for Django models."""
 
 from django import forms
 from django.db.models import Q
@@ -10,11 +6,7 @@ import django_filters
 
 
 class SearchFilterSet(django_filters.FilterSet):
-    """Base filter class providing a generic text search.
-
-    Subclasses must define `search_fields` as a list of model fields
-    that should be included in the search.
-    """
+    """Base filter class providing a generic text search."""
 
     search = django_filters.CharFilter(method="filter_search")
     search_fields = []
@@ -30,15 +22,15 @@ class SearchFilterSet(django_filters.FilterSet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for f in self.filters.values():
-            # Se il filtro ha choices dinamici, non li tocchiamo
+            # Don't touch dynamic choices
             if isinstance(f, django_filters.ChoiceFilter):
-                # Se non sono già popolati, prova a richiamare il metodo per popolarli
+                # Populate choices
                 if getattr(f, "extra", {}).get("choices") == [] and hasattr(
                     f, "get_choices"
                 ):
                     f.extra["choices"] = f.get_choices()
 
-            # Applica le classi CSS al widget senza sovrascrivere i choices
+            # Apply CSS classes without touching choices
             widget = getattr(f.field, "widget", None)
             if widget:
                 existing_classes = widget.attrs.get("class", "")
@@ -49,16 +41,7 @@ class SearchFilterSet(django_filters.FilterSet):
                         break
 
     def filter_search(self, queryset, name, value):
-        """Apply a case-insensitive `icontains` filter across all search fields.
-
-        Args:
-            queryset (QuerySet): The initial queryset to filter.
-            name (str): The name of the filter field (unused).
-            value (str): The search term entered by the user.
-
-        Returns:
-            QuerySet: The filtered queryset.
-        """
+        """Apply a case-insensitive `icontains` filter across all search fields."""
         if not self.search_fields:
             return queryset
         q_objects = Q()

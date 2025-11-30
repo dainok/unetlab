@@ -1,28 +1,24 @@
-"""Common regular expression validators for model fields.
-
-This module provides reusable RegexValidator instances for enforcing
-standardized input rules across models, forms, and serializers.
-"""
+"""Common regular expression validators for model fields."""
 
 from django.core.validators import RegexValidator
-from ui.include import messages
+from django.utils.translation import gettext_lazy as _
 
 AlphanumericPhraseValidator = RegexValidator(
     regex=r"^[a-zA-Z0-9 ]+$",
-    message=messages.ALPHANUMERIC_PHRASE_ERROR,
+    message=_("This field may only contain alphanumeric characters and spaces."),
 )
 
 AlphanumericValidator = RegexValidator(
     regex=r"^[a-zA-Z0-9]+$",
-    message=messages.ALPHANUMERIC_ERROR,
-)
-
-VersionValidator = RegexValidator(
-    regex=r"^[a-zA-Z0-9\-.]+$",
-    message=messages.VERSION_ERROR,
+    message=_("This field may only contain alphanumeric characters."),
 )
 
 SimplePasswordValidator = RegexValidator(
     regex=r"^[a-zA-Z0-9 ._\-!?@#&]+$",
-    message=messages.SIMPLE_PASSWORD_ERROR,
+    message=_("Only letters, numbers, spaces, and common punctuation are allowed."),
+)
+
+VersionValidator = RegexValidator(
+    regex=r"^[a-zA-Z0-9\-.]+$",
+    message=_("Only letters, numbers, dots, and hyphens are allowed."),
 )

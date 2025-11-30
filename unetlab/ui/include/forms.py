@@ -4,18 +4,11 @@ from django import forms
 
 
 class FormMixin:
-    """
-    Mixin to apply Bootstrap-friendly CSS classes to Django forms.
-
-    When included in a Form or ModelForm, this mixin automatically
-    iterates over all visible fields and applies appropriate CSS classes
-    to match Bootstrap's form styles.
-    """
+    """Mixin to apply Bootstrap-friendly CSS classes to Django forms."""
 
     def __init__(self, *args, **kwargs):
         """
-        Initialize the form and apply Bootstrap CSS classes
-        to all visible fields.
+        Initialize the form and apply Bootstrap CSS classes to all visible fields.
         """
         super().__init__(*args, **kwargs)
         for visible in self.visible_fields():
@@ -36,16 +29,11 @@ class FormMixin:
 
 
 class ObjectModelForm(FormMixin, forms.ModelForm):
-    """Base ModelForm that applies Bootstrap-compatible CSS classes.
-
-    All visible fields will automatically receive the CSS class
-    `"form-control"` to ensure consistent styling across forms.
-    """
+    """Base ModelForm that applies Bootstrap-compatible CSS classes."""
 
     def __init__(self, *args, **kwargs):
         """
-        Initialize the model form and ensure Bootstrap classes are applied
-        via FormMixin.
+        Initialize the model form and ensure Bootstrap classes are applied via FormMixin.
         """
         self.user = kwargs.pop("user", None)
         self.request = kwargs.pop("request", None)

@@ -4,7 +4,6 @@ from django import forms
 from django.contrib.auth.models import Group, User
 from django.utils.translation import gettext_lazy as _
 from rest_framework.authtoken.models import Token
-from ui.include import messages
 from ui.include.forms import ObjectModelForm
 
 
@@ -57,13 +56,13 @@ class UserForm(ObjectModelForm):
         label=_("Password"),
         widget=forms.PasswordInput,
         required=False,
-        help_text=messages.PASSWORD1_HELP,
+        help_text=_("Leave blank to not change the password."),
     )
     password2 = forms.CharField(
         label=_("Confirm password"),
         widget=forms.PasswordInput,
         required=False,
-        help_text=messages.PASSWORD2_HELP,
+        help_text=_("Repeat password to confirm."),
     )
 
     class Meta:
@@ -104,7 +103,7 @@ class UserForm(ObjectModelForm):
         if password1 or password2:
             # if one of the two is filled in
             if password1 != password2:
-                raise forms.ValidationError(messages.PASSWORD_ERROR)
+                raise forms.ValidationError(_("The passwords do not match."))
 
         return cleaned_data
 
