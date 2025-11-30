@@ -47,6 +47,13 @@ To set up the development environment, including dev dependencies, run:
 poetry install --with dev
 ```
 
+### Internationalization
+
+```bash
+poetry run ./manage.py makemessages -l en
+poetry run ./manage.py compilemessages
+```
+
 ### Run Checks and Tests
 
 To run all pre-commit checks and tests with coverage reporting:
