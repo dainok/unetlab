@@ -42,11 +42,9 @@
                 <div class="card-footer">
                     <div class="text-end">
                         {% if request.GET.back %}
-                        <a href="{% url 'settings_list' %}" class="btn"> Cancel </a>
+                        <a href="{% url 'settings_list' %}" class="btn"> {% trans "Cancel" %} </a>
                         {% endif %}
-                        <button type="submit" class="btn btn-primary ms-auto">
-                            Update
-                        </button>
+                        <button type="submit" class="btn btn-primary ms-auto"> {% trans "Update" %} </button>
                     </div>
                 </div>
             </div>

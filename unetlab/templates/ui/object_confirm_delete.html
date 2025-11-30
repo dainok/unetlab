@@ -21,10 +21,10 @@
                 <div class="card-body">
                     {% csrf_token %}
                     {% if object %}
-                    <p>Are you sure you want to delete <strong>{{ object }}</strong>?</p>
+                    <p>{% blocktrans with obj=object %}Are you sure you want to delete <strong>{{ object }}</strong>?{% endblocktrans %}</p>
                     {% elif object_list %}
                     <input type="hidden" name="confirm" value="1">
-                    <p>Are you sure you want to delete the following objects?</p>
+                    <p>{% trans "Are you sure you want to delete the following objects?" %}</p>
 
                     <ul>
                         {% for obj in object_list %}
@@ -39,7 +39,7 @@
 
                 <div class="card-footer">
                     <div class="d-flex">
-                        <button type="submit" class="btn btn-danger">Delete</button>
+                        <button type="submit" class="btn btn-danger"> {% trans "Delete" %} </button>
                     </div>
                 </div>
             </div>

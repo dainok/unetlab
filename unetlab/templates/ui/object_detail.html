@@ -33,16 +33,16 @@
                     {% if permissions.can_delete %}
                         {% url model_name|add:'_delete' pk as delete_url %}
                         {% if delete_url %}
-                        <a href="{% url model_name|add:'_delete' pk %}" class="btn">Delete</a>
+                        <a href="{% url model_name|add:'_delete' pk %}" class="btn"> {% trans "Delete" %} </a>
                         {% endif %}
                     {% endif %}
                     {% if request.GET.back %}
-                    <a href="{% url request.GET.back %}" class="btn">Back</a>
+                    <a href="{% url request.GET.back %}" class="btn"> {% trans "Back" %} </a>
                     {% endif %}
                     {% if permissions.can_update %}
                         {% url model_name|add:'_delete' pk as edit_url %}
                         {% if edit_url %}
-                        <a href="{% url model_name|add:'_update' pk %}" class="btn btn-primary ms-auto">Edit</a>
+                        <a href="{% url model_name|add:'_update' pk %}" class="btn btn-primary ms-auto"> {% trans "Edit" %} </a>
                         {% endif %}
                     {% endif %}
                 </div>

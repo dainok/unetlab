@@ -17,8 +17,8 @@
         </div>
         <div class="card-footer text-end">
             <div class="d-flex">
-                <a href="{% url request.resolver_match.url_name %}" class="btn btn-link">Cancel</a>
-                <button type="submit" class="btn btn-primary ms-auto">Filter</button>
+                <a href="{% url request.resolver_match.url_name %}" class="btn btn-link"> {% trans "Cancel" %} </a>
+                <button type="submit" class="btn btn-primary ms-auto"> {% trans "Filter" %} </button>
             </div>
         </div>
     </form>

@@ -43,9 +43,9 @@
                             <div class="dropdown-menu">
                                 {% for action in table.attrs.table_actions %}
                                 {% if action.view %}
-                                <a class="dropdown-item" href="{% url action.view %}">{{ action.button }}</a>
+                                <a class="dropdown-item" href="{% url action.view %}"> {{ action.button }} </a>
                                 {% elif action.js %}
-                                <a class="dropdown-item" href="#" onclick="{{ action.js }}">{{ action.button }}</a>
+                                <a class="dropdown-item" href="#" onclick="{{ action.js }}"> {{ action.button }} </a>
                                 {% endif %}
                                 {% endfor %}
                             </div>
@@ -56,9 +56,7 @@
                         {% if action.view %}
                         <a href="{% url action.view %}" class="btn btn-1">{{ action.button }}</a>
                         {% elif action.js %}
-                        <button type="submit" class="btn btn-primary" onclick="{{ action.js }}">
-                            {{ action.button }}
-                        </button>
+                        <button type="submit" class="btn btn-primary" onclick="{{ action.js }}"> {{ action.button }} </button>
                         {% endif %}
                         {% endfor %}
                         {% endif %}
