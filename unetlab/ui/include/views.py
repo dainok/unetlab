@@ -129,6 +129,13 @@ class ObjectMixin:
 
         return policy.can(user, method, target)
 
+    def get_context_data(self, **kwargs):
+        """Add UI settings to all HTML views."""
+        context = super().get_context_data(**kwargs)
+        context["site_meta"] = settings.SITE_META
+        context["site_navbar"] = settings.SITE_NAVBAR
+        return context
+
 
 class ObjectBulkDeleteView(ObjectMixin, TemplateView):
     """Generic view to delete multiple objects selected via checkboxes."""
@@ -360,3 +367,10 @@ class TemplateMixin:
 
         # Fallback
         return HttpResponse(_("Generic permission error"), status=500)
+
+    def get_context_data(self, **kwargs):
+        """Add UI settings to all HTML views."""
+        context = super().get_context_data(**kwargs)
+        context["site_meta"] = settings.SITE_META
+        context["site_navbar"] = settings.SITE_NAVBAR
+        return context

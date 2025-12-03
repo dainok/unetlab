@@ -6,16 +6,33 @@ register = template.Library()
 
 
 @register.simple_tag(takes_context=True)
-def is_active(context, *view_names):
-    """
-    Determine if the current view matches any of the given view names.
-
-    Returns " active" if the current view matches any view_name, otherwise an empty string.
-    """
+def active_dropdown(context, dropdown_items):
+    """Return CSS active class if current view is included in the parent dropdown menu."""
+    css_class = " active"
     request = context.get("request")
     if not request:
         return ""
     current_view = getattr(request.resolver_match, "view_name", None)
-    if current_view in view_names:
-        return " active"
+
+    for dropdown_item in dropdown_items:
+        if dropdown_item.get("view") == current_view:
+            # If current view is included in the dropdown, return CSS
+            return css_class
+
+    return ""
+
+
+@register.simple_tag(takes_context=True)
+def active_view(context, view_name):
+    """Return CSS active class if current view matches the given one."""
+    css_class = " active"
+    request = context.get("request")
+    if not request:
+        return ""
+    current_view = getattr(request.resolver_match, "view_name", None)
+
+    if current_view == view_name:
+        # If current view match the requested view, return CSS
+        return css_class
+
     return ""

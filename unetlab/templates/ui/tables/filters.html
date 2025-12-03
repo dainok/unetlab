@@ -1,3 +1,4 @@
+{% load i18n static %}
 <div class="card">
     <form method="get" class="card">
         <div class="card-header">
@@ -17,8 +18,8 @@
         </div>
         <div class="card-footer text-end">
             <div class="d-flex">
-                <a href="{% url request.resolver_match.url_name %}" class="btn btn-link"> {% trans "Cancel" %} </a>
-                <button type="submit" class="btn btn-primary ms-auto"> {% trans "Filter" %} </button>
+                <a href="{% url request.resolver_match.url_name %}" class="btn btn-link"> {% translate "Cancel" %} </a>
+                <button type="submit" class="btn btn-primary ms-auto"> {% translate "Filter" %} </button>
             </div>
         </div>
     </form>

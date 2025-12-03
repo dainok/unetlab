@@ -1,16 +1,16 @@
 {% load i18n static %}
 {% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
 <!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" dir="{{ LANGUAGE_BIDI|yesno:'rtl,ltr,auto' }}">
+<html lang="{{ LANGUAGE_CODE|default:'en-us' }}" dir="{{ LANGUAGE_BIDI|yesno:'rtl,ltr,auto' }}">
 
 <head>
     <link rel="author" href="https://www.adainese.it" />
     <link rel="icon" href="{% static 'ui/favicon.ico' %}" type="image/x-icon" sizes="16x16" />
-    <title>{% block title %}eg0n{% endblock title %}</title>
+    <title>{% block title %}{{ site_meta.title }}{% endblock title %}</title>
     <meta charSet="utf-8" />
-    <meta name="author" content="Andrea Dainese, Rocco Sicilia" />
-    <meta name="description" content="eg0n.">
-    <meta name="keywords" content="eg0n, misp, cti">
+    <meta name="author" content="{% for author in site_meta.authors %}{{ author }}{% if not forloop.last %}, {% endif %}{% endfor %}" />
+    <meta name="description" content="{{ site_meta.description }}">
+    <meta name="keywords" content="{% for tag in site_meta.keywords %}{{ tag }}{% if not forloop.last %}, {% endif %}{% endfor %}">
     <meta name="Content-Security-Policy"
         content="default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self';base-uri 'self';form-action 'self'" />
     <meta name="robots" content="noindex, nofollow">

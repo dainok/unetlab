@@ -30,349 +30,46 @@
                     <div class="col">
                         <!-- BEGIN NAVBAR MENU -->
                         <ul class="navbar-nav">
-                            <li class="nav-item{% is_active 'home' %}">
-                                <a class="nav-link" href="{% url 'home' %}">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round" class="icon icon-1">
-                                            <path d="M5 12l-2 0l9 -9l9 9l-2 0"></path>
-                                            <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"></path>
-                                            <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"></path>
-                                        </svg></span>
-                                    <span class="nav-link-title"> {% translate "Home" %} </span>
+                            {% for section in site_navbar %}
+                            {% if section.view %}
+                            <li class="nav-item{% active_view section.view %}">
+                                <a class="nav-link" href="{% url section.view %}">
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block">{{ section.svg|safe }}</span>
+                                    <span class="nav-link-title"> {% translate section.text %} </span>
                                 </a>
                             </li>
-                            <li class="nav-item dropdown{% is_active 'job_list' 'job_detail' 'job_logs' %}">
+                            {% elif section.url %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ section.url }}">
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block">{{ section.svg|safe }}</span>
+                                    <span class="nav-link-title"> {% translate section.text %} </span>
+                                </a>
+                            </li>
+                            {% elif section.dropdown %}
+                            <li class="nav-item dropdown{% active_dropdown section.dropdown %}">
                                 <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"
                                     data-bs-auto-close="outside" role="button" aria-expanded="false">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round" class="icon icon-1">
-                                            <path d="M12 3l8 4.5l0 9l-8 4.5l-8 -4.5l0 -9l8 -4.5"></path>
-                                            <path d="M12 12l8 -4.5"></path>
-                                            <path d="M12 12l0 9"></path>
-                                            <path d="M12 12l-8 -4.5"></path>
-                                            <path d="M16 5.25l-8 4.5"></path>
-                                        </svg></span>
-                                    <span class="nav-link-title"> {% translate "System" %} </span>
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block">{{ section.svg|safe }}</span>
+                                    <span class="nav-link-title"> {% translate section.text %} </span>
                                 </a>
                                 <div class="dropdown-menu">
-                                    <a class="dropdown-item{% is_active 'group_list' %}" href="{% url 'group_list' %}">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="icon icon-tabler icons-tabler-outline icon-tabler-users">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
-                                            <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
-                                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                                            <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
-                                        </svg>
-                                        {% translate "Groups" %}
+                                    {% for subsection in section.dropdown %}
+                                    {% if subsection.view %}
+                                    <a class="dropdown-item{% active_view subsection.view %}" href="{% url subsection.view %}">
+                                        <span class="nav-link-icon d-md-none d-lg-inline-block">{{ subsection.svg|safe }}</span>
+                                        {% translate subsection.text %}
                                     </a>
-                                    <a class="dropdown-item{% is_active 'host_list' %}" href="{% url 'host_list' %}">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="icon icon-tabler icons-tabler-outline icon-tabler-server">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path
-                                                d="M3 4m0 3a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v2a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3z" />
-                                            <path
-                                                d="M3 12m0 3a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v2a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3z" />
-                                            <path d="M7 8l0 .01" />
-                                            <path d="M7 16l0 .01" />
-                                        </svg>
-                                        {% translate "Hosts" %}
+                                    {% elif subsection.url %}
+                                    <a class="dropdown-item" href="{{ section.url }}">
+                                        <span class="nav-link-icon d-md-none d-lg-inline-block">{{ subsection.svg|safe }}</span>
+                                        {% translate subsection.text %}
                                     </a>
-                                    <a class="dropdown-item{% is_active 'job_list' %}" href="{% url 'job_list' %}">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="icon icon-tabler icons-tabler-outline icon-tabler-stack-2">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path d="M12 4l-8 4l8 4l8 -4l-8 -4" />
-                                            <path d="M4 12l8 4l8 -4" />
-                                            <path d="M4 16l8 4l8 -4" />
-                                        </svg>
-                                        {% translate "Jobs" %}
-                                    </a>
-                                    <a class="dropdown-item{% is_active 'log_list' %}" href="{% url 'log_list' %}">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="icon icon-tabler icons-tabler-outline icon-tabler-align-box-left-top">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path
-                                                d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" />
-                                            <path d="M9 13h-2" />
-                                            <path d="M13 10h-6" />
-                                            <path d="M11 7h-4" />
-                                        </svg>
-                                        {% translate "Logs" %}
-                                    </a>
-                                    <a class="dropdown-item{% is_active 'settings_list' %}"
-                                        href="{% url 'settings_list' %}">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round" class="icon icon-1">
-                                            <path
-                                                d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z">
-                                            </path>
-                                            <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"></path>
-                                        </svg>
-                                        {% translate "Settings" %}
-                                    </a>
-                                    <a class="dropdown-item{% is_active 'nodetemplate_list' %}"
-                                        href="{% url 'nodetemplate_list' %}">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="icon icon-tabler icons-tabler-outline icon-tabler-template">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                            <path
-                                                d="M4 4m0 1a1 1 0 0 1 1 -1h14a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-14a1 1 0 0 1 -1 -1z">
-                                            </path>
-                                            <path
-                                                d="M4 12m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z">
-                                            </path>
-                                            <path d="M14 12l6 0"></path>
-                                            <path d="M14 16l6 0"></path>
-                                            <path d="M14 20l6 0"></path>
-                                        </svg>
-                                        {% translate "Templates" %}
-                                    </a>
-                                    <a class="dropdown-item{% is_active 'token_list' %}" href="{% url 'token_list' %}">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="icon icon-tabler icons-tabler-outline icon-tabler-key">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path
-                                                d="M16.555 3.843l3.602 3.602a2.877 2.877 0 0 1 0 4.069l-2.643 2.643a2.877 2.877 0 0 1 -4.069 0l-.301 -.301l-6.558 6.558a2 2 0 0 1 -1.239 .578l-.175 .008h-1.172a1 1 0 0 1 -.993 -.883l-.007 -.117v-1.172a2 2 0 0 1 .467 -1.284l.119 -.13l.414 -.414h2v-2h2v-2l2.144 -2.144l-.301 -.301a2.877 2.877 0 0 1 0 -4.069l2.643 -2.643a2.877 2.877 0 0 1 4.069 0z" />
-                                            <path d="M15 9h.01" />
-                                        </svg>
-                                        {% translate "Tokens" %}
-                                    </a>
-                                    <a class="dropdown-item{% is_active 'user_list' %}" href="{% url 'user_list' %}">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="icon icon-tabler icons-tabler-outline icon-tabler-user">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
-                                            <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
-                                        </svg>
-                                        {% translate "Users" %}
-                                    </a>
+                                    {% endif %}
+                                    {% endfor %}
                                 </div>
                             </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#navbar-layout" data-bs-toggle="dropdown"
-                                    data-bs-auto-close="outside" role="button" aria-expanded="false">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round" class="icon icon-1">
-                                            <path
-                                                d="M4 4m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v1a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z">
-                                            </path>
-                                            <path
-                                                d="M4 13m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v3a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z">
-                                            </path>
-                                            <path
-                                                d="M14 4m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v3a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z">
-                                            </path>
-                                            <path
-                                                d="M14 15m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v1a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z">
-                                            </path>
-                                        </svg></span>
-                                    <span class="nav-link-title"> {% translate "Workspace" %} </span>
-                                </a>
-                                <div class="dropdown-menu">
-                                    <div class="dropdown-menu-columns">
-                                        <div class="dropdown-menu-column">
-                                            <a class="dropdown-item{% is_active 'lab_list' %}" href="{% url 'lab_list' %}">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                    class="icon icon-tabler icons-tabler-outline icon-tabler-clipboard">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                    <path
-                                                        d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
-                                                    <path
-                                                        d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" />
-                                                </svg>
-                                                {% translate "Labs" %}
-                                            </a>
-                                            <a class="dropdown-item{% is_active 'labinstance_list' %}" href="{% url 'labinstance_list' %}">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                    class="icon icon-tabler icons-tabler-outline icon-tabler-clipboard-data">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                    <path
-                                                        d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
-                                                    <path
-                                                        d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" />
-                                                    <path d="M9 17v-4" />
-                                                    <path d="M12 17v-1" />
-                                                    <path d="M15 17v-2" />
-                                                    <path d="M12 17v-1" />
-                                                </svg>
-                                                {% translate "Running labs" %}
-                                            </a>
-                                            <a class="dropdown-item" href="./layout-combo.html">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                    class="icon icon-tabler icons-tabler-outline icon-tabler-layers-intersect">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                                    <path
-                                                        d="M8 4m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z">
-                                                    </path>
-                                                    <path
-                                                        d="M4 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z">
-                                                    </path>
-                                                </svg>
-                                                {% translate "Nodes" %}
-                                            </a>
-                                            <a class="dropdown-item" href="./layout-condensed.html">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                    class="icon icon-tabler icons-tabler-outline icon-tabler-cloud-network">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                                    <path d="M3 20h7"></path>
-                                                    <path d="M14 20h7"></path>
-                                                    <path d="M10 20a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
-                                                    <path d="M12 16v2"></path>
-                                                    <path
-                                                        d="M8 16.004h-1.343c-2.572 -.004 -4.657 -2.011 -4.657 -4.487c0 -2.475 2.085 -4.482 4.657 -4.482c.393 -1.762 1.794 -3.2 3.675 -3.773c1.88 -.572 3.956 -.193 5.444 1c1.488 1.19 2.162 3.007 1.77 4.769h.99c1.913 0 3.464 1.56 3.464 3.486c0 1.927 -1.551 3.487 -3.465 3.487h-2.535">
-                                                    </path>
-                                                </svg>
-                                                {% translate "Gateways" %}
-                                            </a>
-                                            <a class="dropdown-item" href="./layout-fluid.html">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                    class="icon icon-tabler icons-tabler-outline icon-tabler-timeline-event">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                                    <path d="M12 20m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
-                                                    <path d="M10 20h-6"></path>
-                                                    <path d="M14 20h6"></path>
-                                                    <path
-                                                        d="M12 15l-2 -2h-3a1 1 0 0 1 -1 -1v-8a1 1 0 0 1 1 -1h10a1 1 0 0 1 1 1v8a1 1 0 0 1 -1 1h-3l-2 2z">
-                                                    </path>
-                                                </svg>
-                                                {% translate "Links" %}
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#navbar-help" data-bs-toggle="dropdown"
-                                    data-bs-auto-close="outside" role="button" aria-expanded="false">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round" class="icon icon-1">
-                                            <path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"></path>
-                                            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
-                                            <path d="M15 15l3.35 3.35"></path>
-                                            <path d="M9 15l-3.35 3.35"></path>
-                                            <path d="M5.65 5.65l3.35 3.35"></path>
-                                            <path d="M18.35 5.65l-3.35 3.35"></path>
-                                        </svg></span>
-                                    <span class="nav-link-title"> {% translate "Help" %} </span>
-                                </a>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="./changelog.html">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="icon icon-tabler icons-tabler-outline icon-tabler-align-box-left-top">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                            <path
-                                                d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z">
-                                            </path>
-                                            <path d="M9 13h-2"></path>
-                                            <path d="M13 10h-6"></path>
-                                            <path d="M11 7h-4"></path>
-                                        </svg>
-                                        {% translate "Changelog" %}
-                                    </a>
-                                    <a class="dropdown-item" href="https://github.com/dainok/unetlab/" target="_blank"
-                                        rel="noopener">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="icon icon-tabler icons-tabler-outline icon-tabler-contract">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path d="M8 21h-2a3 3 0 0 1 -3 -3v-1h5.5" />
-                                            <path d="M17 8.5v-3.5a2 2 0 1 1 2 2h-2" />
-                                            <path d="M19 3h-11a3 3 0 0 0 -3 3v11" />
-                                            <path d="M9 7h4" />
-                                            <path d="M9 11h4" />
-                                            <path d="M18.42 12.61a2.1 2.1 0 0 1 2.97 2.97l-6.39 6.42h-3v-3z" />
-                                        </svg>
-                                        {% translate "Contribute" %}
-                                    </a>
-                                    <a class="dropdown-item" href="https://www.patreon.com/posts/unetlab-v3-108477005"
-                                        target="_blank" rel="noopener">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round" class="icon icon-1">
-                                            <path d="M5 12l-2 0l9 -9l9 9l-2 0"></path>
-                                            <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"></path>
-                                            <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"></path>
-                                        </svg>
-                                        {% translate "Documentation" %}
-                                    </a>
-                                    <a class="dropdown-item" href="https://www.patreon.com/posts/unetlab-v3-108477005"
-                                        target="_blank" rel="noopener">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="icon icon-tabler icons-tabler-outline icon-tabler-message">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path d="M8 9h8" />
-                                            <path d="M8 13h6" />
-                                            <path
-                                                d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12z" />
-                                        </svg>
-                                        {% translate "Feedback" %}
-                                    </a>
-                                    <a class="dropdown-item" href="https://github.com/dainok/unetlab/" target="_blank"
-                                        rel="noopener">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round" class="icon icon-2">
-                                            <path
-                                                d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5">
-                                            </path>
-                                        </svg>
-                                        {% translate "Source code" %}
-                                    </a>
-                                    <a class="dropdown-item text-pink"
-                                        href="https://www.patreon.com/c/adainese/membership" target="_blank"
-                                        rel="noopener">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="icon icon-inline me-1 icon-2">
-                                            <path
-                                                d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572">
-                                            </path>
-                                        </svg>
-                                        {% translate "Sponsor" %}
-                                    </a>
-                                </div>
-                            </li>
+                            {% endif %}
+                            {% endfor %}
                         </ul>
                         <!-- END NAVBAR MENU -->
                     </div>

@@ -1,4 +1,5 @@
 {% extends "ui/base.html" %}
+{% load i18n static %}
 {% block title %}UNetLab | {{ object.name }} > Detail{% endblock title %}
 {% block page_title %}{{ object.name }} > Detail{% endblock page_title %}
 {% block page_body %}
@@ -48,9 +49,9 @@
                 <div class="card-footer">
                     <div class="text-end">
                         {% if request.GET.back %}
-                        <a href="{% url request.GET.back %}" class="btn"> {% trans "Cancel" %} </a>
+                        <a href="{% url request.GET.back %}" class="btn"> {% translate "Cancel" %} </a>
                         {% endif %}
-                        <button type="submit" class="btn btn-primary ms-auto"> {% if object %}{% trans "Update" %}{% else %}{% trans "Create" %}{% endif %} </button>
+                        <button type="submit" class="btn btn-primary ms-auto"> {% if object %}{% translate "Update" %}{% else %}{% translate "Create" %}{% endif %} </button>
                     </div>
                 </div>
             </div>
