@@ -1,7 +1,7 @@
 {% load i18n static %}
 {% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
 <!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE|default:'en-us' }}" dir="{{ LANGUAGE_BIDI|yesno:'rtl,ltr,auto' }}">
+<html lang="{{ LANGUAGE_CODE|default:'en-us' }}" dir="{{ LANGUAGE_BIDI|yesno:'rtl,ltr,auto' }}" data-bs-theme="light">
 
 <head>
     <link rel="author" href="https://www.adainese.it" />
@@ -18,7 +18,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
     <!-- CSS files -->
     <link href="{% static 'tabler/css/tabler.min.css' %}" rel="stylesheet" />
-    <link href="{% static 'ui/css/main.css' %}" rel="stylesheet" />
+    <link href="{% static 'ui/css/ui.css' %}" rel="stylesheet" />
 </head>
 
 <body class="{% block bodyclass %}{% endblock bodyclass %}">
@@ -68,42 +68,7 @@
     <!-- JavaScript files -->
     <script src="{% static 'tabler/js/tabler.min.js' %}" defer></script>
     <script src="{% static 'alpinejs/js/alpinejs.min.js' %}" defer></script>
-    <script>
-        /**
-        * This script enables closing Bootstrap dropdowns by clicking on a close button inside them.
-        * It supports multiple dropdowns on the same page and ensures that only the correct dropdown is closed.
-        *
-        * Usage requirements:
-        * - Each dropdown toggle must have the attribute: data-bs-toggle="dropdown"
-        * - Each close button must have the attribute: data-bs-dismiss="dropdown"
-        * - The close button must be inside a .dropdown container
-        */
-
-        document.addEventListener("DOMContentLoaded", function () {
-            // Select all close buttons that should dismiss a dropdown
-            const closeButtons = document.querySelectorAll('.btn[data-bs-dismiss="dropdown"]');
-
-            closeButtons.forEach(closeBtn => {
-                closeBtn.addEventListener("click", function () {
-                    // Find the nearest parent dropdown container
-                    const dropdown = closeBtn.closest(".dropdown");
-
-                    if (!dropdown) return; // Exit if no dropdown parent is found
-
-                    // Find the toggle element that controls this dropdown (usually an <a> with data-bs-toggle)
-                    const toggle = dropdown.querySelector('[data-bs-toggle="dropdown"]');
-
-                    if (!toggle) return; // Exit if toggle is not found
-
-                    // Get the Bootstrap Dropdown instance or create one if it doesn't exist
-                    const dropdownInstance = bootstrap.Dropdown.getOrCreateInstance(toggle);
-
-                    // Programmatically hide the dropdown
-                    dropdownInstance.hide();
-                });
-            });
-        });
-    </script>
+    <script src="{% static 'ui/js/ui.js' %}" defer></script>
 </body>
 
 </html>
