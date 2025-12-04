@@ -63,4 +63,3 @@ function toggleTheme() {
         document.documentElement.setAttribute("data-bs-theme", saved);
     }
 })();
-
