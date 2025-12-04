@@ -22,16 +22,9 @@
 </head>
 
 <body class="{% block bodyclass %}{% endblock bodyclass %}">
-    <!-- VIEW: {{ request.resolver_match.view_name }} -->
+    <!-- URL VIEW: {{ request.resolver_match.view_name }} -->
     <!-- Banner -->
     {% block banner %}
-    {% if messages %}
-    <ul>
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
     {% endblock banner %}
     {% block navbar %}
     <!-- Navbar -->
@@ -61,6 +54,10 @@
                 </div>
             </div>
             {% endblock body %}
+            <!-- Messages -->
+            {% block messages %}
+            {% include "ui/partials/messages.html" %}
+            {% endblock messages %}
             <!-- Footer -->
             {% block footer %}
             {% include "ui/partials/footer.html" %}
