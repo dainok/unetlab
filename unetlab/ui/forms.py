@@ -13,7 +13,7 @@ from ui.include.forms import ObjectModelForm
 
 
 class GroupForm(ObjectModelForm):
-    """Form for the Django Group model."""
+    """Form for the Group model."""
 
     users = forms.ModelMultipleChoiceField(
         queryset=User.objects.all(), required=False, widget=forms.SelectMultiple
@@ -47,7 +47,7 @@ class GroupForm(ObjectModelForm):
 
 
 class UserForm(ObjectModelForm):
-    """Form for the Django User model."""
+    """Form for the User model."""
 
     groups = forms.ModelMultipleChoiceField(
         queryset=Group.objects.all(), required=False, widget=forms.SelectMultiple

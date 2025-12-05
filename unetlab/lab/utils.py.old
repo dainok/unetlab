@@ -248,7 +248,7 @@ class LabLld:
     ):
         if not template:
             raise ValueError("Template is mandatory")
-        
+
         # Nodes
         group_node_ids = []
         for i in range(count):
@@ -284,7 +284,7 @@ class LabLld:
     ):
         if not template:
             raise ValueError("Template is mandatory")
-        
+
         # Hubs
         group_hub_ids = []
         for i in range(hubs):
@@ -340,7 +340,7 @@ class LabLld:
     ):
         if not template:
             raise ValueError("Template is mandatory")
-        
+
         # Nodes
         group_node_ids = []
         for i in range(count):
@@ -376,7 +376,7 @@ class LabLld:
     ):
         if not template:
             raise ValueError("Template is mandatory")
-        
+
         # Nodes
         group_node_ids = []
         for i in range(count):

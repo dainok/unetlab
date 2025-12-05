@@ -1,14 +1,10 @@
-"""
-Forms for managing Django Group, User, and Token models.
-
-This module provides reusable forms for CRUD operations on
-auth-related models.
-"""
+"""Forms definitions for Lab app."""
 
 import yaml
 from django import forms
 from django.contrib.auth.models import Group
-from lab.models import Lab, LabInstance
+from django.utils.translation import gettext_lazy as _
+from lab.models import Lab
 from ui.include.forms import ObjectModelForm
 
 
@@ -18,14 +14,19 @@ from ui.include.forms import ObjectModelForm
 
 
 class LabForm(ObjectModelForm):
+    """Form for the Lab model."""
+
     hld_yaml = forms.CharField(
         widget=forms.Textarea,
         required=False,
-        label="HLD (YAML)",
-        help_text="Inserisci la configurazione in YAML",
+        label=_("HLD (YAML)"),
+        help_text=_("Insert the configuration in YAML format."),
     )
     shared_group = forms.ModelChoiceField(
-        queryset=Group.objects.all(), required=False, widget=forms.Select
+        queryset=Group.objects.all(),
+        required=False,
+        widget=forms.Select,
+        # label=_("Shared group"), help_text=_("Choose the group with whom you want to share the lab")
     )
 
     class Meta:
@@ -75,9 +76,9 @@ class LabForm(ObjectModelForm):
 #############################################################################
 # Instance
 #############################################################################
-class LabInstanceForm(ObjectModelForm):
+# class LabInstanceForm(ObjectModelForm):
 
-    class Meta:
+#     class Meta:
 
-        model = LabInstance
-        fields = "__all__"
+#         model = LabInstance
+#         fields = "__all__"
