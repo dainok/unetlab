@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 /**
  * Switch between light and dark theme.
- * 
+ *
  * Usage requirements:
  * - Switch A tag must have onclick=toggleTheme()
  */
