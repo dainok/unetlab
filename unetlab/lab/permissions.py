@@ -38,9 +38,9 @@ class LabPermissionPolicy:
         if target and target.id == user.id:
             # Non-admin users can do anything on their own lab
             return True
-        
+
         if not target and method == "POST":
-            requested_group = payload.get("group_id")
+            requested_group = payload.get("shared_group")
             if requested_group and requested_group in user_group_ids:
                 # Non-admin users can only use the Group objects they belong to
                 return True

@@ -52,8 +52,6 @@ class Lab(models.Model):
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
-        verbose_name="sss",
-        help_text="aaaa aaa",
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -18,8 +18,8 @@ class ObjectPermission(BasePermission):
                 return {}
         elif request.content_type.startswith("multipart/form-data"):
             # HTML
-            payload =  {k: v[0] if len(v) == 1 else v for k, v in request.POST.lists()}
-        
+            payload = {k: v[0] if len(v) == 1 else v for k, v in request.POST.lists()}
+
         return payload
 
     def has_permission(self, request, view):
@@ -39,5 +39,5 @@ class ObjectPermission(BasePermission):
         user = request.user
         method = request.method
         payload = self.get_payload(request)
-        
+
         return policy.can(user, method, obj, payload)
