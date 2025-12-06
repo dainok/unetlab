@@ -8,7 +8,7 @@
 class LabPermissionPolicy:
     """Access policy for the Lab model."""
 
-    def can(self, user, method, target=None):
+    def can(self, user, method, target, payload):
         """Defines what the requesting user can do based on target, role and HTTP method."""
 
         # === GUEST RULES ===
@@ -33,21 +33,21 @@ class LabPermissionPolicy:
             # Admin can do everything
             return True
 
-        # === STAFF RULES ===
-        if user.is_staff:
-            if target:
-                if target.id == user.id:
-                    # Staff users can do anything on their own profile
-                    return True
-                if target.is_superuser or target.is_staff:
-                    # Staff users cannot modify/delete other staffs/admins
-                    return method in ("GET", "HEAD", "OPTIONS")
-            return True
-
-        # === STANDARD USER RULES ===
+        # === STAFF/USER RULES ===
+        user_group_ids = list(user.groups.all().values_list("id", flat=True))
         if target and target.id == user.id:
-            # Standard users can do anything on their own profile
+            # Non-admin users can do anything on their own lab
             return True
+        
+        if not target and method == "POST":
+            requested_group = payload.get("group_id")
+            if requested_group and requested_group in user_group_ids:
+                # Non-admin users can only use the Group objects they belong to
+                return True
+            elif not requested_group:
+                # Non-admin users can create private labs
+                return True
+            return False
 
-        # Standard users can only read other staffs/admins/users
+        # Standard users can only read other labs
         return method in ("GET")
