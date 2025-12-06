@@ -2,8 +2,6 @@
 
 from rest_framework import serializers
 from lab.models import Lab
-from ui.serializers import GroupSerializer
-
 # from node.serializers import NodeSerializer
 
 
