@@ -15,7 +15,7 @@ Return values of the can method:
 class ConstancePermissionPolicy:
     """Access policy for the Constance model."""
 
-    def can(self, user, method):
+    def can(self, user, method, target, payload):
         """Defines what the requesting user can do based on role and HTTP method."""
 
         # === GUEST RULES ===
@@ -39,7 +39,7 @@ class ConstancePermissionPolicy:
 class GroupPermissionPolicy:
     """Access policy for the Group model."""
 
-    def can(self, user, method, target=None):
+    def can(self, user, method, target, payload):
         """Defines what the requesting user can do based on target, role and HTTP method."""
 
         # === GUEST RULES ===
@@ -76,7 +76,7 @@ class GroupPermissionPolicy:
 class UserPermissionPolicy:
     """Access policy for the User model."""
 
-    def can(self, user, method, target=None):
+    def can(self, user, method, target, payload):
         """Defines what the requesting user can do based on target, role and HTTP method."""
 
         # === GUEST RULES ===
@@ -135,7 +135,7 @@ class UserPermissionPolicy:
 class TokenPermissionPolicy:
     """UI and DRF (API) permisson policy for Token objects."""
 
-    def can(self, user, method, target=None):
+    def can(self, user, method, target, payload):
         """Defines what the requesting user can do based on target, role and HTTP method."""
 
         # === GUEST RULES ===
@@ -175,7 +175,7 @@ class TokenPermissionPolicy:
 class HomePermissionPolicy:
     """UI permisson policy for Home."""
 
-    def can(self, user, method):
+    def can(self, user, method, target, payload):
         """Defines what the requesting user can do based on target, role and HTTP method."""
 
         # === GUEST RULES ===
