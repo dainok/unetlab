@@ -1,0 +1,30 @@
+groups:
+  - template: vyos-vyos
+    prefix: Site1R
+    count: 4
+    topology: full-mesh
+  - template: vyos-vyos
+    prefix: Site2R
+    count: 4
+    topology: full-mesh
+  - topology: defined
+    links:
+      - Site1R1, Site2R1
+      - Site1R2, Site2R2
+    link_type: l1
+interfaces:
+  - match: Site1*:Loopback
+    address: 192.168.1.0/24
+    mask: 32
+    features:
+      - ospf:area=0
+  - match: Site1*:Loopback
+    address: 192.168.2.0/24
+    mask: 32
+    features:
+      - ospf:area=0
+  - match: Ethernet
+    address: 10.0.0.0/8
+    mask: auto
+    features:
+      - ospf:area=0

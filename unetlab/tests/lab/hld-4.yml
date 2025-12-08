@@ -1,19 +1,19 @@
 groups:
-  - template: local-vyos-vyos
+  - template: vyos-vyos
     prefix: R
     count: 4
     topology: full-mesh
     link_type: l1
     features:
       - loopback:name=Loopback0
-  - template: local-vyos-vyos
+  - template: vyos-vyos
     prefix: R
     count: 4
     topology: full-mesh
     link_type: l1
     features:
       - loopback:name=Loopback0
-  - template: local-vyos-vyos
+  - template: vyos-vyos
     prefix: R
     count: 8
     topology: hub-spoke
@@ -22,23 +22,23 @@ groups:
     link_type: l1
     features:
       - loopback:name=Loopback0
-  - template: local-vyos-vyos
+  - template: vyos-vyos
     prefix: R
     count: 6
     topology: ring
     link_type: l1
     features:
       - loopback:name=Loopback0
-  - template: local-vyos-vyos
+  - template: vyos-vyos
     prefix: R
     count: 4
     topology: linear
     link_type: l1
     features:
       - loopback:name=Loopback0
-  - template: local-vyos-vyos
+  - template: vyos-vyos
     prefix: R
-    topology: custom
+    topology: defined
     link_type: l1
     links:
       - R30, R31, R32, R33
@@ -46,9 +46,9 @@ groups:
       - R32, R33
       - R32, R11
       - R33, R10
-  - template: local-vyos-vyos
+  - template: vyos-vyos
     prefix: R
-    topology: custom
+    topology: defined
     link_type: l2
     links:
       - R1, R12

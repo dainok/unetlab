@@ -2,15 +2,17 @@ groups:
   - template: vyos-vyos
     prefix: R
     count: 4
+    topology: defined
+    links:
+      - R1, R2, R3
+      - R1, R4
+      - R3, R4
+    link_type: l1
     features:
       - loopback:name=Loopback0
-topologies:
-  - type: full-mesh
-    match:
-      - R
 interfaces:
   - match: Loopback0
-    address: 192.168.0.1/16
+    address: 192.168.0.0/16
     mask: 32
     features:
       - ospf:area=0

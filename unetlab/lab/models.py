@@ -78,50 +78,50 @@ class Lab(models.Model):
 #############################################################################
 
 
-class LabInstance(models.Model):
-    """
-    Model for lab instance.
-    """
+# class LabInstance(models.Model):
+#     """
+#     Model for lab instance.
+#     """
 
-    lab = models.ForeignKey(
-        Lab,
-        on_delete=models.CASCADE,
-        related_name="instances",
-        editable=False,
-    )
-    instance_id = models.PositiveIntegerField(editable=False)
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="instances", editable=False
-    )
-    shared_groups = models.ManyToManyField(Group, related_name="instances", blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+#     lab = models.ForeignKey(
+#         Lab,
+#         on_delete=models.CASCADE,
+#         related_name="instances",
+#         editable=False,
+#     )
+#     instance_id = models.PositiveIntegerField(editable=False)
+#     user = models.ForeignKey(
+#         User, on_delete=models.CASCADE, related_name="instances", editable=False
+#     )
+#     shared_groups = models.ManyToManyField(Group, related_name="instances", blank=True)
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        """Database metadata."""
+#     class Meta:
+#         """Database metadata."""
 
-        db_table = "instances"
-        ordering = ["-updated_at"]
-        unique_together = ["instance_id", "lab", "user"]
-        verbose_name = _("Instance")
-        verbose_name_plural = _("Instances")
+#         db_table = "instances"
+#         ordering = ["-updated_at"]
+#         unique_together = ["instance_id", "lab", "user"]
+#         verbose_name = _("Instance")
+#         verbose_name_plural = _("Instances")
 
-    def __str__(self):
-        """Return a human readable name when the object is printed."""
-        return f"{self.lab.name} ({self.instance_id})"
+#     def __str__(self):
+#         """Return a human readable name when the object is printed."""
+#         return f"{self.lab.name} ({self.instance_id})"
 
-    def get_absolute_url(self):
-        """Return the absolute url."""
-        return reverse("instance-detail-view", args=[str(self.pk)])
+#     def get_absolute_url(self):
+#         """Return the absolute url."""
+#         return reverse("instance-detail-view", args=[str(self.pk)])
 
-    def save(self, *args, **kwargs):
-        if not self.pk:
-            # New object
-            with transaction.atomic():
-                # Get highest instance ID for the same lab
-                last_instance_id = LabInstance.objects.filter(
-                    user=self.user, lab=self.lab
-                ).aggregate(models.Max("instance_id"))["instance_id__max"]
-                # Generate a new isntance ID for the same lab
-                self.instance_id = (last_instance_id or 0) + 1
-        super().save(*args, **kwargs)
+#     def save(self, *args, **kwargs):
+#         if not self.pk:
+#             # New object
+#             with transaction.atomic():
+#                 # Get highest instance ID for the same lab
+#                 last_instance_id = LabInstance.objects.filter(
+#                     user=self.user, lab=self.lab
+#                 ).aggregate(models.Max("instance_id"))["instance_id__max"]
+#                 # Generate a new isntance ID for the same lab
+#                 self.instance_id = (last_instance_id or 0) + 1
+#         super().save(*args, **kwargs)
