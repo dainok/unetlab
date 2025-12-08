@@ -4,6 +4,7 @@ from django.db import models, transaction
 from django.contrib.auth.models import User, Group
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
+from lab.validators import HLDValidator
 from ui.include.validators import (
     AlphanumericPhraseValidator,
     YAMLValidator,
@@ -31,7 +32,7 @@ class Lab(models.Model):
     hld = models.JSONField(
         verbose_name=_("HLD"),
         help_text=_("High Level Description"),
-        validators=[YAMLValidator],
+        validators=[YAMLValidator, HLDValidator],
         default=dict,
         blank=True,
     )
