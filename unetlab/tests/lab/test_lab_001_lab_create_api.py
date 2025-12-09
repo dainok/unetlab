@@ -38,6 +38,9 @@ def test_lab_lab_create_api_user(api_client, user_set_group1, role):
         len(Lab.objects.filter(name=payload["name"])) == 1
     ), "Lab has not been created"
     assert (
+        Lab.objects.get(name=payload["name"]).user.id == user.id
+    ), "Lab has a wrong user ID"
+    assert (
         Lab.objects.get(name=payload["name"]).shared_group.id == payload["shared_group"]
     ), "Lab has a wrong group ID"
 
