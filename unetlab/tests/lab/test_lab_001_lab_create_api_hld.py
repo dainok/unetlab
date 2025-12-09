@@ -1,10 +1,9 @@
 """Test DRF (API) lab creation."""
 
-import yaml
-import json
 import pytest
 from pathlib import Path
 from lab.models import Lab
+from django.template.defaultfilters import slugify
 from django.urls import reverse
 from rest_framework.authtoken.models import Token
 
@@ -26,11 +25,12 @@ def test_lab_lab_create_api_hld(api_client, user_set_group1):
 
         # Create the lab
         payload = {
-            "name": "Lab from",
+            "name": f"Lab from {slugify(hld_file)}",
             "hld": hld,
         }
         print(payload)
         response = api_client.post(url, payload, format="json", headers=headers)
+        print(response.text)
         assert response.status_code == 201, f"Failed for lab {hld_file}"
         assert response.data["name"] == payload["name"], "Lab not in the returning payload"
         assert (

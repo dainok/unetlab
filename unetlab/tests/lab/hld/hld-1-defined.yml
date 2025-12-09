@@ -1,7 +1,6 @@
 groups:
   - template: vyos-vyos
     prefix: R
-    count: 4
     topology: defined
     links:
       - R1, R2, R3

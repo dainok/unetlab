@@ -5,14 +5,15 @@ from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.utils.translation import gettext_lazy as _
 
-AlphanumericPhraseValidator = RegexValidator(
-    regex=r"^[a-zA-Z0-9 ]+$",
-    message=_("This field may only contain alphanumeric characters and spaces."),
-)
 
 AlphanumericValidator = RegexValidator(
     regex=r"^[a-zA-Z0-9]+$",
     message=_("This field may only contain alphanumeric characters."),
+)
+
+PhraseValidator = RegexValidator(
+    regex=r"^[a-zA-Z0-9 _\-]+$",
+    message=_("This field may only contain alphanumeric characters, spaces and -_."),
 )
 
 SimplePasswordValidator = RegexValidator(
