@@ -1,5 +1,7 @@
 """Permissions for Lab app."""
 
+from lab.serializers import LabSerializer
+
 #############################################################################
 # Lab
 #############################################################################
@@ -41,6 +43,11 @@ class LabPermissionPolicy:
 
         if not target and method == "POST":
             requested_group = payload.get("shared_group")
+            try:
+                # In pre-form validation, values must be converted
+                requested_group = int(requested_group)
+            except (TypeError, ValueError):
+                pass
             if requested_group and requested_group in user_group_ids:
                 # Non-admin users can only use the Group objects they belong to
                 return True

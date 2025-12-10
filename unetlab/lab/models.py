@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
 from lab.validators import HLDValidator
 from ui.include.validators import (
-    AlphanumericPhraseValidator,
+    PhraseValidator,
     YAMLValidator,
 )
 
@@ -24,7 +24,7 @@ class Lab(models.Model):
     name = models.CharField(
         max_length=255,
         verbose_name=_("Name"),
-        validators=[AlphanumericPhraseValidator],
+        validators=[PhraseValidator],
         help_text=_("Lab name."),
         unique=True,
         db_index=True,

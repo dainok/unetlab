@@ -23,7 +23,7 @@ class ObjectPermission(BasePermission):
         return payload
 
     def has_permission(self, request, view):
-        """List/create permissions, called before accessing the queryset."""
+        """List/create permissions, called before accessing the queryset (DRF only)."""
         policy_class = getattr(view, "policy_class")
         policy = policy_class()
         user = request.user
@@ -33,7 +33,7 @@ class ObjectPermission(BasePermission):
         return policy.can(user, method, None, payload)
 
     def has_object_permission(self, request, view, obj):
-        """Permissions for single-object operations."""
+        """Permissions for single-object operations (DRF only)."""
         policy_class = getattr(view, "policy_class")
         policy = policy_class()
         user = request.user

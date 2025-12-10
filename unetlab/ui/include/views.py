@@ -83,13 +83,14 @@ class ObjectMixin:
         return HttpResponse(_("Generic permission error"), status=500)
 
     def has_permission(self):
-        """Verify view level permissions using normalized HTTP methods."""
+        """Verify view level permissions using normalized HTTP methods (HTML only)."""
         if not self.policy_class:
             # Access granted without policy_class
             return True
 
         policy = self.policy_class()
         user = self.request.user
+        payload = self.request.POST.dict()
 
         # HTTP method normalization
         method = self.request.method.upper()
@@ -127,7 +128,7 @@ class ObjectMixin:
             except Exception:
                 target = None
 
-        return policy.can(user, method, target, None)
+        return policy.can(user, method, target, payload)
 
     def get_context_data(self, **kwargs):
         """Add UI settings to all HTML views."""
