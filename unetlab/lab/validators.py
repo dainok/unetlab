@@ -1,7 +1,6 @@
 """Validators for Lab app."""
 
 import json
-import yaml
 import jsonschema
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -19,14 +18,8 @@ def HLDValidator(value):
     with open(schema_file, "r") as f:
         schema = json.loads(f.read())
 
-    # Convert HLD from YAML to JSON
-    try:
-        hld = yaml.safe_load(value)
-    except yaml.YAMLError:
-        raise ValidationError(_("Must be a valid YAML."))
-
     # Validate HLD (JSON)
     try:
-        jsonschema.validate(instance=hld, schema=schema)
+        jsonschema.validate(instance=value, schema=schema)
     except jsonschema.exceptions.ValidationError:
         raise ValidationError(_("Must be a valid HLD."))

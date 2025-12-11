@@ -32,7 +32,7 @@ class Lab(models.Model):
     hld = models.JSONField(
         verbose_name=_("HLD"),
         help_text=_("High Level Description"),
-        validators=[YAMLValidator, HLDValidator],
+        validators=[HLDValidator],
         default=dict,
         blank=True,
     )
@@ -72,6 +72,11 @@ class Lab(models.Model):
     def get_absolute_url(self):
         """Return the absolute url."""
         return reverse("lab-detail-view", args=[str(self.pk)])
+
+    def save(self, *args, **kwargs):
+        # Force validators
+        self.full_clean()
+        super().save(*args, **kwargs)
 
 
 #############################################################################

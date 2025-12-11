@@ -5,7 +5,6 @@ from pathlib import Path
 from lab.models import Lab
 from django.template.defaultfilters import slugify
 from django.urls import reverse
-from rest_framework.authtoken.models import Token
 
 
 @pytest.mark.django_db
