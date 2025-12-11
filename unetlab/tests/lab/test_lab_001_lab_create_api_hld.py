@@ -1,5 +1,6 @@
 """Test DRF (API) lab creation from HLD."""
 
+import yaml
 import pytest
 from pathlib import Path
 from lab.models import Lab
@@ -21,7 +22,7 @@ def test_lab_lab_create_api_hld(api_client, user_set_group1):
     hld_files = sorted(hld_dir.glob("hld-*.yml"))
     for hld_file in hld_files:
         with open(hld_file, "r", encoding="utf-8") as fh:
-            hld = fh.read()
+            hld = yaml.safe_load(fh)
 
         # Create the lab
         payload = {
