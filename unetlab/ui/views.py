@@ -127,8 +127,7 @@ class GroupQueryMixin:
     def get_queryset(self) -> query.QuerySet:
         """Return the queryset of Group objects accessible to the current user."""
         users_prefetch = Prefetch(
-            "user_set",
-            queryset=User.objects.all().order_by("username")
+            "user_set", queryset=User.objects.all().order_by("username")
         )
         user = self.request.user
         if user.is_superuser:
@@ -203,8 +202,7 @@ class UserQueryMixin:
     def get_queryset(self) -> query.QuerySet:
         """Return the queryset of User objects accessible to the current user."""
         groups_prefetch = Prefetch(
-            "groups",
-            queryset=Group.objects.all().order_by("name")
+            "groups", queryset=Group.objects.all().order_by("name")
         )
         # order_by is required to aboid UnorderedObjectListWarning warning
         qs = User.objects.all().order_by("username").prefetch_related(groups_prefetch)

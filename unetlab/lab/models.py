@@ -84,24 +84,25 @@ class Lab(models.Model):
 #############################################################################
 
 
-# class LabInstance(models.Model):
-#     """
-#     Model for lab instance.
-#     """
+class LabInstance(models.Model):
+    """
+    Model for lab instance.
+    """
 
-#     lab = models.ForeignKey(
-#         Lab,
-#         on_delete=models.CASCADE,
-#         related_name="instances",
-#         editable=False,
-#     )
-#     instance_id = models.PositiveIntegerField(editable=False)
-#     user = models.ForeignKey(
-#         User, on_delete=models.CASCADE, related_name="instances", editable=False
-#     )
-#     shared_groups = models.ManyToManyField(Group, related_name="instances", blank=True)
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
+    lab = models.ForeignKey(
+        Lab,
+        on_delete=models.CASCADE,
+        related_name="instances",
+        editable=False,
+    )
+    instance_id = models.PositiveIntegerField(editable=False)
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="instances", editable=False
+    )
+    shared_groups = models.ManyToManyField(Group, related_name="instances", blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
 
 #     class Meta:
 #         """Database metadata."""

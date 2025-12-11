@@ -1,4 +1,5 @@
 {% extends "ui/base.html" %}
+{% load ui_tags %}
 {% block title %}UNetLab | {{ object.name }} > Detail{% endblock title %}
 {% block page_title %}{{ object.name }} > Detail{% endblock page_title %}
 {% block page_body %}
@@ -25,17 +26,30 @@
                 </div>
             </div>
 
-            <h1>Lab {{ object.name }}</h1>
-            <ul>
-                <li>User: {{ object.user }}</li>
-                <li>Shared group: {{ object.shared_group }}</li>
-                <li>Created at: {{ object.created_at }}</li>
-                <li>Updated at: {{ object.updated_at }}</li>
-            </ul>
+            <h1>Lab {{ object.record.name }}</h1>
+                <div class="mb-3 row">
+                    <label class="col-3 col-form-label text-uppercase">{{ object.record|get_object_label:"name" }}</label>
+                    <div class="col">{{ object.record|get_object_value:"name" }}</div>
+                </div>
+                <div class="mb-3 row">
+                    <label class="col-3 col-form-label text-uppercase">{{ object.record|get_object_label:"user" }}</label>
+                    <div class="col">{{ object.record|get_object_value:"user" }}</div>
+                </div>
+                <div class="mb-3 row">
+                    <label class="col-3 col-form-label text-uppercase">{{ object.record|get_object_label:"shared_group" }}</label>
+                    <div class="col">{{ object.record|get_object_value:"shared_group" }}</div>
+                </div>
+                <div class="mb-3 row">
+                    <label class="col-3 col-form-label text-uppercase">{{ object.record|get_object_label:"created_at" }}</label>
+                    <div class="col">{{ object.record|get_object_value:"created_at" }}</div>
+                </div>
+                <div class="mb-3 row">
+                    <label class="col-3 col-form-label text-uppercase">{{ object.record|get_object_label:"updated_at" }}</label>
+                    <div class="col">{{ object.record|get_object_value:"updated_at" }}</div>
+                </div>
 
             <h2>High Level Design:</h2>
             <pre><code class="language-scss">{{ hld_yaml }}</code></pre>
-
 
             <h2>Groups</h2>
             <div class="table-responsive">

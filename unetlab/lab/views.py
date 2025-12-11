@@ -90,7 +90,7 @@ class LabDetailView(LabQueryMixin, ObjectDetailView):
     """HTML view for displaying the details of a Lab."""
 
     exclude = ["id"]
-    sequence = ["name", "created_at", "description"]
+    sequence = ["name", "user", "shared_group", "created_at", "updated_at"]
     template_name = "lab_detail.html"
 
     def get_context_data(self, **kwargs):

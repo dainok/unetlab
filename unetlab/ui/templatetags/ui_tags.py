@@ -36,3 +36,15 @@ def active_view(context, view_name):
         return css_class
 
     return ""
+
+
+@register.filter
+def get_object_label(obj, field):
+    """Return column name from a field name."""
+    return obj._meta.get_field(field).verbose_name
+
+
+@register.filter
+def get_object_value(obj, field):
+    """Return column value from a field name."""
+    return getattr(obj, field)
