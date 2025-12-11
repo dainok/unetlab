@@ -1,10 +1,10 @@
 """Test DRF (API) lab creation."""
 
 import pytest
-from lab.models import Lab
 from django.contrib.auth.models import Group
 from django.urls import reverse
 from rest_framework.authtoken.models import Token
+from lab.models import Lab
 
 
 @pytest.mark.django_db
@@ -60,6 +60,9 @@ def test_lab_lab_create_api_user(api_client, user_set_group1, role):
             len(Lab.objects.filter(name=payload["name"])) == 1
         ), "Lab has not been created"
         assert (
+            Lab.objects.get(name=payload["name"]).user.id == user.id
+        ), "Lab has a wrong user ID"
+        assert (
             Lab.objects.get(name=payload["name"]).shared_group.id
             == payload["shared_group"]
         ), "Lab has a wrong group ID"
@@ -72,7 +75,7 @@ def test_lab_lab_create_api_user(api_client, user_set_group1, role):
 
 @pytest.mark.django_db
 def test_lab_lab_create_api_guest(api_client):
-    """Test DRS (API) get lab creation by guest user."""
+    """Test DRS (API) lab creation by guest user."""
     url = reverse("lab-list")
     payload = {"name": "New Lab"}
     response = api_client.post(url, payload, format="json")
