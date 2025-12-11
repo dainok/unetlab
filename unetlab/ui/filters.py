@@ -1,7 +1,7 @@
 """Filter definitions for UI app."""
 
 from django import forms
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.utils.translation import gettext_lazy as _
 import django_filters
 from rest_framework.authtoken.models import Token
@@ -69,8 +69,21 @@ class UserFilter(SearchFilterSet):
     class Meta:
         """Meta options."""
 
-        fields = ["is_active", "is_superuser", "is_staff"]
+        fields = ["groups", "is_active", "is_superuser", "is_staff"]
         model = User
+
+    def __init__(self, *args, **kwargs):
+        """Populate group filter based on the user role."""
+        super().__init__(*args, **kwargs)
+
+        if self.request:
+            user = self.request.user
+            if user.is_superuser:
+                # Admins can see all groups
+                qs = Group.objects.all().order_by("name")
+            else:
+                qs = user.groups.all().order_by("name")
+            self.filters["groups"].field.queryset = qs
 
 
 #############################################################################

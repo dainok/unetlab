@@ -3,7 +3,7 @@
 from constance import config
 from django.contrib import messages as django_msgs
 from django.contrib.auth.models import Group, User
-from django.db.models import Q, query
+from django.db.models import Q, query, Prefetch
 from django.http import (
     HttpResponse,
     HttpResponsePermanentRedirect,
@@ -22,6 +22,7 @@ from ui.include.tables import (
     GreenRedBooleanColumn,
     GreenRedReverseBooleanColumn,
     GroupColumn,
+    UserColumn,
 )
 from ui.include.views import (
     APICRUDViewSet,
@@ -125,14 +126,18 @@ class GroupQueryMixin:
 
     def get_queryset(self) -> query.QuerySet:
         """Return the queryset of Group objects accessible to the current user."""
+        users_prefetch = Prefetch(
+            "user_set",
+            queryset=User.objects.all().order_by("username")
+        )
         user = self.request.user
         if user.is_superuser:
             # Admin users can see all Group objects
             # order_by is required to aboid UnorderedObjectListWarning warning
-            return Group.objects.all().order_by("name")
+            return Group.objects.all().order_by("name").prefetch_related(users_prefetch)
         # Non-admin users can only see the Group objects they belong to
         # order_by is required to aboid UnorderedObjectListWarning warning
-        return user.groups.all().order_by("name")
+        return user.groups.all().order_by("name").prefetch_related(users_prefetch)
 
 
 class GroupAPIViewSet(GroupQueryMixin, APICRUDViewSet):
@@ -168,7 +173,10 @@ class GroupDeleteView(GroupQueryMixin, ObjectDeleteView):
 class GroupDetailView(GroupQueryMixin, ObjectDetailView):
     """HTML view for displaying the details of a Group."""
 
+    users = UserColumn()
+
     exclude = ["id"]
+    sequence = ["name", "users"]
 
 
 class GroupListView(GroupQueryMixin, ObjectListView):
@@ -194,8 +202,12 @@ class UserQueryMixin:
 
     def get_queryset(self) -> query.QuerySet:
         """Return the queryset of User objects accessible to the current user."""
+        groups_prefetch = Prefetch(
+            "groups",
+            queryset=Group.objects.all().order_by("name")
+        )
         # order_by is required to aboid UnorderedObjectListWarning warning
-        qs = User.objects.all().order_by("username")
+        qs = User.objects.all().order_by("username").prefetch_related(groups_prefetch)
         user = self.request.user
         if user.is_superuser:
             # Admin users can see all User objects

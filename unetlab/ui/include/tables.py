@@ -72,6 +72,17 @@ class SeverityColumn(tables.TemplateColumn):
         super().__init__(*args, **kwargs)
 
 
+class UserColumn(tables.TemplateColumn):
+    """Represents users assigned to a group."""
+
+    orderable = False
+
+    def __init__(self, *args, **kwargs):
+        """Initialize the column and apply the default template."""
+        kwargs.setdefault("template_name", "ui/tables/column_user.html")
+        super().__init__(*args, **kwargs)
+
+
 class ObjectTable(tables.Table):
     """Generic table for a model object with default attributes and actions."""
 
