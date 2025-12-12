@@ -26,7 +26,6 @@ class Lab(models.Model):
         verbose_name=_("Name"),
         validators=[PhraseValidator],
         help_text=_("Lab name."),
-        unique=True,
         db_index=True,
     )
     hld = models.JSONField(
@@ -62,6 +61,7 @@ class Lab(models.Model):
 
         db_table = "labs"
         ordering = ["name"]
+        unique_together = ["user", "name"]
         verbose_name = _("Lab")
         verbose_name_plural = _("Labs")
 
