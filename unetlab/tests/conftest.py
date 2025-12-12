@@ -1,10 +1,13 @@
 """
-Pytest fixtures for testing Lab via DRF (API) and CBV.
+Pytest fixtures for testing UNetLab via DRF (API) and CBV.
 """
 
-from django.contrib.auth.models import Group, User
-from rest_framework.test import APIClient
+from pathlib import Path
 import pytest
+from django.contrib.auth.models import Group, User
+from django.template.defaultfilters import slugify
+from rest_framework.test import APIClient
+from lab.models import Lab
 
 
 # ==============================================================================
@@ -61,36 +64,78 @@ def create_user(db):
     return make_user
 
 
+@pytest.fixture
+def create_lab(db):
+    """Provide fixture to create users and groups."""
+
+    def make_labs(user):
+        """Create a lab associated to a username."""
+        # Load HLD from file
+        hld_dir = Path(__file__).parent / "hld"
+        hld_files = sorted(hld_dir.glob("hld-*.yml"))
+        for hld_file in hld_files:
+            with open(hld_file, "r", encoding="utf-8") as fh:
+                hld = fh.read()
+
+            # Create the lab
+            Lab.objects.create(
+                name=f"Lab from {slugify(hld_file)} file",
+                user=user,
+                hld=hld,
+            )
+
+            # Create the shared lab
+            groups = user.groups.all()
+            if groups:
+                Lab.objects.create(
+                    name=f"Shared lab from {slugify(hld_file)} file",
+                    user=user,
+                    hld=hld,
+                    shared_group=groups.first(),
+                )
+
+    return make_labs
+
+
 # ==============================================================================
 # Users and Groups
 # ==============================================================================
 
 
 @pytest.fixture
-def user_set_group1(db, create_user):
+def user_set_group1(db, create_user, create_lab):
     """Create admin, staff and standard user within the same group."""
-    return {
+    users = {
         "admin": create_user("admin11", role="admin", groups="group1"),
         "staff": create_user("staff11", role="staff", groups="group1"),
         "user": create_user("user11", groups="group1"),
     }
+    for user in users.values():
+        create_lab(user)
+    return users
 
 
 @pytest.fixture
-def user_set_ungrouped(db, create_user):
+def user_set_ungrouped(db, create_user, create_lab):
     """Create admin, staff and standard user with no group."""
-    return {
+    users = {
         "admin": create_user("admin31", role="admin"),
         "staff": create_user("staff31", role="staff"),
         "user": create_user("user31"),
     }
+    for user in users.values():
+        create_lab(user)
+    return users
 
 
 @pytest.fixture
-def user_set_single(db, create_user):
+def user_set_single(db, create_user, create_lab):
     """Create admin, staff and standard user, each one with a dedicated group."""
-    return {
+    users = {
         "admin": create_user("admin41", role="admin", groups="group4"),
         "staff": create_user("staff51", role="staff", groups="group5"),
         "user": create_user("user61", groups="group6"),
     }
+    for user in users.values():
+        create_lab(user)
+    return users
