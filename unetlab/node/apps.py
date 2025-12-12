@@ -4,7 +4,7 @@ from django.apps import AppConfig
 
 
 class NodeConfig(AppConfig):
-    """Config for Templates management app."""
+    """Application configuration for the Node app."""
 
     name = "node"  # Python path to the app
     verbose_name = "Nodes"  # Human-readable app name

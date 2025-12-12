@@ -4,7 +4,7 @@
 {% block title %}UNetLab | {{ model_name|title }} > Detail{% endblock title %}
 {% block page_title %}{{ model_name|title }} > Detail{% endblock page_title %}
 {% block page_body %}
-<div class="col-lg-12">
+<div class="col-lg-12" data-pk="{{ pk }}">
     <div class="card">
         <div class="card-table">
             {% if attrs.title %}

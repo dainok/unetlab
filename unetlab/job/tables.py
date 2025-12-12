@@ -1,6 +1,6 @@
 import django_tables2 as tables
 from job.models import Log, Job
-from ui.include import messages
+from proxmox import messages
 from ui.include.tables import (
     GreenBooleanColumn,
     SeverityAllColumn,

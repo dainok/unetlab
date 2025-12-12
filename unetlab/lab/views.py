@@ -1,7 +1,11 @@
 """Views for Lab app."""
 
 import yaml
+from django.db import transaction
 from django.db.models import query
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework import status
 from lab.models import Lab
 
 # from lab.utils import LabLld
@@ -60,6 +64,17 @@ class LabAPIViewSet(LabQueryMixin, APICRUDViewSet):
     def perform_create(self, serializer):
         """Set user when creating a new lab."""
         serializer.save(user=self.request.user)
+
+    @action(detail=True, methods=['post'], url_path='build')
+    def build(self, request, pk=None):
+        """Build LLD from HLD."""
+        lab = self.get_object()
+
+        with transaction.atomic():
+            lab.rebuild()
+
+        serializer = self.get_serializer(lab)
+        return Response(serializer.data)
 
 
 class LabBulkDeleteView(LabQueryMixin, ObjectBulkDeleteView):

@@ -6,8 +6,8 @@ from ui.include.tables import (
 
 
 class NodeTemplateTable(ObjectTable):
-    created_at = tables.DateColumn(orderable=True, format="Y-m-d")
-    updated_at = tables.DateColumn(orderable=True, format="Y-m-d H:i")
+    created = tables.DateColumn(orderable=True, format="Y-m-d")
+    updated = tables.DateColumn(orderable=True, format="Y-m-d H:i")
 
     class Meta:
         model = NodeTemplate
@@ -20,8 +20,8 @@ class NodeTemplateTable(ObjectTable):
             "nics",
             "username",
             "password",
-            "created_at",
-            "updated_at",
+            "created",
+            "updated",
         ]
         sequence = ["vendor", "os", "version", "extra", "..."]
         order_by = ["vendor", "os", "version", "extra"]
@@ -44,8 +44,7 @@ class NodeTemplateTable(ObjectTable):
 class NodeTable(ObjectTable):
     class Meta:
         model = NodeTemplate
-        exclude = [
-        ]
+        exclude = []
         # sequence = ["vendor", "os", "version", "extra", "..."]
         # order_by = ["vendor", "os", "version", "extra"]
         # attrs = {

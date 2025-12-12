@@ -91,4 +91,4 @@ class NodeTemplateFilter(SearchFilterSet):
 
     class Meta:
         model = NodeTemplate
-        fields = ["os", "vendor", "version", "extra", "username"]
+        fields = ["vendor", "os", "version", "extra", "username"]

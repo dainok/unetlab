@@ -1,12 +1,12 @@
-import { labCrud } from "./components/labCrud.js";
 import { registerWsStore } from "./stores/wsStore.js";
+import { labCrud } from "./components/labCrud.js";
 
 // Register websocket store
 registerWsStore();
 
 // Wait for Alpine and register components
 document.addEventListener("alpine:init", () => {
-  Alpine.data("labCrud", labCrud);
+    Alpine.data("labCrud", labCrud);
 });
 
 

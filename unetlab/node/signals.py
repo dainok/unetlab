@@ -5,6 +5,7 @@ This module intercepts database events and triggers functions.
 """
 
 from node.models import NodeTemplate
+
 # from repository.models import Repository
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
@@ -31,7 +32,9 @@ def set_name(sender, instance, **kwargs):
         if instance.extra:
             instance.name = f"template-{instance.vendor}-{instance.os}-{instance.version}-{instance.extra}".lower()
         else:
-            instance.name = f"template-{instance.vendor}-{instance.os}-{instance.version}".lower()
+            instance.name = (
+                f"template-{instance.vendor}-{instance.os}-{instance.version}".lower()
+            )
 
         instance.created_at = timezone.now()
         instance.updated_at = instance.created_at

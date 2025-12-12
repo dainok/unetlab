@@ -6,6 +6,12 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib import messages
 
 
+correlation_id
+Tutti i log relativi alla stessa richiesta condividono lo stesso correlation_id.
+fare overload di logging per usare questa struttura dati
+
+
+
 class JobStatusChoices(models.TextChoices):
     """Enumeration for Job status."""
 

@@ -22,6 +22,7 @@ class DiskTemplateSerializer(serializers.Serializer):
 
 class NodeSerializer(serializers.ModelSerializer):
     """Serializer for Node model."""
+
     disks = DiskTemplateSerializer(read_only=True)
     template = NodeTemplateSerializer(read_only=True)
 
