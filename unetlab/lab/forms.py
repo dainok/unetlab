@@ -23,7 +23,7 @@ class LabForm(ObjectModelForm):
         help_text=_("Insert the configuration in YAML format."),
     )
     shared_group = forms.ModelChoiceField(
-        queryset=Group.objects.none(),
+        queryset=Group.objects.all(),
         required=False,
         widget=forms.Select,
         label=_("Shared group"),
@@ -48,9 +48,8 @@ class LabForm(ObjectModelForm):
 
         # Pre-populate groups
         user = kwargs["user"]
-        if user.is_superuser:
-            self.fields["shared_group"].queryset = Group.objects.all()
-        else:
+        if not user.is_superuser:
+            # Limit group visibiliti for non admins
             self.fields["shared_group"].queryset = user.groups.all()
         if self.instance:
             # If lab exists, pre-populate group
