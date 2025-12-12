@@ -52,7 +52,7 @@ class LabForm(ObjectModelForm):
             self.fields["shared_group"].queryset = Group.objects.all()
         else:
             self.fields["shared_group"].queryset = user.groups.all()
-        if self.instance.pk:
+        if self.instance:
             # If lab exists, pre-populate group
             self.fields["shared_group"].initial = self.instance.shared_group
 

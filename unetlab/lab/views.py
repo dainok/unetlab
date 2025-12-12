@@ -2,7 +2,7 @@
 
 import yaml
 from django.db import transaction
-from django.db.models import query
+from django.db.models import query, Q
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
@@ -46,16 +46,14 @@ class LabQueryMixin:
 
     def get_queryset(self) -> query.QuerySet:
         """Return the queryset of Lab objects accessible to the current user."""
+        qs = Lab.objects.all()
         user = self.request.user
         if user.is_superuser:
             # Admin users can see all Lab objects
-            return Lab.objects.all()
-        if user.is_staff:
-            # Staff users can see users who share at least one group
-            groups = user.groups.all()
-            return Lab.objects.filter(user__groups__in=groups).distinct()
-        # Non-admin users can only see their own user
-        return Lab.objects.filter(user=user)
+            return qs
+        # Staff and standard users can see users who share at least one group
+        groups = user.groups.all()
+        return qs.filter(Q(shared_group__in=groups) | Q(user=user)).distinct()
 
 
 class LabAPIViewSet(LabQueryMixin, APICRUDViewSet):

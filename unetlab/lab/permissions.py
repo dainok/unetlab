@@ -41,7 +41,7 @@ class LabPermissionPolicy:
             # Non-admin users can do anything on their own lab
             return True
 
-        if not target and method == "POST":
+        if not target and method == "POST" and payload:
             requested_group = payload.get("shared_group")
             try:
                 # In pre-form validation, values must be converted
