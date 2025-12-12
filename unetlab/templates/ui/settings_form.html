@@ -1,7 +1,7 @@
 {% extends "ui/base.html" %}
 {% load i18n static %}
-{% block title %}UNetLab | {{ object.name }} > Detail{% endblock title %}
-{% block page_title %}{{ object.name }} > Detail{% endblock page_title %}
+{% block title %}UNetLab | {{ object.name|title }} > Detail{% endblock title %}
+{% block page_title %}{{ object.name|title }} > Detail{% endblock page_title %}
 {% block page_body %}
 <div class="col-lg-12">
     <div class="card">

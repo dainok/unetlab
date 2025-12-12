@@ -1,7 +1,7 @@
 {% extends "ui/base.html" %}
 {% load render_table from django_tables2 %}
-{% block title %}UNetLab | {{ table.attrs.title }} > List{% endblock title %}
-{% block page_title %}{{ table.attrs.title }} > List{% endblock page_title %}
+{% block title %}UNetLab | {{ table.attrs.title|title }} > List{% endblock title %}
+{% block page_title %}{{ table.attrs.title|title }} > List{% endblock page_title %}
 {% block page_body %}
 <div class="col-lg-{% if filter.form.visible_fields|length > 0 and filter.form.visible_fields.0.name != 'search' %}9{% else %}12{% endif %}">
     {% render_table table %}

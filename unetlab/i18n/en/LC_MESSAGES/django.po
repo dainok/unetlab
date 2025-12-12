@@ -1,0 +1,622 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-11-30 14:33+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: job/models.py:12
+msgid "Created"
+msgstr ""
+
+#: job/models.py:13
+msgid "Running"
+msgstr ""
+
+#: job/models.py:14
+msgid "Succeeded"
+msgstr ""
+
+#: job/models.py:15
+msgid "Failed"
+msgstr ""
+
+#: job/models.py:16
+msgid "Canceled"
+msgstr ""
+
+#: job/models.py:34
+msgid "App"
+msgstr ""
+
+#: job/models.py:35
+msgid "Host"
+msgstr ""
+
+#: job/models.py:36 node/models.py:305
+msgid "Node"
+msgstr ""
+
+#: job/models.py:37
+msgid "Scheduler"
+msgstr ""
+
+#: job/models.py:38
+msgid "UI"
+msgstr ""
+
+#: job/models.py:48 templates/ui/partials/navbar.html:558
+msgid "Status"
+msgstr ""
+
+#: job/models.py:49
+msgid "Current status of the job."
+msgstr ""
+
+#: job/models.py:55
+msgid "Owner"
+msgstr ""
+
+#: job/models.py:56
+msgid "User who started the job."
+msgstr ""
+
+#: job/models.py:66 job/models.py:91
+msgid "Job"
+msgstr ""
+
+#: job/models.py:67 templates/ui/partials/navbar.html:100
+#: ui/include/messages.py:76
+msgid "Jobs"
+msgstr ""
+
+#: job/models.py:83
+msgid "Acknowledged"
+msgstr ""
+
+#: job/models.py:84
+msgid "True if the log has been acknowledged."
+msgstr ""
+
+#: job/models.py:92
+msgid "Job associated with this log."
+msgstr ""
+
+#: job/models.py:95
+msgid "Message"
+msgstr ""
+
+#: job/models.py:96
+msgid "Log message content."
+msgstr ""
+
+#: job/models.py:101
+msgid "Severity"
+msgstr ""
+
+#: job/models.py:102
+msgid "Severity level of the log."
+msgstr ""
+
+#: job/models.py:108
+msgid "Source"
+msgstr ""
+
+#: job/models.py:109
+msgid "Source of the log."
+msgstr ""
+
+#: job/models.py:116
+msgid "Type"
+msgstr ""
+
+#: job/models.py:117
+msgid "Type/category of the log."
+msgstr ""
+
+#: job/models.py:127
+msgid "Log"
+msgstr ""
+
+#: job/models.py:128 templates/ui/partials/navbar.html:114
+msgid "Logs"
+msgstr ""
+
+#: lab/models.py:24 node/models.py:31 node/models.py:207 node/models.py:249
+msgid "Name"
+msgstr ""
+
+#: lab/models.py:26 node/models.py:33
+msgid "Template name."
+msgstr ""
+
+#: lab/models.py:31
+msgid "HLD"
+msgstr ""
+
+#: lab/models.py:32
+msgid "High Level Description"
+msgstr ""
+
+#: lab/models.py:37
+msgid "LLD"
+msgstr ""
+
+#: lab/models.py:38
+msgid "Low Level Description"
+msgstr ""
+
+#: lab/models.py:57
+msgid "Lab"
+msgstr ""
+
+#: lab/models.py:58 templates/ui/partials/navbar.html:208
+#: ui/include/messages.py:79
+msgid "Labs"
+msgstr ""
+
+#: lab/models.py:99
+msgid "Instance"
+msgstr ""
+
+#: lab/models.py:100
+msgid "Instances"
+msgstr ""
+
+#: node/models.py:37
+msgid "OS"
+msgstr ""
+
+#: node/models.py:38
+msgid "Template Operating System."
+msgstr ""
+
+#: node/models.py:43
+msgid "Vendor"
+msgstr ""
+
+#: node/models.py:44
+msgid "Template vendor."
+msgstr ""
+
+#: node/models.py:49
+msgid "Version"
+msgstr ""
+
+#: node/models.py:50
+msgid "Template version."
+msgstr ""
+
+#: node/models.py:56
+msgid "Extra"
+msgstr ""
+
+#: node/models.py:58
+msgid "Template label."
+msgstr ""
+
+#: node/models.py:63 node/models.py:270
+msgid "CPU"
+msgstr ""
+
+#: node/models.py:64 node/models.py:271
+msgid "Minimum CPU required."
+msgstr ""
+
+#: node/models.py:68 node/models.py:275
+msgid "RAM"
+msgstr ""
+
+#: node/models.py:69 node/models.py:276
+msgid "Minimum GB of RAM required."
+msgstr ""
+
+#: node/models.py:73 node/models.py:280
+msgid "NIC"
+msgstr ""
+
+#: node/models.py:74 node/models.py:281
+msgid "Template default network interfaces."
+msgstr ""
+
+#: node/models.py:78
+msgid "OOB Management interface"
+msgstr ""
+
+#: node/models.py:79
+msgid "True if first interface is used for OOB management."
+msgstr ""
+
+#: node/models.py:83
+msgid "Username"
+msgstr ""
+
+#: node/models.py:84
+msgid "Username to login."
+msgstr ""
+
+#: node/models.py:89 ui/forms.py:57
+msgid "Password"
+msgstr ""
+
+#: node/models.py:90
+msgid "Password to login."
+msgstr ""
+
+#: node/models.py:101 node/models.py:287
+msgid "Template"
+msgstr ""
+
+#: node/models.py:102 templates/ui/partials/navbar.html:145
+#: ui/include/messages.py:94
+msgid "Templates"
+msgstr ""
+
+#: node/models.py:126
+msgid "Checksum"
+msgstr ""
+
+#: node/models.py:127
+msgid "MD5 hash."
+msgstr ""
+
+#: node/models.py:132
+msgid "Order"
+msgstr ""
+
+#: node/models.py:133
+msgid "Disk order, starting from 0."
+msgstr ""
+
+#: node/models.py:148
+msgid "Disk"
+msgstr ""
+
+#: node/models.py:149
+msgid "Disks"
+msgstr ""
+
+#: node/models.py:180
+msgid "Group"
+msgstr ""
+
+#: node/models.py:181 templates/ui/partials/navbar.html:73
+#: ui/include/messages.py:73
+msgid "Groups"
+msgstr ""
+
+#: node/models.py:209
+msgid "Network name."
+msgstr ""
+
+#: node/models.py:222
+msgid "Network"
+msgstr ""
+
+#: node/models.py:223
+msgid "Networks"
+msgstr ""
+
+#: node/models.py:251
+msgid "Node name."
+msgstr ""
+
+#: node/models.py:257
+msgid "Proxmox host"
+msgstr ""
+
+#: node/models.py:258
+msgid "Proxmox host associated with this node."
+msgstr ""
+
+#: node/models.py:263
+msgid "Proxmox node ID"
+msgstr ""
+
+#: node/models.py:264
+msgid "Proxmox node ID associated with this node."
+msgstr ""
+
+#: node/models.py:288
+msgid "Template associated with this node."
+msgstr ""
+
+#: node/models.py:306 templates/ui/partials/navbar.html:240
+msgid "Nodes"
+msgstr ""
+
+#: node/models.py:331
+msgid "Description"
+msgstr ""
+
+#: node/models.py:333
+msgid "Interface description."
+msgstr ""
+
+#: node/models.py:351
+msgid "Interface"
+msgstr ""
+
+#: node/models.py:352
+msgid "Interfaces"
+msgstr ""
+
+#: templates/ui/partials/navbar.html:43
+msgid "Home"
+msgstr ""
+
+#: templates/ui/partials/navbar.html:59
+msgid "System"
+msgstr ""
+
+#: templates/ui/partials/navbar.html:88 ui/include/messages.py:88
+msgid "Hosts"
+msgstr ""
+
+#: templates/ui/partials/navbar.html:126
+msgid "Settings"
+msgstr ""
+
+#: templates/ui/partials/navbar.html:157 ui/include/messages.py:97
+msgid "Tokens"
+msgstr ""
+
+#: templates/ui/partials/navbar.html:168 ui/include/messages.py:100
+msgid "Users"
+msgstr ""
+
+#: templates/ui/partials/navbar.html:192
+msgid "Workspace"
+msgstr ""
+
+#: templates/ui/partials/navbar.html:225 ui/include/messages.py:82
+msgid "Running labs"
+msgstr ""
+
+#: templates/ui/partials/navbar.html:256
+msgid "Gateways"
+msgstr ""
+
+#: templates/ui/partials/navbar.html:271
+msgid "Links"
+msgstr ""
+
+#: templates/ui/partials/navbar.html:291
+msgid "Help"
+msgstr ""
+
+#: templates/ui/partials/navbar.html:307
+msgid "Changelog"
+msgstr ""
+
+#: templates/ui/partials/navbar.html:323
+msgid "Contribute"
+msgstr ""
+
+#: templates/ui/partials/navbar.html:334
+msgid "Documentation"
+msgstr ""
+
+#: templates/ui/partials/navbar.html:348
+msgid "Feedback"
+msgstr ""
+
+#: templates/ui/partials/navbar.html:359
+msgid "Source code"
+msgstr ""
+
+#: templates/ui/partials/navbar.html:372
+msgid "Sponsor"
+msgstr ""
+
+#: templates/ui/partials/navbar.html:552
+msgid "Profile"
+msgstr ""
+
+#: templates/ui/partials/navbar.html:555
+msgid "API Tokens"
+msgstr ""
+
+#: templates/ui/partials/navbar.html:562
+msgid "Logout"
+msgstr ""
+
+#: templates/ui/tables/pagination.html:11
+#: templates/ui/tables/pagination.html:13
+#: templates/ui/tables/pagination.html:15
+#: templates/ui/tables/pagination.html:17
+msgid "records"
+msgstr ""
+
+#: ui/apps.py:11
+msgid "User Interface"
+msgstr ""
+
+#: ui/filters.py:13
+msgid "Yes"
+msgstr ""
+
+#: ui/filters.py:14
+msgid "No"
+msgstr ""
+
+#: ui/filters.py:42 ui/filters.py:88 ui/include/messages.py:124
+msgid "Active users"
+msgstr ""
+
+#: ui/filters.py:48 ui/filters.py:94 ui/include/messages.py:126
+msgid "Staff users"
+msgstr ""
+
+#: ui/filters.py:54 ui/filters.py:100 ui/include/messages.py:125
+msgid "Admin users"
+msgstr ""
+
+#: ui/filters.py:60 ui/include/messages.py:127
+msgid "Last login before"
+msgstr ""
+
+#: ui/filters.py:66 ui/include/messages.py:128
+msgid "Last login after"
+msgstr ""
+
+#: ui/forms.py:63
+msgid "Confirm password"
+msgstr ""
+
+#: ui/include/messages.py:27 ui/tables.py:95
+msgid "Add"
+msgstr ""
+
+#: ui/include/messages.py:28 ui/tables.py:99 ui/tables.py:105
+msgid "Delete"
+msgstr ""
+
+#: ui/include/messages.py:29
+msgid "Edit"
+msgstr ""
+
+#: ui/include/messages.py:30
+msgid "View"
+msgstr ""
+
+#: ui/include/messages.py:48
+msgid "You must be an admin user to access this resource."
+msgstr ""
+
+#: ui/include/messages.py:49
+msgid "You do not have permission to access this object."
+msgstr ""
+
+#: ui/include/messages.py:50
+msgid "You must be a staff or admin user to access this resource."
+msgstr ""
+
+#: ui/include/messages.py:59
+msgid "This field may only contain alphanumeric characters and spaces."
+msgstr ""
+
+#: ui/include/messages.py:61
+msgid "This field may only contain alphanumeric characters."
+msgstr ""
+
+#: ui/include/messages.py:63
+msgid "Only letters, numbers, spaces, and common punctuation are allowed."
+msgstr ""
+
+#: ui/include/messages.py:65
+msgid "Only letters, numbers, dots, and hyphens are allowed."
+msgstr ""
+
+#: ui/include/messages.py:74
+msgid "List of all user groups in the system."
+msgstr ""
+
+#: ui/include/messages.py:77
+msgid "Displays all scheduled and completed jobs."
+msgstr ""
+
+#: ui/include/messages.py:80
+msgid "All available labs."
+msgstr ""
+
+#: ui/include/messages.py:83
+msgid "All available lab instances."
+msgstr ""
+
+#: ui/include/messages.py:85
+msgid "System Logs"
+msgstr ""
+
+#: ui/include/messages.py:86
+msgid "Displays all system logs with relevant details."
+msgstr ""
+
+#: ui/include/messages.py:89
+msgid "List of all Proxmox hosts managed by the system."
+msgstr ""
+
+#: ui/include/messages.py:91
+msgid "Repositories"
+msgstr ""
+
+#: ui/include/messages.py:92
+msgid "All configured repositories and their metadata."
+msgstr ""
+
+#: ui/include/messages.py:95
+msgid "All available templates for virtual machines."
+msgstr ""
+
+#: ui/include/messages.py:98
+msgid "List of all registered API tokens."
+msgstr ""
+
+#: ui/include/messages.py:101
+msgid "List of all registered users."
+msgstr ""
+
+#: ui/include/messages.py:109
+msgid "Job was canceled due to a stale or invalid status."
+msgstr ""
+
+#: ui/include/messages.py:112
+msgid "Proxmox infrastructure rescan completed successfully."
+msgstr ""
+
+#: ui/include/messages.py:114
+msgid "Proxmox infrastructure rescan has been queued."
+msgstr ""
+
+#: ui/include/messages.py:115
+msgid "Proxmox infrastructure rescan has started."
+msgstr ""
+
+#: ui/include/messages.py:116
+msgid "Failed to execute the request on the Proxmox API."
+msgstr ""
+
+#: ui/include/messages.py:136
+#, fuzzy
+#| msgid "value_error"
+msgid "Value error"
+msgstr "Value error"
+
+#: ui/include/messages.py:137 ui/views.py:107
+msgid "Configuration updated."
+msgstr ""
+
+#: ui/include/views.py:83 ui/include/views.py:362
+msgid "Generic permission error"
+msgstr ""
+
+#: ui/include/views.py:117
+#, python-format
+msgid "You do not have permission to edit %(obj)s"
+msgstr ""
+
+#: ui/tables.py:50
+msgid "Staff"
+msgstr ""
+
+#: ui/tables.py:51
+msgid "Admin"
+msgstr ""
+
+#: ui/views.py:103
+#, python-format
+msgid "Value error (%(key)s) ."
+msgstr ""

@@ -23,10 +23,10 @@ class LabForm(ObjectModelForm):
         help_text=_("Insert the configuration in YAML format."),
     )
     shared_group = forms.ModelChoiceField(
-        queryset=Group.objects.all(),
+        queryset=Group.objects.none(),
         required=False,
         widget=forms.Select,
-        # label=_("Shared group"), help_text=_("Choose the group with whom you want to share the lab")
+        label=_("Shared group"), help_text=_("Choose the group with whom you want to share the lab")
     )
 
     class Meta:
@@ -36,22 +36,23 @@ class LabForm(ObjectModelForm):
         fields = "__all__"
 
     def __init__(self, *args, **kwargs):
-        """
-        Initialize the form and pre-fill the 'groups' field for existing users.
-        """
+        """Initialize the form and pre-fill the groups field."""
         super().__init__(*args, **kwargs)
 
-        # Mostra il contenuto JSON come YAML
+        # Show HLD into YAML format
         if self.instance and self.instance.hld:
             self.fields["hld_yaml"].initial = yaml.safe_dump(
                 self.instance.hld, sort_keys=False
             )
 
+        # Pre-populate groups
         user = kwargs["user"]
-        # Pre-populate groups if user exists
-        self.fields["shared_group"].queryset = user.groups.all()
+        if user.is_superuser:
+            self.fields["shared_group"].queryset = Group.objects.all()
+        else:
+            self.fields["shared_group"].queryset = user.groups.all()
         if self.instance.pk:
-            # se sto modificando, pre-popoliamo i gruppi già associati al Lab
+            # If lab exists, pre-populate group
             self.fields["shared_group"].initial = self.instance.shared_group
 
     def clean_hld_yaml(self):

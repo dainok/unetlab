@@ -24,7 +24,7 @@ export function labCrud() {
         lab_id: parseInt(pk, 10),
       }
       const response = await api.post("/instance/", payload);
-      window.location.href = `/instance/${response.data.id}/`; 
+      window.location.href = `/instance/${response.data.id}/`;
     },
     async build() {
       const pk = this.$el.closest('[data-pk]').dataset.pk;

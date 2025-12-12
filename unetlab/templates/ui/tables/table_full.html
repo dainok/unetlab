@@ -6,8 +6,8 @@
             <div class="row w-full">
                 {% if table.attrs.title %}
                 <div class="col">
-                    <h3 class="card-title mb-0">{{ table.attrs.title }}</h3>
-                    <p class="text-secondary m-0">{{ table.attrs.description }}</p>
+                    <h3 class="card-title mb-0">{{ table.attrs.title|title }}</h3>
+                    <p class="text-secondary m-0">{{ table.attrs.description|title }}</p>
                 </div>
                 {% endif %}
                 <div class="col-md-auto col-sm-12">
