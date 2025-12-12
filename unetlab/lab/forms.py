@@ -26,7 +26,8 @@ class LabForm(ObjectModelForm):
         queryset=Group.objects.none(),
         required=False,
         widget=forms.Select,
-        label=_("Shared group"), help_text=_("Choose the group with whom you want to share the lab")
+        label=_("Shared group"),
+        help_text=_("Choose the group with whom you want to share the lab"),
     )
 
     class Meta:

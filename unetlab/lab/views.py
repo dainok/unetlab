@@ -65,7 +65,7 @@ class LabAPIViewSet(LabQueryMixin, APICRUDViewSet):
         """Set user when creating a new lab."""
         serializer.save(user=self.request.user)
 
-    @action(detail=True, methods=['post'], url_path='build')
+    @action(detail=True, methods=["post"], url_path="build")
     def build(self, request, pk=None):
         """Build LLD from HLD."""
         lab = self.get_object()

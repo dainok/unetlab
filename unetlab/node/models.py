@@ -4,12 +4,14 @@
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+
 # from lab.models import LabInstance
 from ui.include.validators import (
     AlphanumericValidator,
     SimplePasswordValidator,
     VersionValidator,
 )
+
 # from proxmox.models import ProxmoxHost
 
 
