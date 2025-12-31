@@ -1,0 +1,8 @@
+# https://github.com/DavidAnson/markdownlint/tree/main/doc
+# MD013 - Line length
+MD013:
+  code_blocks: false
+  strict: true
+  tables: false
+# MD041 - First line in a file should be a top-level heading
+MD041: false

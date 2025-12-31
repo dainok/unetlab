@@ -1,0 +1,26 @@
+extends: default  # Inherit default yamllint rules
+ignore: |  # Exclude these paths from linting
+  __pycache__
+  .git
+  .venv
+  build
+  dist
+  env
+  migrations
+  venv
+rules:
+  # Enforce consistent spacing inside braces (e.g., { key: value })
+  braces:
+    max-spaces-inside: 1
+    level: error
+  # Enforce consistent spacing inside brackets (e.g., [1, 2, 3])
+  brackets:
+    max-spaces-inside: 1
+    level: error
+  # Require at least 2 spaces between comment character and text
+  comments:
+    min-spaces-from-content: 2
+  # Disable the line-length check (you likely use Black or another tool for this)
+  line-length: disable
+  # Disable the requirement for "---" at the start of YAML documents
+  document-start: disable

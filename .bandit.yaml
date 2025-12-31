@@ -1,0 +1,11 @@
+skips: []
+exclude_dirs:
+  - "__pycache__"
+  - ".git"
+  - ".venv"
+  - "build"
+  - "dist"
+  - "env"
+  - "migrations"
+  - "tests"
+  - "venv"
