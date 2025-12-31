@@ -1,20 +1,8 @@
 [flake8]
+exclude = __pycache__|.git|.venv|build|dist|env|migrations|venv
+# Ignore C901: Function is too complex
 # Ignore E501: Line too long (82 > 79 characters)
 # Ignore W503: Line break occurred before a binary operator
-# Ignore C901: Function is too complex
-ignore = E501, W503, C901
-
-# Exclude common virtual environment folders and Django migration files
-exclude =
-    .venv,
-    venv,
-    env,
-    */migrations/*,
-    __pycache__,
-    .git,
-    .tox,
-    .eggs,
-    *.egg-info
-
+ignore = C901, E501, W503
 max-complexity = 10
 max-line-length = 120

@@ -1,4 +1,3 @@
-# yamlfmt configuration
 formatter:
   type: basic                     # Use the basic formatter type
   include_document_start: false   # Do not insert '---' at the beginning of files

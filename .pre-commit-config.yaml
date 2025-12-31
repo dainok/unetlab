@@ -1,64 +1,80 @@
+exclude: __pycache__|.git|.venv|build|dist|env|migrations|venv
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
-      - id: trailing-whitespace
-        exclude: \.raw|migrations|docker|venv|ntc_templates
-      - id: end-of-file-fixer
-        exclude: \.raw|migrations|docker|venv|ntc_templates
-      - id: check-yaml
-        exclude: \.raw|migrations|docker|venv|ntc_templates
       - id: check-added-large-files
-        exclude: \.raw|migrations|docker|venv|ntc_templates
+      - id: check-case-conflict
       - id: check-json
-        exclude: \.raw|migrations|docker|venv|ntc_templates
-      - id: sort-simple-yaml
-        exclude: \.raw|migrations|docker|venv|library|ntc_templates
-        files: \.yaml$|\.yml$
-  - repo: https://github.com/adrienverge/yamllint
-    rev: v1.37.0
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: fix-byte-order-marker
+      - id: requirements-txt-fixer
+      - id: trailing-whitespace
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.9.2
     hooks:
-      - id: yamllint
-        args: [--format, parsable, --strict]
-        exclude: \.raw|migrations|docker|venv|ntc_templates
-  - repo: https://github.com/google/yamlfmt
-    rev: v0.17.2
+      - id: bandit
+        args: ["-c", ".bandit.yaml"]
+  - repo: https://github.com/psf/black
+    rev: 25.12.0
     hooks:
-      - id: yamlfmt
-        exclude: \.raw|migrations|docker|venv|ntc_templates
+      - id: black
+        args: ["--config=.black.toml"]
+  - repo: https://github.com/Riverside-Healthcare/djLint
+    rev: v1.36.4
+    hooks:
+      - id: djlint-django
+        args: ["--configuration", ".djlintrc"]
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.3.0
+    hooks:
+      - id: flake8
+        args: ["--config", ".flake8"]
   - repo: https://github.com/tillig/json-sort-cli
     rev: v3.0.0
     hooks:
       - id: json-sort
-        exclude: \.raw|migrations|docker|venv|ntc_templates
         args:
           - --autofix
           - --end-of-line=lf
           - --indent-size="    "
           - --indent-style=space
           - --insert-final-newline=true
-  - repo: https://github.com/psf/black
-    rev: 25.1.0
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.47.0
     hooks:
-      - id: black
-        exclude: \.raw|migrations|docker|venv|ntc_templates
-  - repo: https://github.com/PyCQA/bandit
-    rev: 1.8.5
+      - id: markdownlint
+        args: ["--config=.markdownlint.yaml"]
+  - repo: https://github.com/Lucas-C/pre-commit-hooks.git
+    rev: v1.5.5
     hooks:
-      - id: bandit
-        exclude: \.raw|migrations|docker|venv|ntc_templates|tests
-  - repo: https://github.com/PyCQA/flake8
-    rev: 7.3.0
+      - id: forbid-crlf  # Forbid files containing CRLF end-lines to be committed
+      - id: forbid-tabs  # Forbid files containing tabs to be committed
+      - id: remove-crlf  # Replace CRLF end-lines by LF ones before committing
+      - id: remove-tabs  # Replace tabs by whitespaces before committing
+  - repo: https://github.com/PyCQA/pylint
+    rev: v4.0.4
     hooks:
-      - id: flake8
-        exclude: \.raw|migrations|docker|venv|ntc_templates
-  - repo: https://github.com/PyCQA/pydocstyle
-    rev: 6.3.0
+      - id: pylint
+        args: ["--rcfile=.pylintrc"]
+  # - repo: https://github.com/RobertCraigie/pyright-python
+  #   rev: v1.1.407
+  #   hooks:
+  #     - id: pyright
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.10
     hooks:
-      - id: pydocstyle
-        exclude: \.raw|migrations|docker|venv
-  - repo: https://github.com/Riverside-Healthcare/djLint
-    rev: v1.36.4
+      - id: ruff-check  # Run the linter
+        args: [--fix]
+      - id: ruff-format  # Run the formatter
+  - repo: https://github.com/google/yamlfmt
+    rev: v0.20.0
     hooks:
-      - id: djlint-django
-        files: "unetlab/templates"
+      - id: yamlfmt
+        args: [-conf, .yamlfmt]
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.37.1
+    hooks:
+      - id: yamllint
+        args: [--format, parsable, --strict, -c, .yamllint.yaml]
