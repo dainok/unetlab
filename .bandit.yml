@@ -1,6 +1,0 @@
-skips: []
-exclude_dirs:
-  - "./tests/"
-  - "./.venv/"
-assert_used:
-  skips: ["*test_*.py"]

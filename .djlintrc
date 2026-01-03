@@ -1,4 +1,5 @@
 {
   "ignore": "H021",
+  "exclude": "__pycache__,.git,.venv,build,dist,env,migrations,tests,venv",
   "profile": "django"
 }

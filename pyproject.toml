@@ -59,17 +59,19 @@ build-backend = "setuptools.build_meta"
 
 
 [tool.black]
-line-length = 88
-target-version = ['py310']
 exclude = '''
 /(
-  \.venv
+  __pycache__
+  | \.git
+  | \.venv
   | build
   | dist
   | migrations
-  | .*\.raw
+  | venv
 )/
 '''
+skip-string-normalization = true
+target-version = ["py310", "py311", "py312", "py313"]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "unetlab.settings"
@@ -81,9 +83,34 @@ extraPaths = ["./unetlab"]
 include = ["."]
 reportMissingImports = true
 
+[tool.poetry]
+name = "unetlab"
+version = "3.0.0-dev"
+
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.4.1"
 pytest-django = "^4.11.1"
 coverage = "^7.9.2"
 pre-commit = "^4.2.0"
 bs4 = "^0.0.2"
+tomlkit = "^0.13.3"
+
+[tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    "__pycache__",
+    ".git",
+    ".venv",
+    "build",
+    "dist",
+    "env",
+    "migrations",
+    "venv",
+]
+target-version = "py310"
+
+[tool.ruff.format]
+indent-style = "space"            # Indent with spaces
+line-ending = "lf"                # Default line ending on Unix
+quote-style = "single"            # Use single quotes for strings.
+skip-magic-trailing-comma = false # Respect magic trailing commas

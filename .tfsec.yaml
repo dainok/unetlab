@@ -1,0 +1,9 @@
+exclude-paths:
+- __pycache__
+- .git
+- .venv
+- build
+- dist
+- env
+- migrations
+- venv

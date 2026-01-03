@@ -2,6 +2,7 @@
 # MD013 - Line length
 MD013:
   code_blocks: false
+  line_length: -1
   strict: true
   tables: false
 # MD041 - First line in a file should be a top-level heading

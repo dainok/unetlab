@@ -2,4 +2,12 @@
 exclude:
   # Exclude the tests directory globally from Snyk scans
   global:
-    - unetlab/tests
+    - "__pycache__"
+    - ".git"
+    - ".venv"
+    - "build"
+    - "dist"
+    - "env"
+    - "migrations"
+    - "tests"
+    - "venv"

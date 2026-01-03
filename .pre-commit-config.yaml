@@ -1,4 +1,4 @@
-exclude: __pycache__|.git|.venv|build|dist|env|migrations|venv
+exclude: __pycache__|\.git|\.venv|build|dist|env|migrations|venv|\.secrets\.baseline$|sbom-cyclonedx.json|.*large.*|.*\.qcow2|.*\.vma
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -7,6 +7,7 @@ repos:
       - id: check-case-conflict
       - id: check-json
       - id: check-yaml
+      - id: detect-private-key
       - id: end-of-file-fixer
       - id: fix-byte-order-marker
       - id: requirements-txt-fixer
@@ -20,7 +21,10 @@ repos:
     rev: 25.12.0
     hooks:
       - id: black
-        args: ["--config=.black.toml"]
+  # - repo: https://github.com/ibm/detect-secrets
+  #   rev: 0.13.1+ibm.64.dss
+  #   hooks:
+  #     - id: detect-secrets
   - repo: https://github.com/Riverside-Healthcare/djLint
     rev: v1.36.4
     hooks:
@@ -37,10 +41,6 @@ repos:
       - id: json-sort
         args:
           - --autofix
-          - --end-of-line=lf
-          - --indent-size="    "
-          - --indent-style=space
-          - --insert-final-newline=true
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.47.0
     hooks:
@@ -61,6 +61,14 @@ repos:
   # - repo: https://github.com/RobertCraigie/pyright-python
   #   rev: v1.1.407
   #   hooks:
+  #   - id: pyright
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.21.2
+    hooks:
+      - id: pyupgrade
+  # - repo: https://github.com/RobertCraigie/pyright-python
+  #   rev: v1.1.407
+  #   hooks:
   #     - id: pyright
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.14.10
@@ -78,3 +86,34 @@ repos:
     hooks:
       - id: yamllint
         args: [--format, parsable, --strict, -c, .yamllint.yaml]
+  # - repo: local
+  #   hooks:
+  #     - id: ansible-lint
+  #       name: Ansible Linting
+  #       entry: bash -c "poetry run ansible-lint ."
+  #       language: system
+  - repo: local
+    hooks:
+      - id: tf-lint
+        name: Terraform Litning
+        entry: bash -c "tflint --fix --force"
+        language: system
+  - repo: local
+    hooks:
+      - id: tf-sec
+        name: Terraform Security Scan
+        entry: bash -c "tfsec --config-file .tfsec.yaml"
+        language: system
+  - repo: local
+    hooks:
+      - id: cyclonedx-generate
+        name: Generate CycloneDX SBOM
+        entry: bash -c "cyclonedx-py poetry --with dev -o sbom-cyclonedx.json"
+        language: system
+  - repo: local
+    hooks:
+      - id: bomber-scan
+        name: Scan SBOM
+        entry: bash -c "bomber scan sbom-cyclonedx.json"
+        language: system
+        pass_filenames: false

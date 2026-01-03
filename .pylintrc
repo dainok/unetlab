@@ -3,25 +3,26 @@ ignore=__pycache__,.git,.venv,build,dist,env,migrations,tests,venv
 ignore-patterns=.*\.pyc
 
 # Add current directory to PYTHONPATH for proper import resolution.
-init-hook=import os, sys; [sys.path.append(d) for d in os.listdir() if os.path.isdir(d) and "manage.py" in os.listdir(d)]
+init-hook=import os, sys, subprocess; [sys.path.append(d) for d in os.listdir() if os.path.isdir(d) and "manage.py" in os.listdir(d)]; sys.path.append(subprocess.check_output(["poetry","run","python","-c","import site; print(site.getsitepackages()[0])"]).decode().strip())
 
 [MESSAGES CONTROL]
 # Disable messages that are often noisy or irrelevant in Django apps.
 # https://pylint.readthedocs.io/en/stable/index.html
 disable=
-    duplicate-code,               # R0801: Indicates that a set of similar lines has been detected among multiple file. This usually means that the code should be refactored to avoid this duplication.
-    no-member,                    # E1101: Used when a variable is accessed for a nonexistent member (Django ORM attributes can confuse pylint).
-    no-self-use,                  # R6301: Used when a method doesn't use its bound instance, and so could be written as a function (methods that don't use self are common in Django views/forms).
-    too-few-public-methods,       # R0903: Used when class has too few public methods, so be sure it's really worth it.
-    too-many-ancestors,           # R0901: Used when class has too many parent classes, try to reduce this to get a simpler (and so easier to use) class.
-    too-many-arguments,           # R0913: Used when a function or method takes too many arguments.
-    too-many-branches,            # R0912: Used when a function or method has too many branches, making it hard to follow.
-    too-many-instance-attributes, # R0902: Used when class has too many instance attributes, try to reduce this to get a simpler (and so easier to use) class.
-    too-many-lines,               # C0302: Used when a module has too many lines, reducing its readability.
-    too-many-locals,              # R0914: Used when a function or method has too many local variables.
-    too-many-nested-blocks,       # R1702: Used when a function or a method has too many nested blocks. This makes the code less understandable and maintainable.
-    too-many-return-statements,   # R0911: Used when a function or method has too many return statement, making it hard to follow.
-    too-many-statements,          # R0915: Used when a function or method has too many statements. You should then split it in smaller functions / methods.
+    duplicate-code,                # R0801: Indicates that a set of similar lines has been detected among multiple file. This usually means that the code should be refactored to avoid this duplication.
+    no-member,                     # E1101: Used when a variable is accessed for a nonexistent member (Django ORM attributes can confuse pylint).
+    too-few-public-methods,        # R0903: Used when class has too few public methods, so be sure it's really worth it.
+    too-many-ancestors,            # R0901: Used when class has too many parent classes, try to reduce this to get a simpler (and so easier to use) class.
+    too-many-arguments,            # R0913: Used when a function or method takes too many arguments.
+    too-many-branches,             # R0912: Used when a function or method has too many branches, making it hard to follow.
+    too-many-instance-attributes,  # R0902: Used when class has too many instance attributes, try to reduce this to get a simpler (and so easier to use) class.
+    too-many-lines,                # C0302: Used when a module has too many lines, reducing its readability.
+    too-many-locals,               # R0914: Used when a function or method has too many local variables.
+    too-many-nested-blocks,        # R1702: Used when a function or a method has too many nested blocks. This makes the code less understandable and maintainable.
+    too-many-positional-arguments, # Ro917: Too many positional arguments (%s/%s).
+    too-many-public-methods,       # R0904: Used when class has too many public methods, try to reduce this to get a simpler (and so easier to use) class.
+    too-many-return-statements,    # R0911: Used when a function or method has too many return statement, making it hard to follow.
+    too-many-statements,           # R0915: Used when a function or method has too many statements. You should then split it in smaller functions / methods.
 # Skip migrations (auto-generated code)
 ignore=migrations
 
