@@ -58,18 +58,10 @@ repos:
     hooks:
       - id: pylint
         args: ["--rcfile=.pylintrc"]
-  # - repo: https://github.com/RobertCraigie/pyright-python
-  #   rev: v1.1.407
-  #   hooks:
-  #   - id: pyright
   - repo: https://github.com/asottile/pyupgrade
     rev: v3.21.2
     hooks:
       - id: pyupgrade
-  # - repo: https://github.com/RobertCraigie/pyright-python
-  #   rev: v1.1.407
-  #   hooks:
-  #     - id: pyright
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.14.10
     hooks:
@@ -86,24 +78,6 @@ repos:
     hooks:
       - id: yamllint
         args: [--format, parsable, --strict, -c, .yamllint.yaml]
-  # - repo: local
-  #   hooks:
-  #     - id: ansible-lint
-  #       name: Ansible Linting
-  #       entry: bash -c "poetry run ansible-lint ."
-  #       language: system
-  - repo: local
-    hooks:
-      - id: tf-lint
-        name: Terraform Litning
-        entry: bash -c "tflint --fix --force"
-        language: system
-  - repo: local
-    hooks:
-      - id: tf-sec
-        name: Terraform Security Scan
-        entry: bash -c "tfsec --config-file .tfsec.yaml"
-        language: system
   - repo: local
     hooks:
       - id: cyclonedx-generate
