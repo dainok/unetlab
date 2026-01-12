@@ -9,10 +9,10 @@ class NodeTemplateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = NodeTemplate
-        fields = "__all__"
+        fields = '__all__'
         read_only_fields = [
-            "created_at",
-            "updated_at",
+            'created_at',
+            'updated_at',
         ]  # Make some fields read-only
 
 
@@ -28,8 +28,8 @@ class NodeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Node
-        fields = "__all__"
+        fields = '__all__'
         read_only_fields = [
-            "created_at",
-            "updated_at",
+            'created_at',
+            'updated_at',
         ]  # Make some fields read-only

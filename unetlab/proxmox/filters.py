@@ -27,36 +27,36 @@ class ProxmoxHostFilter(SearchFilterSet):
     is_online = django_filters.BooleanFilter(
         widget=forms.Select(
             choices=[
-                ("", "---------"),
-                ("true", "Yes"),
-                ("false", "No"),
+                ('', '---------'),
+                ('true', 'Yes'),
+                ('false', 'No'),
             ],
         ),
-        label="Online",
+        label='Online',
     )
     is_orphan = django_filters.BooleanFilter(
         widget=forms.Select(
             choices=[
-                ("", "---------"),
-                ("true", "Yes"),
-                ("false", "No"),
+                ('', '---------'),
+                ('true', 'Yes'),
+                ('false', 'No'),
             ],
         ),
-        label="Orphan",
+        label='Orphan',
     )
     created_at__gte = django_filters.DateFilter(
-        field_name="created_at",
-        lookup_expr="gte",
-        widget=forms.DateInput(attrs={"type": "date"}),
-        label="Created After",
+        field_name='created_at',
+        lookup_expr='gte',
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        label='Created After',
     )
     created_at__lte = django_filters.DateFilter(
-        field_name="created_at",
-        lookup_expr="lte",
-        widget=forms.DateInput(attrs={"type": "date"}),
-        label="Created Before",
+        field_name='created_at',
+        lookup_expr='lte',
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        label='Created Before',
     )
 
     class Meta:
         model = ProxmoxHost
-        fields = ["is_online", "is_orphan", "created_at__gte", "created_at__lte"]
+        fields = ['is_online', 'is_orphan', 'created_at__gte', 'created_at__lte']

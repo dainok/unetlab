@@ -1,0 +1,10 @@
+/* Tabler fixes */
+.markdown pre {
+    /* Remove max-height */
+    max-height: none !important;
+}
+
+/* Improvements */
+.markdown ul {
+    list-style-type: square;
+}

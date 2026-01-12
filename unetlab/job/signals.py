@@ -34,16 +34,16 @@ def post_save_log(sender, instance, created, **kwargs):
         channel_layer = get_channel_layer()
 
         # TODO: Customize channel/group name based on the user or other context.
-        channel = "broadcast"
+        channel = 'broadcast'
 
         # Serialize the Log instance to JSON-compatible data.
         log = LogSerializer(instance)
 
         # Construct the event dict expected by Channels consumers.
         event = {
-            "type": "event",  # This type is used in unetlab.consumers to identify the message.
-            "command": "log-add",
-            "data": log.data,
+            'type': 'event',  # This type is used in unetlab.consumers to identify the message.
+            'command': 'log-add',
+            'data': log.data,
         }
 
         # Use async_to_sync to call async channel_layer.group_send from sync context.

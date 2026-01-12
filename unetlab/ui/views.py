@@ -54,7 +54,7 @@ class ConstanceListView(TemplateMixin, TemplateView):
     """View to display Constance settings as a list."""
 
     policy_class = ConstancePermissionPolicy
-    template_name = "ui/settings_list.html"
+    template_name = 'ui/settings_list.html'
 
     def get_variables(self) -> dict:
         """Retrieve all Constance configuration variables."""
@@ -65,7 +65,7 @@ class ConstanceListView(TemplateMixin, TemplateView):
         """Add Constance variables to the template context."""
 
         context = super().get_context_data(**kwargs)
-        context["variables"] = self.get_variables()
+        context['variables'] = self.get_variables()
         return context
 
 
@@ -73,7 +73,7 @@ class ConstanceUpdateView(TemplateMixin, TemplateView):
     """View to display and update Constance settings via a form."""
 
     policy_class = ConstancePermissionPolicy
-    template_name = "ui/settings_form.html"
+    template_name = 'ui/settings_form.html'
 
     def get_variables(self) -> dict:
         """Retrieve all Constance configuration variables."""
@@ -82,7 +82,7 @@ class ConstanceUpdateView(TemplateMixin, TemplateView):
     def get(self, request, *args, **kwargs) -> HttpResponse:
         """Handle GET request and render the settings form with current values."""
         context = self.get_context_data()
-        context["variables"] = self.get_variables()
+        context['variables'] = self.get_variables()
         return render(request, self.template_name, context)
 
     def post(
@@ -95,18 +95,18 @@ class ConstanceUpdateView(TemplateMixin, TemplateView):
                 default_value = getattr(config, key)
                 # Convert type to match default
                 if isinstance(default_value, bool):
-                    value = value.lower() in ["true", "1", "on"]
+                    value = value.lower() in ['true', '1', 'on']
                 elif isinstance(default_value, int):
                     try:
                         value = int(value)
                     except ValueError:
                         django_msgs.error(
-                            request, _("Value error (%(key)s) .") % {"key": key}
+                            request, _('Value error (%(key)s) .') % {'key': key}
                         )
                         continue
                 config._backend.set(key, value)
-        django_msgs.success(request, _("Configuration updated."))
-        return redirect("settings_list")
+        django_msgs.success(request, _('Configuration updated.'))
+        return redirect('settings_list')
 
 
 #############################################################################
@@ -127,16 +127,16 @@ class GroupQueryMixin:
     def get_queryset(self) -> query.QuerySet:
         """Return the queryset of Group objects accessible to the current user."""
         users_prefetch = Prefetch(
-            "user_set", queryset=User.objects.all().order_by("username")
+            'user_set', queryset=User.objects.all().order_by('username')
         )
         user = self.request.user
         if user.is_superuser:
             # Admin users can see all Group objects
             # order_by is required to aboid UnorderedObjectListWarning warning
-            return Group.objects.all().order_by("name").prefetch_related(users_prefetch)
+            return Group.objects.all().order_by('name').prefetch_related(users_prefetch)
         # Non-admin users can only see the Group objects they belong to
         # order_by is required to aboid UnorderedObjectListWarning warning
-        return user.groups.all().order_by("name").prefetch_related(users_prefetch)
+        return user.groups.all().order_by('name').prefetch_related(users_prefetch)
 
 
 class GroupAPIViewSet(GroupQueryMixin, APICRUDViewSet):
@@ -174,8 +174,8 @@ class GroupDetailView(GroupQueryMixin, ObjectDetailView):
 
     users = UserColumn()
 
-    exclude = ["id"]
-    sequence = ["name", "users"]
+    exclude = ['id']
+    sequence = ['name', 'users']
 
 
 class GroupListView(GroupQueryMixin, ObjectListView):
@@ -202,10 +202,10 @@ class UserQueryMixin:
     def get_queryset(self) -> query.QuerySet:
         """Return the queryset of User objects accessible to the current user."""
         groups_prefetch = Prefetch(
-            "groups", queryset=Group.objects.all().order_by("name")
+            'groups', queryset=Group.objects.all().order_by('name')
         )
         # order_by is required to aboid UnorderedObjectListWarning warning
-        qs = User.objects.all().order_by("username").prefetch_related(groups_prefetch)
+        qs = User.objects.all().order_by('username').prefetch_related(groups_prefetch)
         user = self.request.user
         if user.is_superuser:
             # Admin users can see all User objects
@@ -248,25 +248,25 @@ class UserDeleteView(UserQueryMixin, ObjectDeleteView):
 class UserDetailView(UserQueryMixin, ObjectDetailView):
     """HTML view for displaying the details of a User."""
 
-    date_joined = tables.DateColumn(orderable=True, format="Y-m-d")
+    date_joined = tables.DateColumn(orderable=True, format='Y-m-d')
     groups = GroupColumn()
     is_active = GreenRedBooleanColumn()
-    is_staff = GreenRedReverseBooleanColumn(verbose_name="Staff")
-    is_superuser = GreenRedReverseBooleanColumn(verbose_name="Admin")
-    last_login = tables.DateColumn(orderable=True, format="Y-m-d H:i")
+    is_staff = GreenRedReverseBooleanColumn(verbose_name='Staff')
+    is_superuser = GreenRedReverseBooleanColumn(verbose_name='Admin')
+    last_login = tables.DateColumn(orderable=True, format='Y-m-d H:i')
 
-    exclude = ("id", "password")
+    exclude = ('id', 'password')
     sequence = (
-        "username",
-        "first_name",
-        "last_name",
-        "email",
-        "is_active",
-        "is_superuser",
-        "is_staff",
-        "groups",
-        "date_joined",
-        "last_login",
+        'username',
+        'first_name',
+        'last_name',
+        'email',
+        'is_active',
+        'is_superuser',
+        'is_staff',
+        'groups',
+        'date_joined',
+        'last_login',
     )
 
 
@@ -294,7 +294,7 @@ class TokenQueryMixin:
     def get_queryset(self) -> query.QuerySet:
         """Return the queryset of Token objects accessible to the current user."""
         # order_by is required to aboid UnorderedObjectListWarning warning
-        qs = Token.objects.all().order_by("user__username")
+        qs = Token.objects.all().order_by('user__username')
         user = self.request.user
         if user.is_superuser:
             # Admin users can see all Token objects
@@ -319,7 +319,7 @@ class TokenCreateView(TokenQueryMixin, ObtainAuthToken):
     ) -> HttpResponsePermanentRedirect | HttpResponseRedirect:
         """Create one Token per User."""
         Token.objects.get_or_create(user=request.user)
-        return redirect("token_list")
+        return redirect('token_list')
 
 
 class TokenDeleteView(TokenQueryMixin, ObjectDeleteView):
@@ -343,4 +343,4 @@ class HomeView(TemplateMixin, TemplateView):
     """Render the home page."""
 
     policy_class = HomePermissionPolicy
-    template_name = "ui/home.html"
+    template_name = 'ui/home.html'

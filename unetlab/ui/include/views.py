@@ -80,7 +80,7 @@ class ObjectMixin:
             return HttpResponse(status=401)  # 401
 
         # Fallback
-        return HttpResponse(_("Generic permission error"), status=500)
+        return HttpResponse(_('Generic permission error'), status=500)
 
     def has_permission(self):
         """Verify view level permissions using normalized HTTP methods (HTML only)."""
@@ -94,35 +94,35 @@ class ObjectMixin:
 
         # HTTP method normalization
         method = self.request.method.upper()
-        if method == "POST":
+        if method == 'POST':
             # POST is used to delete andmodify
             if isinstance(self, ObjectDeleteView) or isinstance(
                 self, ObjectBulkDeleteView
             ):
                 # ObjectDeleteView -> translate to DELETE
-                method = "DELETE"
+                method = 'DELETE'
             if isinstance(self, ObjectChangeView):
                 # ObjectChangeView -> translate to PUT
-                method = "PUT"
+                method = 'PUT'
                 # ObjectCreateView -> translate to POST
             if isinstance(self, ObjectCreateView):
-                method = "POST"
+                method = 'POST'
 
-        data = getattr(self.request, "data", None)
+        data = getattr(self.request, 'data', None)
         if isinstance(data, list):
             # Bulk operation
             for item in data:
                 obj = self._resolve_object(item)
                 if not policy.can(user, method, obj):
                     raise PermissionDenied(
-                        _("You do not have permission to edit %(obj)s")
-                        % {"obj": str(obj)}
+                        _('You do not have permission to edit %(obj)s')
+                        % {'obj': str(obj)}
                     )
             return True
 
         # Single object
         target = None
-        if hasattr(self, "get_object") and callable(getattr(self, "get_object")):
+        if hasattr(self, 'get_object') and callable(getattr(self, 'get_object')):
             try:
                 target = self.get_object()
             except Exception:
@@ -133,8 +133,8 @@ class ObjectMixin:
     def get_context_data(self, **kwargs):
         """Add UI settings to all HTML views."""
         context = super().get_context_data(**kwargs)
-        context["site_meta"] = settings.SITE_META
-        context["site_navbar"] = settings.SITE_NAVBAR
+        context['site_meta'] = settings.SITE_META
+        context['site_navbar'] = settings.SITE_NAVBAR
         return context
 
 
@@ -142,12 +142,12 @@ class ObjectBulkDeleteView(ObjectMixin, TemplateView):
     """Generic view to delete multiple objects selected via checkboxes."""
 
     model = None
-    template_name = "ui/object_confirm_delete.html"
+    template_name = 'ui/object_confirm_delete.html'
 
     def get_success_url(self):
         """Redirect to the model's list view after deletion."""
         model_name = self.model._meta.model_name
-        return reverse_lazy(f"{model_name}_list")
+        return reverse_lazy(f'{model_name}_list')
 
     def post(self, request, *args, **kwargs):
         """Handle bulk deletion from POST data.
@@ -156,7 +156,7 @@ class ObjectBulkDeleteView(ObjectMixin, TemplateView):
         deletes the objects; otherwise renders a confirmation template.
         """
         # The list of IDs is passed as list selected_ids from the form
-        ids = request.POST.getlist("selected_ids")
+        ids = request.POST.getlist('selected_ids')
         if not ids:
             # The list is empty, there is nothing to delete
             return redirect(self.get_success_url())
@@ -166,14 +166,14 @@ class ObjectBulkDeleteView(ObjectMixin, TemplateView):
             # Objects do not exist, there is nothing to delete
             return redirect(self.get_success_url())
 
-        if "confirm" in request.POST:
+        if 'confirm' in request.POST:
             # Last step: the form has passed confirm, we proceed with the cancellation
             queryset.delete()
             return redirect(self.get_success_url())
 
         # Penultimate step: the user must confirm the list of objects to be deleted
         context = self.get_context_data()
-        context["object_list"] = queryset
+        context['object_list'] = queryset
         return render(
             request,
             self.template_name,
@@ -186,17 +186,17 @@ class ObjectChangeView(ObjectMixin, UpdateView):
 
     form_class = None
     model = None
-    template_name = "ui/object_form.html"
+    template_name = 'ui/object_form.html'
 
     def get_success_url(self):
         """Redirect to the object's detail page after successful update."""
         model_name = self.model._meta.model_name
-        return reverse(f"{model_name}_detail", kwargs={"pk": self.object.pk})
+        return reverse(f'{model_name}_detail', kwargs={'pk': self.object.pk})
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         # Add current user
-        kwargs["user"] = self.request.user
+        kwargs['user'] = self.request.user
         return kwargs
 
 
@@ -204,17 +204,17 @@ class ObjectCreateView(ObjectMixin, CreateView):
     """Generic create view for any model object."""
 
     model = None
-    template_name = "ui/object_form.html"
+    template_name = 'ui/object_form.html'
 
     def get_success_url(self):
         """Redirect to the list page of the model after creation."""
         model_name = self.model._meta.model_name
-        return reverse(f"{model_name}_list")
+        return reverse(f'{model_name}_list')
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         # Add current user
-        kwargs["user"] = self.request.user
+        kwargs['user'] = self.request.user
         return kwargs
 
 
@@ -223,12 +223,12 @@ class ObjectDeleteView(ObjectMixin, DeleteView):
 
     form_class = None
     model = None
-    template_name = "ui/object_confirm_delete.html"
+    template_name = 'ui/object_confirm_delete.html'
 
     def get_success_url(self):
         """Redirect to the list page of the model after deletion."""
         model_name = self.model._meta.model_name
-        return reverse_lazy(f"{model_name}_list")
+        return reverse_lazy(f'{model_name}_list')
 
     def post(self, request, *args, **kwargs):
         """Ignore mixins and call delete()."""
@@ -248,7 +248,7 @@ class ObjectDetailView(ObjectMixin, DetailView):
     list_view = None
     model = None
     sequence = []
-    template_name = "ui/object_detail.html"
+    template_name = 'ui/object_detail.html'
 
     def get_column_fields(self):
         """Return all class attributes that are django_tables2 Column instances."""
@@ -272,7 +272,7 @@ class ObjectDetailView(ObjectMixin, DetailView):
                 """Meta options."""
 
                 model = self.model
-                template_name = "django_tables2/bootstrap.html"
+                template_name = 'django_tables2/bootstrap.html'
                 exclude = self.exclude
                 sequence = self.sequence
                 attrs = self.attrs
@@ -286,20 +286,20 @@ class ObjectDetailView(ObjectMixin, DetailView):
         RequestConfig(self.request).configure(table)
 
         # Pass data to the template
-        context["object"] = list(table.rows)[0]
-        context["attrs"] = {
-            "title": self.attrs.get("title", str(obj)),
-            "description": self.attrs.get("description", ""),
-            "name": str(obj),
+        context['object'] = list(table.rows)[0]
+        context['attrs'] = {
+            'title': self.attrs.get('title', str(obj)),
+            'description': self.attrs.get('description', ''),
+            'name': str(obj),
         }
-        context["model_name"] = self.model._meta.model_name
-        context["permissions"] = {
-            "can_create": policy.can(user, "POST", None, None),
-            "can_read": True,
-            "can_update": policy.can(user, "PATCH", obj, None),
-            "can_delete": policy.can(user, "DELETE", obj, None),
+        context['model_name'] = self.model._meta.model_name
+        context['permissions'] = {
+            'can_create': policy.can(user, 'POST', None, None),
+            'can_read': True,
+            'can_update': policy.can(user, 'PATCH', obj, None),
+            'can_delete': policy.can(user, 'DELETE', obj, None),
         }
-        context["pk"] = obj.pk
+        context['pk'] = obj.pk
         return context
 
 
@@ -310,7 +310,7 @@ class ObjectListView(ObjectMixin, SingleTableView, FilterView):
     model = None
     paginate_by = settings.DJANGO_TABLES2_PAGE_SIZE
     table_class = None
-    template_name = "ui/object_list.html"
+    template_name = 'ui/object_list.html'
 
     def get_table_data(self):
         """Return the queryset filtered by the FilterSet if present."""
@@ -327,17 +327,17 @@ class ObjectListView(ObjectMixin, SingleTableView, FilterView):
         user = self.request.user
         context = super().get_context_data(**kwargs)
         # Add model_name to create URLs via views
-        context["model_name"] = self.model._meta.model_name
-        context["permissions"] = {
-            "can_create": policy.can(user, "POST", None, None),
-            "can_read": True,
-            "can_update": True,
-            "can_delete": True,
+        context['model_name'] = self.model._meta.model_name
+        context['permissions'] = {
+            'can_create': policy.can(user, 'POST', None, None),
+            'can_read': True,
+            'can_update': True,
+            'can_delete': True,
         }
         # Add filters
         filterset = self.get_filterset(self.get_filterset_class())
         if filterset:
-            context["filter"] = filterset
+            context['filter'] = filterset
         return context
 
 
@@ -367,11 +367,11 @@ class TemplateMixin:
             return HttpResponse(status=401)  # 401
 
         # Fallback
-        return HttpResponse(_("Generic permission error"), status=500)
+        return HttpResponse(_('Generic permission error'), status=500)
 
     def get_context_data(self, **kwargs):
         """Add UI settings to all HTML views."""
         context = super().get_context_data(**kwargs)
-        context["site_meta"] = settings.SITE_META
-        context["site_navbar"] = settings.SITE_NAVBAR
+        context['site_meta'] = settings.SITE_META
+        context['site_navbar'] = settings.SITE_NAVBAR
         return context

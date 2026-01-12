@@ -6,7 +6,6 @@ import django_tables2 as tables
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from node.permissions import NodeTemplatePermissionPolicy
 from node.filters import NodeFilter, NodeTemplateFilter
 from node.models import Node, NodeTemplate
@@ -47,17 +46,17 @@ class NodeAPIViewSet(NodeQueryMixin, APICRUDViewSet):
     serializer_class = NodeSerializer
     filterset_class = NodeFilter
 
-    @action(detail=False, methods=["post"])
+    @action(detail=False, methods=['post'])
     def stop(self, request):
         # do_rescan(username=request.user.username)
         return Response({}, status=status.HTTP_202_ACCEPTED)
 
-    @action(detail=False, methods=["post"])
+    @action(detail=False, methods=['post'])
     def start(self, request):
         # do_rescan(username=request.user.username)
         return Response({}, status=status.HTTP_202_ACCEPTED)
 
-    @action(detail=False, methods=["post"])
+    @action(detail=False, methods=['post'])
     def wipe(self, request):
         # do_rescan(username=request.user.username)
         return Response({}, status=status.HTTP_202_ACCEPTED)
@@ -90,8 +89,8 @@ class NodeDeleteView(ObjectDeleteView):
 
 class NodeDetailView(ObjectDetailView):
     model = Node
-    exclude = ["id"]
-    sequence = ["name", "created_at", "description"]
+    exclude = ['id']
+    sequence = ['name', 'created_at', 'description']
 
 
 class NodeListView(ObjectListView):
@@ -122,7 +121,7 @@ class NodeTemplateQueryMixin:
 class NodeTemplateAPIViewSet(NodeTemplateQueryMixin, APICRUDViewSet):
     """REST API endpoints for Template model."""
 
-    @action(detail=False, methods=["post"])
+    @action(detail=False, methods=['post'])
     def build(self, request):
         # do_rescan(username=request.user.username)
         return Response({}, status=status.HTTP_202_ACCEPTED)
@@ -135,12 +134,10 @@ class NodeTemplateBulkDeleteView(NodeTemplateQueryMixin, ObjectBulkDeleteView):
 
 
 class NodeTemplateChangeView(NodeTemplateQueryMixin, ObjectChangeView):
-
     pass
 
 
 class NodeTemplateCreateView(NodeTemplateQueryMixin, ObjectCreateView):
-
     pass
 
 
@@ -151,15 +148,14 @@ class NodeTemplateDeleteView(NodeTemplateQueryMixin, ObjectDeleteView):
 
 
 class NodeTemplateDetailView(NodeTemplateQueryMixin, ObjectDetailView):
-    created = tables.DateColumn(orderable=True, format="Y-m-d")
-    updated = tables.DateColumn(orderable=True, format="Y-m-d H:i")
+    created = tables.DateColumn(orderable=True, format='Y-m-d')
+    updated = tables.DateColumn(orderable=True, format='Y-m-d H:i')
 
-    exclude = ["id"]
-    sequence = ["name", "created"]
+    exclude = ['id']
+    sequence = ['name', 'created']
 
 
 class NodeTemplateListView(NodeTemplateQueryMixin, ObjectListView):
-
     pass
 
 
@@ -186,19 +182,19 @@ class DiskTemplateAPIViewSet(viewsets.GenericViewSet):
         # if not serializer.is_valid():
         #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        f = serializer.validated_data["file"]
+        f = serializer.validated_data['file']
         checksum = hashlib.md5()  # nosec B324 # not used for security
         for chunk in f.chunks():
             checksum.update(chunk)
         f.seek(0)
 
-        disk_filename = f"{template.name}.vma"
+        disk_filename = f'{template.name}.vma'
         path = default_storage.save(
-            f"{template.vendor}-{template.os}/{disk_filename}".lower(), f
+            f'{template.vendor}-{template.os}/{disk_filename}'.lower(), f
         )
         url = default_storage.url(path)
 
-        disk = {"filename": disk_filename, "checksum": checksum.hexdigest(), "url": url}
+        disk = {'filename': disk_filename, 'checksum': checksum.hexdigest(), 'url': url}
 
         # Upload
         # curl -X POST -H "Authorization: Token c3ba14c234d1f079601e27ee953db87c1a724d17" -F "file=@repositories/vyos/vyos/vzdump-qemu-vyos-vyos-2025.07.28-0022.vma" http://localhost:8000/api/template/6/disk/
@@ -209,7 +205,7 @@ class DiskTemplateAPIViewSet(viewsets.GenericViewSet):
         template.disk_checksum = checksum.hexdigest()
         template.save()
 
-        return Response({"disk": disk}, status=status.HTTP_201_CREATED)
+        return Response({'disk': disk}, status=status.HTTP_201_CREATED)
 
     def destroy(self, request, template_pk=None, checksum=None):
         """

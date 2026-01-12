@@ -1,7 +1,5 @@
 """Permissions for Lab app."""
 
-from lab.serializers import LabSerializer
-
 #############################################################################
 # Lab
 #############################################################################
@@ -20,12 +18,12 @@ class LabPermissionPolicy:
 
         # === COMMON RULES ===
         if not target and method in (
-            "DELETE",
-            "GET",
-            "HEAD",
-            "OPTIONS",
-            "PATCH",
-            "PUT",
+            'DELETE',
+            'GET',
+            'HEAD',
+            'OPTIONS',
+            'PATCH',
+            'PUT',
         ):
             # Safe methods are granted to anyone
             return True
@@ -36,13 +34,13 @@ class LabPermissionPolicy:
             return True
 
         # === STAFF/USER RULES ===
-        user_group_ids = list(user.groups.all().values_list("id", flat=True))
+        user_group_ids = list(user.groups.all().values_list('id', flat=True))
         if target and target.id == user.id:
             # Non-admin users can do anything on their own lab
             return True
 
-        if not target and method == "POST" and payload:
-            requested_group = payload.get("shared_group")
+        if not target and method == 'POST' and payload:
+            requested_group = payload.get('shared_group')
             try:
                 # In pre-form validation, values must be converted
                 requested_group = int(requested_group)
@@ -57,4 +55,4 @@ class LabPermissionPolicy:
             return False
 
         # Standard users can only read other labs
-        return method in ("GET")
+        return method in ('GET')

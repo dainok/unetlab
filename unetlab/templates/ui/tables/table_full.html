@@ -6,8 +6,8 @@
             <div class="row w-full">
                 {% if table.attrs.title %}
                 <div class="col">
-                    <h3 class="card-title mb-0">{{ table.attrs.title|title }}</h3>
-                    <p class="text-secondary m-0">{{ table.attrs.description|title }}</p>
+                    <h3 class="card-title mb-0">{{ table.attrs.title }}</h3>
+                    <p class="text-secondary m-0">{{ table.attrs.description }}</p>
                 </div>
                 {% endif %}
                 <div class="col-md-auto col-sm-12">
@@ -44,8 +44,8 @@
                                 {% for action in table.attrs.table_actions %}
                                 {% if action.view %}
                                 <a class="dropdown-item" href="{% url action.view %}"> {{ action.button }} </a>
-                                {% elif action.js %}
-                                <a class="dropdown-item" href="#" onclick="{{ action.js }}"> {{ action.button }} </a>
+                                {% elif action.click %}
+                                <button class="dropdown-item btn" @click="{{ action.click }}"> {{ action.button }} </button>
                                 {% endif %}
                                 {% endfor %}
                             </div>
@@ -54,9 +54,9 @@
                         {% if table.attrs.table_vip_actions %}
                         {% for action in table.attrs.table_vip_actions %}
                         {% if action.view %}
-                        <a href="{% url action.view %}" class="btn btn-1">{{ action.button }}</a>
-                        {% elif action.js %}
-                        <button type="submit" class="btn btn-primary" onclick="{{ action.js }}"> {{ action.button }} </button>
+                        <a href="{% url action.view %}" class="btn btn-1"> {{ action.button }} </a>
+                        {% elif action.click %}
+                        <button class="btn btn-primary" @click="{{ action.click }}"> {{ action.button }} </button>
                         {% endif %}
                         {% endfor %}
                         {% endif %}
@@ -111,9 +111,9 @@
                                     {% if table.attrs.row_actions|length == 1 %}
                                     {% with action=table.attrs.row_actions.0 %}
                                     {% if action.view %}
-                                    <a class="btn btn-1" href="{% url action.view row.record.pk %}?back={{ request.resolver_match.view_name }}"> {{ action.button }}</a>
-                                    {% elif action.js %}
-                                    <a class="btn btn-1" href="#" onclick="{{ action.js }}"> {{ action.button }}</a>
+                                    <a class="btn btn-1" href="{% url action.view row.record.pk %}?back={{ request.resolver_match.view_name }}">  {{ action.button }} </a>
+                                    {% elif action.click %}
+                                    <button class="btn btn-1" @click="{{ action.click }}">  {{ action.button }} </button>
                                     {% endif %}
                                     {% endwith %}
                                     {% elif table.attrs.row_actions|length > 1 %}
@@ -129,9 +129,9 @@
                                     <div class="dropdown-menu">
                                         {% for action in table.attrs.row_actions %}
                                         {% if action.view %}
-                                        <a class="dropdown-item" href="{% url action.view row.record.pk %}?back={{ request.resolver_match.view_name }}">{{ action.button }}</a>
-                                        {% elif action.js %}
-                                        <a class="dropdown-item" href="#" onclick="{{ action.js }}">{{ action.button }}</a>
+                                        <a class="dropdown-item" href="{% url action.view row.record.pk %}?back={{ request.resolver_match.view_name }}"> {{ action.button }} </a>
+                                        {% elif action.click %}
+                                        <button class="btn dropdown-item" @click="{{ action.click }}"> {{ action.button }} </button>
                                         {% endif %}
                                         {% endfor %}
                                     </div>

@@ -25,25 +25,25 @@ class JobFilter(SearchFilterSet):
 
     username = django_filters.ChoiceFilter(
         choices=[],  # Populated dynamically in __init__
-        widget=forms.Select(attrs={"class": "form-select"}),
-        label="Owner",
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label='Owner',
     )
     status = django_filters.ChoiceFilter(
         choices=JobStatusChoices.choices,
-        widget=forms.Select(attrs={"class": "form-select"}),
-        label="Status",
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label='Status',
     )
     created_at__gte = django_filters.DateFilter(
-        field_name="created_at",
-        lookup_expr="gte",
-        widget=forms.DateInput(attrs={"type": "date", "class": "form-control mb-2"}),
-        label="Created After",
+        field_name='created_at',
+        lookup_expr='gte',
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control mb-2'}),
+        label='Created After',
     )
     created_at__lte = django_filters.DateFilter(
-        field_name="created_at",
-        lookup_expr="lte",
-        widget=forms.DateInput(attrs={"type": "date", "class": "form-control mb-2"}),
-        label="Created Before",
+        field_name='created_at',
+        lookup_expr='lte',
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control mb-2'}),
+        label='Created Before',
     )
 
     def __init__(self, *args, **kwargs):
@@ -53,15 +53,15 @@ class JobFilter(SearchFilterSet):
         """
         super().__init__(*args, **kwargs)
         usernames = (
-            Job.objects.order_by("username")
-            .values_list("username", flat=True)
+            Job.objects.order_by('username')
+            .values_list('username', flat=True)
             .distinct()
         )
-        self.filters["username"].extra["choices"] = [(u, u) for u in usernames]
+        self.filters['username'].extra['choices'] = [(u, u) for u in usernames]
 
     class Meta:
         model = Job
-        fields = ["username", "status", "created_at__gte", "created_at__lte"]
+        fields = ['username', 'status', 'created_at__gte', 'created_at__lte']
 
 
 class LogFilter(SearchFilterSet):
@@ -73,36 +73,36 @@ class LogFilter(SearchFilterSet):
         - created_at__gte / created_at__lte: Date range filters for creation timestamp
     """
 
-    search_fields = ["message"]
+    search_fields = ['message']
     acknowledged = django_filters.BooleanFilter(
         widget=forms.Select(
-            attrs={"class": "form-select"},
+            attrs={'class': 'form-select'},
             choices=[
-                ("", "---------"),
-                ("true", "Yes"),
-                ("false", "No"),
+                ('', '---------'),
+                ('true', 'Yes'),
+                ('false', 'No'),
             ],
         ),
-        label="Acknowledged",
+        label='Acknowledged',
     )
     severity = django_filters.ChoiceFilter(
         choices=LogSeverityChoices.choices,
-        widget=forms.Select(attrs={"class": "form-select"}),
-        label="Severity",
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label='Severity',
     )
     created_at__gte = django_filters.DateFilter(
-        field_name="created_at",
-        lookup_expr="gte",
-        widget=forms.DateInput(attrs={"type": "date", "class": "form-control mb-2"}),
-        label="Created After",
+        field_name='created_at',
+        lookup_expr='gte',
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control mb-2'}),
+        label='Created After',
     )
     created_at__lte = django_filters.DateFilter(
-        field_name="created_at",
-        lookup_expr="lte",
-        widget=forms.DateInput(attrs={"type": "date", "class": "form-control mb-2"}),
-        label="Created Before",
+        field_name='created_at',
+        lookup_expr='lte',
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control mb-2'}),
+        label='Created Before',
     )
 
     class Meta:
         model = Log
-        fields = ["severity", "acknowledged", "created_at__gte", "created_at__lte"]
+        fields = ['severity', 'acknowledged', 'created_at__gte', 'created_at__lte']

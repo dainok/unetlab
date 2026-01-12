@@ -9,13 +9,13 @@ import os
 from celery import Celery
 
 # Set default Django settings module for the 'celery' CLI.
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "unetlab.settings")
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'unetlab.settings')
 
 # Create the Celery application instance.
-app = Celery("unetlab")
+app = Celery('unetlab')
 
 # Load Celery settings from Django's settings.py using the "CELERY_" namespace.
-app.config_from_object("django.conf:settings", namespace="CELERY")
+app.config_from_object('django.conf:settings', namespace='CELERY')
 
 # Auto-discover tasks.py in all installed apps.
 app.autodiscover_tasks()
@@ -25,4 +25,4 @@ app.autodiscover_tasks()
 @app.task(bind=True)
 def debug_task(self):
     """Task used to debug Celery setup."""
-    print(f"[Celery] Debug Task - Request: {self.request!r}")
+    print(f'[Celery] Debug Task - Request: {self.request!r}')

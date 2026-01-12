@@ -1,6 +1,6 @@
 """Define ORM models for Lab app."""
 
-from django.db import models, transaction
+from django.db import models
 from django.contrib.auth.models import User, Group
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
@@ -23,32 +23,32 @@ class Lab(models.Model):
 
     name = models.CharField(
         max_length=255,
-        verbose_name=_("Name"),
+        verbose_name=_('Name'),
         validators=[PhraseValidator],
-        help_text=_("Lab name."),
+        help_text=_('Lab name.'),
         db_index=True,
     )
     hld = models.JSONField(
-        verbose_name=_("HLD"),
-        help_text=_("High Level Description"),
+        verbose_name=_('HLD'),
+        help_text=_('High Level Description'),
         validators=[HLDValidator],
         default=dict,
         blank=True,
     )
     lld = models.JSONField(
-        verbose_name=_("LLD"),
-        help_text=_("Low Level Description"),
+        verbose_name=_('LLD'),
+        help_text=_('Low Level Description'),
         validators=[YAMLValidator],
         default=dict,
         editable=False,
         blank=True,
     )
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="labs", editable=False
+        User, on_delete=models.CASCADE, related_name='labs', editable=False
     )
     shared_group = models.ForeignKey(
         Group,
-        related_name="labs",
+        related_name='labs',
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
@@ -59,11 +59,11 @@ class Lab(models.Model):
     class Meta:
         """Database metadata."""
 
-        db_table = "labs"
-        ordering = ["name"]
-        unique_together = ["user", "name"]
-        verbose_name = _("Lab")
-        verbose_name_plural = _("Labs")
+        db_table = 'labs'
+        ordering = ['name']
+        unique_together = ['user', 'name']
+        verbose_name = _('Lab')
+        verbose_name_plural = _('Labs')
 
     def __str__(self):
         """Return a human readable name when the object is printed."""
@@ -71,7 +71,7 @@ class Lab(models.Model):
 
     def get_absolute_url(self):
         """Return the absolute url."""
-        return reverse("lab-detail-view", args=[str(self.pk)])
+        return reverse('lab-detail-view', args=[str(self.pk)])
 
     def save(self, *args, **kwargs):
         # Force validators

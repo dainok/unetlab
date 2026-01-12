@@ -5,7 +5,6 @@ from django.db import transaction
 from django.db.models import query, Q
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework import status
 from lab.models import Lab
 
 # from lab.utils import LabLld
@@ -63,7 +62,7 @@ class LabAPIViewSet(LabQueryMixin, APICRUDViewSet):
         """Set user when creating a new lab."""
         serializer.save(user=self.request.user)
 
-    @action(detail=True, methods=["post"], url_path="build")
+    @action(detail=True, methods=['post'], url_path='build')
     def build(self, request, pk=None):
         """Build LLD from HLD."""
         lab = self.get_object()
@@ -102,9 +101,9 @@ class LabDeleteView(LabQueryMixin, ObjectDeleteView):
 class LabDetailView(LabQueryMixin, ObjectDetailView):
     """HTML view for displaying the details of a Lab."""
 
-    exclude = ["id"]
-    sequence = ["name", "user", "shared_group", "created_at", "updated_at"]
-    template_name = "lab_detail.html"
+    exclude = ['id']
+    sequence = ['name', 'user', 'shared_group', 'created_at', 'updated_at']
+    template_name = 'lab_detail.html'
 
     def get_context_data(self, **kwargs):
         """Prepare HLD/LLD data for rendering."""
@@ -113,7 +112,7 @@ class LabDetailView(LabQueryMixin, ObjectDetailView):
 
         if lab.hld:
             # Convert JSON into YAML
-            context["hld_yaml"] = yaml.safe_dump(
+            context['hld_yaml'] = yaml.safe_dump(
                 lab.hld,
                 default_flow_style=False,
                 sort_keys=False,
@@ -121,7 +120,7 @@ class LabDetailView(LabQueryMixin, ObjectDetailView):
                 indent=2,
             )
         else:
-            context["hld_yaml"] = ""
+            context['hld_yaml'] = ''
         return context
 
 

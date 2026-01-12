@@ -15,39 +15,39 @@ from ui.include.filters import SearchFilterSet
 class LabFilter(SearchFilterSet):
     """Filter class for the Lab model."""
 
-    search_fields = ["name"]
+    search_fields = ['name']
     created_at__gte = django_filters.DateFilter(
-        field_name="created_at",
-        lookup_expr="gte",
-        widget=forms.DateInput(attrs={"type": "date"}),
-        label=_("Created after"),
+        field_name='created_at',
+        lookup_expr='gte',
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        label=_('Created after'),
     )
     created_at__lte = django_filters.DateFilter(
-        field_name="created_at",
-        lookup_expr="lte",
-        widget=forms.DateInput(attrs={"type": "date"}),
-        label=_("Created before"),
+        field_name='created_at',
+        lookup_expr='lte',
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        label=_('Created before'),
     )
     updated_at__gte = django_filters.DateFilter(
-        field_name="created_at",
-        lookup_expr="gte",
-        widget=forms.DateInput(attrs={"type": "date"}),
-        label=_("Updated after"),
+        field_name='created_at',
+        lookup_expr='gte',
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        label=_('Updated after'),
     )
     updated_at__lte = django_filters.DateFilter(
-        field_name="created_at",
-        lookup_expr="lte",
-        widget=forms.DateInput(attrs={"type": "date"}),
-        label=_("Updated before"),
+        field_name='created_at',
+        lookup_expr='lte',
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        label=_('Updated before'),
     )
 
     class Meta:
         model = Lab
         fields = [
-            "created_at__gte",
-            "created_at__lte",
-            "updated_at__gte",
-            "updated_at__lte",
+            'created_at__gte',
+            'created_at__lte',
+            'updated_at__gte',
+            'updated_at__lte',
         ]
 
 

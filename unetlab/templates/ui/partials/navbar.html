@@ -103,11 +103,6 @@
                                 </div>
                             </li>
                             <li class="nav-item">
-                                {% block notifications %}
-                                {% include "ui/partials/notifications.html" %}
-                                {% endblock notifications %}
-                            </li>
-                            <li class="nav-item">
                                 <div class="nav-item dropdown d-none d-md-flex me-3">
                                     <a href="#" class="nav-link px-0" data-bs-toggle="dropdown" tabindex="-1"
                                         aria-label="Show app menu" data-bs-auto-close="outside" aria-expanded="false">
@@ -127,104 +122,6 @@
                                             <path d="M17 4l0 6"></path>
                                         </svg>
                                     </a>
-                                    <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-end dropdown-menu-card">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <div class="card-title">My Apps</div>
-                                                <div class="card-actions btn-actions">
-                                                    <a href="#" class="btn-action">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                            stroke-width="2" stroke-linecap="round"
-                                                            stroke-linejoin="round" class="icon icon-1">
-                                                            <path
-                                                                d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z">
-                                                            </path>
-                                                            <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"></path>
-                                                        </svg>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                            <div class="card-body scroll-y p-2" style="max-height: 50vh">
-                                                <div class="row g-0">
-                                                    <div class="col-4">
-                                                        <a href="#"
-                                                            class="d-flex flex-column flex-center text-center text-secondary py-2 px-2 link-hoverable">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                                                                height="24" viewBox="0 0 24 24" fill="none"
-                                                                stroke="currentColor" stroke-width="2"
-                                                                stroke-linecap="round" stroke-linejoin="round"
-                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-layers-intersect">
-                                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                                <path
-                                                                    d="M8 4m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z" />
-                                                                <path
-                                                                    d="M4 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z" />
-                                                            </svg>
-                                                            <span class="h5">Node</span>
-                                                        </a>
-                                                    </div>
-                                                    <div class="col-4">
-                                                        <a href="#"
-                                                            class="d-flex flex-column flex-center text-center text-secondary py-2 px-2 link-hoverable">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                                                                height="24" viewBox="0 0 24 24" fill="none"
-                                                                stroke="currentColor" stroke-width="2"
-                                                                stroke-linecap="round" stroke-linejoin="round"
-                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-template">
-                                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                                <path
-                                                                    d="M4 4m0 1a1 1 0 0 1 1 -1h14a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-14a1 1 0 0 1 -1 -1z" />
-                                                                <path
-                                                                    d="M4 12m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
-                                                                <path d="M14 12l6 0" />
-                                                                <path d="M14 16l6 0" />
-                                                                <path d="M14 20l6 0" />
-                                                            </svg>
-                                                            <span class="h5">Template</span>
-                                                        </a>
-                                                    </div>
-                                                    <div class="col-4">
-                                                        <a href="#"
-                                                            class="d-flex flex-column flex-center text-center text-secondary py-2 px-2 link-hoverable">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                                                                height="24" viewBox="0 0 24 24" fill="none"
-                                                                stroke="currentColor" stroke-width="2"
-                                                                stroke-linecap="round" stroke-linejoin="round"
-                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-cloud-network">
-                                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                                <path d="M3 20h7" />
-                                                                <path d="M14 20h7" />
-                                                                <path d="M10 20a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
-                                                                <path d="M12 16v2" />
-                                                                <path
-                                                                    d="M8 16.004h-1.343c-2.572 -.004 -4.657 -2.011 -4.657 -4.487c0 -2.475 2.085 -4.482 4.657 -4.482c.393 -1.762 1.794 -3.2 3.675 -3.773c1.88 -.572 3.956 -.193 5.444 1c1.488 1.19 2.162 3.007 1.77 4.769h.99c1.913 0 3.464 1.56 3.464 3.486c0 1.927 -1.551 3.487 -3.465 3.487h-2.535" />
-                                                            </svg>
-                                                            <span class="h5">Gateway</span>
-                                                        </a>
-                                                    </div>
-                                                    <div class="col-4">
-                                                        <a href="#"
-                                                            class="d-flex flex-column flex-center text-center text-secondary py-2 px-2 link-hoverable">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                                                                height="24" viewBox="0 0 24 24" fill="none"
-                                                                stroke="currentColor" stroke-width="2"
-                                                                stroke-linecap="round" stroke-linejoin="round"
-                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-timeline-event">
-                                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                                <path d="M12 20m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                                                                <path d="M10 20h-6" />
-                                                                <path d="M14 20h6" />
-                                                                <path
-                                                                    d="M12 15l-2 -2h-3a1 1 0 0 1 -1 -1v-8a1 1 0 0 1 1 -1h10a1 1 0 0 1 1 1v8a1 1 0 0 1 -1 1h-3l-2 2z" />
-                                                            </svg>
-                                                            <span class="h5">Link</span>
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </li>
                             <li class="nav-item">
@@ -252,7 +149,6 @@
                                             {% translate "API Tokens" %}
                                         </a>
                                         <div class="dropdown-divider"></div>
-                                        <a href="#" class="dropdown-item">{% translate "Status" %}</a>
                                         <form id="logout-form" method="post" action="{% url 'logout' %}">
                                             {% csrf_token %}
                                             <button type="submit" class="dropdown-item">

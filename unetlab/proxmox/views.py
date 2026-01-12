@@ -31,7 +31,7 @@ class ProxmoxHostAPIViewSet(ProxmoxHostQueryMixin, APIRViewSet):
     serializer_class = ProxmoxHostSerializer
     filterset_class = ProxmoxHostFilter
 
-    @action(detail=False, methods=["post"], permission_classes=IsAdminOrStaff)
+    @action(detail=False, methods=['post'], permission_classes=IsAdminOrStaff)
     def rescan(self, request):
         do_rescan(username=request.user.username)
         return Response({}, status=status.HTTP_202_ACCEPTED)

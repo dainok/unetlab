@@ -18,12 +18,12 @@ class NodeTemplatePermissionPolicy:
 
         # === COMMON RULES ===
         if not target and method in (
-            "GET",
-            "OPTIONS",
-            "HEAD",
-            "PUT",
-            "PATCH",
-            "DELETE",
+            'GET',
+            'OPTIONS',
+            'HEAD',
+            'PUT',
+            'PATCH',
+            'DELETE',
         ):
             # Without target object, return True with safe methods
             return True
@@ -34,4 +34,4 @@ class NodeTemplatePermissionPolicy:
             return True
 
         # === STAFF/USER RULES ===
-        return method in ("GET")
+        return method in ('GET')

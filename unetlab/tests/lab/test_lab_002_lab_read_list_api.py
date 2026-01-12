@@ -1,7 +1,7 @@
 """Test DRF (API) lab list."""
 
 import pytest
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework.authtoken.models import Token
 from lab.models import Lab
@@ -16,12 +16,12 @@ def test_lab_group_read_list_api_admin(
     """Test DRF (API) lab list view by admin."""
     for user in User.objects.filter(is_superuser=True):
         token, _ = Token.objects.get_or_create(user=user)
-        headers = {"Authorization": f"Token {token}"}
-        all_labs = Lab.objects.all().values_list("id", flat=True)
-        url = reverse("lab-list") + f"?per_page={len(all_labs)}"
+        headers = {'Authorization': f'Token {token}'}
+        all_labs = Lab.objects.all().values_list('id', flat=True)
+        url = reverse('lab-list') + f'?per_page={len(all_labs)}'
         response = api_client.get(url, headers=headers)
-        assert response.status_code == 200, f"Failed for user {user.username}"
-        result_labs = [l["id"] for l in response.data["results"]]
+        assert response.status_code == 200, f'Failed for user {user.username}'
+        result_labs = [l['id'] for l in response.data['results']]
         # for g in all_groups:
         #     assert g in result_groups, f"Group {g} not found by {user.username}"
 

@@ -2,28 +2,27 @@ from ui.forms import ObjectModelForm
 from node.models import Node, NodeTemplate
 
 # from repository.models import Repository
-from django.core.exceptions import ValidationError
 
 
 class NodeTemplateForm(ObjectModelForm):
     field_order = [
-        "vendor",
-        "os",
-        "version",
-        "extra",
-        "cpu",
-        "ram",
-        "nics",
-        "oob",
-        "username",
-        "password",
-        "...",
+        'vendor',
+        'os',
+        'version',
+        'extra',
+        'cpu',
+        'ram',
+        'nics',
+        'oob',
+        'username',
+        'password',
+        '...',
     ]
 
     class Meta:
         model = NodeTemplate
 
-        fields = "__all__"
+        fields = '__all__'
         # fields = ["vendor", "os", "version", "extra", "username"]
 
     # def clean(self):
@@ -64,4 +63,4 @@ class NodeTemplateForm(ObjectModelForm):
 class NodeForm(ObjectModelForm):
     class Meta:
         model = Node
-        fields = "__all__"
+        fields = '__all__'

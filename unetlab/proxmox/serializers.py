@@ -9,9 +9,9 @@ class ProxmoxHostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProxmoxHost
-        fields = "__all__"
+        fields = '__all__'
         read_only_fields = [
-            "id",
-            "created_at",
-            "updated_at",
+            'id',
+            'created_at',
+            'updated_at',
         ]

@@ -5,5 +5,5 @@ from unetlab import consumers
 
 websocket_urlpatterns = [
     # Route WebSocket requests for actions to ActionConsumer
-    re_path(r"ws/action", consumers.ActionConsumer.as_asgi()),
+    re_path(r'ws/action', consumers.ActionConsumer.as_asgi()),
 ]

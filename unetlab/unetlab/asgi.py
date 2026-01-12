@@ -1,9 +1,9 @@
 """ASGI config for unetlab project."""
 
-__author__ = "Andrea Dainese"
-__contact__ = "andrea@adainese.it"
-__copyright__ = "Copyright 2024, Andrea Dainese"
-__license__ = "GPLv3"
+__author__ = 'Andrea Dainese'
+__contact__ = 'andrea@adainese.it'
+__copyright__ = 'Copyright 2024, Andrea Dainese'
+__license__ = 'GPLv3'
 
 import os
 
@@ -14,12 +14,12 @@ from channels.security.websocket import AllowedHostsOriginValidator
 
 from unetlab import routing
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "unetlab.settings")
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'unetlab.settings')
 
 application = ProtocolTypeRouter(
     {
-        "http": get_asgi_application(),
-        "websocket": AllowedHostsOriginValidator(
+        'http': get_asgi_application(),
+        'websocket': AllowedHostsOriginValidator(
             AuthMiddlewareStack(
                 URLRouter(routing.websocket_urlpatterns),
             )

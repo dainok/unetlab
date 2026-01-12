@@ -30,66 +30,66 @@ class NodeTemplate(models.Model):
     name = models.CharField(
         max_length=255,
         editable=False,
-        verbose_name=_("Name"),
+        verbose_name=_('Name'),
         validators=[AlphanumericValidator],
-        help_text=_("Template name."),
+        help_text=_('Template name.'),
     )
     os = models.CharField(
         max_length=255,
-        verbose_name=_("OS"),
-        help_text=_("Template Operating System."),
+        verbose_name=_('OS'),
+        help_text=_('Template Operating System.'),
         validators=[AlphanumericValidator],
     )
     vendor = models.CharField(
         max_length=255,
-        verbose_name=_("Vendor"),
-        help_text=_("Template vendor."),
+        verbose_name=_('Vendor'),
+        help_text=_('Template vendor.'),
         validators=[AlphanumericValidator],
     )
     version = models.CharField(
         max_length=255,
-        verbose_name=_("Version"),
-        help_text=_("Template version."),
+        verbose_name=_('Version'),
+        help_text=_('Template version.'),
         validators=[VersionValidator],
     )
     extra = models.CharField(
         max_length=255,
-        default="",
-        verbose_name=_("Extra"),
+        default='',
+        verbose_name=_('Extra'),
         blank=True,
-        help_text=_("Template label."),
+        help_text=_('Template label.'),
         validators=[AlphanumericValidator],
     )
     cpu = models.IntegerField(
         default=1,
-        verbose_name=_("CPU"),
-        help_text=_("Minimum CPU required."),
+        verbose_name=_('CPU'),
+        help_text=_('Minimum CPU required.'),
     )
     ram = models.IntegerField(
         default=2,
-        verbose_name=_("RAM"),
-        help_text=_("Minimum GB of RAM required."),
+        verbose_name=_('RAM'),
+        help_text=_('Minimum GB of RAM required.'),
     )
     nics = models.IntegerField(
         default=4,
-        verbose_name=_("NIC"),
-        help_text=_("Template default network interfaces."),
+        verbose_name=_('NIC'),
+        help_text=_('Template default network interfaces.'),
     )
     oob = models.BooleanField(
         default=True,
-        verbose_name=_("OOB Management interface"),
-        help_text=_("True if first interface is used for OOB management."),
+        verbose_name=_('OOB Management interface'),
+        help_text=_('True if first interface is used for OOB management.'),
     )
     username = models.CharField(
         max_length=255,
-        verbose_name=_("Username"),
-        help_text=_("Username to login."),
+        verbose_name=_('Username'),
+        help_text=_('Username to login.'),
         validators=[AlphanumericValidator],
     )
     password = models.CharField(
         max_length=255,
-        verbose_name=_("Password"),
-        help_text=_("Password to login."),
+        verbose_name=_('Password'),
+        help_text=_('Password to login.'),
         validators=[SimplePasswordValidator],
     )
     created_at = models.DateTimeField(auto_now_add=True)
@@ -98,11 +98,11 @@ class NodeTemplate(models.Model):
     class Meta:
         """Database metadata."""
 
-        db_table = "templates"
-        ordering = ["vendor", "os", "version", "extra"]
-        verbose_name = _("Template")
-        verbose_name_plural = _("Templates")
-        unique_together = ["vendor", "os", "version", "extra"]
+        db_table = 'templates'
+        ordering = ['vendor', 'os', 'version', 'extra']
+        verbose_name = _('Template')
+        verbose_name_plural = _('Templates')
+        unique_together = ['vendor', 'os', 'version', 'extra']
 
     def __str__(self):
         """Return a human readable name when the object is printed."""
@@ -110,7 +110,7 @@ class NodeTemplate(models.Model):
 
     def get_absolute_url(self):
         """Return the absolute url."""
-        return reverse("template-detail-view", args=[str(self.pk)])
+        return reverse('template-detail-view', args=[str(self.pk)])
 
 
 #############################################################################
@@ -125,19 +125,19 @@ class DiskTemplate(models.Model):
         default=None,
         null=True,
         blank=True,
-        verbose_name=_("Checksum"),
-        help_text=_("MD5 hash."),
+        verbose_name=_('Checksum'),
+        help_text=_('MD5 hash.'),
         editable=False,
     )
     order = models.IntegerField(
         default=0,
-        verbose_name=_("Order"),
-        help_text=_("Disk order, starting from 0."),
+        verbose_name=_('Order'),
+        help_text=_('Disk order, starting from 0.'),
     )
     template = models.ForeignKey(
         NodeTemplate,
         on_delete=models.CASCADE,
-        related_name="disks",
+        related_name='disks',
         editable=False,
     )
     created_at = models.DateTimeField(auto_now_add=True)
@@ -145,10 +145,10 @@ class DiskTemplate(models.Model):
     class Meta:
         """Database metadata."""
 
-        db_table = "disks"
-        ordering = ["filename"]
-        verbose_name = _("Disk")
-        verbose_name_plural = _("Disks")
+        db_table = 'disks'
+        ordering = ['filename']
+        verbose_name = _('Disk')
+        verbose_name_plural = _('Disks')
 
     def __str__(self):
         """Return a human readable name when the object is printed."""
@@ -156,7 +156,7 @@ class DiskTemplate(models.Model):
 
     def get_absolute_url(self):
         """Return the absolute url."""
-        return reverse("disk-detail-view", args=[str(self.pk)])
+        return reverse('disk-detail-view', args=[str(self.pk)])
 
 
 # class NodeGroup(models.Model):

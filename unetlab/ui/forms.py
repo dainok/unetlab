@@ -22,7 +22,7 @@ class GroupForm(ObjectModelForm):
     class Meta:
         """Meta options."""
 
-        fields = ["name", "users"]
+        fields = ['name', 'users']
         model = Group
 
     def __init__(self, *args, **kwargs):
@@ -30,14 +30,14 @@ class GroupForm(ObjectModelForm):
         super().__init__(*args, **kwargs)
         # Pre-populate the users field with those already in the group
         if self.instance.pk:
-            self.fields["users"].initial = self.instance.user_set.all()
+            self.fields['users'].initial = self.instance.user_set.all()
 
     def save(self, commit=True):
         """Save the group instance and update the associated users."""
         group = super().save(commit=False)
         if commit:
             group.save()
-            group.user_set.set(self.cleaned_data["users"])
+            group.user_set.set(self.cleaned_data['users'])
         return group
 
 
@@ -53,16 +53,16 @@ class UserForm(ObjectModelForm):
         queryset=Group.objects.all(), required=False, widget=forms.SelectMultiple
     )
     password1 = forms.CharField(
-        label=_("Password"),
+        label=_('Password'),
         widget=forms.PasswordInput,
         required=False,
-        help_text=_("Leave blank to not change the password."),
+        help_text=_('Leave blank to not change the password.'),
     )
     password2 = forms.CharField(
-        label=_("Confirm password"),
+        label=_('Confirm password'),
         widget=forms.PasswordInput,
         required=False,
-        help_text=_("Repeat password to confirm."),
+        help_text=_('Repeat password to confirm.'),
     )
 
     class Meta:
@@ -70,14 +70,14 @@ class UserForm(ObjectModelForm):
 
         model = User
         fields = [
-            "username",
-            "first_name",
-            "last_name",
-            "email",
-            "is_active",
-            "is_superuser",
-            "is_staff",
-            "groups",
+            'username',
+            'first_name',
+            'last_name',
+            'email',
+            'is_active',
+            'is_superuser',
+            'is_staff',
+            'groups',
         ]
 
     def __init__(self, *args, **kwargs):
@@ -85,25 +85,25 @@ class UserForm(ObjectModelForm):
         super().__init__(*args, **kwargs)
         # Pre-populate groups if user exists
         if self.instance.pk:
-            self.fields["groups"].initial = self.instance.groups.all()
+            self.fields['groups'].initial = self.instance.groups.all()
         if self.user and not self.user.is_superuser:
             # Disable field for non admins
-            self.fields["groups"].disabled = True
-            self.fields["is_staff"].disabled = True
-            self.fields["is_superuser"].disabled = True
+            self.fields['groups'].disabled = True
+            self.fields['is_staff'].disabled = True
+            self.fields['is_superuser'].disabled = True
 
     def clean(self):
         """
         Check that password1 and password2 match.
         """
         cleaned_data = super().clean()
-        password1 = cleaned_data.get("password1")
-        password2 = cleaned_data.get("password2")
+        password1 = cleaned_data.get('password1')
+        password2 = cleaned_data.get('password2')
 
         if password1 or password2:
             # if one of the two is filled in
             if password1 != password2:
-                raise forms.ValidationError(_("The passwords do not match."))
+                raise forms.ValidationError(_('The passwords do not match.'))
 
         return cleaned_data
 
@@ -111,7 +111,7 @@ class UserForm(ObjectModelForm):
         """Save the user instance and update the associated groups."""
         obj = super().save(commit=False)
 
-        password1 = self.cleaned_data.get("password1")
+        password1 = self.cleaned_data.get('password1')
         if password1:
             # Update password only if set/modified
             obj.set_password(password1)
@@ -126,7 +126,7 @@ class UserForm(ObjectModelForm):
             obj.save()
             if self.user.is_superuser:
                 # Set groups only if admin
-                obj.groups.set(Group.objects.filter(id__in=self.cleaned_data["groups"]))
+                obj.groups.set(Group.objects.filter(id__in=self.cleaned_data['groups']))
 
         return obj
 

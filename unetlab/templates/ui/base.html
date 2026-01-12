@@ -26,8 +26,8 @@
     <!-- Banner -->
     {% block banner %}
     {% endblock banner %}
-    {% block navbar %}
     <!-- Navbar -->
+    {% block navbar %}
     {% include "ui/partials/navbar.html" %}
     {% endblock navbar %}
     <div class="{% block pageclass %}page{% endblock pageclass %}">
@@ -65,9 +65,12 @@
         </div>
         {% endblock page %}
     </div>
+    <!-- Modal -->
+    {% block modal %}
+    {% endblock modal %}
     <!-- JavaScript files -->
     <script src="{% static 'tabler/js/tabler.min.js' %}" defer></script>
-    <script type="module" src="{% static 'unetlab/js/main.js' %}" defer></script>
+    <script type="module" src="{% static 'eg0n/js/main.js' %}" defer></script>
     <script src="{% static 'alpinejs/js/alpinejs.min.js' %}" defer></script>
     <script src="{% static 'ui/js/ui.js' %}" defer></script>
 </body>

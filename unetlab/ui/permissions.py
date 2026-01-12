@@ -49,12 +49,12 @@ class GroupPermissionPolicy:
 
         # === COMMON RULES ===
         if not target and method in (
-            "DELETE",
-            "GET",
-            "HEAD",
-            "OPTIONS",
-            "PATCH",
-            "PUT",
+            'DELETE',
+            'GET',
+            'HEAD',
+            'OPTIONS',
+            'PATCH',
+            'PUT',
         ):
             # Safe methods are granted to anyone
             return True
@@ -65,7 +65,7 @@ class GroupPermissionPolicy:
 
         # === STAFF/USER RULES ===
         # With target and GET -> Permission granted
-        return method in ("GET")
+        return method in ('GET')
 
 
 #############################################################################
@@ -86,12 +86,12 @@ class UserPermissionPolicy:
 
         # === COMMON RULES ===
         if not target and method in (
-            "DELETE",
-            "GET",
-            "HEAD",
-            "OPTIONS",
-            "PATCH",
-            "PUT",
+            'DELETE',
+            'GET',
+            'HEAD',
+            'OPTIONS',
+            'PATCH',
+            'PUT',
         ):
             # Safe methods are granted to anyone
             return True
@@ -99,11 +99,11 @@ class UserPermissionPolicy:
         # === ADMIN RULES ===
         if user.is_superuser:
             # Admin can do everything except delete themselves
-            if target and target.id == user.id and method == "DELETE":
+            if target and target.id == user.id and method == 'DELETE':
                 return False
             return True
 
-        if method == "POST" and not user.is_superuser:
+        if method == 'POST' and not user.is_superuser:
             # Only admins can create new users
             return False
 
@@ -115,7 +115,7 @@ class UserPermissionPolicy:
                     return True
                 if target.is_superuser or target.is_staff:
                     # Staff users cannot modify/delete other staffs/admins
-                    return method in ("GET", "HEAD", "OPTIONS")
+                    return method in ('GET', 'HEAD', 'OPTIONS')
             return True
 
         # === STANDARD USER RULES ===
@@ -124,7 +124,7 @@ class UserPermissionPolicy:
             return True
 
         # Standard users can only read other staffs/admins/users
-        return method in ("GET")
+        return method in ('GET')
 
 
 #############################################################################
@@ -148,19 +148,19 @@ class TokenPermissionPolicy:
             # Anyone can do anything on owned Tokens
             return True
         if not target and method in (
-            "DELETE",
-            "GET",
-            "HEAD",
-            "OPTIONS",
-            "PATCH",
-            "POST",
-            "PUT",
+            'DELETE',
+            'GET',
+            'HEAD',
+            'OPTIONS',
+            'PATCH',
+            'POST',
+            'PUT',
         ):
             # Safe methods are granted to anyone
             return True
 
         # === ADMIN RULES ===
-        if user.is_superuser and method in ("DELETE", "GET"):
+        if user.is_superuser and method in ('DELETE', 'GET'):
             # Admin can always read and delete
             return True
 

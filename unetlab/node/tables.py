@@ -6,36 +6,36 @@ from ui.include.tables import (
 
 
 class NodeTemplateTable(ObjectTable):
-    created = tables.DateColumn(orderable=True, format="Y-m-d")
-    updated = tables.DateColumn(orderable=True, format="Y-m-d H:i")
+    created = tables.DateColumn(orderable=True, format='Y-m-d')
+    updated = tables.DateColumn(orderable=True, format='Y-m-d H:i')
 
     class Meta:
         model = NodeTemplate
         exclude = [
-            "id",
-            "name",
-            "checksum",
-            "mgmt",
-            "disk_checksum",
-            "nics",
-            "username",
-            "password",
-            "created",
-            "updated",
+            'id',
+            'name',
+            'checksum',
+            'mgmt',
+            'disk_checksum',
+            'nics',
+            'username',
+            'password',
+            'created',
+            'updated',
         ]
-        sequence = ["vendor", "os", "version", "extra", "..."]
-        order_by = ["vendor", "os", "version", "extra"]
+        sequence = ['vendor', 'os', 'version', 'extra', '...']
+        order_by = ['vendor', 'os', 'version', 'extra']
         attrs = {
-            "table_vip_actions": [
+            'table_vip_actions': [
                 {
-                    "button": "Rescan",
-                    "js": "RescanView('repository')",
+                    'button': 'Rescan',
+                    'js': "RescanView('repository')",
                 },
             ],
-            "row_actions": [
+            'row_actions': [
                 {
-                    "button": "View",
-                    "view": "nodetemplate_detail",
+                    'button': 'View',
+                    'view': 'nodetemplate_detail',
                 }
             ],
         }

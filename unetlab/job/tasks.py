@@ -31,7 +31,7 @@ def job_cancel_stale_jobs():
         stale_job_qs = Job.objects.filter(
             status__in=[JobStatusChoices.CREATED, JobStatusChoices.RUNNING]
         )
-        stale_job_ids = list(stale_job_qs.values_list("id", flat=True))
+        stale_job_ids = list(stale_job_qs.values_list('id', flat=True))
 
         if stale_job_ids:
             # Log the cancellation for each stale job
@@ -40,7 +40,7 @@ def job_cancel_stale_jobs():
                     job_id=job_id,
                     message=messages.JOB_TASK_CANCELED,
                     severity=40,
-                    source="SCHEDULER",
+                    source='SCHEDULER',
                 )
 
             # Bulk update all stale jobs in a single query

@@ -11,8 +11,8 @@ def test_job_filters_user(jobs):
     """
     Test filtering Jobs by user using the pre-created jobs fixture.
     """
-    qs = JobFilter(data={"username": "user"}).qs
-    assert list(qs) == [jobs["user"]]
+    qs = JobFilter(data={'username': 'user'}).qs
+    assert list(qs) == [jobs['user']]
 
 
 @pytest.mark.django_db
@@ -20,9 +20,9 @@ def test_job_filters_status(jobs):
     """
     Test filtering Jobs by user using the pre-created jobs fixture.
     """
-    qs_created = JobFilter(data={"status": JobStatusChoices.CREATED}).qs
+    qs_created = JobFilter(data={'status': JobStatusChoices.CREATED}).qs
     assert len(qs_created) == 3, "Expected 3 jobs with status 'CREATED'."
-    qs_succeeded = JobFilter(data={"status": JobStatusChoices.SUCCEEDED}).qs
+    qs_succeeded = JobFilter(data={'status': JobStatusChoices.SUCCEEDED}).qs
     assert len(qs_succeeded) == 1, "Expected 1 job with status 'SUCCEEDED'."
 
 

@@ -1,225 +1,225 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "additionalProperties": false,
-    "definitions": {
-        "feature": {
-            "description": "Enable a feature passing a set of key-value parameters (e.g. feature:key=value)",
-            "pattern": "^[A-Za-z0-9_\\-]+:[A-Za-z0-9_\\-]+=[A-Za-z0-9_\\-]+$",
-            "type": "string"
-        },
-        "interface": {
-            "additionalProperties": false,
-            "properties": {
-                "address": {
-                    "pattern": "^(?:(?:25[0-5]|2[0-4]\\d|1?\\d{1,2})\\.){3}(?:25[0-5]|2[0-4]\\d|1?\\d{1,2})\\/(?:[0-9]|[12][0-9]|3[0-2])$",
-                    "type": "string"
-                },
-                "features": {
-                    "items": {
-                        "$ref": "#/definitions/feature"
-                    },
-                    "type": "array",
-                    "uniqueItems": true
-                },
-                "mask": {
-                    "oneOf": [
-                        {
-                            "enum": [
-                                "auto"
-                            ],
-                            "type": "string"
-                        },
-                        {
-                            "maximum": 32,
-                            "minimum": 0,
-                            "type": "integer"
-                        }
-                    ]
-                },
-                "match": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "match",
-                "address",
-                "mask"
-            ],
-            "type": "object"
-        },
-        "link": {
-            "description": "Attach nodes to the same link (e.g. R1, R2, R3)",
-            "pattern": "^[^,\\s]+(?:\\s*,\\s*[^,\\s]+)+$",
-            "type": "string"
-        },
-        "topology-defined": {
-            "additionalProperties": false,
-            "properties": {
-                "features": {
-                    "items": {
-                        "$ref": "#/definitions/feature"
-                    },
-                    "type": "array",
-                    "uniqueItems": true
-                },
-                "link_type": {
-                    "enum": [
-                        "l1",
-                        "l2"
-                    ],
-                    "type": "string"
-                },
-                "links": {
-                    "items": {
-                        "$ref": "#/definitions/link"
-                    },
-                    "type": "array",
-                    "uniqueItems": true
-                },
-                "prefix": {
-                    "pattern": "^[A-Za-z0-9_\\-]+$",
-                    "type": "string"
-                },
-                "template": {
-                    "pattern": "^[A-Za-z0-9_\\-]+$",
-                    "type": "string"
-                },
-                "topology": {
-                    "enum": [
-                        "defined"
-                    ],
-                    "type": "string"
-                }
-            },
-            "required": [
-                "links",
-                "topology"
-            ],
-            "type": "object"
-        },
-        "topology-simple": {
-            "additionalProperties": false,
-            "properties": {
-                "count": {
-                    "minimum": 1,
-                    "type": "integer"
-                },
-                "features": {
-                    "items": {
-                        "$ref": "#/definitions/feature"
-                    },
-                    "type": "array",
-                    "uniqueItems": true
-                },
-                "link_type": {
-                    "enum": [
-                        "l1",
-                        "l2"
-                    ],
-                    "type": "string"
-                },
-                "prefix": {
-                    "pattern": "^[A-Za-z0-9_\\-]+$",
-                    "type": "string"
-                },
-                "template": {
-                    "pattern": "^[A-Za-z0-9_\\-]+$",
-                    "type": "string"
-                },
-                "topology": {
-                    "enum": [
-                        "full-mesh",
-                        "ring",
-                        "linear"
-                    ],
-                    "type": "string"
-                }
-            },
-            "required": [
-                "count",
-                "topology"
-            ],
-            "type": "object"
-        },
-        "topology-star": {
-            "additionalProperties": false,
-            "properties": {
-                "connect_hubs": {
-                    "type": "boolean"
-                },
-                "count": {
-                    "minimum": 1,
-                    "type": "integer"
-                },
-                "features": {
-                    "items": {
-                        "$ref": "#/definitions/feature"
-                    },
-                    "type": "array",
-                    "uniqueItems": true
-                },
-                "hubs": {
-                    "minimum": 1,
-                    "type": "integer"
-                },
-                "link_type": {
-                    "enum": [
-                        "l1",
-                        "l2"
-                    ],
-                    "type": "string"
-                },
-                "prefix": {
-                    "pattern": "^[A-Za-z0-9_\\-]+$",
-                    "type": "string"
-                },
-                "template": {
-                    "pattern": "^[A-Za-z0-9_\\-]+$",
-                    "type": "string"
-                },
-                "topology": {
-                    "enum": [
-                        "hub-spoke"
-                    ],
-                    "type": "string"
-                }
-            },
-            "required": [
-                "count",
-                "topology"
-            ],
-            "type": "object"
-        }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "feature": {
+      "description": "Enable a feature passing a set of key-value parameters (e.g. feature:key=value)",
+      "pattern": "^[A-Za-z0-9_\\-]+:[A-Za-z0-9_\\-]+=[A-Za-z0-9_\\-]+$",
+      "type": "string"
     },
-    "properties": {
-        "groups": {
-            "items": {
-                "oneOf": [
-                    {
-                        "$ref": "#/definitions/topology-simple"
-                    },
-                    {
-                        "$ref": "#/definitions/topology-star"
-                    },
-                    {
-                        "$ref": "#/definitions/topology-defined"
-                    }
-                ]
-            },
-            "minItems": 1,
-            "type": "array"
+    "interface": {
+      "additionalProperties": false,
+      "properties": {
+        "address": {
+          "pattern": "^(?:(?:25[0-5]|2[0-4]\\d|1?\\d{1,2})\\.){3}(?:25[0-5]|2[0-4]\\d|1?\\d{1,2})\\/(?:[0-9]|[12][0-9]|3[0-2])$",
+          "type": "string"
         },
-        "interfaces": {
-            "items": {
-                "$ref": "#/definitions/interface"
+        "features": {
+          "items": {
+            "$ref": "#/definitions/feature"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "mask": {
+          "oneOf": [
+            {
+              "enum": [
+                "auto"
+              ],
+              "type": "string"
             },
-            "minItems": 0,
-            "type": "array"
+            {
+              "maximum": 32,
+              "minimum": 0,
+              "type": "integer"
+            }
+          ]
+        },
+        "match": {
+          "type": "string"
         }
+      },
+      "required": [
+        "match",
+        "address",
+        "mask"
+      ],
+      "type": "object"
     },
-    "required": [
-        "groups"
-    ],
-    "title": "High Level Description",
-    "type": "object"
+    "link": {
+      "description": "Attach nodes to the same link (e.g. R1, R2, R3)",
+      "pattern": "^[^,\\s]+(?:\\s*,\\s*[^,\\s]+)+$",
+      "type": "string"
+    },
+    "topology-defined": {
+      "additionalProperties": false,
+      "properties": {
+        "features": {
+          "items": {
+            "$ref": "#/definitions/feature"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "link_type": {
+          "enum": [
+            "l1",
+            "l2"
+          ],
+          "type": "string"
+        },
+        "links": {
+          "items": {
+            "$ref": "#/definitions/link"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "prefix": {
+          "pattern": "^[A-Za-z0-9_\\-]+$",
+          "type": "string"
+        },
+        "template": {
+          "pattern": "^[A-Za-z0-9_\\-]+$",
+          "type": "string"
+        },
+        "topology": {
+          "enum": [
+            "defined"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "links",
+        "topology"
+      ],
+      "type": "object"
+    },
+    "topology-simple": {
+      "additionalProperties": false,
+      "properties": {
+        "count": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "features": {
+          "items": {
+            "$ref": "#/definitions/feature"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "link_type": {
+          "enum": [
+            "l1",
+            "l2"
+          ],
+          "type": "string"
+        },
+        "prefix": {
+          "pattern": "^[A-Za-z0-9_\\-]+$",
+          "type": "string"
+        },
+        "template": {
+          "pattern": "^[A-Za-z0-9_\\-]+$",
+          "type": "string"
+        },
+        "topology": {
+          "enum": [
+            "full-mesh",
+            "ring",
+            "linear"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "count",
+        "topology"
+      ],
+      "type": "object"
+    },
+    "topology-star": {
+      "additionalProperties": false,
+      "properties": {
+        "connect_hubs": {
+          "type": "boolean"
+        },
+        "count": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "features": {
+          "items": {
+            "$ref": "#/definitions/feature"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "hubs": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "link_type": {
+          "enum": [
+            "l1",
+            "l2"
+          ],
+          "type": "string"
+        },
+        "prefix": {
+          "pattern": "^[A-Za-z0-9_\\-]+$",
+          "type": "string"
+        },
+        "template": {
+          "pattern": "^[A-Za-z0-9_\\-]+$",
+          "type": "string"
+        },
+        "topology": {
+          "enum": [
+            "hub-spoke"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "count",
+        "topology"
+      ],
+      "type": "object"
+    }
+  },
+  "properties": {
+    "groups": {
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/definitions/topology-simple"
+          },
+          {
+            "$ref": "#/definitions/topology-star"
+          },
+          {
+            "$ref": "#/definitions/topology-defined"
+          }
+        ]
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "interfaces": {
+      "items": {
+        "$ref": "#/definitions/interface"
+      },
+      "minItems": 0,
+      "type": "array"
+    }
+  },
+  "required": [
+    "groups"
+  ],
+  "title": "High Level Description",
+  "type": "object"
 }

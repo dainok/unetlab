@@ -11,8 +11,8 @@ class JobConfig(AppConfig):
     and execute startup logic like signal registration.
     """
 
-    name = "job"  # Python path to the app
-    verbose_name = "Jobs"  # Human-readable app name
+    name = 'job'  # Python path to the app
+    verbose_name = 'Jobs'  # Human-readable app name
 
     def ready(self):
         """

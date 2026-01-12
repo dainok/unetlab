@@ -1,9 +1,9 @@
 """Manage WebSocket messages."""
 
-__author__ = "Andrea Dainese"
-__contact__ = "andrea@adainese.it"
-__copyright__ = "Copyright 2024, Andrea Dainese"
-__license__ = "GPLv3"
+__author__ = 'Andrea Dainese'
+__contact__ = 'andrea@adainese.it'
+__copyright__ = 'Copyright 2024, Andrea Dainese'
+__license__ = 'GPLv3'
 
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
@@ -17,45 +17,45 @@ class ActionConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         """Accept a new WebSocket user."""
         # TODO: authentication is required before using WS
-        self.user = self.scope["user"]
-        print("*** CONNECT", self.user)
+        self.user = self.scope['user']
+        print('*** CONNECT', self.user)
         # print("*** CHANNEL", self.channel_name)
 
         # Ass user's channel to broadcast group
         await self.channel_layer.group_add(
-            "broadcast",
+            'broadcast',
             self.channel_name,
         )
         # To avoid tracking of user's channel, add it to the well known group
         await self.channel_layer.group_add(
-            f"group-{self.user}",
+            f'group-{self.user}',
             self.channel_name,
         )
         await self.accept()
 
     async def disconnect(self, close_code):
         """Disconnect a WebSocket user."""
-        print("*** DISCONNECT", self.user)
+        print('*** DISCONNECT', self.user)
         # print("*** GROUPS", self.channel_layer.groups)
 
         # Remove user's channel from groups
         await self.channel_layer.group_discard(
-            f"group-{self.user}",
+            f'group-{self.user}',
             self.channel_name,
         )
         await self.channel_layer.group_discard(
-            "broadcast",
+            'broadcast',
             self.channel_name,
         )
 
     async def receive(self, text_data):
         """Receive a message from a WebSocket user."""
-        print("*** RECEIVE", self.user)
+        print('*** RECEIVE', self.user)
         # print("*** GROUPS", self.channel_layer.groups) # Not all messages are from WebSockets
         try:
             log = json.loads(text_data)
         except json.decoder.JSONDecodeError:
-            print("NOT A LOG", text_data)
+            print('NOT A LOG', text_data)
             return
 
         # TODO: validate the log schema
@@ -79,11 +79,11 @@ class ActionConsumer(AsyncWebsocketConsumer):
     #     self.channel_layer.group_send("broadcast", data)
 
     async def event(self, data):
-        if data["command"] == "log-add":
+        if data['command'] == 'log-add':
             # Forward external log to WebSockets.
-            print("*** LOG MSG -> USER", data)
+            print('*** LOG MSG -> USER', data)
             # TODO: must select the right channel
             await self.send(text_data=json.dumps(data))
-            self.channel_layer.group_send("broadcast", data)
+            self.channel_layer.group_send('broadcast', data)
         else:
-            print("UNKOWN EVENT COMMAND", data)
+            print('UNKOWN EVENT COMMAND', data)

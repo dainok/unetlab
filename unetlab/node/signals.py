@@ -30,10 +30,10 @@ def set_name(sender, instance, **kwargs):
 
         # Define repository name
         if instance.extra:
-            instance.name = f"template-{instance.vendor}-{instance.os}-{instance.version}-{instance.extra}".lower()
+            instance.name = f'template-{instance.vendor}-{instance.os}-{instance.version}-{instance.extra}'.lower()
         else:
             instance.name = (
-                f"template-{instance.vendor}-{instance.os}-{instance.version}".lower()
+                f'template-{instance.vendor}-{instance.os}-{instance.version}'.lower()
             )
 
         instance.created_at = timezone.now()

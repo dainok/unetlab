@@ -10,4 +10,4 @@ class ObjectSerializer(serializers.ModelSerializer):
         """Meta options."""
 
         model = None
-        fields = "__all__"
+        fields = '__all__'

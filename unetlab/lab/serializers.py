@@ -18,10 +18,10 @@ class LabSerializer(serializers.ModelSerializer):
         """Meta options."""
 
         model = Lab
-        fields = "__all__"
+        fields = '__all__'
         read_only_fields = [
-            "created_at",
-            "updated_at",
+            'created_at',
+            'updated_at',
         ]  # Make some fields read-only
 
 

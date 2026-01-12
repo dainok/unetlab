@@ -13,24 +13,24 @@ from ui.include.tables import ObjectTable
 class LabTable(ObjectTable):
     """Table definition for the Lab model."""
 
-    name = tables.LinkColumn("lab_detail", args=[tables.A("pk")])
-    user = tables.LinkColumn("user_detail", args=[tables.A("user__pk")])
+    name = tables.LinkColumn('lab_detail', args=[tables.A('pk')])
+    user = tables.LinkColumn('user_detail', args=[tables.A('user__pk')])
     shared_group = tables.LinkColumn(
-        "group_detail", args=[tables.A("shared_group__pk")]
+        'group_detail', args=[tables.A('shared_group__pk')]
     )
-    created_at = tables.DateColumn(orderable=True, format="Y-m-d")
-    updated_at = tables.DateColumn(orderable=True, format="Y-m-d H:i")
+    created_at = tables.DateColumn(orderable=True, format='Y-m-d')
+    updated_at = tables.DateColumn(orderable=True, format='Y-m-d H:i')
 
     class Meta:
         model = Lab
         exclude = [
-            "id",
-            "hld",
-            "lld",
-            "created_at",
+            'id',
+            'hld',
+            'lld',
+            'created_at',
         ]
-        sequence = ["name", "user", "shared_group", "updated_at"]
-        order_by = ["name"]
+        sequence = ['name', 'user', 'shared_group', 'updated_at']
+        order_by = ['name']
         # attrs = {
         #     "row_actions": [
         #         {

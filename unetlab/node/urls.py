@@ -17,9 +17,9 @@ from node.views import (
 
 # DRF router for API endpoints of Template viewsets
 router = DefaultRouter()
-router.register(r"template", NodeTemplateAPIViewSet, basename="template")
-template_router = NestedSimpleRouter(router, r"template", lookup="template")
-template_router.register(r"disk", DiskTemplateAPIViewSet, basename="template-disk")
+router.register(r'template', NodeTemplateAPIViewSet, basename='template')
+template_router = NestedSimpleRouter(router, r'template', lookup='template')
+template_router.register(r'disk', DiskTemplateAPIViewSet, basename='template-disk')
 
 # URL patterns for class-based views and API endpoints
 urlpatterns = [
@@ -39,29 +39,29 @@ urlpatterns = [
     #########################################################################
     # NodeTemplate views (HTML)
     #########################################################################
-    path("template/", NodeTemplateListView.as_view(), name="nodetemplate_list"),
+    path('template/', NodeTemplateListView.as_view(), name='nodetemplate_list'),
     path(
-        "template/create", NodeTemplateCreateView.as_view(), name="nodetemplate_create"
+        'template/create', NodeTemplateCreateView.as_view(), name='nodetemplate_create'
     ),
     path(
-        "template/delete",
+        'template/delete',
         NodeTemplateBulkDeleteView.as_view(),
-        name="nodetemplate_bulkdelete",
+        name='nodetemplate_bulkdelete',
     ),
     path(
-        "template/<str:pk>/delete",
+        'template/<str:pk>/delete',
         NodeTemplateDeleteView.as_view(),
-        name="nodetemplate_delete",
+        name='nodetemplate_delete',
     ),
     path(
-        "template/<str:pk>/update",
+        'template/<str:pk>/update',
         NodeTemplateChangeView.as_view(),
-        name="nodetemplate_update",
+        name='nodetemplate_update',
     ),
     path(
-        "template/<str:pk>/",
+        'template/<str:pk>/',
         NodeTemplateDetailView.as_view(),
-        name="nodetemplate_detail",
+        name='nodetemplate_detail',
     ),
     #########################################################################
     # Custom API endpoints
@@ -74,6 +74,6 @@ urlpatterns = [
     #########################################################################
     # API endpoints
     #########################################################################
-    path("api/", include(router.urls)),
-    path("api/", include(template_router.urls)),
+    path('api/', include(router.urls)),
+    path('api/', include(template_router.urls)),
 ]

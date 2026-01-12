@@ -16,7 +16,7 @@ class GroupSerializer(ObjectSerializer):
     class Meta:
         """Meta options."""
 
-        fields = ("id", "name")
+        fields = ('id', 'name')
         model = Group
 
 
@@ -41,37 +41,37 @@ class UserSerializer(ObjectSerializer):
 
         model = User
         fields = (
-            "date_joined",
-            "email",
-            "first_name",
-            "groups_display",
-            "groups",
-            "id",
-            "is_active",
-            "is_staff",
-            "is_superuser",
-            "last_login",
-            "last_name",
-            "username",
+            'date_joined',
+            'email',
+            'first_name',
+            'groups_display',
+            'groups',
+            'id',
+            'is_active',
+            'is_staff',
+            'is_superuser',
+            'last_login',
+            'last_name',
+            'username',
         )
         read_only_fields = (
-            "date_joined",
-            "groups_display",
-            "id",
-            "last_login",
+            'date_joined',
+            'groups_display',
+            'id',
+            'last_login',
         )
 
     def get_groups_display(self, obj) -> list:
         """Return Group names in readable format."""
         return [
-            {"id": group.id, "name": group.name}
-            for group in obj.groups.all().order_by("name")
+            {'id': group.id, 'name': group.name}
+            for group in obj.groups.all().order_by('name')
         ]
 
     def update(self, instance, validated_data) -> User:
         """Update the User objects managing password and Groups."""
-        groups = validated_data.pop("groups", None)
-        password = validated_data.pop("password", None)
+        groups = validated_data.pop('groups', None)
+        password = validated_data.pop('password', None)
 
         for attr, value in validated_data.items():
             # Update standard fields
@@ -90,10 +90,10 @@ class UserSerializer(ObjectSerializer):
 
     def get_fields(self) -> dict:
         fields = super().get_fields()
-        request = self.context.get("request", None)
+        request = self.context.get('request', None)
         if request and request.user and not request.user.is_superuser:
             # Web request -> disable field for non admins
-            fields["groups"].read_only = True
-            fields["is_staff"].read_only = True
-            fields["is_superuser"].read_only = True
+            fields['groups'].read_only = True
+            fields['is_staff'].read_only = True
+            fields['is_superuser'].read_only = True
         return fields

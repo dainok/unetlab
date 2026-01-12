@@ -14,18 +14,18 @@ def test_job_models_job_create():
     - The string representation returns the primary key as a string.
     - The default status is set to 'CREATED'.
     """
-    job = Job.objects.create(username="admin")
+    job = Job.objects.create(username='admin')
 
     # Check that __str__ returns the primary key as string
-    assert str(job) == str(job.pk), "Job __str__ should return primary key as string"
+    assert str(job) == str(job.pk), 'Job __str__ should return primary key as string'
 
     # Check that the default status is CREATED
-    assert (
-        job.status == JobStatusChoices.CREATED.value
-    ), "Default job status should be CREATED"
+    assert job.status == JobStatusChoices.CREATED.value, (
+        'Default job status should be CREATED'
+    )
 
     # Check that the user is set correctly
-    assert job.username == "admin", "Job user should match the provided value"
+    assert job.username == 'admin', 'Job user should match the provided value'
 
 
 @pytest.mark.django_db
@@ -40,35 +40,35 @@ def test_job_models_log_create():
     - Default acknowledged field is False.
     - All provided fields (severity, source, type) are set correctly.
     """
-    job = Job.objects.create(username="admin")
+    job = Job.objects.create(username='admin')
 
     # Verify Job creation
-    assert str(job) == str(job.pk), "Job __str__ should return primary key as string"
-    assert (
-        job.status == JobStatusChoices.CREATED.value
-    ), "Default job status should be CREATED"
-    assert job.username == "admin", "Job user should match the provided value"
+    assert str(job) == str(job.pk), 'Job __str__ should return primary key as string'
+    assert job.status == JobStatusChoices.CREATED.value, (
+        'Default job status should be CREATED'
+    )
+    assert job.username == 'admin', 'Job user should match the provided value'
 
     # Create a Log entry associated with the Job
     log = Log.objects.create(
         job=job,
-        message="Test message",
+        message='Test message',
         severity=LogSeverityChoices.ERROR,
-        source="testhost",
+        source='testhost',
         type=LogTypeChoices.APP,
     )
 
     # Check string representation returns primary key
-    assert str(log) == str(log.pk), "Log __str__ should return primary key as string"
+    assert str(log) == str(log.pk), 'Log __str__ should return primary key as string'
 
     # Confirm default acknowledged value is False
-    assert not log.acknowledged, "Default acknowledged field should be False"
+    assert not log.acknowledged, 'Default acknowledged field should be False'
 
     # Validate all assigned fields
-    assert log.job == job, "Log.job should reference the associated Job"
-    assert log.message == "Test message", "Log message should be set correctly"
-    assert (
-        log.severity == LogSeverityChoices.ERROR
-    ), "Log severity should match assigned value"
-    assert log.source == "testhost", "Log source should match assigned value"
-    assert log.type == LogTypeChoices.APP, "Log type should match assigned value"
+    assert log.job == job, 'Log.job should reference the associated Job'
+    assert log.message == 'Test message', 'Log message should be set correctly'
+    assert log.severity == LogSeverityChoices.ERROR, (
+        'Log severity should match assigned value'
+    )
+    assert log.source == 'testhost', 'Log source should match assigned value'
+    assert log.type == LogTypeChoices.APP, 'Log type should match assigned value'

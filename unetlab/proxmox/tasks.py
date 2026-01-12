@@ -1,9 +1,9 @@
 """Proxmox tasks."""
 
-__author__ = "Andrea Dainese"
-__contact__ = "andrea@adainese.it"
-__copyright__ = "Copyright 2024, Andrea Dainese"
-__license__ = "GPLv3"
+__author__ = 'Andrea Dainese'
+__contact__ = 'andrea@adainese.it'
+__copyright__ = 'Copyright 2024, Andrea Dainese'
+__license__ = 'GPLv3'
 
 from celery import shared_task
 from proxmoxer import ProxmoxAPI
@@ -23,16 +23,16 @@ def call_proxmox_api(func, *, job_id=None):
     except ResourceException as err:
         log(
             job_id,
-            f"{messages.PROXMOX_API_ERROR} ({err.status_message.lower()})",
+            f'{messages.PROXMOX_API_ERROR} ({err.status_message.lower()})',
             40,
-            "SCHEDULER",
+            'SCHEDULER',
         )
     except ConnectTimeout:
-        log(job_id, f"{messages.PROXMOX_API_ERROR} (timeout)", 40, "SCHEDULER")
+        log(job_id, f'{messages.PROXMOX_API_ERROR} (timeout)', 40, 'SCHEDULER')
     except ConnectionError:
-        log(job_id, f"{messages.PROXMOX_API_ERROR} (connection error)", 40, "SCHEDULER")
+        log(job_id, f'{messages.PROXMOX_API_ERROR} (connection error)', 40, 'SCHEDULER')
     except RequestException:
-        log(job_id, f"{messages.PROXMOX_API_ERROR} (exception)", 40, "SCHEDULER")
+        log(job_id, f'{messages.PROXMOX_API_ERROR} (exception)', 40, 'SCHEDULER')
 
 
 @shared_task
@@ -48,7 +48,7 @@ def job_rescan(job_id):
     )
 
     # Start the job
-    log(job_obj.pk, messages.PROXMOX_TASK_RESCAN_STARTED, 20, "SCHEDULER")
+    log(job_obj.pk, messages.PROXMOX_TASK_RESCAN_STARTED, 20, 'SCHEDULER')
     job_obj.status = JobStatusChoices.RUNNING.value
     job_obj.save()
 
@@ -63,12 +63,12 @@ def job_rescan(job_id):
     # Analyse data
     hosts = []
     for entry in data:
-        if entry["type"] != "node":
+        if entry['type'] != 'node':
             continue
         # Add/update ProxmoxHost
-        hosts.append(entry["name"])
-        host_obj, created = ProxmoxHost.objects.get_or_create(name=entry["name"])
-        host_obj.ip_address = entry["ip"]
+        hosts.append(entry['name'])
+        host_obj, created = ProxmoxHost.objects.get_or_create(name=entry['name'])
+        host_obj.ip_address = entry['ip']
         host_obj.is_online = True
         host_obj.is_orphan = False
         host_obj.save()
@@ -76,7 +76,7 @@ def job_rescan(job_id):
     ProxmoxHost.objects.exclude(name__in=hosts).update(is_orphan=True)
 
     # End the job
-    log(job_obj.pk, messages.PROXMOX_TASK_RESCAN_COMPLETED, 20, "SCHEDULER")
+    log(job_obj.pk, messages.PROXMOX_TASK_RESCAN_COMPLETED, 20, 'SCHEDULER')
     job_obj.status = JobStatusChoices.SUCCEEDED.value
     job_obj.save()
 
@@ -85,5 +85,5 @@ def do_rescan(username=None):
     """Rescan Proxmox infrastructure."""
     # Create job and log
     job_obj = Job.objects.create(username=username)
-    log(job_obj.pk, messages.PROXMOX_TASK_RESCAN_ENQUEUED, 20, "APP")
+    log(job_obj.pk, messages.PROXMOX_TASK_RESCAN_ENQUEUED, 20, 'APP')
     job_rescan.delay(job_obj.pk)

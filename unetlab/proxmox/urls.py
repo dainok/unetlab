@@ -11,14 +11,14 @@ from proxmox.views import (
 
 # DRF router for API endpoints of ProxmoxHost viewsets
 router = DefaultRouter()
-router.register(r"host", ProxmoxHostAPIViewSet, basename="host")
+router.register(r'host', ProxmoxHostAPIViewSet, basename='host')
 
 # URL patterns for class-based views and API endpoints
 urlpatterns = [
-    path("host/", ProxmoxHostListView.as_view(), name="host_list"),
-    path("host/<str:pk>/", ProxmoxHostDetailView.as_view(), name="host_detail"),
+    path('host/', ProxmoxHostListView.as_view(), name='host_list'),
+    path('host/<str:pk>/', ProxmoxHostDetailView.as_view(), name='host_detail'),
     #########################################################################
     # API endpoints
     #########################################################################
-    path("api/", include(router.urls)),
+    path('api/', include(router.urls)),
 ]

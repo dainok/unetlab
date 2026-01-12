@@ -24,7 +24,7 @@ class NodeFilter(SearchFilterSet):
 
     class Meta:
         model = Node
-        fields = ["running_name"]
+        fields = ['running_name']
 
 
 class NodeTemplateFilter(SearchFilterSet):
@@ -40,26 +40,26 @@ class NodeTemplateFilter(SearchFilterSet):
         - created_at__lte: Filter Templates created on or before a given date
     """
 
-    search_fields = ["name", "checksum"]
+    search_fields = ['name', 'checksum']
     extra = django_filters.ChoiceFilter(
         choices=[],  # Populated dynamically in __init__
-        label="Extra",
+        label='Extra',
     )
     os = django_filters.ChoiceFilter(
         choices=[],  # Populated dynamically in __init__
-        label="OS",
+        label='OS',
     )
     username = django_filters.ChoiceFilter(
         choices=[],  # Populated dynamically in __init__
-        label="Username",
+        label='Username',
     )
     vendor = django_filters.ChoiceFilter(
         choices=[],  # Populated dynamically in __init__
-        label="Vendor",
+        label='Vendor',
     )
     version = django_filters.ChoiceFilter(
         choices=[],  # Populated dynamically in __init__
-        label="Version",
+        label='Version',
     )
 
     def __init__(self, *args, **kwargs):
@@ -70,25 +70,25 @@ class NodeTemplateFilter(SearchFilterSet):
         super().__init__(*args, **kwargs)
         queryset = NodeTemplate.objects.all()
         # Ottieni valori distinti
-        extras = queryset.order_by("extra").values_list("extra", flat=True).distinct()
-        oses = queryset.order_by("os").values_list("os", flat=True).distinct()
+        extras = queryset.order_by('extra').values_list('extra', flat=True).distinct()
+        oses = queryset.order_by('os').values_list('os', flat=True).distinct()
         usernames = (
-            queryset.order_by("username").values_list("username", flat=True).distinct()
+            queryset.order_by('username').values_list('username', flat=True).distinct()
         )
         vendors = (
-            queryset.order_by("vendor").values_list("vendor", flat=True).distinct()
+            queryset.order_by('vendor').values_list('vendor', flat=True).distinct()
         )
         versions = (
-            queryset.order_by("version").values_list("version", flat=True).distinct()
+            queryset.order_by('version').values_list('version', flat=True).distinct()
         )
 
         # Aggiorna direttamente i choices del widget
-        self.filters["extra"].field.choices = [(e, e) for e in extras]
-        self.filters["os"].field.choices = [(o, o) for o in oses]
-        self.filters["username"].field.choices = [(u, u) for u in usernames]
-        self.filters["vendor"].field.choices = [(v, v) for v in vendors]
-        self.filters["version"].field.choices = [(v, v) for v in versions]
+        self.filters['extra'].field.choices = [(e, e) for e in extras]
+        self.filters['os'].field.choices = [(o, o) for o in oses]
+        self.filters['username'].field.choices = [(u, u) for u in usernames]
+        self.filters['vendor'].field.choices = [(v, v) for v in vendors]
+        self.filters['version'].field.choices = [(v, v) for v in versions]
 
     class Meta:
         model = NodeTemplate
-        fields = ["vendor", "os", "version", "extra", "username"]
+        fields = ['vendor', 'os', 'version', 'extra', 'username']
