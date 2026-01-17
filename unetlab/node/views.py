@@ -132,25 +132,17 @@ class NodeTemplateAPIViewSet(NodeTemplateQueryMixin, APICRUDViewSet):
 class NodeTemplateBulkDeleteView(NodeTemplateQueryMixin, ObjectBulkDeleteView):
     """HTML view for deleting multiple NodeTemplate objects at once."""
 
-    pass
-
 
 class NodeTemplateChangeView(NodeTemplateQueryMixin, ObjectChangeView):
     """HTML view for updating an existing NodeTemplate."""
-
-    pass
 
 
 class NodeTemplateCreateView(NodeTemplateQueryMixin, ObjectCreateView):
     """HTML view for creating a new NodeTemplate."""
 
-    pass
-
 
 class NodeTemplateDeleteView(NodeTemplateQueryMixin, ObjectDeleteView):
     """HTML view for deleting a single NodeTemplate."""
-
-    pass
 
 
 class NodeTemplateDetailView(NodeTemplateQueryMixin, ObjectDetailView):
@@ -165,8 +157,6 @@ class NodeTemplateDetailView(NodeTemplateQueryMixin, ObjectDetailView):
 
 class NodeTemplateListView(NodeTemplateQueryMixin, ObjectListView):
     """HTML view for displaying a table of NodeTemplate objects."""
-
-    pass
 
 
 #############################################################################

@@ -14,18 +14,18 @@ from node.models import NodeTemplate
 def nodetemplate_rescan():
     """Rescan NodeTemplates and update database."""
     TEMPLATE_PATHS = (
-        Path("/opt/unetlab/addons"),
-        Path("/opt/unetlab/templates"),
+        Path('/opt/unetlab/addons'),
+        Path('/opt/unetlab/templates'),
     )
-    nodetemplate_list = set(NodeTemplate.objects.all().values_list("path", flat=True))
+    nodetemplate_list = set(NodeTemplate.objects.all().values_list('path', flat=True))
     for template_path in TEMPLATE_PATHS:
         if not template_path.exists():
             # Skip missing directory
             continue
 
-        for template_file in template_path.rglob("template.yml"):
+        for template_file in template_path.rglob('template.yml'):
             print(template_file)
-            with open(template_file, "r") as fh:
+            with open(template_file) as fh:
                 template = yaml.safe_load(fh)
                 print(template)
             # IF TEMPLATE EXIST IN THE MODEL -> UPDATE THE OBJECT and remove from nodetemplate_list

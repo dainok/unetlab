@@ -77,25 +77,17 @@ class LabAPIViewSet(LabQueryMixin, APICRUDViewSet):
 class LabBulkDeleteView(LabQueryMixin, ObjectBulkDeleteView):
     """HTML view for deleting multiple Lab objects at once."""
 
-    pass
-
 
 class LabChangeView(LabQueryMixin, ObjectChangeView):
     """HTML view for updating an existing Lab."""
-
-    pass
 
 
 class LabCreateView(LabQueryMixin, ObjectCreateView):
     """HTML view for creating a new Lab."""
 
-    pass
-
 
 class LabDeleteView(LabQueryMixin, ObjectDeleteView):
     """HTML view for deleting a single GLabroup."""
-
-    pass
 
 
 class LabDetailView(LabQueryMixin, ObjectDetailView):
@@ -126,8 +118,6 @@ class LabDetailView(LabQueryMixin, ObjectDetailView):
 
 class LabListView(LabQueryMixin, ObjectListView):
     """HTML view for displaying a table of Lab objects."""
-
-    pass
 
 
 # class LabTopologyView(LabQueryMixin, ObjectDetailView):
