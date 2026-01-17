@@ -142,31 +142,21 @@ class GroupQueryMixin:
 class GroupAPIViewSet(GroupQueryMixin, APICRUDViewSet):
     """REST API ViewSet for the Group model."""
 
-    pass
-
 
 class GroupBulkDeleteView(GroupQueryMixin, ObjectBulkDeleteView):
     """HTML view for deleting multiple Group objects at once."""
-
-    pass
 
 
 class GroupChangeView(GroupQueryMixin, ObjectChangeView):
     """HTML view for updating an existing Group."""
 
-    pass
-
 
 class GroupCreateView(GroupQueryMixin, ObjectCreateView):
     """HTML view for creating a new Group."""
 
-    pass
-
 
 class GroupDeleteView(GroupQueryMixin, ObjectDeleteView):
     """HTML view for deleting a single Group."""
-
-    pass
 
 
 class GroupDetailView(GroupQueryMixin, ObjectDetailView):
@@ -180,8 +170,6 @@ class GroupDetailView(GroupQueryMixin, ObjectDetailView):
 
 class GroupListView(GroupQueryMixin, ObjectListView):
     """HTML view for displaying a table of Group objects."""
-
-    pass
 
 
 #############################################################################
@@ -218,31 +206,21 @@ class UserQueryMixin:
 class UserAPIViewSet(UserQueryMixin, APICRUDViewSet):
     """REST API ViewSet for the User model."""
 
-    pass
-
 
 class UserBulkDeleteView(UserQueryMixin, ObjectBulkDeleteView):
     """HTML view for deleting multiple User objects at once."""
-
-    pass
 
 
 class UserChangeView(UserQueryMixin, ObjectChangeView):
     """HTML view for updating an existing User."""
 
-    pass
-
 
 class UserCreateView(UserQueryMixin, ObjectCreateView):
     """HTML view for creating a new User."""
 
-    pass
-
 
 class UserDeleteView(UserQueryMixin, ObjectDeleteView):
     """HTML view for deleting a single User."""
-
-    pass
 
 
 class UserDetailView(UserQueryMixin, ObjectDetailView):

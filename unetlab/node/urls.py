@@ -1,4 +1,4 @@
-"""UNetLab URL Configuration for the proxmox app."""
+"""URL configuration for Node app."""
 
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
@@ -12,14 +12,14 @@ from node.views import (
     NodeTemplateDeleteView,
     NodeTemplateDetailView,
     NodeTemplateListView,
-    DiskTemplateAPIViewSet,
+    # DiskTemplateAPIViewSet,
 )
 
 # DRF router for API endpoints of Template viewsets
 router = DefaultRouter()
 router.register(r'template', NodeTemplateAPIViewSet, basename='template')
 template_router = NestedSimpleRouter(router, r'template', lookup='template')
-template_router.register(r'disk', DiskTemplateAPIViewSet, basename='template-disk')
+# template_router.register(r'disk', DiskTemplateAPIViewSet, basename='template-disk')
 
 # URL patterns for class-based views and API endpoints
 urlpatterns = [

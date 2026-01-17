@@ -1,3 +1,5 @@
+"""Table definitions for Node app."""
+
 import django_tables2 as tables
 from node.models import NodeTemplate
 from ui.include.tables import (

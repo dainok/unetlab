@@ -1,5 +1,5 @@
 ansible: false
-djang_app: null
+djang_app: unetlab
 pyright: false
 sbom: true
 terraform: false

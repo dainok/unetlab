@@ -386,3 +386,8 @@ Backup of *.doc*
 #############################################################################
 
 sbom-cyclonedx.json
+secrets.json
+secrets.txt
+secrets.yaml
+secrets.yml
+/*.tar.gz

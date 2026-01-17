@@ -9,6 +9,6 @@ urlpatterns = [
     # Include URLs from the local apps
     # path("", include("job.urls")),
     path('', include('lab.urls')),
-    # path("", include("node.urls")),
+    path('', include('node.urls')),
     # path("", include("proxmox.urls")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

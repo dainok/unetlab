@@ -1,7 +1,7 @@
-"""Serializers, called by API View."""
+"""Serializers for Node app."""
 
 from rest_framework import serializers
-from node.models import Node, NodeTemplate
+from node.models import NodeTemplate
 
 
 class NodeTemplateSerializer(serializers.ModelSerializer):
@@ -16,20 +16,20 @@ class NodeTemplateSerializer(serializers.ModelSerializer):
         ]  # Make some fields read-only
 
 
-class DiskTemplateSerializer(serializers.Serializer):
-    file = serializers.FileField()
+# class DiskTemplateSerializer(serializers.Serializer):
+#     file = serializers.FileField()
 
 
-class NodeSerializer(serializers.ModelSerializer):
-    """Serializer for Node model."""
+# class NodeSerializer(serializers.ModelSerializer):
+#     """Serializer for Node model."""
 
-    disks = DiskTemplateSerializer(read_only=True)
-    template = NodeTemplateSerializer(read_only=True)
+#     disks = DiskTemplateSerializer(read_only=True)
+#     template = NodeTemplateSerializer(read_only=True)
 
-    class Meta:
-        model = Node
-        fields = '__all__'
-        read_only_fields = [
-            'created_at',
-            'updated_at',
-        ]  # Make some fields read-only
+#     class Meta:
+#         model = Node
+#         fields = '__all__'
+#         read_only_fields = [
+#             'created_at',
+#             'updated_at',
+#         ]  # Make some fields read-only

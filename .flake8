@@ -1,5 +1,5 @@
 [flake8]
-exclude = __pycache__|.git|.venv|build|dist|env|migrations|venv
+exclude = __pycache__|.git|.venv|.vscode|build|dist|env|fonts|migrations|venv
 # Ignore C901: Function is too complex
 # Ignore E501: Line too long (82 > 79 characters)
 # Ignore W503: Line break occurred before a binary operator

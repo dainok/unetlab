@@ -1,4 +1,4 @@
-exclude: __pycache__|\.git|\.venv|build|dist|env|migrations|venv|\.secrets\.baseline$|sbom-cyclonedx.json|.*large.*|.*\.qcow2|.*\.vma
+exclude: __pycache__|\.git|\.venv|\.vscode|build|dist|env|migrations|venv|\.secrets\.baseline$|sbom-cyclonedx.json|fonts|.*large.*|.*\.qcow2|.*\.vma
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -28,8 +28,7 @@ repos:
   - repo: https://github.com/Riverside-Healthcare/djLint
     rev: v1.36.4
     hooks:
-      - id: djlint-django
-        args: ["--configuration", ".djlintrc"]
+      - id: djlint-jinja
   - repo: https://github.com/PyCQA/flake8
     rev: 7.3.0
     hooks:

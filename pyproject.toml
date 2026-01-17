@@ -65,8 +65,10 @@ exclude = '''
   __pycache__
   | \.git
   | \.venv
+  | .vscode
   | build
   | dist
+  | fonts
   | migrations
   | venv
 )/
@@ -75,14 +77,17 @@ skip-string-normalization = true
 target-version = ["py310", "py311", "py312", "py313"]
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "unetlab.settings"
+minversion = "7.0"
+testpaths = ["tests"]
+
 python_files = ["test_*.py"]
-addopts = "-p no:warnings"
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+addopts = "-v -ra --strict-markers --strict-config"
 
 [tool.pyright]
-extraPaths = ["./unetlab"]
-include = ["."]
-reportMissingImports = true
+typeCheckingMode = "off"
 
 [tool.poetry]
 name = "unetlab"
@@ -105,9 +110,11 @@ exclude = [
     "__pycache__",
     ".git",
     ".venv",
+    ".vscode",
     "build",
     "dist",
     "env",
+    "fonts",
     "migrations",
     "venv",
 ]
@@ -118,3 +125,8 @@ indent-style = "space"            # Indent with spaces
 line-ending = "lf"                # Default line ending on Unix
 quote-style = "single"            # Use single quotes for strings.
 skip-magic-trailing-comma = false # Respect magic trailing commas
+
+[tool.djlint]
+exclude="__pycache__,.git,.venv,.vscode,build,dist,env,fonts,migrations,tests,venv"
+ignore="H021"
+profile="django"

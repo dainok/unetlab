@@ -21,7 +21,7 @@ def test_lab_group_read_list_api_admin(
         url = reverse('lab-list') + f'?per_page={len(all_labs)}'
         response = api_client.get(url, headers=headers)
         assert response.status_code == 200, f'Failed for user {user.username}'
-        result_labs = [l['id'] for l in response.data['results']]
+        result_labs = [lab['id'] for lab in response.data['results']]
         # for g in all_groups:
         #     assert g in result_groups, f"Group {g} not found by {user.username}"
 

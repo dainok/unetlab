@@ -2,8 +2,10 @@ exclude-paths:
   - __pycache__
   - .git
   - .venv
+  - .vscode
   - build
   - dist
   - env
+  - fonts
   - migrations
   - venv

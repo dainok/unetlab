@@ -3,9 +3,11 @@ ignore: |  # Exclude these paths from linting
   __pycache__
   .git
   .venv
+  .vscode
   build
   dist
   env
+  fonts
   migrations
   venv
 rules:

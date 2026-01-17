@@ -1,5 +1,7 @@
+"""Forms definitions for Node app."""
+
 from ui.forms import ObjectModelForm
-from node.models import Node, NodeTemplate
+from node.models import NodeTemplate
 
 # from repository.models import Repository
 
@@ -60,7 +62,7 @@ class NodeTemplateForm(ObjectModelForm):
     #     return cleaned_data
 
 
-class NodeForm(ObjectModelForm):
-    class Meta:
-        model = Node
-        fields = '__all__'
+# class NodeForm(ObjectModelForm):
+#     class Meta:
+#         model = Node
+#         fields = '__all__'

@@ -1,9 +1,12 @@
 """Define ORM models for logs."""
 
+import uuid
 from django.db import models
+from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.contrib import messages
+
+# from django.contrib import messages
 
 # TODO
 # correlation_id
@@ -27,10 +30,10 @@ class LogSeverityChoices(models.IntegerChoices):
     Uses integers as per django.contrib.messages constants.
     """
 
-    ERROR = messages.ERROR  # 40
-    WARNING = messages.WARNING  # 30
-    INFO = messages.INFO  # 20
-    DEBUG = messages.DEBUG  # 10
+    ERROR = 40, _('Error')
+    WARNING = 30, _('Warning')
+    INFO = 20, _('Info')
+    DEBUG = 10, _('Debug')
 
 
 class LogTypeChoices(models.TextChoices):
@@ -47,7 +50,7 @@ class Job(models.Model):
     """Model representing a background or system Job."""
 
     status = models.CharField(
-        max_length=255,
+        max_length=32,
         choices=JobStatusChoices.choices,
         default=JobStatusChoices.CREATED,
         verbose_name=_('Status'),
@@ -55,12 +58,14 @@ class Job(models.Model):
         editable=False,
         db_index=True,
     )
-    username = models.CharField(
-        max_length=255,
-        verbose_name=_('Owner'),
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='jobs',
         help_text=_('User who started the job.'),
         editable=False,
-        db_index=True,
     )
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
@@ -89,6 +94,10 @@ class Log(models.Model):
         help_text=_('True if the log has been acknowledged.'),
         db_index=True,
     )
+    correlation_id = models.UUIDField(
+        default=uuid.uuid4,
+        db_index=True,
+    )
     job = models.ForeignKey(
         Job,
         on_delete=models.CASCADE,
@@ -108,10 +117,10 @@ class Log(models.Model):
         editable=False,
         db_index=True,
     )
-    source = models.CharField(
+    hostname = models.CharField(
         max_length=255,
-        verbose_name=_('Source'),
-        help_text=_('Source of the log.'),
+        verbose_name=_('Hostname'),
+        help_text=_('Hostname generating the log.'),
         editable=False,
         db_index=True,
     )
@@ -124,13 +133,17 @@ class Log(models.Model):
         db_index=True,
     )
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    acknowledged_at = models.DateTimeField(auto_now=True, db_index=True)
 
     class Meta:
         db_table = 'logs'
         ordering = ['-created_at']
         verbose_name = _('Log')
         verbose_name_plural = _('Logs')
+        indexes = [
+            models.Index(fields=['job', 'severity']),
+            models.Index(fields=['job', 'created_at']),
+        ]
 
     def __str__(self) -> str:
         """Return string representation of the log (its primary key)."""
