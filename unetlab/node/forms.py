@@ -7,19 +7,21 @@ from node.models import NodeTemplate
 
 
 class NodeTemplateForm(ObjectModelForm):
-    field_order = [
-        'vendor',
-        'os',
-        'version',
-        'extra',
-        'cpu',
-        'ram',
-        'nics',
-        'oob',
-        'username',
-        'password',
-        '...',
-    ]
+    # field_order = [
+    #     'path',
+    #     'template',
+    #     'vendor',
+    #     'os',
+    #     'version',
+    #     'extra',
+    #     'cpu',
+    #     'ram',
+    #     'nics',
+    #     'oob',
+    #     'username',
+    #     'password',
+    #     '...',
+    # ]
 
     class Meta:
         model = NodeTemplate

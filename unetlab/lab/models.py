@@ -17,9 +17,7 @@ from ui.include.validators import (
 
 
 class Lab(models.Model):
-    """
-    Model for lab.
-    """
+    """Model for lab."""
 
     name = models.CharField(
         max_length=255,

@@ -1,21 +1,15 @@
-"""Define ORM models for logs."""
+"""Define ORM models for Task app."""
 
 import uuid
 from django.db import models
 from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
-# from django.contrib import messages
-
-# TODO
-# correlation_id
-# Tutti i log relativi alla stessa richiesta condividono lo stesso correlation_id.
-# fare overload di logging per usare questa struttura dati
+from ui.include.validators import PhraseValidator
 
 
-class JobStatusChoices(models.TextChoices):
-    """Enumeration for Job status."""
+class TaskStatusChoices(models.TextChoices):
+    """Enumeration for Task status."""
 
     CREATED = 'CREATED', _('Created')
     RUNNING = 'RUNNING', _('Running')
@@ -25,10 +19,7 @@ class JobStatusChoices(models.TextChoices):
 
 
 class LogSeverityChoices(models.IntegerChoices):
-    """
-    Enumeration for log severity, mapped to Django's message levels.
-    Uses integers as per django.contrib.messages constants.
-    """
+    """Enumeration for log severity. Uses integers as per django.contrib.messages constants."""
 
     ERROR = 40, _('Error')
     WARNING = 30, _('Warning')
@@ -46,15 +37,21 @@ class LogTypeChoices(models.TextChoices):
     UI = 'UI', _('UI')
 
 
-class Job(models.Model):
-    """Model representing a background or system Job."""
+class Task(models.Model):
+    """Model for background Task."""
 
+    name = models.CharField(
+        max_length=255,
+        verbose_name=_('Name'),
+        validators=[PhraseValidator],
+        help_text=_('Task name.'),
+    )
     status = models.CharField(
         max_length=32,
-        choices=JobStatusChoices.choices,
-        default=JobStatusChoices.CREATED,
+        choices=TaskStatusChoices.choices,
+        default=TaskStatusChoices.CREATED,
         verbose_name=_('Status'),
-        help_text=_('Current status of the job.'),
+        help_text=_('Current status of the task.'),
         editable=False,
         db_index=True,
     )
@@ -63,30 +60,30 @@ class Job(models.Model):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        related_name='jobs',
-        help_text=_('User who started the job.'),
+        related_name='tasks',
+        help_text=_('User who started the task.'),
         editable=False,
     )
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
 
     class Meta:
-        db_table = 'jobs'
+        db_table = 'tasks'
         ordering = ['-created_at']
-        verbose_name = _('Job')
-        verbose_name_plural = _('Jobs')
+        verbose_name = _('Task')
+        verbose_name_plural = _('Tasks')
 
-    def __str__(self) -> str:
-        """Return string representation of the job (its primary key)."""
-        return str(self.pk)
+    def __str__(self):
+        """Return a human readable name when the object is printed."""
+        return self.pk
 
-    def get_absolute_url(self) -> str:
-        """Return absolute URL for the job detail view."""
-        return reverse('job-detail-view', args=[str(self.pk)])
+    def get_absolute_url(self):
+        """Return the absolute url."""
+        return reverse('task-detail-view', args=[str(self.pk)])
 
 
 class Log(models.Model):
-    """Model representing a log entry linked to a job."""
+    """Model representing a Logb."""
 
     acknowledged = models.BooleanField(
         default=False,
@@ -98,12 +95,12 @@ class Log(models.Model):
         default=uuid.uuid4,
         db_index=True,
     )
-    job = models.ForeignKey(
-        Job,
+    task = models.ForeignKey(
+        Task,
         on_delete=models.CASCADE,
         related_name='logs',
-        verbose_name=_('Job'),
-        help_text=_('Job associated with this log.'),
+        verbose_name=_('Task'),
+        help_text=_('Task associated with this log.'),
     )
     message = models.TextField(
         verbose_name=_('Message'),
@@ -141,14 +138,14 @@ class Log(models.Model):
         verbose_name = _('Log')
         verbose_name_plural = _('Logs')
         indexes = [
-            models.Index(fields=['job', 'severity']),
-            models.Index(fields=['job', 'created_at']),
+            models.Index(fields=['task', 'severity']),
+            models.Index(fields=['task', 'created_at']),
         ]
 
-    def __str__(self) -> str:
-        """Return string representation of the log (its primary key)."""
-        return str(self.pk)
+    def __str__(self):
+        """Return a human readable name when the object is printed."""
+        return self.pk
 
-    def get_absolute_url(self) -> str:
-        """Return absolute URL for the log detail view."""
-        return reverse('log-detail-view', args=[str(self.pk)])
+    def get_absolute_url(self):
+        """Return the absolute url."""
+        return reverse('task-detail-view', args=[str(self.pk)])

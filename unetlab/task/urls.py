@@ -1,29 +1,29 @@
-"""UNetLab URL Configuration for the job app."""
+"""URL configuration for Task app."""
 
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from job.views import (
-    JobAPIViewSet,
-    JobListView,
-    JobDetailView,
+from task.views import (
+    TaskAPIViewSet,
+    TaskListView,
+    TaskDetailView,
     LogAPIViewSet,
     LogListView,
     LogDetailView,
 )
 
-# DRF router for API endpoints of Job and Log viewsets
+# DRF router for API endpoints of Task and Log viewsets
 router = DefaultRouter()
-router.register(r'job', JobAPIViewSet, basename='job')
+router.register(r'task', TaskAPIViewSet, basename='task')
 router.register(r'log', LogAPIViewSet, basename='log')
 
 # URL patterns for class-based views and API endpoints
 urlpatterns = [
     #########################################################################
-    # Job views (HTML)
+    # Task views (HTML)
     #########################################################################
-    path('job/', JobListView.as_view(), name='job_list'),
-    path('job/<int:pk>/', JobDetailView.as_view(), name='job_detail'),
+    path('task/', TaskListView.as_view(), name='task_list'),
+    path('task/<int:pk>/', TaskDetailView.as_view(), name='task_detail'),
     #########################################################################
     # Log views (HTML)
     #########################################################################

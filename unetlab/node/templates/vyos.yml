@@ -1,0 +1,37 @@
+Le directory che hanno il file template.yml o template.yaml all'interno di /opt/unetlab/addons o /opt/unetlab/templates vengono caricate come node template
+Mi serve poi uno o più esempi per permettere l'upload dei file o per aggiungere quello che già esiste
+Gli esempi servono anche per poter modificare il default dei template già esistenti 
+vendor: vyos
+os: vyos
+version: 2026.01.09-0021
+extra: iac
+description: VyOS Universal Router
+type: qemu
+qemu:
+    machine: q35
+    memory: 4096
+    cpu: 4
+    console: serial
+    cdrom: cdrom.iso
+    networks:
+      driver: virtio
+      oob: 0
+      count: 4
+      name: "Ethernet%CARD%/%PORT%"
+    disks:
+      driver: virtio
+      files:
+        - virtioa.qcow2
+boot:
+  timeout: 300
+  completed:
+  - Press RETURN to get started
+ui:
+  icons:
+    - router
+  description: |2-
+
+    1024 MB DRAM, running in a container
+access:
+  username: vyos
+  password: vyos

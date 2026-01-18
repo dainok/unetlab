@@ -1,7 +1,7 @@
-"""Serializers, called by API View."""
+"""Serializers for Task app."""
 
 from rest_framework import serializers
-from job.models import Job, Log
+from task.models import Task, Log
 
 
 class LogSerializer(serializers.ModelSerializer):
@@ -17,7 +17,7 @@ class LogSerializer(serializers.ModelSerializer):
         ]  # Make some fields read-only
 
 
-class JobSerializer(serializers.ModelSerializer):
+class TaskSerializer(serializers.ModelSerializer):
     """Serializer for Job model.
 
     Include related logs as nested representation in read-only mode.
@@ -26,7 +26,7 @@ class JobSerializer(serializers.ModelSerializer):
     logs = LogSerializer(many=True, read_only=True)
 
     class Meta:
-        model = Job
+        model = Task
         fields = '__all__'
         read_only_fields = [
             'id',

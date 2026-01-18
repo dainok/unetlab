@@ -87,7 +87,7 @@ class LabCreateView(LabQueryMixin, ObjectCreateView):
 
 
 class LabDeleteView(LabQueryMixin, ObjectDeleteView):
-    """HTML view for deleting a single GLabroup."""
+    """HTML view for deleting a single Lab."""
 
 
 class LabDetailView(LabQueryMixin, ObjectDetailView):

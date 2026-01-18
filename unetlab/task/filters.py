@@ -1,27 +1,18 @@
-"""Django filters definitions for Job and Log models.
-
-Provides filtering capabilities used in views and API endpoints
-to enable users to filter Job and Log records by relevant fields.
-"""
+"""Filter definitions for Job app."""
 
 from django import forms
 import django_filters
-from job.models import Job, JobStatusChoices, Log, LogSeverityChoices
+from task.models import Task, TaskStatusChoices, Log, LogSeverityChoices
 from ui.include.filters import SearchFilterSet
 
 
-class JobFilter(SearchFilterSet):
-    """FilterSet for filtering Job instances by username, status, and creation date.
+#############################################################################
+# Task
+#############################################################################
 
-    This filter is used primarily in list views and APIs to narrow down
-    Job records based on selected criteria.
 
-    Filters:
-        - username: Dropdown choice of job owners dynamically populated
-        - status: Job status, using JobStatusChoices enum
-        - created_at__gte: Filter jobs created on or after a given date
-        - created_at__lte: Filter jobs created on or before a given date
-    """
+class TaskFilter(SearchFilterSet):
+    """Filter class for the Task model."""
 
     username = django_filters.ChoiceFilter(
         choices=[],  # Populated dynamically in __init__
@@ -29,7 +20,7 @@ class JobFilter(SearchFilterSet):
         label='Owner',
     )
     status = django_filters.ChoiceFilter(
-        choices=JobStatusChoices.choices,
+        choices=TaskStatusChoices.choices,
         widget=forms.Select(attrs={'class': 'form-select'}),
         label='Status',
     )
@@ -52,26 +43,21 @@ class JobFilter(SearchFilterSet):
         based on distinct users currently owning jobs.
         """
         super().__init__(*args, **kwargs)
-        usernames = (
-            Job.objects.order_by('username')
-            .values_list('username', flat=True)
-            .distinct()
-        )
+        usernames = Task.objects.order_by('username').values_list('username', flat=True).distinct()
         self.filters['username'].extra['choices'] = [(u, u) for u in usernames]
 
     class Meta:
-        model = Job
+        model = Task
         fields = ['username', 'status', 'created_at__gte', 'created_at__lte']
 
 
-class LogFilter(SearchFilterSet):
-    """FilterSet for filtering Log instances by severity, acknowledgment, and creation date.
+#############################################################################
+# Log
+#############################################################################
 
-    This filter supports:
-        - severity: Level of the log message, based on LogSeverityChoices
-        - acknowledged: Boolean filter for whether the log was acknowledged
-        - created_at__gte / created_at__lte: Date range filters for creation timestamp
-    """
+
+class LogFilter(SearchFilterSet):
+    """Filter class for the Log model."""
 
     search_fields = ['message']
     acknowledged = django_filters.BooleanFilter(

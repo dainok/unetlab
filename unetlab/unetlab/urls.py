@@ -6,8 +6,8 @@ from django.conf import settings
 
 urlpatterns = [
     path('', include('ui.urls')),
+    path('', include('task.urls')),
     # Include URLs from the local apps
-    # path("", include("job.urls")),
     path('', include('lab.urls')),
     path('', include('node.urls')),
     # path("", include("proxmox.urls")),

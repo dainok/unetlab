@@ -26,8 +26,11 @@ class NodeTemplate(models.Model):
     The details of Repository are retrieved and cached.
     """
 
-    path = models.FilePathField(unique=True)
-    template = models.JSONField()
+    path = models.CharField(
+        unique=True,
+        help_text='Directory of the template.',
+    )
+    template = models.JSONField(help_text='Template configuration.')
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

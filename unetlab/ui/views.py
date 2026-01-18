@@ -251,8 +251,6 @@ class UserDetailView(UserQueryMixin, ObjectDetailView):
 class UserListView(UserQueryMixin, ObjectListView):
     """HTML view for displaying a table of User objects."""
 
-    pass
-
 
 #############################################################################
 # Token
@@ -284,8 +282,6 @@ class TokenQueryMixin:
 class TokenBulkDeleteView(TokenQueryMixin, ObjectBulkDeleteView):
     """HTML view for deleting multiple Token objects at once."""
 
-    pass
-
 
 class TokenCreateView(TokenQueryMixin, ObtainAuthToken):
     """HTML view for creating a new Token."""
@@ -303,13 +299,9 @@ class TokenCreateView(TokenQueryMixin, ObtainAuthToken):
 class TokenDeleteView(TokenQueryMixin, ObjectDeleteView):
     """HTML view for deleting a single Token."""
 
-    pass
-
 
 class TokenListView(TokenQueryMixin, ObjectListView):
     """HTML view for displaying a table of Token objects."""
-
-    pass
 
 
 #############################################################################

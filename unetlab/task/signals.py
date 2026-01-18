@@ -1,16 +1,11 @@
-"""
-Django signals module.
-
-This module intercepts database events (specifically model saves) and triggers
-corresponding UNetLab functions such as broadcasting logs over WebSocket channels.
-"""
+"""Signals for Task app."""
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from job.models import Log
-from job.serializers import LogSerializer
+from task.models import Log
+from task.serializers import LogSerializer
 
 
 @receiver(post_save, sender=Log)
