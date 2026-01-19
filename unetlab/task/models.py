@@ -67,6 +67,34 @@ class Task(models.Model):
         """Return the absolute url."""
         return reverse('task-detail-view', args=[str(self.pk)])
 
+    def mark_canceled(self):
+        """Proceed a Task from created/running to canceled."""
+        if self.status in (TaskStatusChoices.CREATED, TaskStatusChoices.RUNNING):
+            return
+        self.status = TaskStatusChoices.CANCELED
+        self.save(update_fields=["status", "updated_at"])
+
+    def mark_failed(self):
+        """Proceed a Task from created/running to failed."""
+        if self.status in (TaskStatusChoices.CREATED, TaskStatusChoices.RUNNING):
+            return
+        self.status = TaskStatusChoices.FAILED
+        self.save(update_fields=["status", "updated_at"])
+
+    def mark_running(self):
+        """Proceed a Task from created to running."""
+        if self.status != TaskStatusChoices.CREATED:
+            return
+        self.status = TaskStatusChoices.RUNNING
+        self.save(update_fields=["status", "updated_at"])
+
+    def mark_succeeded(self):
+        """Proceed a Task from running to succeeded."""
+        if self.status != TaskStatusChoices.RUNNING:
+            return
+        self.status = TaskStatusChoices.SUCCEEDED
+        self.save(update_fields=["status", "updated_at"])
+
 
 #############################################################################
 # Log
