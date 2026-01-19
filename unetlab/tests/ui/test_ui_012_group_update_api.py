@@ -9,13 +9,13 @@ from rest_framework.authtoken.models import Token
 @pytest.mark.django_db
 def test_ui_group_update_api_admin(
     api_client,
-    user_set_group1,
-    user_set_group_multiple,
-    user_set_ungrouped,
-    user_set_single,
+    _user_set_group1,
+    _user_set_group_multiple,
+    _user_set_ungrouped,
+    _user_set_single,
 ):
     """Test DRF (API) group update by admin."""
-    user = user_set_group_multiple['admin1']
+    user = _user_set_group_multiple['admin1']
     token, _ = Token.objects.get_or_create(user=user)
     headers = {'Authorization': f'Token {token}'}
     for g in Group.objects.all():
@@ -39,10 +39,10 @@ def test_ui_group_update_api_admin(
 @pytest.mark.django_db
 def test_ui_group_update_api_user(
     api_client,
-    user_set_group1,
-    user_set_group_multiple,
-    user_set_ungrouped,
-    user_set_single,
+    _user_set_group1,
+    _user_set_group_multiple,
+    _user_set_ungrouped,
+    _user_set_single,
 ):
     """Test DRF (API) user detail view by users/staffs."""
     for user in User.objects.filter(is_superuser=False):
@@ -69,7 +69,7 @@ def test_ui_group_update_api_user(
 
 
 @pytest.mark.django_db
-def test_ui_group_update_api_guest(client, user_set_group1):
+def test_ui_group_update_api_guest(client, _user_set_group1):
     """Test DRF (API) group update by guest user."""
     for g in Group.objects.all():
         url = reverse('group-detail', kwargs={'pk': g.id})

@@ -6,9 +6,9 @@ from django.urls import reverse
 
 
 @pytest.mark.django_db
-def test_ui_profile_delete_html_admin(client, user_set_group1, user_set_ungrouped):
+def test_ui_profile_delete_html_admin(client, _user_set_group1, _user_set_ungrouped):
     """Test HTML (UI) admin profile deletion."""
-    for user_set_group in [user_set_group1, user_set_ungrouped]:
+    for user_set_group in [_user_set_group1, _user_set_ungrouped]:
         role = 'admin'
         user = user_set_group[role]
         client.force_login(user)
@@ -32,9 +32,11 @@ def test_ui_profile_delete_html_admin(client, user_set_group1, user_set_ungroupe
 
 @pytest.mark.django_db
 @pytest.mark.parametrize('role', ['staff', 'user'])
-def test_ui_profile_delete_html_user(client, user_set_group1, user_set_ungrouped, role):
+def test_ui_profile_delete_html_user(
+    client, _user_set_group1, _user_set_ungrouped, role
+):
     """Test HTML (UI) non-admin profile deletion."""
-    for user_set_group in [user_set_group1, user_set_ungrouped]:
+    for user_set_group in [_user_set_group1, _user_set_ungrouped]:
         user = user_set_group[role]
         client.force_login(user)
         url = reverse('user_delete', kwargs={'pk': user.id})

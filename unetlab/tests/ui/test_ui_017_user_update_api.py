@@ -9,13 +9,13 @@ from rest_framework.authtoken.models import Token
 @pytest.mark.django_db
 def test_ui_user_update_api_admin(
     api_client,
-    user_set_group1,
-    user_set_group_multiple,
-    user_set_ungrouped,
-    user_set_single,
+    _user_set_group1,
+    _user_set_group_multiple,
+    _user_set_ungrouped,
+    _user_set_single,
 ):
     """Test DRF (API) user update by admin."""
-    user = user_set_group_multiple['admin1']
+    user = _user_set_group_multiple['admin1']
     token, _ = Token.objects.get_or_create(user=user)
     headers = {'Authorization': f'Token {token}'}
     for u in User.objects.all():
@@ -42,13 +42,13 @@ def test_ui_user_update_api_admin(
 @pytest.mark.django_db
 def test_ui_user_update_api_staff(
     api_client,
-    user_set_group1,
-    user_set_group_multiple,
-    user_set_ungrouped,
-    user_set_single,
+    _user_set_group1,
+    _user_set_group_multiple,
+    _user_set_ungrouped,
+    _user_set_single,
 ):
     """Test DRF (API) user update by staffs."""
-    user = user_set_group_multiple['staff1']
+    user = _user_set_group_multiple['staff1']
     token, _ = Token.objects.get_or_create(user=user)
     headers = {'Authorization': f'Token {token}'}
     for u in User.objects.all():
@@ -82,13 +82,13 @@ def test_ui_user_update_api_staff(
 @pytest.mark.django_db
 def test_ui_user_update_api_user(
     api_client,
-    user_set_group1,
-    user_set_group_multiple,
-    user_set_ungrouped,
-    user_set_single,
+    _user_set_group1,
+    _user_set_group_multiple,
+    _user_set_ungrouped,
+    _user_set_single,
 ):
     """Test DRF (API) user update view by users."""
-    user = user_set_group_multiple['user1']
+    user = _user_set_group_multiple['user1']
     token, _ = Token.objects.get_or_create(user=user)
     headers = {'Authorization': f'Token {token}'}
     for u in User.objects.all():
@@ -113,7 +113,7 @@ def test_ui_user_update_api_user(
 
 
 @pytest.mark.django_db
-def test_ui_user_update_api_guest(api_client, user_set_group1):
+def test_ui_user_update_api_guest(api_client, _user_set_group1):
     """Test DRF (API) user update by guest user."""
     for u in User.objects.all():
         url = reverse('user_update', kwargs={'pk': u.id})
@@ -126,9 +126,9 @@ def test_ui_user_update_api_guest(api_client, user_set_group1):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize('role', ['admin', 'staff', 'user'])
-def test_ui_user_update_api_role(api_client, user_set_group1, role):
+def test_ui_user_update_api_role(api_client, _user_set_group1, role):
     """Test DRF (API) role upgrade."""
-    user = user_set_group1[role]
+    user = _user_set_group1[role]
     token, _ = Token.objects.get_or_create(user=user)
     headers = {'Authorization': f'Token {token}'}
     for u in User.objects.exclude(is_superuser=True):
@@ -148,10 +148,10 @@ def test_ui_user_update_api_role(api_client, user_set_group1, role):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize('role', ['admin', 'staff', 'user'])
-def test_ui_user_update_api_groups(api_client, user_set_group1, role):
+def test_ui_user_update_api_groups(api_client, _user_set_group1, role):
     """Test DRF (API) groups change."""
     new_group, _ = Group.objects.get_or_create(name='group_new')
-    user = user_set_group1[role]
+    user = _user_set_group1[role]
     token, _ = Token.objects.get_or_create(user=user)
     headers = {'Authorization': f'Token {token}'}
     for u in User.objects.all():

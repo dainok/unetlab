@@ -95,8 +95,7 @@ pyats:
   series: iosv
   config_extract_command: show run
 ui:
-  description: |2-
-
+  description: |-
     1024 MB DRAM, running in a container
   group: Cisco
   icon: router

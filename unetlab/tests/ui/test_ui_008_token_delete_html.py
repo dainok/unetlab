@@ -7,11 +7,11 @@ from rest_framework.authtoken.models import Token
 
 @pytest.mark.django_db
 @pytest.mark.parametrize('role', ['admin', 'staff', 'user'])
-def test_ui_authentication_token_delete_html_user(client, user_set_group1, role):
+def test_ui_authentication_token_delete_html_user(client, _user_set_group1, role):
     """Test HTML (UI) user token deletion."""
-    for user in user_set_group1.values():
+    for user in _user_set_group1.values():
         Token.objects.get_or_create(user_id=user.id)
-    user = user_set_group1[role]
+    user = _user_set_group1[role]
     client.force_login(user)
     if role == 'admin':
         for token in Token.objects.all():

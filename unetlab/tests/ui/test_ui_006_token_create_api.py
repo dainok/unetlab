@@ -6,9 +6,9 @@ from django.urls import reverse
 
 @pytest.mark.django_db
 @pytest.mark.parametrize('role', ['admin', 'staff', 'user'])
-def test_ui_authentication_token_create_api_user(api_client, user_set_group1, role):
+def test_ui_authentication_token_create_api_user(api_client, _user_set_group1, role):
     """Test DRF (API) user token creation."""
-    user = user_set_group1[role]
+    user = _user_set_group1[role]
     password = f'{user.username}123'
     url = reverse('api_token')
     data = {'username': user.username, 'password': password}

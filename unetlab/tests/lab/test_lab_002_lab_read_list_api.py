@@ -10,8 +10,8 @@ from lab.models import Lab
 @pytest.mark.django_db
 def test_lab_group_read_list_api_admin(
     api_client,
-    user_set_group1,
-    user_set_ungrouped,
+    _user_set_group1,
+    _user_set_ungrouped,
 ):
     """Test DRF (API) lab list view by admin."""
     for user in User.objects.filter(is_superuser=True):
@@ -29,10 +29,10 @@ def test_lab_group_read_list_api_admin(
 # @pytest.mark.django_db
 # def test_ui_group_read_list_api_user(
 #     api_client,
-#     user_set_group1,
-#     user_set_group_multiple,
-#     user_set_ungrouped,
-#     user_set_single,
+#     _user_set_group1,
+#     _user_set_group_multiple,
+#     _user_set_ungrouped,
+#     _user_set_single,
 # ):
 #     """Test DRF (API) user list view by staffs and users."""
 #     for user in User.objects.filter(is_superuser=False):

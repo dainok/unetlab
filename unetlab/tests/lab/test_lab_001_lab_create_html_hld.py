@@ -8,9 +8,9 @@ from django.urls import reverse
 
 
 @pytest.mark.django_db
-def test_lab_lab_create_html_hld(client, user_set_group1):
+def test_lab_lab_create_html_hld(client, _user_set_group1):
     """Test DRS (API) lab creation from HLD file."""
-    user = user_set_group1['user']
+    user = _user_set_group1['user']
     client.force_login(user)
     url = reverse('lab_create')
 

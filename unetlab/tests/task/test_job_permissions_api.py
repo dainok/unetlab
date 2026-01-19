@@ -50,7 +50,7 @@ def test_job_permissions_api_joblist_user(api_client, user, jobs):
 
 
 @pytest.mark.django_db
-def test_job_permissions_api_joblist_guest(api_client, db):
+def test_job_permissions_api_joblist_guest(api_client, _db):
     """Unauthenticated users cannot access job list."""
     response = api_client.get('/api/job/')
     assert response.status_code == 401, (

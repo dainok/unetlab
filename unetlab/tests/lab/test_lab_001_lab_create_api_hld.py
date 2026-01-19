@@ -10,9 +10,9 @@ from rest_framework.authtoken.models import Token
 
 
 @pytest.mark.django_db
-def test_lab_lab_create_api_hld(api_client, user_set_group1):
+def test_lab_lab_create_api_hld(api_client, _user_set_group1):
     """Test DRS (API) lab creation from HLD file."""
-    user = user_set_group1['user']
+    user = _user_set_group1['user']
     token, _ = Token.objects.get_or_create(user=user)
     headers = {'Authorization': f'Token {token}'}
     url = reverse('lab-list')

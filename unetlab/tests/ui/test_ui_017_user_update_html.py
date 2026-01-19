@@ -8,13 +8,13 @@ from django.urls import reverse
 @pytest.mark.django_db
 def test_ui_user_update_html_admin(
     client,
-    user_set_group1,
-    user_set_group_multiple,
-    user_set_ungrouped,
-    user_set_single,
+    _user_set_group1,
+    _user_set_group_multiple,
+    _user_set_ungrouped,
+    _user_set_single,
 ):
     """Test HTML (UI) user update by admin."""
-    user = user_set_group_multiple['admin1']
+    user = _user_set_group_multiple['admin1']
     client.force_login(user)
     for u in User.objects.all():
         if u.id == user.id:
@@ -37,13 +37,13 @@ def test_ui_user_update_html_admin(
 @pytest.mark.django_db
 def test_ui_user_update_html_staff(
     client,
-    user_set_group1,
-    user_set_group_multiple,
-    user_set_ungrouped,
-    user_set_single,
+    _user_set_group1,
+    _user_set_group_multiple,
+    _user_set_ungrouped,
+    _user_set_single,
 ):
     """Test HTML (UI) user update by staffs."""
-    user = user_set_group_multiple['staff1']
+    user = _user_set_group_multiple['staff1']
     client.force_login(user)
     for u in User.objects.all():
         if u.id == user.id:
@@ -89,13 +89,13 @@ def test_ui_user_update_html_staff(
 @pytest.mark.django_db
 def test_ui_user_update_html_user(
     client,
-    user_set_group1,
-    user_set_group_multiple,
-    user_set_ungrouped,
-    user_set_single,
+    _user_set_group1,
+    _user_set_group_multiple,
+    _user_set_ungrouped,
+    _user_set_single,
 ):
     """Test HTML (UI) user update by users."""
-    user = user_set_group_multiple['user1']
+    user = _user_set_group_multiple['user1']
     client.force_login(user)
     for u in User.objects.all():
         if u.id == user.id:
@@ -127,7 +127,7 @@ def test_ui_user_update_html_user(
 
 
 @pytest.mark.django_db
-def test_ui_user_update_html_guest(client, user_set_group1):
+def test_ui_user_update_html_guest(client, _user_set_group1):
     """Test HTML (UI) user update by guest user."""
     for u in User.objects.all():
         url = reverse('user_update', kwargs={'pk': u.id})
@@ -138,9 +138,9 @@ def test_ui_user_update_html_guest(client, user_set_group1):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize('role', ['admin', 'staff', 'user'])
-def test_ui_user_update_html_role(client, user_set_group1, role):
+def test_ui_user_update_html_role(client, _user_set_group1, role):
     """Test DRF (API) role upgrade."""
-    user = user_set_group1[role]
+    user = _user_set_group1[role]
     client.force_login(user)
     for u in User.objects.exclude(is_superuser=True):
         payload = {'username': u.username, 'is_superuser': True, 'is_staff': True}
@@ -159,10 +159,10 @@ def test_ui_user_update_html_role(client, user_set_group1, role):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize('role', ['admin', 'staff', 'user'])
-def test_ui_user_update_html_groups(client, user_set_group1, role):
+def test_ui_user_update_html_groups(client, _user_set_group1, role):
     """Test HTML (UI) groups change."""
     new_group, _ = Group.objects.get_or_create(name='group_new')
-    user = user_set_group1[role]
+    user = _user_set_group1[role]
     client.force_login(user)
     for u in User.objects.all():
         group_ids = set(u.groups.all().values_list('id', flat=True))

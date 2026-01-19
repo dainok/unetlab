@@ -9,9 +9,9 @@ from lab.models import Lab
 
 @pytest.mark.django_db
 @pytest.mark.parametrize('role', ['admin', 'staff', 'user'])
-def test_lab_lab_create_api_user(api_client, user_set_group1, role):
+def test_lab_lab_create_api_user(api_client, _user_set_group1, role):
     """Test DRS (API) lab creation."""
-    user = user_set_group1[role]
+    user = _user_set_group1[role]
     token, _ = Token.objects.get_or_create(user=user)
     headers = {'Authorization': f'Token {token}'}
     url = reverse('lab-list')

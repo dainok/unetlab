@@ -8,10 +8,10 @@ from django.urls import reverse
 @pytest.mark.django_db
 def test_ui_user_read_detail_html_admin(
     client,
-    user_set_group1,
-    user_set_group_multiple,
-    user_set_ungrouped,
-    user_set_single,
+    _user_set_group1,
+    _user_set_group_multiple,
+    _user_set_ungrouped,
+    _user_set_single,
 ):
     """Test HTML (UI) user detail view by admin."""
     for user in User.objects.filter(is_superuser=True):
@@ -27,10 +27,10 @@ def test_ui_user_read_detail_html_admin(
 @pytest.mark.django_db
 def test_ui_user_read_detail_html_user(
     client,
-    user_set_group1,
-    user_set_group_multiple,
-    user_set_ungrouped,
-    user_set_single,
+    _user_set_group1,
+    _user_set_group_multiple,
+    _user_set_ungrouped,
+    _user_set_single,
 ):
     """Test HTML (UI) user detail view by staffs and users."""
     for user in User.objects.filter(is_superuser=False):
@@ -58,7 +58,7 @@ def test_ui_user_read_detail_html_user(
 
 
 @pytest.mark.django_db
-def test_ui_user_read_detail_html_guest(client, user_set_group1):
+def test_ui_user_read_detail_html_guest(client, _user_set_group1):
     """Test HTML (UI) user detail view by guest user."""
     for u in User.objects.all():
         url = reverse('user-detail', kwargs={'pk': u.id})

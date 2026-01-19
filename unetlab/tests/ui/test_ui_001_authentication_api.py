@@ -8,9 +8,9 @@ from rest_framework.authtoken.models import Token
 
 @pytest.mark.django_db
 @pytest.mark.parametrize('role', ['admin', 'staff', 'user'])
-def test_ui_authentication_api_password(api_client, user_set_group1, role):
+def test_ui_authentication_api_password(api_client, _user_set_group1, role):
     """Test DRF (API) password authentication."""
-    user = user_set_group1[role]
+    user = _user_set_group1[role]
     userpass = f'{user.username}:{user.username}123'
     token = base64.b64encode(userpass.encode()).decode()
     api_client.credentials(HTTP_AUTHORIZATION=f'Basic {token}')
@@ -21,9 +21,9 @@ def test_ui_authentication_api_password(api_client, user_set_group1, role):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize('role', ['admin', 'staff', 'user'])
-def test_ui_authentication_api_token(api_client, user_set_group1, role):
+def test_ui_authentication_api_token(api_client, _user_set_group1, role):
     """Test DRF (API) token authentication."""
-    user = user_set_group1[role]
+    user = _user_set_group1[role]
     token, _ = Token.objects.get_or_create(user=user)
     headers = {'Authorization': f'Token {token}'}
     url = reverse('user-list')

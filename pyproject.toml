@@ -85,6 +85,7 @@ python_classes = ["Test*"]
 python_functions = ["test_*"]
 
 addopts = "-v -ra --strict-markers --strict-config"
+DJANGO_SETTINGS_MODULE = "unetlab.settings"
 
 [tool.pyright]
 typeCheckingMode = "off"

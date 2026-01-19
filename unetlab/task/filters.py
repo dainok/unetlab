@@ -2,7 +2,7 @@
 
 from django import forms
 import django_filters
-from task.models import Task, TaskStatusChoices, Log, LogSeverityChoices
+from task.models import Task, Log, LogSeverityChoices
 from ui.include.filters import SearchFilterSet
 
 
@@ -14,16 +14,6 @@ from ui.include.filters import SearchFilterSet
 class TaskFilter(SearchFilterSet):
     """Filter class for the Task model."""
 
-    username = django_filters.ChoiceFilter(
-        choices=[],  # Populated dynamically in __init__
-        widget=forms.Select(attrs={'class': 'form-select'}),
-        label='Owner',
-    )
-    status = django_filters.ChoiceFilter(
-        choices=TaskStatusChoices.choices,
-        widget=forms.Select(attrs={'class': 'form-select'}),
-        label='Status',
-    )
     created_at__gte = django_filters.DateFilter(
         field_name='created_at',
         lookup_expr='gte',
@@ -37,18 +27,9 @@ class TaskFilter(SearchFilterSet):
         label='Created Before',
     )
 
-    def __init__(self, *args, **kwargs):
-        """
-        Override initializer to dynamically set the user choices
-        based on distinct users currently owning jobs.
-        """
-        super().__init__(*args, **kwargs)
-        usernames = Task.objects.order_by('username').values_list('username', flat=True).distinct()
-        self.filters['username'].extra['choices'] = [(u, u) for u in usernames]
-
     class Meta:
         model = Task
-        fields = ['username', 'status', 'created_at__gte', 'created_at__lte']
+        fields = ['user', 'status', 'created_at__gte', 'created_at__lte']
 
 
 #############################################################################

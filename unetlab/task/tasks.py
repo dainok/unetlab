@@ -24,7 +24,9 @@ def cancel_stale_tasks():
     # Check if the default Celery task queue is empty
     if redis_client.llen(settings.CELERY_TASK_DEFAULT_QUEUE) == 0:
         # Fetch all tasks that were never processed or stuck mid-process
-        stale_task_qs = Task.objects.filter(status__in=[TaskStatusChoices.CREATED, TaskStatusChoices.RUNNING])
+        stale_task_qs = Task.objects.filter(
+            status__in=[TaskStatusChoices.CREATED, TaskStatusChoices.RUNNING]
+        )
         stale_task_ids = list(stale_task_qs.values_list('id', flat=True))
 
         if stale_task_ids:

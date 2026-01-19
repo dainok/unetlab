@@ -19,7 +19,7 @@ def api_client():
 
 
 @pytest.fixture
-def create_user(db):
+def create_user(db):  # pylint: disable=unused-argument
     """Provide fixture to create users and groups."""
 
     def make_user(username, role='user', groups=None):
@@ -67,7 +67,7 @@ def create_user(db):
 
 
 @pytest.fixture
-def user_set_group1(db, create_user):
+def _user_set_group1(db, create_user):  # pylint: disable=unused-argument,redefined-outer-name
     """Create admin, staff and standard user within the same group."""
     return {
         'admin': create_user('admin11', role='admin', groups='group1'),
@@ -77,7 +77,7 @@ def user_set_group1(db, create_user):
 
 
 @pytest.fixture
-def user_set_group_multiple(db, create_user):
+def _user_set_group_multiple(db, create_user):  # pylint: disable=unused-argument,redefined-outer-name
     """Create 2 x admins, 2 x staffs and 2 x standard users within the same group."""
     return {
         'admin1': create_user('admin21', role='admin', groups='group2'),
@@ -90,7 +90,7 @@ def user_set_group_multiple(db, create_user):
 
 
 @pytest.fixture
-def user_set_ungrouped(db, create_user):
+def _user_set_ungrouped(db, create_user):  # pylint: disable=unused-argument,redefined-outer-name
     """Create admin, staff and standard user with no group."""
     return {
         'admin': create_user('admin31', role='admin'),
@@ -100,7 +100,7 @@ def user_set_ungrouped(db, create_user):
 
 
 @pytest.fixture
-def user_set_single(db, create_user):
+def _user_set_single(db, create_user):  # pylint: disable=unused-argument,redefined-outer-name
     """Create admin, staff and standard user, each one with a dedicated group."""
     return {
         'admin': create_user('admin41', role='admin', groups='group4'),

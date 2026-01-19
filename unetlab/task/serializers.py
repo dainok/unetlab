@@ -4,6 +4,11 @@ from rest_framework import serializers
 from task.models import Task, Log
 
 
+#############################################################################
+# Log
+#############################################################################
+
+
 class LogSerializer(serializers.ModelSerializer):
     """Serializer for Log model."""
 
@@ -15,6 +20,11 @@ class LogSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
         ]  # Make some fields read-only
+
+
+#############################################################################
+# Task
+#############################################################################
 
 
 class TaskSerializer(serializers.ModelSerializer):

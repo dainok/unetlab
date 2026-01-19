@@ -8,6 +8,11 @@ from django.utils.translation import gettext_lazy as _
 from ui.include.validators import PhraseValidator
 
 
+#############################################################################
+# Task
+#############################################################################
+
+
 class TaskStatusChoices(models.TextChoices):
     """Enumeration for Task status."""
 
@@ -16,25 +21,6 @@ class TaskStatusChoices(models.TextChoices):
     SUCCEEDED = 'SUCCEEDED', _('Succeeded')
     FAILED = 'FAILED', _('Failed')
     CANCELED = 'CANCELED', _('Canceled')
-
-
-class LogSeverityChoices(models.IntegerChoices):
-    """Enumeration for log severity. Uses integers as per django.contrib.messages constants."""
-
-    ERROR = 40, _('Error')
-    WARNING = 30, _('Warning')
-    INFO = 20, _('Info')
-    DEBUG = 10, _('Debug')
-
-
-class LogTypeChoices(models.TextChoices):
-    """Enumeration for log types/categories."""
-
-    APP = 'APP', _('App')
-    HOST = 'HOST', _('Host')
-    NODE = 'NODE', _('Node')
-    SCHEDULER = 'SCHEDULER', _('Scheduler')
-    UI = 'UI', _('UI')
 
 
 class Task(models.Model):
@@ -80,6 +66,30 @@ class Task(models.Model):
     def get_absolute_url(self):
         """Return the absolute url."""
         return reverse('task-detail-view', args=[str(self.pk)])
+
+
+#############################################################################
+# Log
+#############################################################################
+
+
+class LogSeverityChoices(models.IntegerChoices):
+    """Enumeration for log severity. Uses integers as per django.contrib.messages constants."""
+
+    ERROR = 40, _('Error')
+    WARNING = 30, _('Warning')
+    INFO = 20, _('Info')
+    DEBUG = 10, _('Debug')
+
+
+class LogTypeChoices(models.TextChoices):
+    """Enumeration for log types/categories."""
+
+    APP = 'APP', _('App')
+    HOST = 'HOST', _('Host')
+    NODE = 'NODE', _('Node')
+    SCHEDULER = 'SCHEDULER', _('Scheduler')
+    UI = 'UI', _('UI')
 
 
 class Log(models.Model):

@@ -8,9 +8,9 @@ from rest_framework.authtoken.models import Token
 
 @pytest.mark.django_db
 @pytest.mark.parametrize('role', ['admin', 'staff', 'user'])
-def test_ui_group_create_api_user(api_client, user_set_group1, role):
+def test_ui_group_create_api_user(api_client, _user_set_group1, role):
     """Test DRS (API) group creation."""
-    user = user_set_group1[role]
+    user = _user_set_group1[role]
     token, _ = Token.objects.get_or_create(user=user)
     headers = {'Authorization': f'Token {token}'}
     url = reverse('group-list')

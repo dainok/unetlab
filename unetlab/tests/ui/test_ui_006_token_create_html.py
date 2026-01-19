@@ -7,9 +7,9 @@ from django.urls import reverse
 
 @pytest.mark.django_db
 @pytest.mark.parametrize('role', ['admin', 'staff', 'user'])
-def test_ui_authentication_token_create_html_user(client, user_set_group1, role):
+def test_ui_authentication_token_create_html_user(client, _user_set_group1, role):
     """Test HTML (UI) user token creation."""
-    user = user_set_group1[role]
+    user = _user_set_group1[role]
     client.force_login(user)
     url = reverse('token_create')
     response = client.post(url)

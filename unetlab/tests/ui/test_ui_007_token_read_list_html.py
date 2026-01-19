@@ -7,11 +7,11 @@ from rest_framework.authtoken.models import Token
 
 @pytest.mark.django_db
 @pytest.mark.parametrize('role', ['admin', 'staff', 'user'])
-def test_ui_authentication_token_read_list_html_user(client, user_set_group1, role):
+def test_ui_authentication_token_read_list_html_user(client, _user_set_group1, role):
     """Test HTML (UI) user token list."""
-    for user in user_set_group1.values():
+    for user in _user_set_group1.values():
         Token.objects.get_or_create(user=user)
-    user = user_set_group1[role]
+    user = _user_set_group1[role]
     client.force_login(user)
     url = reverse('token_list')
     response = client.get(url)

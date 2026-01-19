@@ -5,9 +5,9 @@ import pytest
 
 @pytest.mark.django_db
 @pytest.mark.parametrize('role', ['admin', 'staff', 'user'])
-def test_ui_authentication_html_user(client, user_set_group1, role):
+def test_ui_authentication_html_user(client, _user_set_group1, role):
     """Test HTML (UI) user authentication."""
-    user = user_set_group1[role]
+    user = _user_set_group1[role]
     username = user.username
     password = f'{username}123'
     logged = client.login(username=username, password=password)

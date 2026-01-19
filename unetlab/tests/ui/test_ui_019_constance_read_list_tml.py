@@ -6,9 +6,9 @@ from django.urls import reverse
 
 @pytest.mark.django_db
 @pytest.mark.parametrize('role', ['admin', 'staff', 'user'])
-def test_ui_constance_read_list_html(client, user_set_group1, role):
+def test_ui_constance_read_list_html(client, _user_set_group1, role):
     """Test HTML (UI) constance read by users."""
-    user = user_set_group1[role]
+    user = _user_set_group1[role]
     client.force_login(user)
     url = reverse('settings_list')
     response = client.get(url)

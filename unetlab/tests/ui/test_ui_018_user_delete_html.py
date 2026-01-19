@@ -8,13 +8,13 @@ from django.urls import reverse
 @pytest.mark.django_db
 def test_ui_user_delete_html_admin(
     client,
-    user_set_group1,
-    user_set_group_multiple,
-    user_set_ungrouped,
-    user_set_single,
+    _user_set_group1,
+    _user_set_group_multiple,
+    _user_set_ungrouped,
+    _user_set_single,
 ):
     """Test HTML (UI) user deletion by admin."""
-    user = user_set_group_multiple['admin1']
+    user = _user_set_group_multiple['admin1']
     client.force_login(user)
     for u in User.objects.all():
         if u.id == user.id:
@@ -39,13 +39,13 @@ def test_ui_user_delete_html_admin(
 @pytest.mark.django_db
 def test_ui_user_delete_html_staff(
     client,
-    user_set_group1,
-    user_set_group_multiple,
-    user_set_ungrouped,
-    user_set_single,
+    _user_set_group1,
+    _user_set_group_multiple,
+    _user_set_ungrouped,
+    _user_set_single,
 ):
     """Test HTML (UI) user deletion by staffs."""
-    user = user_set_group_multiple['staff1']
+    user = _user_set_group_multiple['staff1']
     client.force_login(user)
     for u in User.objects.all():
         if u.id == user.id:
@@ -93,13 +93,13 @@ def test_ui_user_delete_html_staff(
 @pytest.mark.django_db
 def test_ui_user_delete_html_user(
     client,
-    user_set_group1,
-    user_set_group_multiple,
-    user_set_ungrouped,
-    user_set_single,
+    _user_set_group1,
+    _user_set_group_multiple,
+    _user_set_ungrouped,
+    _user_set_single,
 ):
     """Test HTML (UI) user deletion by users."""
-    user = user_set_group_multiple['user1']
+    user = _user_set_group_multiple['user1']
     client.force_login(user)
     for u in User.objects.all():
         if u.id == user.id:
@@ -132,7 +132,7 @@ def test_ui_user_delete_html_user(
 
 
 @pytest.mark.django_db
-def test_ui_user_delete_html_guest(client, user_set_group1):
+def test_ui_user_delete_html_guest(client, _user_set_group1):
     """Test HTML (UI) user deletion by guest user."""
     for u in User.objects.all():
         url = reverse('user_delete', kwargs={'pk': u.id})

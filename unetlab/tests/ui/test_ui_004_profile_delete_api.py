@@ -7,9 +7,9 @@ from rest_framework.authtoken.models import Token
 
 
 @pytest.mark.django_db
-def test_ui_profile_delete_api_admin(api_client, user_set_group1, user_set_ungrouped):
+def test_ui_profile_delete_api_admin(api_client, _user_set_group1, _user_set_ungrouped):
     """Test DRF (API) admin profile deletion."""
-    for user_set_group in [user_set_group1, user_set_ungrouped]:
+    for user_set_group in [_user_set_group1, _user_set_ungrouped]:
         role = 'admin'
         user = user_set_group[role]
         token, _ = Token.objects.get_or_create(user=user)
@@ -28,10 +28,10 @@ def test_ui_profile_delete_api_admin(api_client, user_set_group1, user_set_ungro
 @pytest.mark.django_db
 @pytest.mark.parametrize('role', ['staff', 'user'])
 def test_ui_profile_delete_api_user(
-    api_client, user_set_group1, user_set_ungrouped, role
+    api_client, _user_set_group1, _user_set_ungrouped, role
 ):
     """Test DRF (API) non-admin profile deletion."""
-    for user_set_group in [user_set_group1, user_set_ungrouped]:
+    for user_set_group in [_user_set_group1, _user_set_ungrouped]:
         user = user_set_group[role]
         token, _ = Token.objects.get_or_create(user=user)
         headers = {'Authorization': f'Token {token}'}
