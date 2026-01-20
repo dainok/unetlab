@@ -15,7 +15,7 @@ from ui.include.tables import (
 #############################################################################
 
 
-class TaskTable(tables.Table):
+class TaskTable(ObjectTable):
     id = tables.LinkColumn(
         'task_detail',
         args=[tables.A('pk')],
@@ -31,8 +31,6 @@ class TaskTable(tables.Table):
         exclude = ['select', 'updated_at']
         order_by = '-updated_at'
         attrs = {
-            'title': "DACAMBIARE",
-            'description': "DACAMBIARE",
             'search': True,
             'table_actions': [],
             'row_actions': [],

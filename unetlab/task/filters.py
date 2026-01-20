@@ -1,5 +1,6 @@
 """Filter definitions for Job app."""
 
+from django.utils.translation import gettext_lazy as _
 from django import forms
 import django_filters
 from task.models import Task, Log, LogSeverityChoices
@@ -19,13 +20,13 @@ class TaskFilter(SearchFilterSet):
         field_name='created_at',
         lookup_expr='gte',
         widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control mb-2'}),
-        label='Created After',
+        label=_('Created After'),
     )
     created_at__lte = django_filters.DateFilter(
         field_name='created_at',
         lookup_expr='lte',
         widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control mb-2'}),
-        label='Created Before',
+        label=_('Created Before'),
     )
 
     class Meta:
