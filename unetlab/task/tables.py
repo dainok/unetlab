@@ -1,8 +1,8 @@
 """Table definitions for Task app."""
 
+from django.utils.translation import gettext_lazy as _
 import django_tables2 as tables
 from task.models import Log, Task
-from proxmox import messages
 from ui.include.tables import (
     GreenBooleanColumn,
     ObjectTable,
@@ -20,22 +20,22 @@ class TaskTable(tables.Table):
         'task_detail',
         args=[tables.A('pk')],
     )
-    log_count = tables.Column(
-        orderable=False, verbose_name='Logs', attrs={'td': {'class': 'text-center'}}
-    )
+    log_count = tables.Column(orderable=False, verbose_name=_('Logs'), attrs={'td': {'class': 'text-center'}})
     created_at = tables.DateColumn(orderable=True, format='Y-m-d H:i')
     updated_at = tables.DateColumn(orderable=True, format='Y-m-d H:i')
 
     class Meta:
         model = Task
-        sequence = ['id', 'user', 'status', 'log_count', '...']
+        sequence = ['id', 'name', 'user', 'status', 'log_count', 'created_at', 'updated_at']
         fields = [f.name for f in Task._meta.fields] + ['log_count']
-        exclude = ['select']
-        order_by = '-created_at'
+        exclude = ['select', 'updated_at']
+        order_by = '-updated_at'
         attrs = {
-            'title': messages.TABLE_JOB_TITLE,
-            'description': messages.TABLE_JOB_DESCRIPTION,
+            'title': "DACAMBIARE",
+            'description': "DACAMBIARE",
             'search': True,
+            'table_actions': [],
+            'row_actions': [],
         }
 
 
@@ -44,12 +44,8 @@ class TaskDetailLogTable(ObjectTable):
         'log_detail',
         args=[tables.A('pk')],
     )
-    acknowledged = GreenBooleanColumn(
-        orderable=True, verbose_name='Ack', attrs={'td': {'class': 'text-center'}}
-    )
-    severity = SeverityAllColumn(
-        orderable=True, verbose_name='Sev', attrs={'td': {'class': 'text-center'}}
-    )
+    acknowledged = GreenBooleanColumn(orderable=True, verbose_name=_('Ack'), attrs={'td': {'class': 'text-center'}})
+    severity = SeverityAllColumn(orderable=True, verbose_name=_('Sev'), attrs={'td': {'class': 'text-center'}})
     created_at = tables.DateColumn(orderable=True, format='Y-m-d H:i')
 
     class Meta:
@@ -73,18 +69,14 @@ class LogTable(ObjectTable):
         'log_detail',
         args=[tables.A('pk')],
     )
-    acknowledged = GreenBooleanColumn(
-        orderable=True, verbose_name='Ack', attrs={'td': {'class': 'text-center'}}
-    )
-    severity = SeverityAllColumn(
-        orderable=True, verbose_name='Sev', attrs={'td': {'class': 'text-center'}}
-    )
+    acknowledged = GreenBooleanColumn(orderable=True, verbose_name=_('Ack'), attrs={'td': {'class': 'text-center'}})
+    severity = SeverityAllColumn(orderable=True, verbose_name=_('Sev'), attrs={'td': {'class': 'text-center'}})
     created_at = tables.DateColumn(orderable=True, format='Y-m-d H:i')
 
     class Meta:
         model = Log
         sequence = ['id', 'severity', 'acknowledged', 'type', '...']
-        exclude = ['select', 'source', 'task', 'updated_at']
+        exclude = ['select', 'source', 'task', 'updated_at', 'correlation_id', 'acknowledged_at']
         order_by = '-created_at'
         attrs = {
             'search': True,
@@ -98,12 +90,8 @@ class LogHomeTable(ObjectTable):
         'log_detail',
         args=[tables.A('pk')],
     )
-    acknowledged = GreenBooleanColumn(
-        orderable=True, verbose_name='Ack', attrs={'td': {'class': 'text-center'}}
-    )
-    severity = SeverityAllColumn(
-        orderable=True, verbose_name='Sev', attrs={'td': {'class': 'text-center'}}
-    )
+    acknowledged = GreenBooleanColumn(orderable=True, verbose_name=_('Ack'), attrs={'td': {'class': 'text-center'}})
+    severity = SeverityAllColumn(orderable=True, verbose_name=_('Sev'), attrs={'td': {'class': 'text-center'}})
     created_at = tables.DateColumn(orderable=True, format='Y-m-d H:i')
 
     class Meta:

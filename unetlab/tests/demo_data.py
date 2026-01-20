@@ -15,6 +15,7 @@ from django.contrib.auth.models import Group, User
 # from django.contrib.auth.hashers import make_password
 from rest_framework.authtoken.models import Token
 from lab.models import Lab
+from task.models import Task, Log
 
 
 # Drop data
@@ -244,9 +245,7 @@ FIRMS = [
 # Create superuser
 admin_obj = get_or_none(User, username='admin')
 if not admin_obj:
-    admin_obj = User.objects.create_superuser(
-        username='admin', password='admin', email='admin@example.com'
-    )
+    admin_obj = User.objects.create_superuser(username='admin', password='admin', email='admin@example.com')
     admin_obj.full_clean()
 
 
@@ -263,11 +262,7 @@ user_list = []
 # password_hash = make_password("password")
 password_hash = 'pbkdf2_sha256$1000000$eF2L5tYyTWTEro6dJaU9HS$n7JgU23uuRDpd+6ko7Zpd+UYpdRQhFLw9gvu945iGCU='
 for user in USERS:
-    username = (
-        f'{user["first_name"][0]}{user["last_name"]}'.replace("'", '')
-        .replace(' ', '')
-        .lower()
-    )
+    username = f'{user["first_name"][0]}{user["last_name"]}'.replace("'", '').replace(' ', '').lower()
     role_id = random.randint(0, 2)
     is_admin = True if role_id == 0 else False
     is_staff = True if is_admin or role_id == 1 else False
@@ -315,3 +310,17 @@ for ver in range(0, 2):
         if bool(random.randint(0, 1)):
             lab_obj.shared_group = group_list[random.randint(0, 19)]
             lab_obj.save()
+
+
+# Create tasks and logs
+for user_obj in user_list:
+    for task_count in range(1, 5):
+        task_obj = Task.objects.create(name=f'Task {task_count}', user=user_obj)
+        for log_count in range(1, 5):
+            Log.objects.create(
+                task=task_obj,
+                message=f"Log {log_count}",
+                severity=30,
+                hostname="test",
+                type="APP",
+            )

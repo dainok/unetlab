@@ -14,6 +14,7 @@ from ui.include.filters import SearchFilterSet
 class TaskFilter(SearchFilterSet):
     """Filter class for the Task model."""
 
+    search_fields = ['name']
     created_at__gte = django_filters.DateFilter(
         field_name='created_at',
         lookup_expr='gte',
